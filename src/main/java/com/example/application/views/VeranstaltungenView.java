@@ -1,13 +1,13 @@
 package com.example.application.views;
 
+import com.example.application.data.Veranstaltung;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.listbox.ListBox;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @PageTitle("Veranstaltungen")
 @Route(value = "")
@@ -18,60 +18,49 @@ public class VeranstaltungenView extends VerticalLayout {
         HorizontalLayout mainLayout = new HorizontalLayout();
         mainLayout.setSizeFull();
 
-        // Linke Seite mit Semestern und Veranstaltungen
-        VerticalLayout leftLayout = new VerticalLayout();
-        // Beispieldaten für Semester
-        List<Semester> semesterListe = Arrays.asList(
-                new Semester("Informatik 1", 1),
-                new Semester("Mathematik für Informatiker", 1),
-                new Semester("Algorithmen und Datenstrukturen", 2),
-                new Semester("Datenbanken", 2)
-        );
-        Grid<Semester> semesterGrid = new Grid<>(Semester.class);
-        semesterGrid.setItems(semesterListe);
-        semesterGrid.addColumn(Semester::getName).setHeader("Veranstaltung");
-        semesterGrid.addColumn(Semester::getSemester).setHeader("Semester");
+        // FlexLayout für die Kacheln
+        Div kachelContainer = new Div();
+        kachelContainer.addClassName("veranstaltungen-container");
+        kachelContainer.getStyle().set("display", "flex");
+        kachelContainer.getStyle().set("flexWrap", "wrap");
 
-        // Rechte Seite mit Terminliste
-        VerticalLayout rightLayout = new VerticalLayout();
-        // Beispieldaten für Termine
-        List<String> termineListe = Arrays.asList(
-                "Treffen mit Studienberater - 14:00",
-                "Tutorium Algorithmen - 16:00",
-                "Klausur Mathematik - 10:00"
-        );
-        ListBox<String> termineListBox = new ListBox<>();
-        termineListBox.setItems(termineListe);
+        // Ein Set, um sicherzustellen, dass jede Veranstaltung nur einmal existiert
+        Set<Veranstaltung> einzigartigeVeranstaltungen = new HashSet<>();
+        einzigartigeVeranstaltungen.add(new Veranstaltung(1L, 1, "Informatik 1"));
+        einzigartigeVeranstaltungen.add(new Veranstaltung(2L, 1, "Mathematik für Informatiker"));
+        einzigartigeVeranstaltungen.add(new Veranstaltung(3L, 2, "Algorithmen und Datenstrukturen"));
+        einzigartigeVeranstaltungen.add(new Veranstaltung(4L, 2, "Datenbanken"));
 
-        // Füge die Layouts zum Hauptlayout hinzu
-        leftLayout.add(semesterGrid);
-        rightLayout.add(termineListBox);
+        // Kacheln erstellen
+        for (Veranstaltung veranstaltung : einzigartigeVeranstaltungen) {
+            // Verwende ein Div-Element als Kachel
+            Div kachel = new Div();
+            kachel.addClassNames("veranstaltung-kachel");
+            kachel.getStyle().set("width", "200px").set("height", "200px")
+                    .set("border", "1px solid lightgray").set("padding", "10px")
+                    .set("margin", "5px").set("cursor", "pointer");
 
-        mainLayout.add(leftLayout, rightLayout);
+            // Titel der Veranstaltung
+            Div titel = new Div();
+            titel.setText(veranstaltung.getTitel());
+            kachel.add(titel);
 
-        // Füge das Hauptlayout zur View hinzu
+            // Button oder Div zum Klicken für Details
+            Div details = new Div();
+            details.addClickListener(e -> {
+                // Hier Navigation zur Detailseite der Veranstaltung
+                getUI().ifPresent(ui -> ui.navigate("veranstaltung-detail/" + veranstaltung.getVeranstaltungsId()));
+            });
+            kachel.add(details);
+
+            // Füge die Kachel zum Container hinzu
+            kachelContainer.add(kachel);
+        }
+
+        mainLayout.add(kachelContainer);
         add(mainLayout);
     }
 
-    // Datenmodellklasse für Semester
-    public static class Semester {
-        private String name;
-        private int semester;
-
-        public Semester(String name, int semester) {
-            this.name = name;
-            this.semester = semester;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public int getSemester() {
-            return semester;
-        }
-    }
-
-    // ...
-
 }
+
+
