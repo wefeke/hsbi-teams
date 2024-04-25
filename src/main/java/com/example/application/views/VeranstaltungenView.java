@@ -1,4 +1,4 @@
-package com.example.application.views.list;
+package com.example.application.views;
 
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
@@ -10,9 +10,9 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 
 @PageTitle("list")
 @Route(value = "")
-public class ListView extends VerticalLayout {
+public class VeranstaltungenView extends VerticalLayout {
 
-    public ListView() {
+    public VeranstaltungenView() {
         setSpacing(false);
 
         Image img = new Image("images/empty-plant.png", "placeholder plant");
