@@ -1,7 +1,6 @@
 package com.example.application.views.veranstaltungen;
 
-import com.example.application.data.Veranstaltung;
-import com.vaadin.flow.component.button.Button;
+import com.example.application.models.Veranstaltung;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -10,6 +9,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Date;
 
 @PageTitle("Veranstaltungen")
 @Route(value = "ver")
@@ -26,10 +26,10 @@ public class VeranstaltungenView extends VerticalLayout {
 
         // Testdaten: Nur übergangsweise, da kein Datenbankzugriff
         Set<Veranstaltung> veranstaltungen = new HashSet<>();
-        veranstaltungen.add(new Veranstaltung(1L, 1, "Informatik 1"));
-        veranstaltungen.add(new Veranstaltung(2L, 1, "Mathematik für Informatiker"));
-        veranstaltungen.add(new Veranstaltung(3L, 2, "Algorithmen und Datenstrukturen"));
-        veranstaltungen.add(new Veranstaltung(4L, 2, "Datenbanken"));
+        veranstaltungen.add(new Veranstaltung(1L, new Date(), "Informatik 1"));
+        veranstaltungen.add(new Veranstaltung(2L, new Date(), "Mathematik für Informatiker"));
+        veranstaltungen.add(new Veranstaltung(3L, new Date(), "Algorithmen und Datenstrukturen"));
+        veranstaltungen.add(new Veranstaltung(4L, new Date(), "Datenbanken"));
 
         // Kacheln für vorhandene Veranstaltungen erstellen
         for (Veranstaltung veranstaltung : veranstaltungen) {

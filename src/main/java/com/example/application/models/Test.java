@@ -1,9 +1,14 @@
+//Autor: Leon
 package com.example.application.models;
 
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 
@@ -11,10 +16,6 @@ public class Test {
     @Id
     private int testid;
     private String testname;
-
- 
-
-
 
     public Test() {
 

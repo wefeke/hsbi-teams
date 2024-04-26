@@ -1,15 +1,35 @@
-package com.example.application.data;
+//Autor: Joris
+package com.example.application.models;
+
+import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.Date;
 
+@Entity
 public class Veranstaltung implements Serializable {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long veranstaltungsId; // Primary Key
-    private int semester;      // Semester-Nummer
+    private Date semester;          // Semester-Nummer
     private String titel;          // Titel der Veranstaltung
 
-    public Veranstaltung(Long veranstaltungsId, Integer semester, String titel) {
+    //Beziehungen
+    @ManyToOne
+    private User user = new User();
+    @OneToMany
+    private List<Veranstaltungstermin> veranstaltungstermine = new ArrayList<>();
+    @ManyToMany
+    private List<Teilnehmer> teilnehmer = new ArrayList<>();
+
+    public Veranstaltung() {
+    }
+
+    public Veranstaltung(Long veranstaltungsId, Date semester, String titel) {
         this.veranstaltungsId = veranstaltungsId;
         this.semester = semester;
         this.titel = titel;
@@ -24,18 +44,17 @@ public class Veranstaltung implements Serializable {
         this.veranstaltungsId = veranstaltungsId;
     }
 
-    public Integer getSemester() {
+    public Date getSemester() {
         return semester;
     }
 
-    public void setSemester(Integer semester) {
+    public void setSemester(Date semester) {
         this.semester = semester;
     }
 
     public String getTitel() {
         return titel;
     }
-
     public void setTitel(String titel) {
         this.titel = titel;
     }
@@ -64,4 +83,3 @@ public class Veranstaltung implements Serializable {
                 '}';
     }
 }
-
