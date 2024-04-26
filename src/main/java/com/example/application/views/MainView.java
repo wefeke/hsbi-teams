@@ -11,8 +11,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import java.util.Collections;
-
 @Route("")
 @PageTitle("TeamBuilder")
 public class MainView extends AppLayout {
@@ -20,10 +18,6 @@ public class MainView extends AppLayout {
     private Button veranstaltungenButton;
     private Button studierendeButton;
 
-    /**
-     * Konstruktor für MainView.
-     * Initialisiert die Header und setzt die Startansicht auf VeranstaltungenView.
-     */
     public MainView() {
         createHeader();
         updateView(new VeranstaltungenView()); // Initialansicht
