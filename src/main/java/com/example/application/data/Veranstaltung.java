@@ -6,7 +6,7 @@ import java.util.Objects;
 public class Veranstaltung implements Serializable {
 
     private Long veranstaltungsId; // Primary Key
-    private Integer semester;      // Semester-Nummer
+    private int semester;      // Semester-Nummer
     private String titel;          // Titel der Veranstaltung
 
     public Veranstaltung(Long veranstaltungsId, Integer semester, String titel) {
