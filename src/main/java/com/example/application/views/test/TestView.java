@@ -2,17 +2,25 @@ package com.example.application.views.test;
 
 import com.example.application.models.Test;
 import com.example.application.services.TestService;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamResource;
 
+import java.io.ByteArrayInputStream;
+import java.io.StringWriter;
 import java.util.Collections;
+import java.util.stream.Stream;
 
 
 @Route(value = "test")
@@ -62,9 +70,34 @@ public class TestView extends VerticalLayout {
         filterText.addValueChangeListener(e -> updateList());
 
         Button addContactButton = new Button("Add test");
+        Button csvExportButton = new Button("CSV Export");
 
-        var toolbar = new HorizontalLayout(filterText, addContactButton);
+        var streamResource = new StreamResource(
+                "test.csv",
+                () -> {
+
+                    try {
+                        Stream<Test> tests = grid.getGenericDataView().getItems();
+                        StringWriter writer = new StringWriter();
+                        var beanToCSV = new StatefulBeanToCsvBuilder<Test>(writer).build();
+                        beanToCSV.write(tests);
+                        var contents = writer.toString();
+                        return new ByteArrayInputStream(contents.getBytes());
+                    } catch (CsvDataTypeMismatchException e) {
+                        throw new RuntimeException(e);
+                    } catch (CsvRequiredFieldEmptyException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+        );
+
+        var download = new Anchor(streamResource, "Download");
+
+
+
+        var toolbar = new HorizontalLayout(filterText, addContactButton,download);
         toolbar.addClassName("toolbar");
+
         return toolbar;
     }
 
