@@ -1,5 +1,7 @@
+//Author: Joris
 package com.example.application.views;
 
+import com.example.application.services.VeranstaltungenService;
 import com.example.application.views.studierende.StudierendeView;
 import com.example.application.views.veranstaltungen.VeranstaltungenView;
 import com.vaadin.flow.component.Component;
@@ -10,6 +12,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Route("")
 @PageTitle("TeamBuilder")
@@ -17,10 +20,13 @@ public class MainView extends AppLayout {
 
     private Button veranstaltungenButton;
     private Button studierendeButton;
+    private final VeranstaltungenService veranstaltungenService;
 
-    public MainView() {
+    @Autowired
+    public MainView(VeranstaltungenService veranstaltungenService) {
+        this.veranstaltungenService = veranstaltungenService;
         createHeader();
-        updateView(new VeranstaltungenView()); // Initialansicht
+        updateView(new VeranstaltungenView(veranstaltungenService)); // Initialansicht
     }
 
     /**
@@ -34,11 +40,11 @@ public class MainView extends AppLayout {
         header.getStyle().set("background", "transparent"); // Transparenter Hintergrund
 
         // Logo-Button, das als Home-Button fungiert
-        Button logoButton = new Button("H.S.B.I TeamBuilder", e -> updateView(new VeranstaltungenView()));
+        Button logoButton = new Button("H.S.B.I TeamBuilder", e -> updateView(new VeranstaltungenView(veranstaltungenService)));
         configureButton(logoButton, "24px", false);
 
         // Navigationsbutton für die Veranstaltungen
-        veranstaltungenButton = new Button("Veranstaltungen", e -> updateView(new VeranstaltungenView()));
+        veranstaltungenButton = new Button("Veranstaltungen", e -> updateView(new VeranstaltungenView(veranstaltungenService)));
         configureButton(veranstaltungenButton, "16px", true);
 
         // Navigationsbutton für die Studierenden

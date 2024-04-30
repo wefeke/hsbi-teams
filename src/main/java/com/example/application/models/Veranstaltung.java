@@ -59,6 +59,7 @@ public class Veranstaltung implements Serializable {
         this.titel = titel;
     }
 
+
     // equals und hashCode Methoden
     @Override
     public boolean equals(Object o) {
