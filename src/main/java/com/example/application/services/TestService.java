@@ -36,11 +36,11 @@ public class TestService {
     }
 
     public void saveTest(Test test) {
-        if (test == null) {
-            System.err.println("Test is null. Are you sure you have connected your form to the application?");
-            return;
+        if (test != null) {
+            testRepository.save(test);
         }
-        testRepository.save(test);
+        else
+            System.err.println("Test is null. Are you sure you have connected your form to the application?");
     }
 
     public List<Test> findAllTests() {
