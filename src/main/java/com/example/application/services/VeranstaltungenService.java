@@ -1,10 +1,9 @@
-/*
+
 package com.example.application.services;
 
 import com.example.application.models.Test;
 import com.example.application.models.Veranstaltung;
 import com.example.application.repositories.VeranstaltungenRepository;
-import com.example.application.views.veranstaltungen.VeranstaltungenView;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +13,7 @@ public class VeranstaltungenService {
 
     private final VeranstaltungenRepository veranstaltungenRepository;
 
-    public VeranstaltungenService(VeranstaltungenRepository veranstaltungenRepository, VeranstaltungenView ver) {
+    public VeranstaltungenService(VeranstaltungenRepository veranstaltungenRepository) {
         this.veranstaltungenRepository = veranstaltungenRepository;
     }
 
@@ -33,4 +32,3 @@ public class VeranstaltungenService {
     }
 
 }
-*/

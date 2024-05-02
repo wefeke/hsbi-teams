@@ -1,4 +1,4 @@
-/*
+
 package com.example.application.repositories;
 
 import com.example.application.models.Test;
@@ -12,4 +12,3 @@ import java.util.List;
 public interface VeranstaltungenRepository extends JpaRepository<Veranstaltung, Long> {
 
 }
-*/
