@@ -13,7 +13,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TestRepository extends JpaRepository<Test, Long> {
 
-
     @Query("select s from Test s " +
             "where lower(s.testname) like lower(concat('%', :searchTerm, '%')) ")
     List<Test> search(@Param("searchTerm") String searchTerm);

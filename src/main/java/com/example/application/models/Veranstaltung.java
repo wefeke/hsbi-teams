@@ -19,7 +19,7 @@ public class Veranstaltung implements Serializable {
     private String titel;          // Titel der Veranstaltung
 
     //Beziehungen
-    @ManyToOne
+    @ManyToOne()
     private User user = new User();
     @OneToMany
     private List<Veranstaltungstermin> veranstaltungstermine = new ArrayList<>();
@@ -59,6 +59,9 @@ public class Veranstaltung implements Serializable {
         this.titel = titel;
     }
 
+    public void setUser(User user){
+        this.user = user;
+    }
 
     // equals und hashCode Methoden
     @Override

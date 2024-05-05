@@ -1,5 +1,6 @@
 package com.example.application.views.test;
 import com.example.application.models.Test;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -8,8 +9,13 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.router.Route;
+import com.vaadin.flow.shared.Registration;
 
 import java.util.List;
+
+@Route(value = "testContact")
 public class TestContactForm extends FormLayout{
     TextField testid = new TextField("Test ID");
     TextField testname = new TextField("Test Name");
@@ -25,10 +31,12 @@ public class TestContactForm extends FormLayout{
         test.setItems(tests);
         test.setItemLabelGenerator(Test::gettestname);
 
-        add(testid,
+        add(
+                testid,
                 testname,
                 test,
-                createButtonsLayout());
+                createButtonsLayout()
+        );
     }
 
     private HorizontalLayout createButtonsLayout() {
@@ -41,4 +49,5 @@ public class TestContactForm extends FormLayout{
 
         return new HorizontalLayout(save, delete, close);
     }
+
 }

@@ -30,6 +30,7 @@ public class TestView extends VerticalLayout {
     TextField filterText = new TextField();
     TestContactForm form;
     TestService testService;
+
     public TestView(TestService testService) {
         this.testService = testService;
         addClassName("test-view");
@@ -70,6 +71,7 @@ public class TestView extends VerticalLayout {
         filterText.addValueChangeListener(e -> updateList());
 
         Button addContactButton = new Button("Add test");
+
         Button csvExportButton = new Button("CSV Export");
 
         var streamResource = new StreamResource(
