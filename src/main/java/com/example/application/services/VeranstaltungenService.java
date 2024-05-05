@@ -31,4 +31,12 @@ public class VeranstaltungenService {
             System.err.println("Test is null. Are you sure you have connected your form to the application?");
     }
 
+    public void deleteVeranstaltung(Veranstaltung veranstaltung) {
+        if (veranstaltung != null) {
+            veranstaltungenRepository.delete(veranstaltung);
+        }
+        else
+            System.err.println("Test is null. Are you sure you have connected your form to the application?");
+    }
+
 }

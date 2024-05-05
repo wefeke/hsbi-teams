@@ -20,6 +20,7 @@ public class MainView extends AppLayout {
 
     private Button veranstaltungenButton;
     private Button studierendeButton;
+
     private final VeranstaltungenService veranstaltungenService;
 
     @Autowired

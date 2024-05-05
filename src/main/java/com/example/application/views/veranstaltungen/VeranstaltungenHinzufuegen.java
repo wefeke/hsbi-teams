@@ -1,6 +1,7 @@
 package com.example.application.views.veranstaltungen;
 
 import com.example.application.models.Veranstaltung;
+import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -20,25 +21,41 @@ import java.util.Date;
 public class VeranstaltungenHinzufuegen extends VerticalLayout {
 
     private final VeranstaltungenService veranstaltungenService;
+    private final UserService userService;
+
+    TextField titelField = new TextField("Titel");
+    DatePicker datePicker = new DatePicker("Datum");
+    Button save = new Button("Save");
 
     @Autowired
-    public VeranstaltungenHinzufuegen(VeranstaltungenService veranstaltungenService) {
+    public VeranstaltungenHinzufuegen(VeranstaltungenService veranstaltungenService, UserService userService) {
+
         this.veranstaltungenService = veranstaltungenService;
+        this.userService = userService;
 
-        FormLayout formLayout = new FormLayout();
+        add(
+                titelField,
+                datePicker,
+                save
+        );
 
-        TextField titelField = new TextField("Titel");
-        DatePicker datePicker = new DatePicker("Datum");
+        save.addClickListener(e -> saveVeranstaltung());
+    }
 
-        Button submitButton = new Button("Submit", clickEvent -> {
-            Veranstaltung veranstaltung = new Veranstaltung();
-            veranstaltung.setTitel(titelField.getValue());
-            veranstaltung.setSemester(Date.from(datePicker.getValue().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
-            veranstaltungenService.addVeranstaltung(veranstaltung);
-            Notification.show("Veranstaltung hinzugefügt");
-        });
+    private void saveVeranstaltung() {
+        String titel = titelField.getValue();
+        Date date = Date.from(datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-        formLayout.add(titelField, datePicker, submitButton);
-        add(formLayout);
+        Veranstaltung veranstaltung = new Veranstaltung();
+        veranstaltung.setTitel(titel);
+        veranstaltung.setSemester(date);
+        veranstaltung.setUser(userService.findAdmin());
+
+        veranstaltungenService.saveVeranstaltung(veranstaltung);
+
+        Notification.show("Veranstaltung gespeichert");
+
+        titelField.clear();
+        datePicker.clear();
     }
 }

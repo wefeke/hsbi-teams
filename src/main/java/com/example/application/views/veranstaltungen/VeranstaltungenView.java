@@ -3,13 +3,17 @@ package com.example.application.views.veranstaltungen;
 import com.example.application.models.Test;
 import com.example.application.models.Veranstaltung;
 import com.example.application.services.TestService;
+import com.example.application.services.VeranstaltungenService;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.Date;
 
@@ -17,7 +21,12 @@ import java.util.Date;
 @Route(value = "ver")
 public class VeranstaltungenView extends VerticalLayout {
 
-    public VeranstaltungenView() {
+    private final VeranstaltungenService veranstaltungenService;
+
+    @Autowired
+    public VeranstaltungenView(VeranstaltungenService veranstaltungenService) {
+        this.veranstaltungenService = veranstaltungenService;
+
         HorizontalLayout mainLayout = new HorizontalLayout();
         mainLayout.setSizeFull();
 
@@ -26,12 +35,8 @@ public class VeranstaltungenView extends VerticalLayout {
         kachelContainer.getStyle().set("display", "flex");
         kachelContainer.getStyle().set("flexWrap", "wrap");
 
-        // Testdaten: Nur übergangsweise, da kein Datenbankzugriff
-        Set<Veranstaltung> veranstaltungen = new HashSet<>();
-        veranstaltungen.add(new Veranstaltung(1L, new Date(), "Informatik 1"));
-        veranstaltungen.add(new Veranstaltung(2L, new Date(), "Mathematik für Informatiker"));
-        veranstaltungen.add(new Veranstaltung(3L, new Date(), "Algorithmen und Datenstrukturen"));
-        veranstaltungen.add(new Veranstaltung(4L, new Date(), "Datenbanken"));
+        // Alle Veranstaltungen aus der Datenbank abrufen
+        List<Veranstaltung> veranstaltungen = veranstaltungenService.findAllVeranstaltungen();
 
         // Kacheln für vorhandene Veranstaltungen erstellen
         for (Veranstaltung veranstaltung : veranstaltungen) {
