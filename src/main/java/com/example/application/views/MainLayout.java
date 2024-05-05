@@ -2,17 +2,14 @@
 package com.example.application.views;
 
 import com.example.application.services.VeranstaltungenService;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.Location;
-import com.vaadin.flow.router.RouteConfiguration;
 
+
+//MainLayout ist die Hauptansicht der Anwendung, die die Navigationsleiste enthält.
 public class MainLayout extends AppLayout {
 
     private Button veranstaltungenButton;
