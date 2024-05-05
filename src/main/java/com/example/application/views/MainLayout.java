@@ -9,7 +9,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
 
-//MainLayout ist die Hauptansicht der Anwendung, die die Navigationsleiste enthält.
+//MainLayout ist die Hauptansicht der Anwendung, die die Navigationsleiste enthält
 public class MainLayout extends AppLayout {
 
     private Button veranstaltungenButton;
