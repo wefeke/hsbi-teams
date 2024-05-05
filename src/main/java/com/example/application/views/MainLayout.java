@@ -2,32 +2,27 @@
 package com.example.application.views;
 
 import com.example.application.services.VeranstaltungenService;
-import com.example.application.views.studierende.StudierendeView;
-import com.example.application.views.veranstaltungen.VeranstaltungenView;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.Location;
+import com.vaadin.flow.router.RouteConfiguration;
 
-@Route("")
-@PageTitle("TeamBuilder")
-public class MainView extends AppLayout {
+public class MainLayout extends AppLayout {
 
     private Button veranstaltungenButton;
     private Button studierendeButton;
 
     private final VeranstaltungenService veranstaltungenService;
 
-    @Autowired
-    public MainView(VeranstaltungenService veranstaltungenService) {
+    public MainLayout(VeranstaltungenService veranstaltungenService) {
         this.veranstaltungenService = veranstaltungenService;
         createHeader();
-        updateView(new VeranstaltungenView(veranstaltungenService)); // Initialansicht
     }
 
     /**
@@ -41,15 +36,15 @@ public class MainView extends AppLayout {
         header.getStyle().set("background", "transparent"); // Transparenter Hintergrund
 
         // Logo-Button, das als Home-Button fungiert
-        Button logoButton = new Button("H.S.B.I TeamBuilder", e -> updateView(new VeranstaltungenView(veranstaltungenService)));
+        Button logoButton = new Button("H.S.B.I TeamBuilder", e -> getUI().ifPresent(ui -> ui.navigate("")));
         configureButton(logoButton, "24px", false);
 
         // Navigationsbutton für die Veranstaltungen
-        veranstaltungenButton = new Button("Veranstaltungen", e -> updateView(new VeranstaltungenView(veranstaltungenService)));
+        veranstaltungenButton = new Button("Veranstaltungen", e -> getUI().ifPresent(ui -> ui.navigate("")));
         configureButton(veranstaltungenButton, "16px", true);
 
         // Navigationsbutton für die Studierenden
-        studierendeButton = new Button("Studierende", e -> updateView(new StudierendeView()));
+        studierendeButton = new Button("Studierende", e -> getUI().ifPresent(ui -> ui.navigate("studierende")));
         configureButton(studierendeButton, "16px", true);
 
         header.add(logoButton, veranstaltungenButton, studierendeButton);
@@ -67,37 +62,15 @@ public class MainView extends AppLayout {
         button.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
         button.getStyle().set("font-size", fontSize);
         button.getStyle().set("cursor", "pointer");
-        if (!colorControl) {
+        //hier wieder (!colorControl): also ! ergänzen um die Farbe zu ändern
+        if (colorControl) {
             button.getStyle().set("color", "black");
         }
     }
 
-    /**
-     * Aktualisiert die Hauptansicht der Anwendung und ändert den Stil der Navigationsbuttons.
-     *
-     * @param component Die Komponente, die als neue Hauptansicht gesetzt wird.
-     */
-    private void updateView(Component component) {
-        setContent(component);
-        updateButtonStyles(component);
-    }
 
-    /**
-     * Aktualisiert die Farbe der Navigationsbuttons basierend auf der aktuell angezeigten View.
-     *
-     * @param component Die aktuell aktive Komponente in der Hauptansicht.
-     */
-    private void updateButtonStyles(Component component) {
-        if (component instanceof VeranstaltungenView) {
-            veranstaltungenButton.getStyle().set("color", "blue");
-            studierendeButton.getStyle().set("color", "black");
-        } else if (component instanceof StudierendeView) {
-            studierendeButton.getStyle().set("color", "blue");
-            veranstaltungenButton.getStyle().set("color", "black");
-        }
+    private void updateButtonStyles() {
+        //hier noch eine Methode einfügen um die Farben für die Buttons zu konfigurieren.
+        //muss irgendwie über die Route laufen, aber ich weiß gerade nciht wir ich die Route bekomme.
     }
 }
-
-
-
-

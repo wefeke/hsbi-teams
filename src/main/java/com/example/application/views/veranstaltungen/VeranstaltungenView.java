@@ -4,6 +4,11 @@ import com.example.application.models.Test;
 import com.example.application.models.Veranstaltung;
 import com.example.application.services.TestService;
 import com.example.application.services.VeranstaltungenService;
+import com.example.application.views.MainLayout;
+import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -18,7 +23,7 @@ import java.util.Set;
 import java.util.Date;
 
 @PageTitle("Veranstaltungen")
-@Route(value = "ver")
+@Route(value = "", layout = MainLayout.class)
 public class VeranstaltungenView extends VerticalLayout {
 
     private final VeranstaltungenService veranstaltungenService;
@@ -68,6 +73,7 @@ public class VeranstaltungenView extends VerticalLayout {
 
         Div kachel = new Div(kachelContent);
         kachel.getStyle()
+                .set("position", "relative")
                 .set("border", "1px solid var(--lumo-contrast-20pct)")
                 .set("border-radius", "10px")
                 .set("padding", "1em")
@@ -76,6 +82,48 @@ public class VeranstaltungenView extends VerticalLayout {
                 .set("box-shadow", "0 4px 8px 0 rgba(0,0,0,0.2)");
         kachel.setWidth("150px");
         kachel.setHeight("150px");
+
+        Div deleteIcon = new Div();
+        deleteIcon.setText("🗑️");
+        deleteIcon.addClassName("delete-icon");
+        deleteIcon.getStyle().set("position", "absolute");
+        deleteIcon.getStyle().set("bottom", "5px");
+        deleteIcon.getStyle().set("right", "5px");
+        deleteIcon.getStyle().set("visibility", "hidden");
+
+        Dialog confirmationDialog = new Dialog();
+        confirmationDialog.add(new Text("Möchten Sie die Veranstaltung " + veranstaltung.getTitel() + " wirklich löschen?"));
+
+        Button yesButton = new Button("Ja", event -> {
+            veranstaltungenService.deleteVeranstaltung(veranstaltung);
+            Notification.show("Veranstaltung gelöscht");
+            getUI().ifPresent(ui -> ui.getPage().reload());
+            confirmationDialog.close();
+        });
+
+        Button noButton = new Button("Nein", event -> {
+            confirmationDialog.close();
+            kachel.getStyle().set("background-color", "");
+            deleteIcon.getStyle().set("visibility", "hidden");
+        });
+
+        confirmationDialog.add(yesButton, noButton);
+
+        deleteIcon.getElement().addEventListener("click", e -> {
+            confirmationDialog.open();
+        }).addEventData("event.stopPropagation()");
+
+        kachel.add(deleteIcon);
+
+        kachel.getElement().addEventListener("mouseover", e -> {
+            kachel.getStyle().set("background-color", "lightblue");
+            deleteIcon.getStyle().set("visibility", "visible");
+        });
+
+        kachel.getElement().addEventListener("mouseout", e -> {
+            kachel.getStyle().set("background-color", "");
+            deleteIcon.getStyle().set("visibility", "hidden");
+        });
 
         kachel.addClickListener(e -> {
             getUI().ifPresent(ui -> ui.navigate("veranstaltung-detail/" + veranstaltung.getVeranstaltungsId()));
@@ -114,8 +162,16 @@ public class VeranstaltungenView extends VerticalLayout {
         neueVeranstaltungKachel.setWidth("150px");
         neueVeranstaltungKachel.setHeight("150px");
 
+        neueVeranstaltungKachel.getElement().addEventListener("mouseover", e -> {
+            neueVeranstaltungKachel.getStyle().set("background-color", "lightblue");
+        });
+
+        neueVeranstaltungKachel.getElement().addEventListener("mouseout", e -> {
+            neueVeranstaltungKachel.getStyle().set("background-color", "");
+        });
+
         neueVeranstaltungKachel.addClickListener(e -> {
-            Notification.show("Neue Veranstaltung hinzufügen");
+            getUI().ifPresent(ui -> ui.navigate("add-veranstaltung"));
         });
 
         return neueVeranstaltungKachel;

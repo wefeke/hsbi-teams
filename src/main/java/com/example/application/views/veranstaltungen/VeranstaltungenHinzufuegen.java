@@ -3,6 +3,7 @@ package com.example.application.views.veranstaltungen;
 import com.example.application.models.Veranstaltung;
 import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
+import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -16,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.ZoneId;
 import java.util.Date;
 
-@Route(value = "add-veranstaltung")
+@Route(value = "add-veranstaltung", layout = MainLayout.class)
 @PageTitle("Veranstaltung hinzufügen")
 public class VeranstaltungenHinzufuegen extends VerticalLayout {
 

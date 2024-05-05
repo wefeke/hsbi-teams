@@ -1,6 +1,7 @@
 //Autor: Joris
 package com.example.application.models;
 
+import com.vaadin.flow.component.html.Div;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -16,7 +17,7 @@ public class Veranstaltung implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long veranstaltungsId; // Primary Key
     private Date semester;          // Semester-Nummer
-    private String titel;          // Titel der Veranstaltung
+    private String titel;
 
     //Beziehungen
     @ManyToOne()
