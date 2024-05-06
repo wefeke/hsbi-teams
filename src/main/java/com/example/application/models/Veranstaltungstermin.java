@@ -17,7 +17,7 @@ public class Veranstaltungstermin {
 
     //Beziehungen
     @ManyToOne
-    private Veranstaltung veranstaltung = new Veranstaltung();
+    private Veranstaltung veranstaltung;
     @OneToMany
     private List<Gruppenarbeit> gruppenarbeiten = new ArrayList<>();
 
@@ -35,5 +35,13 @@ public class Veranstaltungstermin {
 
     public void setDatum(Date datum) {
         this.datum = datum;
+    }
+
+    public Veranstaltung getVeranstaltung() {
+        return veranstaltung;
+    }
+
+    public void setVeranstaltung(Veranstaltung veranstaltung) {
+        this.veranstaltung = veranstaltung;
     }
 }

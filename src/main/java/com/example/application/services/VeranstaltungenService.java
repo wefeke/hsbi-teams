@@ -1,9 +1,9 @@
 
 package com.example.application.services;
 
-import com.example.application.models.Test;
 import com.example.application.models.Veranstaltung;
 import com.example.application.repositories.VeranstaltungenRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +21,11 @@ public class VeranstaltungenService {
 
             return veranstaltungenRepository.findAll();
 
+    }
+
+    public Veranstaltung findVeranstaltungById(Long id) {
+        return veranstaltungenRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid Veranstaltung Id:" + id));
     }
 
     public void saveVeranstaltung(Veranstaltung veranstaltung) {
