@@ -1,6 +1,5 @@
 package com.example.application.services;
 
-import com.example.application.models.Veranstaltung;
 import com.example.application.models.Veranstaltungstermin;
 import com.example.application.repositories.VeranstaltungsterminRepository;
 import org.springframework.stereotype.Service;
@@ -20,8 +19,8 @@ public class VeranstaltungsterminService {
         return veranstaltungsterminRepository.findAll();
     }
 
-    public List<Veranstaltungstermin> findVeranstaltungstermineByVeranstaltungId(Long veranstaltungId) {
-        return veranstaltungsterminRepository.findByVeranstaltungId(veranstaltungId);
+    public List<Veranstaltungstermin> findVeranstaltungstermineByVeranstaltungId(Long veranstaltungsId) {
+        return veranstaltungsterminRepository.findVeranstaltungstermineByVeranstaltungVeranstaltungsId(veranstaltungsId);
     }
 
     public void saveVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin) {

@@ -24,7 +24,9 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     public VeranstaltungDetailView(VeranstaltungsterminService veranstaltungsterminService) {
         this.veranstaltungsterminService = veranstaltungsterminService;
 
-        List<Veranstaltungstermin> termine = veranstaltungsterminService.findVeranstaltungstermineByVeranstaltungId(Long.parseLong(veranstaltungId));
+        //Hier muss noch ein Fehler behoben werden, da die veranstaltungsId ein String ist und in der Datenbank ein Long
+        //List<Veranstaltungstermin> termine = veranstaltungsterminService.findVeranstaltungstermineByVeranstaltungId(Long.parseLong(veranstaltungId));
+        List<Veranstaltungstermin> termine = veranstaltungsterminService.findAllVeranstaltungstermine();
 
         HorizontalLayout mainLayout = new HorizontalLayout();
         mainLayout.setSizeFull();
