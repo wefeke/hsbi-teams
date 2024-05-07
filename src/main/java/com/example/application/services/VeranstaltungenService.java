@@ -2,6 +2,7 @@
 package com.example.application.services;
 
 import com.example.application.models.Veranstaltung;
+import com.example.application.models.Veranstaltungstermin;
 import com.example.application.repositories.VeranstaltungenRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;

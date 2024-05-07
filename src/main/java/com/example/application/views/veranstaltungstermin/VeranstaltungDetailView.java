@@ -1,27 +1,57 @@
 package com.example.application.views.veranstaltungstermin;
 
+import com.example.application.models.Veranstaltung;
 import com.example.application.models.Veranstaltungstermin;
 import com.example.application.repositories.VeranstaltungenRepository;
 import com.example.application.repositories.VeranstaltungsterminRepository;
 import com.example.application.services.VeranstaltungenService;
 import com.example.application.services.VeranstaltungsterminService;
 import com.example.application.views.MainLayout;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
+import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.router.*;
+import org.hibernate.Hibernate;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @PageTitle("Veranstaltung Detail")
 @Route(value = "veranstaltung-detail/:veranstaltungId", layout = MainLayout.class)
 public class VeranstaltungDetailView extends VerticalLayout implements HasUrlParameter<String> {
 
+    private final VeranstaltungenService veranstaltungService;
     private final VeranstaltungsterminService veranstaltungsterminService;
-
     private String veranstaltungId;
 
-    public VeranstaltungDetailView(VeranstaltungsterminService veranstaltungsterminService) {
+    //Dialog Instance
+    private final Dialog addDialog = new Dialog();;
+
+    //Dialog Items
+    private final DatePicker startDatePicker = new DatePicker("Termin Datum");
+    private final DatePicker endDatePicker = new DatePicker("Ende Terminserie");
+    private final TimePicker startTimePicker = new TimePicker("Startzeit");
+    private final TimePicker endTimePicker = new TimePicker("Endzeit");
+    private final TextField ort = new TextField("Ort");
+    private final TextField notizen = new TextField("Notizen");
+    private final RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
+
+
+    public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService) {
+        this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
 
         //Hier muss noch ein Fehler behoben werden, da die veranstaltungsId ein String ist und in der Datenbank ein Long
@@ -46,6 +76,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         mainLayout.add(kachelContainer);
         add(mainLayout);
+
+        createAddDialog();
     }
 
     @Override
@@ -135,9 +167,147 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         neueVeranstaltungKachel.addClickListener(e -> {
             System.out.println(veranstaltungId);
-            getUI().ifPresent(ui -> ui.navigate("add-veranstaltungstermin/" + veranstaltungId));
+            addDialog.open();
+            //getUI().ifPresent(ui -> ui.navigate("add-veranstaltungstermin/" + veranstaltungId));
         });
 
         return neueVeranstaltungKachel;
+    }
+
+    private void createAddDialog () {
+
+        endDatePicker.setVisible(false);
+
+        //Default buttons for Dialog
+        Button saveButton= new Button("Save", e -> {
+            calcPersistVeranstaltungstermin();
+            clearDialogFields();
+        });
+            saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        Button cancelButton = new Button("Cancel", e -> {
+            addDialog.close();
+            clearDialogFields();
+        });
+
+        //Radiobutton Implementation
+        radioGroup.setLabel("Terminart");
+        radioGroup.setItems("Einmalig", "Wöchentlich", "Monatlich");
+        radioGroup.setValue("Einmalig"); // Default selection
+        radioGroup.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
+
+        radioGroup.addValueChangeListener(e -> {
+            if (e.getValue().equals("Wöchentlich") || e.getValue().equals("Monatlich")) {
+                endDatePicker.setVisible(true);
+            } else {
+                endDatePicker.setVisible(false);
+            }
+        });
+
+        //Add to Dialog
+        addDialog.setHeaderTitle("Veranstaltung hinzufügen");
+
+        addDialog.getFooter().add(cancelButton);
+        addDialog.getFooter().add(saveButton);
+
+        addDialog.add(
+
+                new HorizontalLayout(
+                        new VerticalLayout(
+                                notizen,
+                                startTimePicker,
+                                startDatePicker,
+                                radioGroup
+                        ),
+
+                        new VerticalLayout(
+                                ort,
+                                endTimePicker,
+                                endDatePicker
+                        )
+                )
+        );
+    }
+
+    private void calcPersistVeranstaltungstermin () {
+        LocalDate startDate = startDatePicker.getValue();
+        LocalDate endDate = endDatePicker.getValue();
+
+        //"Einmalig" Save Event
+        if (radioGroup.getValue().equals("Einmalig")) {
+            persistVeranstaltungstermin(startDate, endDate);
+        }
+        else if (radioGroup.getValue().equals("Wöchentlich")) {
+            persistVeranstaltungstermin(startDate, endDate);
+            startDate = startDate.plusDays(7);
+
+            while (!startDate.isAfter(endDate)) {
+                // If the date is a Saturday or Sunday, adjust it to the next Monday
+                if (startDate.getDayOfWeek() == DayOfWeek.SATURDAY) {
+                    startDate = startDate.plusDays(2);
+                } else if (startDate.getDayOfWeek() == DayOfWeek.SUNDAY) {
+                    startDate = startDate.plusDays(1);
+                }
+
+                persistVeranstaltungstermin(startDate, endDate);
+
+                // Increment the date by 7 days
+                startDate = startDate.plusDays(7);
+            }
+        }
+        else if (radioGroup.getValue().equals("Monatlich")) {
+            persistVeranstaltungstermin(startDate, endDate);
+            startDate = startDate.plusMonths(1);
+
+            while (!startDate.isAfter(endDate)) {
+                if (startDate.getDayOfWeek() == DayOfWeek.SATURDAY) {
+                    startDate = startDate.plusDays(2);
+                } else if (startDate.getDayOfWeek() == DayOfWeek.SUNDAY) {
+                    startDate = startDate.plusDays(1);
+                }
+                persistVeranstaltungstermin(startDate, endDate);
+                startDate = startDate.plusMonths(1);
+            }
+        }
+
+        addDialog.close();
+        UI.getCurrent().getPage().reload();
+    }
+
+
+    public void persistVeranstaltungstermin (LocalDate startDate, LocalDate endDate) {
+        Veranstaltungstermin veranstaltungstermin = new Veranstaltungstermin();
+        veranstaltungstermin.setDatum(startDate);
+        veranstaltungstermin.setUhrzeit(startTimePicker.getValue());
+        veranstaltungstermin.setOrt(ort.getValue());
+        veranstaltungstermin.setNotizen(notizen.getValue());
+
+        Veranstaltung veranstaltung = veranstaltungService.findVeranstaltungById(Long.parseLong(veranstaltungId));
+
+        veranstaltungstermin.setVeranstaltung(veranstaltung);
+
+        //veranstaltung.addVeranstaltungstermin(veranstaltungstermin);
+        ArrayList<Veranstaltungstermin> list = new ArrayList<>();
+        list.add(veranstaltungstermin);
+        veranstaltung.setVeranstaltungstermine(list);
+
+        //veranstaltung.addVeranstaltungstermin(veranstaltungstermin); //Lazy Load Problem
+
+        veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
+        veranstaltungService.saveVeranstaltung(veranstaltung);
+
+
+
+        Notification.show("You saved an entry");
+    }
+
+    public void clearDialogFields(){
+        //Clear all Fields after saving
+        startDatePicker.clear();
+        endDatePicker.clear();
+        startTimePicker.clear();
+        endTimePicker.clear();
+        ort.clear();
+        notizen.clear();
+        radioGroup.setValue("Einmalig");
     }
 }

@@ -95,4 +95,21 @@ public class Veranstaltung implements Serializable {
     public void setTeilnehmer(List<Teilnehmer> teilnehmer) {
         this.teilnehmer = teilnehmer;
     }
+
+    public void addTeilnehmer(Teilnehmer teilnehmer) {
+        this.teilnehmer.add(teilnehmer);
+    }
+
+    public List<Veranstaltungstermin> getVeranstaltungstermine() {
+        return veranstaltungstermine;
+    }
+
+    public void setVeranstaltungstermine(List<Veranstaltungstermin> veranstaltungstermine) {
+        this.veranstaltungstermine = veranstaltungstermine;
+    }
+
+    public void addVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin) {
+        this.veranstaltungstermine.add(veranstaltungstermin);
+    }
+
 }

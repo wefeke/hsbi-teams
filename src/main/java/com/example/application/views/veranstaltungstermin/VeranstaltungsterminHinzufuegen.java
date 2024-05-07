@@ -1,3 +1,4 @@
+/*
 package com.example.application.views.veranstaltungstermin;
 
 import com.example.application.models.Veranstaltungstermin;
@@ -171,3 +172,4 @@ public class VeranstaltungsterminHinzufuegen extends VerticalLayout implements H
         Notification.show("You saved an entry");
     }
 }
+*/

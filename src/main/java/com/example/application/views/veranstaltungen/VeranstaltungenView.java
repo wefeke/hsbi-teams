@@ -3,13 +3,10 @@ package com.example.application.views.veranstaltungen;
 
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.Veranstaltung;
-import com.example.application.models.Veranstaltungstermin;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
-import com.example.application.services.VeranstaltungsterminService;
 import com.example.application.views.MainLayout;
-import com.example.application.views.veranstaltungstermin.VeranstaltungsterminHinzufuegen;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -18,7 +15,7 @@ import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -40,7 +37,7 @@ public class VeranstaltungenView extends VerticalLayout {
     private final VeranstaltungenService veranstaltungenService;
     private final TeilnehmerService teilnehmerService;
     private final UserService userService;
-    private Dialog addVeranstaltungDialog;
+    private Dialog addDialog;
 
     @Autowired
     public VeranstaltungenView(VeranstaltungenService veranstaltungenService, UserService userService, TeilnehmerService teilnehmerService) {
@@ -72,8 +69,7 @@ public class VeranstaltungenView extends VerticalLayout {
 
 
         //addVeranstaltungDialog = new Dialog(new VeranstaltungenHinzufuegen(veranstaltungenService, userService, teilnehmerService));
-
-        createAddVeranstaltungenDialog();
+        createAddDialog();
     }
 
     /**
@@ -199,33 +195,52 @@ public class VeranstaltungenView extends VerticalLayout {
             // Create a Dialog
 
             // Add the VeranstaltungDetailView to the Dialog
-            addVeranstaltungDialog.open();
+            addDialog.open();
             //getUI().ifPresent(ui -> ui.navigate(navigationalTarget));
         });
 
         return neueVeranstaltungKachel;
     }
 
-    public void createAddVeranstaltungenDialog () {
+    public void createAddDialog() {
 
-        addVeranstaltungDialog = new Dialog();
-            addVeranstaltungDialog.setHeaderTitle("Veranstaltung hinzufügen");
-            addVeranstaltungDialog.setWidth("80vh");
+        addDialog = new Dialog();
+            addDialog.setHeaderTitle("Veranstaltung hinzufügen");
+            addDialog.setWidth("90vh");
+
         TextField titelField = new TextField("Titel");
         DatePicker datePicker = new DatePicker("Datum");
+
         MultiSelectComboBox<Teilnehmer> comboBox = new MultiSelectComboBox<>("Teilnehmer");
             comboBox.setItems(teilnehmerService.findAllTeilnehmer());
             comboBox.setItemLabelGenerator(Teilnehmer::getVorname);
-        Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class, false);
 
+        Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class, false);
+            grid.setItems(teilnehmerService.findAllTeilnehmer());
+            grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
+            //grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
+            grid.addColumn(Teilnehmer::getId).setHeader("ID");
+            grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
+
+            /*
+            grid.asSingleSelect().addValueChangeListener(event -> {
+                // Get the selected student
+                Teilnehmer selectedStudent = event.getValue();
+
+                // Add the selected student to the combobox
+                if (selectedStudent != null) {
+                    comboBox.setValue(selectedStudent);
+                }
+            });
+             */
         Button saveButton = new Button("Save", e -> persistVeranstaltung(titelField, datePicker, comboBox, grid));
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        Button cancelButton = new Button("Cancel", e -> addVeranstaltungDialog.close());
-        addVeranstaltungDialog.getFooter().add(cancelButton);
-        addVeranstaltungDialog.getFooter().add(saveButton);
+        Button cancelButton = new Button("Cancel", e -> addDialog.close());
+        addDialog.getFooter().add(cancelButton);
+        addDialog.getFooter().add(saveButton);
 
-        addVeranstaltungDialog.add(
+        addDialog.add(
                 new HorizontalLayout(
                         new VerticalLayout(
                                 titelField,

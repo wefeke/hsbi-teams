@@ -1,3 +1,4 @@
+/*
 package com.example.application.views.veranstaltungen;
 
 import com.example.application.models.Teilnehmer;
@@ -110,3 +111,5 @@ public class VeranstaltungenHinzufuegen extends VerticalLayout {
         return new HorizontalLayout(leftSide, rightSide);
     }
 }
+
+ */
