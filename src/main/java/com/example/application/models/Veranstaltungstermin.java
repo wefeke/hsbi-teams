@@ -3,6 +3,8 @@ package com.example.application.models;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,7 +15,10 @@ public class Veranstaltungstermin {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
-    private Date datum;
+    private LocalDate datum;
+    private LocalTime uhrzeit;
+    private String ort;
+    private String notizen;
 
     //Beziehungen
     @ManyToOne
@@ -29,11 +34,11 @@ public class Veranstaltungstermin {
         this.id = id;
     }
 
-    public Date getDatum() {
+    public LocalDate getDatum() {
         return datum;
     }
 
-    public void setDatum(Date datum) {
+    public void setDatum(LocalDate datum) {
         this.datum = datum;
     }
 
@@ -43,5 +48,29 @@ public class Veranstaltungstermin {
 
     public void setVeranstaltung(Veranstaltung veranstaltung) {
         this.veranstaltung = veranstaltung;
+    }
+
+    public String getNotizen() {
+        return notizen;
+    }
+
+    public void setNotizen(String notizen) {
+        this.notizen = notizen;
+    }
+
+    public String getOrt() {
+        return ort;
+    }
+
+    public void setOrt(String ort) {
+        this.ort = ort;
+    }
+
+    public LocalTime getUhrzeit() {
+        return uhrzeit;
+    }
+
+    public void setUhrzeit(LocalTime uhrzeit) {
+        this.uhrzeit = uhrzeit;
     }
 }

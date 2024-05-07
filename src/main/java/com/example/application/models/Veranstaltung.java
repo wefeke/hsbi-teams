@@ -87,4 +87,12 @@ public class Veranstaltung implements Serializable {
                 ", titel='" + titel + '\'' +
                 '}';
     }
+
+    public List<Teilnehmer> getTeilnehmer() {
+        return teilnehmer;
+    }
+
+    public void setTeilnehmer(List<Teilnehmer> teilnehmer) {
+        this.teilnehmer = teilnehmer;
+    }
 }

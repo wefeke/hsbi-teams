@@ -1,19 +1,36 @@
 //Author: Joris
 package com.example.application.views.veranstaltungen;
 
+import com.example.application.models.Teilnehmer;
 import com.example.application.models.Veranstaltung;
+import com.example.application.models.Veranstaltungstermin;
+import com.example.application.services.TeilnehmerService;
+import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
+import com.example.application.services.VeranstaltungsterminService;
 import com.example.application.views.MainLayout;
+import com.example.application.views.veranstaltungstermin.VeranstaltungsterminHinzufuegen;
 import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @PageTitle("Veranstaltungen")
@@ -21,10 +38,14 @@ import java.util.List;
 public class VeranstaltungenView extends VerticalLayout {
 
     private final VeranstaltungenService veranstaltungenService;
+    private final TeilnehmerService teilnehmerService;
+    private final UserService userService;
+    private Dialog addVeranstaltungDialog;
 
     @Autowired
-    public VeranstaltungenView(VeranstaltungenService veranstaltungenService) {
+    public VeranstaltungenView(VeranstaltungenService veranstaltungenService, UserService userService, TeilnehmerService teilnehmerService) {
         this.veranstaltungenService = veranstaltungenService;
+        this.teilnehmerService = teilnehmerService;
 
         HorizontalLayout mainLayout = new HorizontalLayout();
         mainLayout.setSizeFull();
@@ -47,6 +68,12 @@ public class VeranstaltungenView extends VerticalLayout {
 
         mainLayout.add(kachelContainer);
         add(mainLayout);
+        this.userService = userService;
+
+
+        //addVeranstaltungDialog = new Dialog(new VeranstaltungenHinzufuegen(veranstaltungenService, userService, teilnehmerService));
+
+        createAddVeranstaltungenDialog();
     }
 
     /**
@@ -68,7 +95,7 @@ public class VeranstaltungenView extends VerticalLayout {
         Div kachel = new Div(kachelContent);
         kachel.getStyle()
                 .set("position", "relative")
-                .set("border", "1px solid var(--lumo-contrast-20pct)")
+                .set("border", "2px solid var(--lumo-contrast-20pct)")
                 .set("border-radius", "10px")
                 .set("padding", "1em")
                 .set("margin", "0.5em")
@@ -169,11 +196,71 @@ public class VeranstaltungenView extends VerticalLayout {
         });
 
         neueVeranstaltungKachel.addClickListener(e -> {
-            getUI().ifPresent(ui -> ui.navigate(navigationalTarget));
+            // Create a Dialog
+
+            // Add the VeranstaltungDetailView to the Dialog
+            addVeranstaltungDialog.open();
+            //getUI().ifPresent(ui -> ui.navigate(navigationalTarget));
         });
 
         return neueVeranstaltungKachel;
     }
+
+    public void createAddVeranstaltungenDialog () {
+
+        addVeranstaltungDialog = new Dialog();
+            addVeranstaltungDialog.setHeaderTitle("Veranstaltung hinzufügen");
+            addVeranstaltungDialog.setWidth("80vh");
+        TextField titelField = new TextField("Titel");
+        DatePicker datePicker = new DatePicker("Datum");
+        MultiSelectComboBox<Teilnehmer> comboBox = new MultiSelectComboBox<>("Teilnehmer");
+            comboBox.setItems(teilnehmerService.findAllTeilnehmer());
+            comboBox.setItemLabelGenerator(Teilnehmer::getVorname);
+        Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class, false);
+
+        Button saveButton = new Button("Save", e -> persistVeranstaltung(titelField, datePicker, comboBox, grid));
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        Button cancelButton = new Button("Cancel", e -> addVeranstaltungDialog.close());
+        addVeranstaltungDialog.getFooter().add(cancelButton);
+        addVeranstaltungDialog.getFooter().add(saveButton);
+
+        addVeranstaltungDialog.add(
+                new HorizontalLayout(
+                        new VerticalLayout(
+                                titelField,
+                                datePicker,
+                                comboBox
+                                ),
+                        new VerticalLayout(
+                                grid
+                        )
+                )
+        );
+    }
+
+    private void persistVeranstaltung(TextField titelField, DatePicker datePicker, MultiSelectComboBox<Teilnehmer> comboBox, Grid<Teilnehmer> grid) {
+        String titel = titelField.getValue();
+        Date date = Date.from(datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        Veranstaltung veranstaltung = new Veranstaltung();
+        veranstaltung.setTitel(titel);
+        veranstaltung.setSemester(date);
+        veranstaltung.setUser(userService.findAdmin());
+
+        veranstaltung.setTeilnehmer(new ArrayList<>(comboBox.getSelectedItems()));
+
+        veranstaltungenService.saveVeranstaltung(veranstaltung);
+
+        Notification.show("Veranstaltung gespeichert");
+
+        titelField.clear();
+        datePicker.clear();
+        comboBox.clear();
+
+        UI.getCurrent().getPage().reload();
+    }
+
 }
 
 
