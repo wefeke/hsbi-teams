@@ -96,6 +96,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private Div createVeranstaltungsterminKachel(Veranstaltungstermin veranstaltungstermin) {
         Div terminInfo = new Div();
         terminInfo.setText(veranstaltungstermin.getDatum().toString());
+
         terminInfo.getStyle().set("text-align", "center");
         terminInfo.getStyle().set("margin", "auto");
 
@@ -273,7 +274,6 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         UI.getCurrent().getPage().reload();
     }
 
-
     public void persistVeranstaltungstermin (LocalDate startDate, LocalDate endDate) {
         Veranstaltungstermin veranstaltungstermin = new Veranstaltungstermin();
         veranstaltungstermin.setDatum(startDate);
@@ -285,19 +285,12 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         veranstaltungstermin.setVeranstaltung(veranstaltung);
 
-        //veranstaltung.addVeranstaltungstermin(veranstaltungstermin);
-        ArrayList<Veranstaltungstermin> list = new ArrayList<>();
-        list.add(veranstaltungstermin);
-        veranstaltung.setVeranstaltungstermine(list);
-
-        //veranstaltung.addVeranstaltungstermin(veranstaltungstermin); //Lazy Load Problem
+        veranstaltung.addVeranstaltungstermin(veranstaltungstermin); //Lazy Load Problem
 
         veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
         veranstaltungService.saveVeranstaltung(veranstaltung);
 
-
-
-        Notification.show("You saved an entry");
+        Notification.show("Veranstaltungstermin angelegt!");
     }
 
     public void clearDialogFields(){

@@ -22,9 +22,9 @@ public class Veranstaltung implements Serializable {
     //Beziehungen
     @ManyToOne()
     private User user = new User();
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<Veranstaltungstermin> veranstaltungstermine = new ArrayList<>();
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Teilnehmer> teilnehmer = new ArrayList<>();
 
     public Veranstaltung() {

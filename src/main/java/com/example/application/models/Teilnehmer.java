@@ -50,4 +50,16 @@ public class Teilnehmer {
     public Teilnehmer() {
 
     }
+
+    public List<Veranstaltung> getVeranstaltungen() {
+        return veranstaltungen;
+    }
+
+    public void setVeranstaltungen(List<Veranstaltung> veranstaltungen) {
+        this.veranstaltungen = veranstaltungen;
+    }
+
+    public void addVerastaltung (Veranstaltung veranstaltung){
+        this.veranstaltungen.add(veranstaltung);
+    }
 }

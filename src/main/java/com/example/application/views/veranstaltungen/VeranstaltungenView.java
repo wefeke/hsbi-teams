@@ -267,7 +267,7 @@ public class VeranstaltungenView extends VerticalLayout {
 
         veranstaltungenService.saveVeranstaltung(veranstaltung);
 
-        Notification.show("Veranstaltung gespeichert");
+        Notification.show("Veranstaltung angelegt!");
 
         titelField.clear();
         datePicker.clear();
