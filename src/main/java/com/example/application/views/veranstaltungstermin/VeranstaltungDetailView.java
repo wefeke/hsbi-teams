@@ -175,6 +175,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         return neueVeranstaltungKachel;
     }
 
+
     private void createAddDialog () {
 
         endDatePicker.setVisible(false);
