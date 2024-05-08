@@ -2,7 +2,9 @@ package com.example.application.services;
 
 import com.example.application.models.Veranstaltungstermin;
 import com.example.application.repositories.VeranstaltungsterminRepository;
+import org.hibernate.annotations.ColumnTransformer;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -23,6 +25,7 @@ public class VeranstaltungsterminService {
         return veranstaltungsterminRepository.findVeranstaltungstermineByVeranstaltungVeranstaltungsId(veranstaltungsId);
     }
 
+    @Transactional
     public void saveVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin) {
         if (veranstaltungstermin != null) {
             veranstaltungsterminRepository.save(veranstaltungstermin);

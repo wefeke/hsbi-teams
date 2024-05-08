@@ -6,6 +6,7 @@ import com.example.application.models.Veranstaltungstermin;
 import com.example.application.repositories.VeranstaltungenRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class VeranstaltungenService {
             .orElseThrow(() -> new IllegalArgumentException("Invalid Veranstaltung Id:" + id));
     }
 
+    @Transactional
     public void saveVeranstaltung(Veranstaltung veranstaltung) {
         if (veranstaltung != null) {
             veranstaltungenRepository.save(veranstaltung);
@@ -37,6 +39,7 @@ public class VeranstaltungenService {
             System.err.println("Test is null. Are you sure you have connected your form to the application?");
     }
 
+    @Transactional
     public void deleteVeranstaltung(Veranstaltung veranstaltung) {
         if (veranstaltung != null) {
             veranstaltungenRepository.delete(veranstaltung);
