@@ -38,16 +38,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private String veranstaltungId;
 
     //Dialog Instance
-    private final Dialog addDialog = new Dialog();;
-
-    //Dialog Items
-    private final DatePicker startDatePicker = new DatePicker("Termin Datum");
-    private final DatePicker endDatePicker = new DatePicker("Ende Terminserie");
-    private final TimePicker startTimePicker = new TimePicker("Startzeit");
-    private final TimePicker endTimePicker = new TimePicker("Endzeit");
-    private final TextField ort = new TextField("Ort");
-    private final TextField notizen = new TextField("Notizen");
-    private final RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
+    private VeranstaltungsterminDialog veranstaltungsterminDialog;
 
 
     public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService) {
@@ -76,8 +67,6 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         mainLayout.add(kachelContainer);
         add(mainLayout);
-
-        createAddDialog();
     }
 
     @Override
@@ -91,6 +80,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         } else {
             System.out.println("No veranstaltungId in URL");
         }
+
+        createVeranstaltungsterminDialog();
     }
 
     private Div createVeranstaltungsterminKachel(Veranstaltungstermin veranstaltungstermin) {
@@ -168,140 +159,13 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         neueVeranstaltungKachel.addClickListener(e -> {
             System.out.println(veranstaltungId);
-            addDialog.open();
-            //getUI().ifPresent(ui -> ui.navigate("add-veranstaltungstermin/" + veranstaltungId));
+            veranstaltungsterminDialog.open();
         });
 
         return neueVeranstaltungKachel;
     }
 
-
-    private void createAddDialog () {
-
-        endDatePicker.setVisible(false);
-
-        //Default buttons for Dialog
-        Button saveButton= new Button("Save", e -> {
-            calcPersistVeranstaltungstermin();
-            clearDialogFields();
-        });
-            saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        Button cancelButton = new Button("Cancel", e -> {
-            addDialog.close();
-            clearDialogFields();
-        });
-
-        //Radiobutton Implementation
-        radioGroup.setLabel("Terminart");
-        radioGroup.setItems("Einmalig", "Wöchentlich", "Monatlich");
-        radioGroup.setValue("Einmalig"); // Default selection
-        radioGroup.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
-
-        radioGroup.addValueChangeListener(e -> {
-            if (e.getValue().equals("Wöchentlich") || e.getValue().equals("Monatlich")) {
-                endDatePicker.setVisible(true);
-            } else {
-                endDatePicker.setVisible(false);
-            }
-        });
-
-        //Add to Dialog
-        addDialog.setHeaderTitle("Veranstaltung hinzufügen");
-
-        addDialog.getFooter().add(cancelButton);
-        addDialog.getFooter().add(saveButton);
-
-        addDialog.add(
-
-                new HorizontalLayout(
-                        new VerticalLayout(
-                                notizen,
-                                startTimePicker,
-                                startDatePicker,
-                                radioGroup
-                        ),
-
-                        new VerticalLayout(
-                                ort,
-                                endTimePicker,
-                                endDatePicker
-                        )
-                )
-        );
-    }
-
-    private void calcPersistVeranstaltungstermin () {
-        LocalDate startDate = startDatePicker.getValue();
-        LocalDate endDate = endDatePicker.getValue();
-
-        //"Einmalig" Save Event
-        if (radioGroup.getValue().equals("Einmalig")) {
-            persistVeranstaltungstermin(startDate, endDate);
-        }
-        else if (radioGroup.getValue().equals("Wöchentlich")) {
-            persistVeranstaltungstermin(startDate, endDate);
-            startDate = startDate.plusDays(7);
-
-            while (!startDate.isAfter(endDate)) {
-                // If the date is a Saturday or Sunday, adjust it to the next Monday
-                if (startDate.getDayOfWeek() == DayOfWeek.SATURDAY) {
-                    startDate = startDate.plusDays(2);
-                } else if (startDate.getDayOfWeek() == DayOfWeek.SUNDAY) {
-                    startDate = startDate.plusDays(1);
-                }
-
-                persistVeranstaltungstermin(startDate, endDate);
-
-                // Increment the date by 7 days
-                startDate = startDate.plusDays(7);
-            }
-        }
-        else if (radioGroup.getValue().equals("Monatlich")) {
-            persistVeranstaltungstermin(startDate, endDate);
-            startDate = startDate.plusMonths(1);
-
-            while (!startDate.isAfter(endDate)) {
-                if (startDate.getDayOfWeek() == DayOfWeek.SATURDAY) {
-                    startDate = startDate.plusDays(2);
-                } else if (startDate.getDayOfWeek() == DayOfWeek.SUNDAY) {
-                    startDate = startDate.plusDays(1);
-                }
-                persistVeranstaltungstermin(startDate, endDate);
-                startDate = startDate.plusMonths(1);
-            }
-        }
-
-        addDialog.close();
-        UI.getCurrent().getPage().reload();
-    }
-
-    public void persistVeranstaltungstermin (LocalDate startDate, LocalDate endDate) {
-        Veranstaltungstermin veranstaltungstermin = new Veranstaltungstermin();
-        veranstaltungstermin.setDatum(startDate);
-        veranstaltungstermin.setUhrzeit(startTimePicker.getValue());
-        veranstaltungstermin.setOrt(ort.getValue());
-        veranstaltungstermin.setNotizen(notizen.getValue());
-
-        Veranstaltung veranstaltung = veranstaltungService.findVeranstaltungById(Long.parseLong(veranstaltungId));
-
-        veranstaltungstermin.setVeranstaltung(veranstaltung);
-
-        veranstaltung.addVeranstaltungstermin(veranstaltungstermin); //Lazy Load Problem
-
-        veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
-        veranstaltungService.saveVeranstaltung(veranstaltung);
-
-        Notification.show("Veranstaltungstermin angelegt!");
-    }
-
-    public void clearDialogFields(){
-        //Clear all Fields after saving
-        startDatePicker.clear();
-        endDatePicker.clear();
-        startTimePicker.clear();
-        endTimePicker.clear();
-        ort.clear();
-        notizen.clear();
-        radioGroup.setValue("Einmalig");
+    public void createVeranstaltungsterminDialog () {
+        veranstaltungsterminDialog = new VeranstaltungsterminDialog(veranstaltungService, veranstaltungsterminService, veranstaltungId);
     }
 }

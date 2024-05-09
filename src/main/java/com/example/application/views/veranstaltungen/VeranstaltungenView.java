@@ -7,6 +7,7 @@ import com.example.application.services.TeilnehmerService;
 import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
 import com.example.application.views.MainLayout;
+import com.example.application.views.veranstaltungstermin.VeranstaltungsterminDialog;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -37,7 +38,7 @@ public class VeranstaltungenView extends VerticalLayout {
     private final VeranstaltungenService veranstaltungenService;
     private final TeilnehmerService teilnehmerService;
     private final UserService userService;
-    private Dialog addDialog;
+    private VeranstaltungDialog veranstaltungDialog;
 
     @Autowired
     public VeranstaltungenView(VeranstaltungenService veranstaltungenService, UserService userService, TeilnehmerService teilnehmerService) {
@@ -67,9 +68,7 @@ public class VeranstaltungenView extends VerticalLayout {
         add(mainLayout);
         this.userService = userService;
 
-
-        //addVeranstaltungDialog = new Dialog(new VeranstaltungenHinzufuegen(veranstaltungenService, userService, teilnehmerService));
-        createAddDialog();
+        createVeranstaltungDialog();
     }
 
     /**
@@ -195,87 +194,15 @@ public class VeranstaltungenView extends VerticalLayout {
             // Create a Dialog
 
             // Add the VeranstaltungDetailView to the Dialog
-            addDialog.open();
-            //getUI().ifPresent(ui -> ui.navigate(navigationalTarget));
+            veranstaltungDialog.open();
         });
 
         return neueVeranstaltungKachel;
     }
 
-    public void createAddDialog() {
-
-        addDialog = new Dialog();
-            addDialog.setHeaderTitle("Veranstaltung hinzufügen");
-            addDialog.setWidth("90vh");
-
-        TextField titelField = new TextField("Titel");
-        DatePicker datePicker = new DatePicker("Datum");
-
-        MultiSelectComboBox<Teilnehmer> comboBox = new MultiSelectComboBox<>("Teilnehmer");
-            comboBox.setItems(teilnehmerService.findAllTeilnehmer());
-            comboBox.setItemLabelGenerator(Teilnehmer::getVorname);
-
-        Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class, false);
-            grid.setItems(teilnehmerService.findAllTeilnehmer());
-            grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
-            //grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
-            grid.addColumn(Teilnehmer::getId).setHeader("ID");
-            grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
-
-            /*
-            grid.asSingleSelect().addValueChangeListener(event -> {
-                // Get the selected student
-                Teilnehmer selectedStudent = event.getValue();
-
-                // Add the selected student to the combobox
-                if (selectedStudent != null) {
-                    comboBox.setValue(selectedStudent);
-                }
-            });
-             */
-        Button saveButton = new Button("Save", e -> persistVeranstaltung(titelField, datePicker, comboBox, grid));
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
-        Button cancelButton = new Button("Cancel", e -> addDialog.close());
-        addDialog.getFooter().add(cancelButton);
-        addDialog.getFooter().add(saveButton);
-
-        addDialog.add(
-                new HorizontalLayout(
-                        new VerticalLayout(
-                                titelField,
-                                datePicker,
-                                comboBox
-                                ),
-                        new VerticalLayout(
-                                grid
-                        )
-                )
-        );
+    public void createVeranstaltungDialog () {
+        veranstaltungDialog = new VeranstaltungDialog(veranstaltungenService, teilnehmerService, userService);
     }
-
-    private void persistVeranstaltung(TextField titelField, DatePicker datePicker, MultiSelectComboBox<Teilnehmer> comboBox, Grid<Teilnehmer> grid) {
-        String titel = titelField.getValue();
-        Date date = Date.from(datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
-
-        Veranstaltung veranstaltung = new Veranstaltung();
-        veranstaltung.setTitel(titel);
-        veranstaltung.setSemester(date);
-        veranstaltung.setUser(userService.findAdmin());
-
-        veranstaltung.setTeilnehmer(new ArrayList<>(comboBox.getSelectedItems()));
-
-        veranstaltungenService.saveVeranstaltung(veranstaltung);
-
-        Notification.show("Veranstaltung angelegt!");
-
-        titelField.clear();
-        datePicker.clear();
-        comboBox.clear();
-
-        UI.getCurrent().getPage().reload();
-    }
-
 }
 
 

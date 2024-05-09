@@ -25,6 +25,7 @@ public class VeranstaltungsterminDialog extends Dialog {
     //Services
     private final VeranstaltungenService veranstaltungService;
     private final VeranstaltungsterminService veranstaltungsterminService;
+    private String veranstaltungId;
 
     //Dialog Items
     private final DatePicker startDatePicker = new DatePicker("Termin Datum");
@@ -34,22 +35,24 @@ public class VeranstaltungsterminDialog extends Dialog {
     private final TextField ort = new TextField("Ort");
     private final TextField notizen = new TextField("Notizen");
     private final RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
-    Button cancelButton= new Button("Cancel");
-    Button saveButton= new Button("Save");
+    private final Button cancelButton= new Button("Cancel");
+    private final Button saveButton= new Button("Save");
 
-    public VeranstaltungsterminDialog(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService) {
+    public VeranstaltungsterminDialog(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, String veranstaltungId) {
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
-
-        setHeaderTitle("Veranstaltung hinzufügen");
-        getFooter().add(cancelButton);
-        getFooter().add(saveButton);
+        this.veranstaltungId = veranstaltungId;
 
         add(createLayout());
         configureElements();
     }
 
     private VerticalLayout createLayout () {
+
+        setHeaderTitle("Veranstaltung hinzufügen");
+        getFooter().add(cancelButton);
+        getFooter().add(saveButton);
+
         return(
                 new VerticalLayout(
                     new HorizontalLayout(
@@ -71,6 +74,7 @@ public class VeranstaltungsterminDialog extends Dialog {
     }
 
     private void configureElements(){
+        endDatePicker.setVisible(false); //Standard is to hide the field
 
         //Radiobutton Implementation
         radioGroup.setLabel("Terminart");
@@ -86,18 +90,19 @@ public class VeranstaltungsterminDialog extends Dialog {
             }
         });
 
+
         //Footer Button Implementation
         saveButton.addClickListener( e -> {
            calcPersistVeranstaltungstermin();
            close();
-           clearDialogFields();
+           clearFields();
            UI.getCurrent().getPage().reload();
         });
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         cancelButton.addClickListener( e -> {
             close();
-            clearDialogFields();
+            clearFields();
         });
 
     }
@@ -143,6 +148,7 @@ public class VeranstaltungsterminDialog extends Dialog {
             }
         }
     }
+
     public void persistVeranstaltungstermin (LocalDate startDate, LocalDate endDate) {
         Veranstaltungstermin veranstaltungstermin = new Veranstaltungstermin();
         veranstaltungstermin.setDatum(startDate);
@@ -162,7 +168,7 @@ public class VeranstaltungsterminDialog extends Dialog {
         Notification.show("Veranstaltungstermin angelegt!");
     }
 
-    public void clearDialogFields(){
+    public void clearFields(){
         //Clear all Fields after saving
         startDatePicker.clear();
         endDatePicker.clear();
@@ -172,4 +178,5 @@ public class VeranstaltungsterminDialog extends Dialog {
         notizen.clear();
         radioGroup.setValue("Einmalig");
     }
+
 }
