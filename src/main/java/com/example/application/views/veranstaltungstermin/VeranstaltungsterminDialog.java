@@ -47,30 +47,27 @@ public class VeranstaltungsterminDialog extends Dialog {
         configureElements();
     }
 
-    private VerticalLayout createLayout () {
+    private HorizontalLayout createLayout () {
 
         setHeaderTitle("Veranstaltung hinzufügen");
         getFooter().add(cancelButton);
         getFooter().add(saveButton);
 
         return(
-                new VerticalLayout(
-                    new HorizontalLayout(
+                new HorizontalLayout(
                         new VerticalLayout(
                                 notizen,
                                 startTimePicker,
                                 startDatePicker,
                                 radioGroup
                         ),
-
                         new VerticalLayout(
                                 ort,
                                 endTimePicker,
                                 endDatePicker
                         )
                     )
-                )
-        );
+                );
     }
 
     private void configureElements(){

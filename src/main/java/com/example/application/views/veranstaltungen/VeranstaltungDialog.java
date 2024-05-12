@@ -5,6 +5,7 @@ import com.example.application.models.Veranstaltung;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
+import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -18,11 +19,15 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.Route;
 
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
+@Route(value = "addDialog")
 public class VeranstaltungDialog extends Dialog {
 
     //Services
@@ -45,27 +50,20 @@ public class VeranstaltungDialog extends Dialog {
 
         add(createLayout());
         configureElements();
+
     }
 
-    private FlexLayout createLayout() {
+    private HorizontalLayout createLayout() {
         setHeaderTitle("Veranstaltung hinzufügen");
         getFooter().add(cancelButton);
         getFooter().add(saveButton);
 
-        setWidth("100vh");
-
+        setWidth("70vh");
         return (
-                new FlexLayout(
-                        new HorizontalLayout(
-                                new VerticalLayout(
-                                        titelField,
-                                        datePicker,
-                                        comboBox
-                                ),
-                                new VerticalLayout(
-                                        grid
-                                )
-                        )
+                new HorizontalLayout(
+                        new VerticalLayout(titelField, datePicker, comboBox),
+                        new VerticalLayout(grid)
+
                 ));
         }
 
@@ -79,8 +77,9 @@ public class VeranstaltungDialog extends Dialog {
         grid.setItems(teilnehmerService.findAllTeilnehmer());
         grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
         //grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
-        grid.addColumn(Teilnehmer::getId).setHeader("ID");
+       // grid.addColumn(Teilnehmer::getId).setHeader("ID");
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
+        grid.setSizeFull();
 
         /*
             grid.asSingleSelect().addValueChangeListener(event -> {
@@ -89,10 +88,12 @@ public class VeranstaltungDialog extends Dialog {
 
                 // Add the selected student to the combobox
                 if (selectedStudent != null) {
-                    comboBox.setValue(selectedStudent);
+                    Set<Teilnehmer> temp_teilnehmer = comboBox.getValue();
+                    temp_teilnehmer.add(selectedStudent);
+                    comboBox.setValue(temp_teilnehmer);
                 }
             });
-         */
+        */
 
         //Buttons
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
