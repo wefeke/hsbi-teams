@@ -16,6 +16,8 @@ import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.ValidationException;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -38,6 +40,9 @@ public class VeranstaltungsterminDialog extends Dialog {
     private final Button cancelButton= new Button("Cancel");
     private final Button saveButton= new Button("Save");
 
+    //Data Binder
+    Binder<Veranstaltungstermin> binder = new Binder<>(Veranstaltungstermin.class);
+
     public VeranstaltungsterminDialog(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, String veranstaltungId) {
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
@@ -45,6 +50,7 @@ public class VeranstaltungsterminDialog extends Dialog {
 
         add(createLayout());
         configureElements();
+        bindFields();
     }
 
     private HorizontalLayout createLayout () {
@@ -87,13 +93,23 @@ public class VeranstaltungsterminDialog extends Dialog {
             }
         });
 
-
         //Footer Button Implementation
-        saveButton.addClickListener( e -> {
-           calcPersistVeranstaltungstermin();
-           close();
-           clearFields();
-           UI.getCurrent().getPage().reload();
+        saveButton.addClickListener( event -> {
+            try {
+                Veranstaltungstermin veranstaltungstermin = new Veranstaltungstermin();
+                binder.writeBean(veranstaltungstermin);
+
+                calcPersistVeranstaltungstermin();
+                close();
+                clearFields();
+                UI.getCurrent().getPage().reload();
+
+            } catch (ValidationException e) {
+                e.getBeanValidationErrors().forEach(error -> {
+                    String fieldName = error.getErrorMessage().toString();
+                    System.out.println("Validation error in field '" + fieldName);
+                });
+            }
         });
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
@@ -104,65 +120,77 @@ public class VeranstaltungsterminDialog extends Dialog {
 
     }
 
+    private void bindFields(){
+        binder.forField(notizen)
+                .bind(Veranstaltungstermin::getNotizen, Veranstaltungstermin::setNotizen);
+        binder.forField(ort)
+                .bind(Veranstaltungstermin::getOrt, Veranstaltungstermin::setOrt);
+       binder.forField(startTimePicker)
+               .asRequired("Startzeit darf nicht leer sein")
+               .bind(Veranstaltungstermin::getUhrzeit, Veranstaltungstermin::setUhrzeit);
+       binder.forField(endTimePicker)
+               .withValidator(endTime -> !endTime.isBefore(startTimePicker.getValue()),
+                       "Endzeit darf nicht vor Startzeit sein")
+               .bind(Veranstaltungstermin::getUhrzeit, Veranstaltungstermin::setUhrzeit);
+       binder.forField(startDatePicker)
+               .asRequired("Datum darf nicht leer sein")
+               .bind(Veranstaltungstermin::getDatum, Veranstaltungstermin::setDatum);
+       binder.forField(endDatePicker)
+               .withValidator(endDate -> !endDatePicker.isVisible() || !endDate.isBefore(startDatePicker.getValue()),
+                       "Enddatum darf nicht vor Startdatum sein");
+    }
+
     private void calcPersistVeranstaltungstermin () {
         LocalDate startDate = startDatePicker.getValue();
         LocalDate endDate = endDatePicker.getValue();
 
         //"Einmalig" Save Event
         if (radioGroup.getValue().equals("Einmalig")) {
-            persistVeranstaltungstermin(startDate, endDate);
+            persistVeranstaltungstermin();
         }
         else if (radioGroup.getValue().equals("Wöchentlich")) {
-            persistVeranstaltungstermin(startDate, endDate);
-            startDate = startDate.plusDays(7);
+            persistVeranstaltungstermin();
+            startDate = startDate.plusWeeks(1);
+            startDatePicker.setValue(startDate);
 
             while (!startDate.isAfter(endDate)) {
-                // If the date is a Saturday or Sunday, adjust it to the next Monday
-                if (startDate.getDayOfWeek() == DayOfWeek.SATURDAY) {
-                    startDate = startDate.plusDays(2);
-                } else if (startDate.getDayOfWeek() == DayOfWeek.SUNDAY) {
-                    startDate = startDate.plusDays(1);
-                }
-
-                persistVeranstaltungstermin(startDate, endDate);
-
-                // Increment the date by 7 days
-                startDate = startDate.plusDays(7);
+                persistVeranstaltungstermin();
+                startDate = startDate.plusWeeks(1);
+                startDatePicker.setValue(startDate);
             }
         }
         else if (radioGroup.getValue().equals("Monatlich")) {
-            persistVeranstaltungstermin(startDate, endDate);
+            persistVeranstaltungstermin();
             startDate = startDate.plusMonths(1);
+            startDatePicker.setValue(startDate);
 
             while (!startDate.isAfter(endDate)) {
-                if (startDate.getDayOfWeek() == DayOfWeek.SATURDAY) {
-                    startDate = startDate.plusDays(2);
-                } else if (startDate.getDayOfWeek() == DayOfWeek.SUNDAY) {
-                    startDate = startDate.plusDays(1);
-                }
-                persistVeranstaltungstermin(startDate, endDate);
+                persistVeranstaltungstermin();
                 startDate = startDate.plusMonths(1);
+                startDatePicker.setValue(startDate);
             }
         }
     }
 
-    public void persistVeranstaltungstermin (LocalDate startDate, LocalDate endDate) {
-        Veranstaltungstermin veranstaltungstermin = new Veranstaltungstermin();
-        veranstaltungstermin.setDatum(startDate);
-        veranstaltungstermin.setUhrzeit(startTimePicker.getValue());
-        veranstaltungstermin.setOrt(ort.getValue());
-        veranstaltungstermin.setNotizen(notizen.getValue());
+    public void persistVeranstaltungstermin () {
+        try {
+            Veranstaltungstermin veranstaltungstermin = new Veranstaltungstermin();
+            binder.writeBean(veranstaltungstermin);
 
-        Veranstaltung veranstaltung = veranstaltungService.findVeranstaltungById(Long.parseLong(veranstaltungId));
+            Veranstaltung veranstaltung = veranstaltungService.findVeranstaltungById(Long.parseLong(veranstaltungId));
+            veranstaltung.addVeranstaltungstermin(veranstaltungstermin); //Lazy Load Problem
+            veranstaltungstermin.setVeranstaltung(veranstaltung);
 
-        veranstaltungstermin.setVeranstaltung(veranstaltung);
+            veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
+            veranstaltungService.saveVeranstaltung(veranstaltung);
+            Notification.show("Veranstaltungstermin angelegt!");
 
-        veranstaltung.addVeranstaltungstermin(veranstaltungstermin); //Lazy Load Problem
-
-        veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
-        veranstaltungService.saveVeranstaltung(veranstaltung);
-
-        Notification.show("Veranstaltungstermin angelegt!");
+        } catch (ValidationException e) {
+            e.getBeanValidationErrors().forEach(error -> {
+                String fieldName = error.getErrorMessage().toString();
+                System.out.println("Validation error in field '" + fieldName);
+            });
+        }
     }
 
     public void clearFields(){

@@ -5,7 +5,7 @@ import com.example.application.models.Veranstaltung;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
-import com.example.application.views.MainLayout;
+import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -15,17 +15,16 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.data.binder.Binder;
+import jdk.jfr.Event;
 
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Route(value = "addDialog")
 public class VeranstaltungDialog extends Dialog {
@@ -43,6 +42,9 @@ public class VeranstaltungDialog extends Dialog {
     private final Button cancelButton= new Button("Cancel");
     private final Button saveButton= new Button("Save");
 
+    //Data Binder
+    Binder<Veranstaltung> binder = new Binder<>(Veranstaltung.class);
+
     public VeranstaltungDialog(VeranstaltungenService veranstaltungenService, TeilnehmerService teilnehmerService, UserService userService) {
         this.veranstaltungenService = veranstaltungenService;
         this.teilnehmerService = teilnehmerService;
@@ -50,7 +52,7 @@ public class VeranstaltungDialog extends Dialog {
 
         add(createLayout());
         configureElements();
-
+        bindFields();
     }
 
     private HorizontalLayout createLayout() {
@@ -63,7 +65,6 @@ public class VeranstaltungDialog extends Dialog {
                 new HorizontalLayout(
                         new VerticalLayout(titelField, datePicker, comboBox),
                         new VerticalLayout(grid)
-
                 ));
         }
 
@@ -77,53 +78,41 @@ public class VeranstaltungDialog extends Dialog {
         grid.setItems(teilnehmerService.findAllTeilnehmer());
         grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
         //grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
-       // grid.addColumn(Teilnehmer::getId).setHeader("ID");
+        // grid.addColumn(Teilnehmer::getId).setHeader("ID");
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setSizeFull();
 
-        /*
-            grid.asSingleSelect().addValueChangeListener(event -> {
-                // Get the selected student
-                Teilnehmer selectedStudent = event.getValue();
-
-                // Add the selected student to the combobox
-                if (selectedStudent != null) {
-                    Set<Teilnehmer> temp_teilnehmer = comboBox.getValue();
-                    temp_teilnehmer.add(selectedStudent);
-                    comboBox.setValue(temp_teilnehmer);
-                }
-            });
-        */
-
         //Buttons
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        saveButton.addClickListener(e -> {
-            persistVeranstaltung();
-            clearFields();
-            close();
-            UI.getCurrent().getPage().reload();
+        saveButton.addClickListener(event -> {
+            try {
+                Veranstaltung veranstaltung = new Veranstaltung();
+                veranstaltung.setUser(userService.findAdmin()); //Angemeldeten User holen
+                binder.writeBean(veranstaltung);
+                veranstaltungenService.saveVeranstaltung(veranstaltung);
+                Notification.show("Veranstaltung angelegt");
+                clearFields();
+                close();
+                UI.getCurrent().getPage().reload();
+            } catch (ValidationException e) {
+                e.printStackTrace();
+            }
         });
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         cancelButton.addClickListener(e -> {
+            clearFields();
             close();
         });
     }
 
-    private void persistVeranstaltung() {
-
-        Veranstaltung veranstaltung = new Veranstaltung();
-        veranstaltung.setTitel(titelField.getValue());
-        veranstaltung.setSemester(Date.from(datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-        veranstaltung.setTeilnehmer(new ArrayList<>(comboBox.getSelectedItems()));
-        veranstaltung.setUser(userService.findAdmin());
-
-        veranstaltungenService.saveVeranstaltung(veranstaltung);
-
-        Notification.show("Veranstaltung angelegt!");
-
-        titelField.clear();
-        datePicker.clear();
-        comboBox.clear();
+    private void bindFields() {
+        binder.forField(titelField)
+                .asRequired("Titel muss gefüllt sein")
+                .bind(Veranstaltung::getTitel, Veranstaltung::setTitel);
+        binder.forField(datePicker)
+                .bind(Veranstaltung::getSemester, Veranstaltung::setSemester);
+        binder.forField(comboBox)
+                .bind(Veranstaltung::getTeilnehmer, Veranstaltung::setTeilnehmer);
     }
 
     public void clearFields(){

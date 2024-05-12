@@ -40,7 +40,6 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     //Dialog Instance
     private VeranstaltungsterminDialog veranstaltungsterminDialog;
 
-
     public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService) {
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;

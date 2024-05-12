@@ -5,10 +5,8 @@ import com.vaadin.flow.component.html.Div;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Date;
+import java.time.LocalDate;
+import java.util.*;
 
 @Entity
 public class Veranstaltung implements Serializable {
@@ -16,7 +14,7 @@ public class Veranstaltung implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long veranstaltungsId; // Primary Key
-    private Date semester;          // Semester-Nummer
+    private LocalDate semester;          // Semester-Nummer
     private String titel;
 
     //Beziehungen
@@ -25,12 +23,12 @@ public class Veranstaltung implements Serializable {
     @OneToMany(fetch = FetchType.EAGER)
     private List<Veranstaltungstermin> veranstaltungstermine = new ArrayList<>();
     @ManyToMany(fetch = FetchType.EAGER)
-    private List<Teilnehmer> teilnehmer = new ArrayList<>();
+    private Set<Teilnehmer> teilnehmer = new HashSet<>();
 
     public Veranstaltung() {
     }
 
-    public Veranstaltung(Long veranstaltungsId, Date semester, String titel) {
+    public Veranstaltung(Long veranstaltungsId, LocalDate semester, String titel) {
         this.veranstaltungsId = veranstaltungsId;
         this.semester = semester;
         this.titel = titel;
@@ -45,11 +43,11 @@ public class Veranstaltung implements Serializable {
         this.veranstaltungsId = veranstaltungsId;
     }
 
-    public Date getSemester() {
+    public LocalDate getSemester() {
         return semester;
     }
 
-    public void setSemester(Date semester) {
+    public void setSemester(LocalDate semester) {
         this.semester = semester;
     }
 
@@ -88,11 +86,11 @@ public class Veranstaltung implements Serializable {
                 '}';
     }
 
-    public List<Teilnehmer> getTeilnehmer() {
+    public Set<Teilnehmer> getTeilnehmer() {
         return teilnehmer;
     }
 
-    public void setTeilnehmer(List<Teilnehmer> teilnehmer) {
+    public void setTeilnehmer(Set<Teilnehmer> teilnehmer) {
         this.teilnehmer = teilnehmer;
     }
 
