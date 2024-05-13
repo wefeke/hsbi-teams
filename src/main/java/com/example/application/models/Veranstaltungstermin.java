@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -16,7 +15,8 @@ public class Veranstaltungstermin {
     @Column(name = "id", nullable = false)
     private Long id;
     private LocalDate datum;
-    private LocalTime uhrzeit;
+    private LocalTime startZeit;
+    private LocalTime endZeit;
     private String ort;
     private String notizen;
 
@@ -66,11 +66,18 @@ public class Veranstaltungstermin {
         this.ort = ort;
     }
 
-    public LocalTime getUhrzeit() {
-        return uhrzeit;
+    public LocalTime getStartZeit() {
+        return startZeit;
     }
 
-    public void setUhrzeit(LocalTime uhrzeit) {
-        this.uhrzeit = uhrzeit;
+    public void setStartZeit(LocalTime startZeit) {
+        this.startZeit = startZeit;
+    }
+
+    public LocalTime getEndZeit() {
+        return endZeit;
+    }
+    public void setEndZeit(LocalTime endZeit) {
+        this.endZeit = endZeit;
     }
 }
