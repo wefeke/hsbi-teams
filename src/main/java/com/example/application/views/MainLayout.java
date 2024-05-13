@@ -35,6 +35,7 @@ public class MainLayout extends AppLayout {
         // Logo-Button, das als Home-Button fungiert
         Button logoButton = new Button("H.S.B.I TeamBuilder", e -> getUI().ifPresent(ui -> ui.navigate("")));
         configureButton(logoButton, "24px", false);
+        logoButton.getStyle().set("padding-left", "20px");
 
         // Navigationsbutton für die Veranstaltungen
         veranstaltungenButton = new Button("Veranstaltungen", e -> getUI().ifPresent(ui -> ui.navigate("")));
