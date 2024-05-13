@@ -84,25 +84,30 @@ public class VeranstaltungDialog extends Dialog {
 
         //Buttons
         saveButton.addClickListener(event -> {
-            try {
-                Veranstaltung veranstaltung = new Veranstaltung();
+
+            Veranstaltung veranstaltung = new Veranstaltung();
+
+            if (binder.writeBeanIfValid(veranstaltung)) {
                 veranstaltung.setUser(userService.findAdmin()); //Angemeldeten User holen
-                binder.writeBean(veranstaltung);
                 veranstaltungenService.saveVeranstaltung(veranstaltung);
-                Notification.show("Veranstaltung angelegt");
+
                 clearFields();
                 close();
                 UI.getCurrent().getPage().reload();
-            } catch (ValidationException e) {
-                e.printStackTrace();
+
+                Notification.show("Veranstaltung angelegt");
             }
-        });
+            else {
+                Notification.show("Fehler beim Speichern");
+            }
+
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         cancelButton.addClickListener(e -> {
             clearFields();
             close();
         });
+    });
     }
 
     private void bindFields() {
