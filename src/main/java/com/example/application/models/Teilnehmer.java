@@ -31,7 +31,35 @@ public class Teilnehmer {
         this.matrikelNr = matrikelNummer;
     }
 
+    public String getVorname() {
+        return vorname;
+    }
+
+    public void setVorname(String vorname) {
+        this.vorname = vorname;
+    }
+
+    public String getNachname() {
+        return nachname;
+    }
+
+    public void setNachname(String nachname) {
+        this.nachname = nachname;
+    }
+
     public Teilnehmer() {
 
+    }
+
+    public List<Veranstaltung> getVeranstaltungen() {
+        return veranstaltungen;
+    }
+
+    public void setVeranstaltungen(List<Veranstaltung> veranstaltungen) {
+        this.veranstaltungen = veranstaltungen;
+    }
+
+    public void addVerastaltung (Veranstaltung veranstaltung){
+        this.veranstaltungen.add(veranstaltung);
     }
 }
