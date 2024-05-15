@@ -7,6 +7,7 @@ import com.example.application.repositories.VeranstaltungsterminRepository;
 import com.example.application.services.VeranstaltungenService;
 import com.example.application.services.VeranstaltungsterminService;
 import com.example.application.views.MainLayout;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -96,6 +97,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         Div kachel = new Div(kachelContent);
         kachel.getStyle()
+                .set("position", "relative")
                 .set("border", "1px solid var(--lumo-contrast-20pct)")
                 .set("border-radius", "10px")
                 .set("padding", "1em")
@@ -105,12 +107,50 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         kachel.setWidth("150px");
         kachel.setHeight("150px");
 
+        Div deleteIcon = new Div();
+        deleteIcon.setText("🗑️");
+        deleteIcon.addClassName("delete-icon");
+        deleteIcon.getStyle().set("position", "absolute");
+        deleteIcon.getStyle().set("bottom", "5px");
+        deleteIcon.getStyle().set("right", "5px");
+        deleteIcon.getStyle().set("visibility", "hidden");
+
+        Dialog confirmationDialog = new Dialog();
+        confirmationDialog.add(new Text("Möchten Sie den Veranstaltungstermin " + veranstaltungstermin.getDatum() + " wirklich löschen?"));
+
+        Button yesButton = new Button("Ja", event -> {
+            veranstaltungsterminService.deleteVeranstaltungstermin(veranstaltungstermin);
+            Notification.show("Veranstaltungstermin gelöscht");
+            getUI().ifPresent(ui -> ui.getPage().reload());
+            confirmationDialog.close();
+        });
+
+        Button noButton = new Button("Nein", event -> {
+            confirmationDialog.close();
+            kachel.getStyle().set("background-color", "");
+            deleteIcon.getStyle().set("visibility", "hidden");
+        });
+
+        confirmationDialog.add(yesButton, noButton);
+
+        deleteIcon.getElement().addEventListener("click", e -> {
+            confirmationDialog.open();
+        }).addEventData("event.stopPropagation()");
+
+        kachel.add(deleteIcon);
+
         kachel.getElement().addEventListener("mouseover", e -> {
             kachel.getStyle().set("background-color", "lightblue");
+            deleteIcon.getStyle().set("visibility", "visible");
         });
 
         kachel.getElement().addEventListener("mouseout", e -> {
             kachel.getStyle().set("background-color", "");
+            deleteIcon.getStyle().set("visibility", "hidden");
+        });
+
+        kachel.addClickListener(e -> {
+            Notification.show("Veranstaltungstermin geklickt!");
         });
 
         return kachel;
