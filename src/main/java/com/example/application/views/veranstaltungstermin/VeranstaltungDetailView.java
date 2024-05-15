@@ -2,41 +2,41 @@ package com.example.application.views.veranstaltungstermin;
 
 import com.example.application.models.Veranstaltung;
 import com.example.application.models.Veranstaltungstermin;
-import com.example.application.repositories.VeranstaltungenRepository;
-import com.example.application.repositories.VeranstaltungsterminRepository;
 import com.example.application.services.VeranstaltungenService;
 import com.example.application.services.VeranstaltungsterminService;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
-import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.router.*;
-import org.hibernate.Hibernate;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @PageTitle("Veranstaltung Detail")
 @Route(value = "veranstaltung-detail/:veranstaltungId", layout = MainLayout.class)
 public class VeranstaltungDetailView extends VerticalLayout implements HasUrlParameter<String> {
 
+    //Services
     private final VeranstaltungenService veranstaltungService;
     private final VeranstaltungsterminService veranstaltungsterminService;
-    private String veranstaltungId;
+
+    //Data
+    private String veranstaltungIdString;
+    private long veranstaltungIdLong;
+    private Veranstaltung veranstaltung;
+    private List<Veranstaltungstermin> termine;
+
+    //UI Elements
+    private Div kachelContainer;
+    private H1 veranstaltungTitle;
+    private Text text;
+    private Hr lineBefore;
+    private Hr lineAfter;
 
     //Dialog Instance
     private VeranstaltungsterminDialog veranstaltungsterminDialog;
@@ -45,27 +45,37 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
 
-        //Hier muss noch ein Fehler behoben werden, da die veranstaltungsId ein String ist und in der Datenbank ein Long
-        //List<Veranstaltungstermin> termine = veranstaltungsterminService.findVeranstaltungstermineByVeranstaltungId(Long.parseLong(veranstaltungId));
-        List<Veranstaltungstermin> termine = veranstaltungsterminService.findAllVeranstaltungstermine();
-
-        HorizontalLayout mainLayout = new HorizontalLayout();
+        VerticalLayout mainLayout = new VerticalLayout();
         mainLayout.setSizeFull();
 
-        Div kachelContainer = new Div();
+        this.kachelContainer = new Div();
         kachelContainer.addClassName("veranstaltungen-container");
         kachelContainer.getStyle().set("display", "flex");
         kachelContainer.getStyle().set("flexWrap", "wrap");
 
-        // Kacheln für vorhandene Veranstaltungstermine erstellen
-        for (Veranstaltungstermin termin : termine) {
-            kachelContainer.add(createVeranstaltungsterminKachel(termin));
-        }
+        this.veranstaltungTitle = new H1();
+        veranstaltungTitle.getStyle().set("font-size", "28px");
 
-        // Kachel für neue Veranstaltung hinzufügen
-        kachelContainer.add(createKachel());
+        this.text = new Text("Veranstaltungstermine");
 
-        mainLayout.add(kachelContainer);
+        this.lineBefore = new Hr();
+        lineBefore.getStyle().set("flex-grow", "0");
+        lineBefore.getStyle().set("flex-shrink", "0");
+        lineBefore.getStyle().set("width", "30px");
+        lineBefore.getStyle().set("margin-top", "15px");
+        lineBefore.getStyle().set("margin-right", "-8px");
+
+        this.lineAfter = new Hr();
+        lineAfter.getStyle().set("flex-grow", "1");
+        lineAfter.getStyle().set("flex-shrink", "0");
+        lineAfter.getStyle().set("margin-top", "15px");
+        lineAfter.getStyle().set("margin-left", "-8px");
+
+        HorizontalLayout lineWithText = new HorizontalLayout(lineBefore, text, lineAfter);
+        lineWithText.setWidth("100%");
+        lineWithText.setAlignItems(Alignment.CENTER);
+
+        mainLayout.add(veranstaltungTitle, lineWithText, kachelContainer);
         add(mainLayout);
     }
 
@@ -75,13 +85,34 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         List<String> segments = location.getSegments();
 
         if (!segments.isEmpty()) {
-            this.veranstaltungId = segments.get(segments.size() - 1);
-            System.out.println("setParameter called with: " + veranstaltungId);
+            this.veranstaltungIdString = segments.get(segments.size() - 1);
+            try {
+                veranstaltungIdLong = Long.parseLong(veranstaltungIdString);
+                termine = veranstaltungsterminService.findVeranstaltungstermineByVeranstaltungId(veranstaltungIdLong);
+                veranstaltung = veranstaltungService.findVeranstaltungById(veranstaltungIdLong);
+            } catch (NumberFormatException e) {
+                System.err.println("Invalid veranstaltungId: " + veranstaltungIdString);
+            }
         } else {
-            System.out.println("No veranstaltungId in URL");
+            System.err.println("No veranstaltungId in URL");
         }
 
         createVeranstaltungsterminDialog();
+        //init Methode ist wichtig, da erst hier die termine gesetzt werden, weil sonst im Konstruktor die termine noch nicht gesetzt sind,
+        // wenn er aufgerufen wird, wodurch es zu einem Fehler kommt.
+        init();
+    }
+
+    private void init() {
+        veranstaltungTitle.setText(veranstaltung.getTitel());
+
+        // Kacheln für vorhandene Veranstaltungstermine der Veranstaltung erstellen
+        for (Veranstaltungstermin termin : termine) {
+            kachelContainer.add(createVeranstaltungsterminKachel(termin));
+        }
+
+        // Kachel für neue Veranstaltung hinzufügen
+        kachelContainer.add(createKachel());
     }
 
     private Div createVeranstaltungsterminKachel(Veranstaltungstermin veranstaltungstermin) {
@@ -133,9 +164,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         confirmationDialog.add(yesButton, noButton);
 
-        deleteIcon.getElement().addEventListener("click", e -> {
-            confirmationDialog.open();
-        }).addEventData("event.stopPropagation()");
+        deleteIcon.getElement().addEventListener("click", e ->
+            confirmationDialog.open()).addEventData("event.stopPropagation()");
 
         kachel.add(deleteIcon);
 
@@ -149,9 +179,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             deleteIcon.getStyle().set("visibility", "hidden");
         });
 
-        kachel.addClickListener(e -> {
-            Notification.show("Veranstaltungstermin geklickt!");
-        });
+        kachel.addClickListener(e ->
+            Notification.show("Veranstaltungstermin geklickt!"));
 
         return kachel;
     }
@@ -188,23 +217,19 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         neueVeranstaltungKachel.setWidth("150px");
         neueVeranstaltungKachel.setHeight("150px");
 
-        neueVeranstaltungKachel.getElement().addEventListener("mouseover", e -> {
-            neueVeranstaltungKachel.getStyle().set("background-color", "lightblue");
-        });
+        neueVeranstaltungKachel.getElement().addEventListener("mouseover", e ->
+                neueVeranstaltungKachel.getStyle().set("background-color", "lightblue"));
 
-        neueVeranstaltungKachel.getElement().addEventListener("mouseout", e -> {
-            neueVeranstaltungKachel.getStyle().set("background-color", "");
-        });
+        neueVeranstaltungKachel.getElement().addEventListener("mouseout", e ->
+                neueVeranstaltungKachel.getStyle().set("background-color", ""));
 
-        neueVeranstaltungKachel.addClickListener(e -> {
-            System.out.println(veranstaltungId);
-            veranstaltungsterminDialog.open();
-        });
+        neueVeranstaltungKachel.addClickListener(e ->
+                veranstaltungsterminDialog.open());
 
         return neueVeranstaltungKachel;
     }
 
     public void createVeranstaltungsterminDialog () {
-        veranstaltungsterminDialog = new VeranstaltungsterminDialog(veranstaltungService, veranstaltungsterminService, veranstaltungId);
+        veranstaltungsterminDialog = new VeranstaltungsterminDialog(veranstaltungService, veranstaltungsterminService, veranstaltungIdString);
     }
 }

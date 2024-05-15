@@ -28,6 +28,11 @@ public class VeranstaltungsterminService {
         return veranstaltungsterminRepository.findVeranstaltungstermineByVeranstaltungVeranstaltungsId(veranstaltungsId);
     }
 
+    public Veranstaltungstermin findVeranstaltungsterminById(Long id) {
+        return veranstaltungsterminRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid Veranstaltungstermin Id:" + id));
+    }
+
     @Transactional
     public void saveVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin) {
         if (veranstaltungstermin != null) {

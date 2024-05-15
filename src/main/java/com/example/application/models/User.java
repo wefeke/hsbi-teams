@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "users") // Ändern Sie den Tabellennamen auf "users"
+@Table(name = "users")
 public class User {
     @Id
     @Column(name = "username", nullable = false)
