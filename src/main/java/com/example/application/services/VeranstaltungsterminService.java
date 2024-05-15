@@ -34,4 +34,14 @@ public class VeranstaltungsterminService {
         }
     }
 
+    public void deleteVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin) {
+
+        if (veranstaltungstermin == null) {
+            veranstaltungsterminRepository.delete(veranstaltungstermin);
+        } else {
+            System.err.println("Veranstaltungstermin is null. Are you sure you have connected your form to the application?");
+        }
+    }
+
+
 }
