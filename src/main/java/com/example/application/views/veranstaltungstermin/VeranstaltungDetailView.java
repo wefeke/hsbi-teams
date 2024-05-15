@@ -11,6 +11,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.html.Div;
@@ -147,22 +148,27 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         deleteIcon.getStyle().set("visibility", "hidden");
 
         Dialog confirmationDialog = new Dialog();
-        confirmationDialog.add(new Text("Möchten Sie den Veranstaltungstermin " + veranstaltungstermin.getDatum() + " wirklich löschen?"));
+        HorizontalLayout buttonLayout = new HorizontalLayout(
+                new Button("Ja", event -> {
+                    veranstaltungsterminService.deleteVeranstaltungstermin(veranstaltungstermin);
+                    Notification.show("Veranstaltungstermin gelöscht");
+                    getUI().ifPresent(ui -> ui.getPage().reload());
+                    confirmationDialog.close();
+                }),
+                new Button("Nein", event -> {
+                    confirmationDialog.close();
+                    kachel.getStyle().set("background-color", "");
+                    deleteIcon.getStyle().set("visibility", "hidden");
+                })
+        );
+        buttonLayout.setAlignItems(FlexComponent.Alignment.CENTER);
 
-        Button yesButton = new Button("Ja", event -> {
-            veranstaltungsterminService.deleteVeranstaltungstermin(veranstaltungstermin);
-            Notification.show("Veranstaltungstermin gelöscht");
-            getUI().ifPresent(ui -> ui.getPage().reload());
-            confirmationDialog.close();
-        });
-
-        Button noButton = new Button("Nein", event -> {
-            confirmationDialog.close();
-            kachel.getStyle().set("background-color", "");
-            deleteIcon.getStyle().set("visibility", "hidden");
-        });
-
-        confirmationDialog.add(yesButton, noButton);
+        confirmationDialog.add(
+                new VerticalLayout(
+                        new Text("Möchten Sie den Veranstaltungstermin für den " + veranstaltungstermin.getDatum() + " wirklich löschen?"),
+                        buttonLayout
+                )
+        );
 
         deleteIcon.getElement().addEventListener("click", e ->
             confirmationDialog.open()).addEventData("event.stopPropagation()");
