@@ -1,7 +1,9 @@
 package com.example.application.views.veranstaltungstermin;
 
+import com.example.application.models.Gruppenarbeit;
 import com.example.application.models.Veranstaltung;
 import com.example.application.models.Veranstaltungstermin;
+import com.example.application.services.GruppenarbeitService;
 import com.example.application.services.VeranstaltungenService;
 import com.example.application.services.VeranstaltungsterminService;
 import com.example.application.views.MainLayout;
@@ -25,58 +27,49 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     //Services
     private final VeranstaltungenService veranstaltungService;
     private final VeranstaltungsterminService veranstaltungsterminService;
+    private final GruppenarbeitService gruppenarbeitService;
 
     //Data
     private String veranstaltungIdString;
     private long veranstaltungIdLong;
     private Veranstaltung veranstaltung;
     private List<Veranstaltungstermin> termine;
+    private Div aktiveKachel = null;
 
     //UI Elements
-    private Div kachelContainer;
+    private Div veranstaltungsterminContainer;
+    private Div gruppenarbeitContainer;
     private H1 veranstaltungTitle;
-    private Text text;
-    private Hr lineBefore;
-    private Hr lineAfter;
 
     //Dialog Instance
     private VeranstaltungsterminDialog veranstaltungsterminDialog;
 
-    public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService) {
+    //Layout
+    private final VerticalLayout mainLayout;
+    private HorizontalLayout gruppenarbeitline;
+
+    public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService) {
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
+        this.gruppenarbeitService = gruppenarbeitService;
 
-        VerticalLayout mainLayout = new VerticalLayout();
+        this.mainLayout = new VerticalLayout();
         mainLayout.setSizeFull();
-
-        this.kachelContainer = new Div();
-        kachelContainer.addClassName("veranstaltungen-container");
-        kachelContainer.getStyle().set("display", "flex");
-        kachelContainer.getStyle().set("flexWrap", "wrap");
 
         this.veranstaltungTitle = new H1();
         veranstaltungTitle.getStyle().set("font-size", "28px");
 
-        this.text = new Text("Veranstaltungstermine");
+        this.veranstaltungsterminContainer = new Div();
+        veranstaltungsterminContainer.addClassName("veranstaltungen-container");
+        veranstaltungsterminContainer.getStyle().set("display", "flex");
+        veranstaltungsterminContainer.getStyle().set("flexWrap", "wrap");
 
-        this.lineBefore = new Hr();
-        lineBefore.getStyle().set("flex-grow", "0");
-        lineBefore.getStyle().set("flex-shrink", "0");
-        lineBefore.getStyle().set("width", "30px");
-        lineBefore.getStyle().set("margin-top", "15px");
-        lineBefore.getStyle().set("margin-right", "-8px");
+        this.gruppenarbeitContainer = new Div();
+        gruppenarbeitContainer.addClassName("gruppenarbeiten-container");
+        gruppenarbeitContainer.getStyle().set("display", "flex");
+        gruppenarbeitContainer.getStyle().set("flexWrap", "wrap");
 
-        this.lineAfter = new Hr();
-        lineAfter.getStyle().set("flex-grow", "1");
-        lineAfter.getStyle().set("flex-shrink", "0");
-        lineAfter.getStyle().set("margin-top", "15px");
-        lineAfter.getStyle().set("margin-left", "-8px");
-
-        HorizontalLayout lineWithText = new HorizontalLayout(lineBefore, text, lineAfter);
-        lineWithText.setWidth("100%");
-        lineWithText.setAlignItems(Alignment.CENTER);
-
-        mainLayout.add(veranstaltungTitle, lineWithText, kachelContainer);
+        mainLayout.add(veranstaltungTitle, createLineWithText("Veranstaltungstermine"), veranstaltungsterminContainer);
         add(mainLayout);
     }
 
@@ -109,14 +102,14 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         // Kacheln für vorhandene Veranstaltungstermine der Veranstaltung erstellen
         for (Veranstaltungstermin termin : termine) {
-            kachelContainer.add(createVeranstaltungsterminKachel(termin));
+            veranstaltungsterminContainer.add(veranstaltungsterminKachel(termin));
         }
 
         // Kachel für neue Veranstaltung hinzufügen
-        kachelContainer.add(createKachel());
+        veranstaltungsterminContainer.add(createVeranstaltungsterminKachel());
     }
 
-    private Div createVeranstaltungsterminKachel(Veranstaltungstermin veranstaltungstermin) {
+    private Div veranstaltungsterminKachel(Veranstaltungstermin veranstaltungstermin) {
         Div terminInfo = new Div();
         terminInfo.setText(veranstaltungstermin.getDatum().toString());
 
@@ -176,17 +169,60 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         kachel.add(deleteIcon);
 
         kachel.getElement().addEventListener("mouseover", e -> {
-            kachel.getStyle().set("background-color", "lightblue");
+            if (!kachel.equals(aktiveKachel)) {
+                kachel.getStyle().set("background-color", "lightblue");
+            }
             deleteIcon.getStyle().set("visibility", "visible");
         });
 
         kachel.getElement().addEventListener("mouseout", e -> {
-            kachel.getStyle().set("background-color", "");
+            if (!kachel.equals(aktiveKachel)) {
+                kachel.getStyle().set("background-color", "");
+            }
             deleteIcon.getStyle().set("visibility", "hidden");
         });
 
-        kachel.addClickListener(e ->
-            Notification.show("Veranstaltungstermin geklickt!"));
+        kachel.addClickListener(e -> {
+            // Wenn die aktive Kachel die angeklickte Kachel ist, entfernen Sie die Gruppenarbeit-Kacheln und die Linie
+            if (kachel.equals(aktiveKachel)) {
+                gruppenarbeitContainer.removeAll();
+                gruppenarbeitline.setVisible(false);
+                aktiveKachel.getStyle().set("background-color", "");
+                aktiveKachel = null;
+            } else {
+                // Setzen Sie die Hintergrundfarbe der aktiven Kachel zurück
+                if (aktiveKachel != null) {
+                    aktiveKachel.getStyle().set("background-color", "");
+                }
+
+                // Setzen Sie die Hintergrundfarbe der angeklickten Kachel auf blau und machen Sie sie zur aktiven Kachel
+                kachel.getStyle().set("background-color", "lightblue");
+                aktiveKachel = kachel;
+
+                // Entfernen Sie alle vorhandenen Gruppenarbeit-Kacheln
+                gruppenarbeitContainer.removeAll();
+
+                if (gruppenarbeitline == null) {
+                    gruppenarbeitline = createLineWithText("Gruppenarbeiten");
+                    mainLayout.add(gruppenarbeitline, gruppenarbeitContainer);
+                }
+
+                // Fügen Sie Kacheln für jede Gruppenarbeit des Veranstaltungstermins hinzu
+                for (Gruppenarbeit gruppenarbeit : veranstaltungstermin.getGruppenarbeiten()) {
+                    gruppenarbeitContainer.add(gruppenarbeitKachel(gruppenarbeit));
+                }
+
+                // Fügen Sie die Kachel zum Erstellen einer neuen Gruppenarbeit hinzu
+                gruppenarbeitContainer.add(createGruppenarbeitKachel());
+
+                gruppenarbeitline.setVisible(true);
+                gruppenarbeitContainer.setVisible(true);
+
+                // Setzen Sie die Hintergrundfarbe der angeklickten Kachel auf Blau und machen Sie sie zur aktiven Kachel
+                kachel.getStyle().set("background-color", "#4682B4");
+                aktiveKachel = kachel;
+            }
+        });
 
         return kachel;
     }
@@ -199,7 +235,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
      *
      * @return Die erstellte Kachel als {@link Div}-Element, bereit zum Hinzufügen zum Container.
      */
-    private Div createKachel() {
+
+    private Div createVeranstaltungsterminKachel() {
         //Ich kann diese Methode nicht als static machen, weil getUi() nicht statisch ist.
         //Dadurch muss ich diese Methode in jeder Klasse neu einbauen, wo ich sie verwenden möchte.
         Div plusSymbol = new Div();
@@ -237,5 +274,137 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
     public void createVeranstaltungsterminDialog () {
         veranstaltungsterminDialog = new VeranstaltungsterminDialog(veranstaltungService, veranstaltungsterminService, veranstaltungIdString);
+    }
+
+    private Div gruppenarbeitKachel(Gruppenarbeit gruppenarbeit) {
+        Div gruppenarbeitInfo = new Div();
+        gruppenarbeitInfo.setText(gruppenarbeit.getTitel());
+
+        gruppenarbeitInfo.getStyle().set("text-align", "center");
+        gruppenarbeitInfo.getStyle().set("margin", "auto");
+
+        Div kachelContent = new Div(gruppenarbeitInfo);
+        kachelContent.getStyle().set("display", "flex");
+        kachelContent.getStyle().set("flex-direction", "column");
+
+        Div kachel = new Div(kachelContent);
+        kachel.getStyle()
+                .set("position", "relative")
+                .set("border", "1px solid var(--lumo-contrast-20pct)")
+                .set("border-radius", "10px")
+                .set("padding", "1em")
+                .set("margin", "0.5em")
+                .set("cursor", "pointer")
+                .set("box-shadow", "0 4px 8px 0 rgba(0,0,0,0.2)");
+        kachel.setWidth("150px");
+        kachel.setHeight("150px");
+
+        Div deleteIcon = new Div();
+        deleteIcon.setText("🗑️");
+        deleteIcon.addClassName("delete-icon");
+        deleteIcon.getStyle().set("position", "absolute");
+        deleteIcon.getStyle().set("bottom", "5px");
+        deleteIcon.getStyle().set("right", "5px");
+        deleteIcon.getStyle().set("visibility", "hidden");
+
+        Dialog confirmationDialog = new Dialog();
+        HorizontalLayout buttonLayout = new HorizontalLayout(
+                new Button("Ja", event -> {
+                    gruppenarbeitService.deleteGruppenarbeit(gruppenarbeit);
+                    confirmationDialog.close();
+                }),
+                new Button("Nein", event -> {
+                    confirmationDialog.close();
+                    kachel.getStyle().set("background-color", "");
+                    deleteIcon.getStyle().set("visibility", "hidden");
+                })
+        );
+        buttonLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+
+        confirmationDialog.add(
+                new VerticalLayout(
+                        new Text("Möchten Sie die Gruppenarbeit " + gruppenarbeit.getTitel() + " wirklich löschen?"),
+                        buttonLayout
+                )
+        );
+
+        deleteIcon.getElement().addEventListener("click", e ->
+            confirmationDialog.open()).addEventData("event.stopPropagation()");
+
+        kachel.add(deleteIcon);
+
+        kachel.getElement().addEventListener("mouseover", e -> {
+            kachel.getStyle().set("background-color", "lightblue");
+            deleteIcon.getStyle().set("visibility", "visible");
+        });
+
+        kachel.getElement().addEventListener("mouseout", e -> {
+            kachel.getStyle().set("background-color", "");
+            deleteIcon.getStyle().set("visibility", "hidden");
+        });
+
+        kachel.addClickListener(e ->
+            Notification.show("Gruppenarbeit geklickt!"));
+
+        return kachel;
+    }
+
+    private Div createGruppenarbeitKachel() {
+        //Ich kann diese Methode nicht als static machen, weil getUi() nicht statisch ist.
+        //Dadurch muss ich diese Methode in jeder Klasse neu einbauen, wo ich sie verwenden möchte.
+        Div plusSymbol = new Div();
+        plusSymbol.setText("+");
+        plusSymbol.getStyle()
+                .set("font-size", "40px")
+                .set("text-align", "center")
+                .set("margin", "auto");
+
+        Div neueGruppenarbeitKachel = new Div(plusSymbol);
+        neueGruppenarbeitKachel.getStyle()
+                .set("border", "1px solid var(--lumo-contrast-20pct)")
+                .set("border-radius", "10px")
+                .set("padding", "1em")
+                .set("margin", "0.5em")
+                .set("cursor", "pointer")
+                .set("box-shadow", "0 4px 8px 0 rgba(0,0,0,0.2)")
+                .set("display", "flex")
+                .set("align-items", "center")
+                .set("justify-content", "center");
+        neueGruppenarbeitKachel.setWidth("150px");
+        neueGruppenarbeitKachel.setHeight("150px");
+
+        neueGruppenarbeitKachel.getElement().addEventListener("mouseover", e ->
+                neueGruppenarbeitKachel.getStyle().set("background-color", "lightblue"));
+
+        neueGruppenarbeitKachel.getElement().addEventListener("mouseout", e ->
+                neueGruppenarbeitKachel.getStyle().set("background-color", ""));
+
+        neueGruppenarbeitKachel.addClickListener(e ->
+                Notification.show("Gruppenarbeit hinzufügen"));
+
+        return neueGruppenarbeitKachel;
+    }
+
+    private HorizontalLayout createLineWithText(String text) {
+        Hr lineBefore = new Hr();
+        lineBefore.getStyle().set("flex-grow", "0");
+        lineBefore.getStyle().set("flex-shrink", "0");
+        lineBefore.getStyle().set("width", "30px");
+        lineBefore.getStyle().set("margin-top", "15px");
+        lineBefore.getStyle().set("margin-right", "-8px");
+
+        Hr lineAfter = new Hr();
+        lineAfter.getStyle().set("flex-grow", "1");
+        lineAfter.getStyle().set("flex-shrink", "0");
+        lineAfter.getStyle().set("margin-top", "15px");
+        lineAfter.getStyle().set("margin-left", "-8px");
+
+        Text lineText = new Text(text);
+
+        HorizontalLayout lineWithText = new HorizontalLayout(lineBefore, lineText, lineAfter);
+        lineWithText.setWidth("100%");
+        lineWithText.setAlignItems(Alignment.CENTER);
+
+        return lineWithText;
     }
 }

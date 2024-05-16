@@ -1,4 +1,4 @@
-package com.example.application;
+package com.example.application.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
