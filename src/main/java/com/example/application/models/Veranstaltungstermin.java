@@ -23,7 +23,7 @@ public class Veranstaltungstermin {
     //Beziehungen
     @ManyToOne
     private Veranstaltung veranstaltung;
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<Gruppenarbeit> gruppenarbeiten = new ArrayList<>();
 
     public Long getId() {
@@ -77,7 +77,12 @@ public class Veranstaltungstermin {
     public LocalTime getEndZeit() {
         return endZeit;
     }
+
     public void setEndZeit(LocalTime endZeit) {
         this.endZeit = endZeit;
+    }
+
+    public List<Gruppenarbeit> getGruppenarbeiten() {
+        return gruppenarbeiten;
     }
 }

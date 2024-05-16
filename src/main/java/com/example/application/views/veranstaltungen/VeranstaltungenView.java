@@ -17,6 +17,8 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -35,23 +37,55 @@ import java.util.List;
 @Route(value = "", layout = MainLayout.class)
 public class VeranstaltungenView extends VerticalLayout {
 
+    //Services
     private final VeranstaltungenService veranstaltungenService;
     private final TeilnehmerService teilnehmerService;
     private final UserService userService;
+
+    //Dialog Instance
     private VeranstaltungDialog veranstaltungDialog;
+
+    //UI Elements
+    private H1 username;
+    private Text text;
+    private Hr lineBefore;
+    private Hr lineAfter;
 
     @Autowired
     public VeranstaltungenView(VeranstaltungenService veranstaltungenService, UserService userService, TeilnehmerService teilnehmerService) {
         this.veranstaltungenService = veranstaltungenService;
         this.teilnehmerService = teilnehmerService;
 
-        HorizontalLayout mainLayout = new HorizontalLayout();
+        VerticalLayout mainLayout = new VerticalLayout();
         mainLayout.setSizeFull();
 
         Div kachelContainer = new Div();
         kachelContainer.addClassName("veranstaltungen-container");
         kachelContainer.getStyle().set("display", "flex");
         kachelContainer.getStyle().set("flexWrap", "wrap");
+
+        //Hier später noch die Logik für den Namen des Users einbauen.
+        this.username = new H1("Herzlich Willkommen, XY");
+        username.getStyle().set("font-size", "28px");
+
+        this.text = new Text("Veranstaltungen");
+
+        this.lineBefore = new Hr();
+        lineBefore.getStyle().set("flex-grow", "0");
+        lineBefore.getStyle().set("flex-shrink", "0");
+        lineBefore.getStyle().set("width", "30px");
+        lineBefore.getStyle().set("margin-top", "15px");
+        lineBefore.getStyle().set("margin-right", "-8px");
+
+        this.lineAfter = new Hr();
+        lineAfter.getStyle().set("flex-grow", "1");
+        lineAfter.getStyle().set("flex-shrink", "0");
+        lineAfter.getStyle().set("margin-top", "15px");
+        lineAfter.getStyle().set("margin-left", "-8px");
+
+        HorizontalLayout lineWithText = new HorizontalLayout(lineBefore, text, lineAfter);
+        lineWithText.setWidth("100%");
+        lineWithText.setAlignItems(Alignment.CENTER);
 
         // Alle Veranstaltungen aus der Datenbank abrufen
         List<Veranstaltung> veranstaltungen = veranstaltungenService.findAllVeranstaltungen();
@@ -64,7 +98,7 @@ public class VeranstaltungenView extends VerticalLayout {
         // Kachel für neue Veranstaltung hinzufügen
         kachelContainer.add(createKachel("add-veranstaltung"));
 
-        mainLayout.add(kachelContainer);
+        mainLayout.add(username, lineWithText, kachelContainer);
         add(mainLayout);
         this.userService = userService;
 
