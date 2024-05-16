@@ -14,10 +14,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @PageTitle("Gruppenarbeiten")
 @Route(value = "gruppenarbeiten", layout = MainLayout.class)
@@ -27,20 +24,20 @@ public class GruppenarbeitHinzufuegenView extends VerticalLayout {
     HorizontalLayout formData = new HorizontalLayout();
     HorizontalLayout buttons = new HorizontalLayout();
     VerticalLayout dataAndParticipants = new VerticalLayout();
-    List<String> allParticipants = new ArrayList<String>();
+    Set<String> allParticipants = new HashSet<>();
 
     TextField titleField = new TextField("Titel");
     TextArea descriptionArea = new TextArea("Beschreibung");
     H2 infoText = new H2("Gruppenarbeit anlegen");
     MultiSelectListBox<String> participants = new MultiSelectListBox<>();
-    Button save = new Button("Speichern");
     Button clear = new Button("Leeren");
     Select<String> groupSize = new Select<>();
+    Button testAdd = new Button("Add");
 
 
     @Autowired
     public GruppenarbeitHinzufuegenView(GruppenarbeitService gruppenarbeitService) {
-        addParticipants();
+        //addParticipants();
         this.gruppenarbeitService = gruppenarbeitService;
         participants();
         formData();
@@ -61,11 +58,14 @@ public class GruppenarbeitHinzufuegenView extends VerticalLayout {
         allParticipants.add("Test 8");
         allParticipants.add("Test 9");
         allParticipants.add("Test 10");
+        participants.getDataProvider().refreshAll();
+        selectGroupsize();
     }
 
     private void buttons() {
-        save.addClickListener(e -> groupSize.setVisible(true));
-        buttons.add(save,clear);
+        testAdd.addClickListener(e -> addParticipants());
+
+        buttons.add(clear, testAdd);
     }
 
     private void formData() {
@@ -77,12 +77,22 @@ public class GruppenarbeitHinzufuegenView extends VerticalLayout {
     }
 
     private void selectGroupsize(){
-        List<String> groups = groupNumbersAndSizes(allParticipants.size());
+        List<String> groups = getGroups();
         groupSize.setLabel("Gruppen wählen");
         groupSize.setWidth("25%");
         groupSize.setItems(groups);
-        groupSize.setVisible(false);
     }
+
+    private List<String> getGroups() {
+        List<String> groups = new ArrayList<>();
+        if(allParticipants.isEmpty()){
+            groups.add("Error: Keine Teilnehmer. Kann keine Gruppen erstellen");
+            return groups;
+        }
+        groups = groupNumbersAndSizes(allParticipants.size());
+        return groups;
+    }
+
     private void descriptionArea() {
         descriptionArea.setWidthFull();
         descriptionArea.setHeight("150px");
