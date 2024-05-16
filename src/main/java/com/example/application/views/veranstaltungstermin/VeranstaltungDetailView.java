@@ -183,7 +183,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         });
 
         kachel.addClickListener(e -> {
-            // Wenn die aktive Kachel die angeklickte Kachel ist, entfernen Sie die Gruppenarbeit-Kacheln und die Linie
+            // Wenn die aktive Kachel die angeklickte Kachel ist, entfernen Sie die Gruppenarbeit-Kacheln und die Linie.
             if (kachel.equals(aktiveKachel)) {
                 gruppenarbeitContainer.removeAll();
                 gruppenarbeitline.setVisible(false);
