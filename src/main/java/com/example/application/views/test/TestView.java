@@ -1,7 +1,11 @@
 package com.example.application.views.test;
 
+import com.example.application.models.Auswertung;
 import com.example.application.models.Test;
+import com.example.application.models.Veranstaltung;
+import com.example.application.services.AuswertungService;
 import com.example.application.services.TestService;
+import com.example.application.services.VeranstaltungenService;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
@@ -22,17 +26,17 @@ import java.io.StringWriter;
 import java.util.Collections;
 import java.util.stream.Stream;
 
-
+//LEON
 @Route(value = "test")
 @PageTitle("Tests | Vaadin CRM")
 public class TestView extends VerticalLayout {
-    Grid<Test> grid = new Grid<>(Test.class);
+    Grid<Auswertung> grid = new Grid<>(Auswertung.class);
     TextField filterText = new TextField();
     TestContactForm form;
-    TestService testService;
+    AuswertungService auswertungService;
 
-    public TestView(TestService testService) {
-        this.testService = testService;
+    public TestView(AuswertungService auswertungService) {
+        this.auswertungService = auswertungService;
         addClassName("test-view");
         setSizeFull();
         configureGrid();
@@ -51,16 +55,16 @@ public class TestView extends VerticalLayout {
     }
 
     private void configureForm() {
-        form = new TestContactForm(testService.findAllTests());
+        form = new TestContactForm(auswertungService.findAllAuswertungen());
         form.setWidth("25em");
     }
 
     private void configureGrid() {
         grid.addClassNames("contact-grid");
         grid.setSizeFull();
-        grid.setColumns("testid", "testname");
-        grid.addColumn(Test::gettestid).setHeader("Test ID");
-        grid.addColumn(Test::gettestname).setHeader("Test Name");
+        grid.setColumns("name","titelVeranstaltung","titelGruppenarbeit","punkte");
+        //grid.addColumn(Test::gettestid).setHeader("Test ID");
+        //grid.addColumn(Test::gettestname).setHeader("Test Name");
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
     }
 
@@ -70,19 +74,18 @@ public class TestView extends VerticalLayout {
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateList());
 
-        Button addContactButton = new Button("Add test");
 
         Button csvExportButton = new Button("CSV Export");
 
         var streamResource = new StreamResource(
-                "test.csv",
+                "veranstaltungen.csv",
                 () -> {
 
                     try {
-                        Stream<Test> tests = grid.getGenericDataView().getItems();
+                        Stream<Auswertung> auswertungen = grid.getGenericDataView().getItems();
                         StringWriter writer = new StringWriter();
-                        var beanToCSV = new StatefulBeanToCsvBuilder<Test>(writer).build();
-                        beanToCSV.write(tests);
+                        var beanToCSV = new StatefulBeanToCsvBuilder<Auswertung>(writer).build();
+                        beanToCSV.write(auswertungen);
                         var contents = writer.toString();
                         return new ByteArrayInputStream(contents.getBytes());
                     } catch (CsvDataTypeMismatchException e) {
@@ -95,16 +98,13 @@ public class TestView extends VerticalLayout {
 
         var download = new Anchor(streamResource, "Download");
 
-
-
-        var toolbar = new HorizontalLayout(filterText, addContactButton,download);
+        var toolbar = new HorizontalLayout(filterText,download);
         toolbar.addClassName("toolbar");
-
         return toolbar;
     }
 
     private void updateList() {
-        grid.setItems(testService.findAllTests(filterText.getValue()));
+        grid.setItems(auswertungService.findAllAuswertungen());
     }
 }
 
