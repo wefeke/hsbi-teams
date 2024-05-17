@@ -62,4 +62,8 @@ public class Teilnehmer {
     public void addVerastaltung (Veranstaltung veranstaltung){
         this.veranstaltungen.add(veranstaltung);
     }
+
+    public String toString(){
+        return this.nachname + ", " + this.vorname;
+    }
 }

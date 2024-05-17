@@ -1,8 +1,11 @@
 package com.example.application.views.gruppenarbeit;
 
+import com.example.application.models.Teilnehmer;
 import com.example.application.services.GruppenarbeitService;
+import com.example.application.services.TeilnehmerService;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.listbox.MultiSelectListBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -16,97 +19,80 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
+//Lilli
 @PageTitle("Gruppenarbeiten")
 @Route(value = "gruppenarbeiten", layout = MainLayout.class)
-public class GruppenarbeitHinzufuegenView extends VerticalLayout {
+public class GruppenarbeitHinzufuegenDialog extends Dialog {
+
+    //Services
     private final GruppenarbeitService gruppenarbeitService;
+    private final TeilnehmerService teilnehmerService;
 
-    HorizontalLayout formData = new HorizontalLayout();
-    HorizontalLayout buttons = new HorizontalLayout();
-    VerticalLayout dataAndParticipants = new VerticalLayout();
-    Set<String> allParticipants = new HashSet<>();
+    //Data
+    Set<Teilnehmer> allParticipants = new HashSet<>();
 
+    //Dialog Items
     TextField titleField = new TextField("Titel");
     TextArea descriptionArea = new TextArea("Beschreibung");
     H2 infoText = new H2("Gruppenarbeit anlegen");
     MultiSelectListBox<String> participants = new MultiSelectListBox<>();
-    Button clear = new Button("Leeren");
     Select<String> groupSize = new Select<>();
-    Button testAdd = new Button("Add");
 
-
+    //Konstruktor
     @Autowired
-    public GruppenarbeitHinzufuegenView(GruppenarbeitService gruppenarbeitService) {
-        //addParticipants();
+    public GruppenarbeitHinzufuegenDialog(GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService) {
         this.gruppenarbeitService = gruppenarbeitService;
+        this.teilnehmerService = teilnehmerService;
+
         participants();
-        formData();
-        buttons();
-        selectGroupsize();
-        add(infoText, formData, buttons, groupSize);
 
-    }
-
-    private void addParticipants(){
-        allParticipants.add("Test 1");
-        allParticipants.add("Test 2");
-        allParticipants.add("Test 3");
-        allParticipants.add("Test 4");
-        allParticipants.add("Test 5");
-        allParticipants.add("Test 6");
-        allParticipants.add("Test 7");
-        allParticipants.add("Test 8");
-        allParticipants.add("Test 9");
-        allParticipants.add("Test 10");
-        participants.getDataProvider().refreshAll();
-        selectGroupsize();
-    }
-
-    private void buttons() {
-        testAdd.addClickListener(e -> addParticipants());
-
-        buttons.add(clear, testAdd);
-    }
-
-    private void formData() {
-        descriptionArea();
-        titleField.setWidthFull();
-        dataAndParticipants.add(titleField, descriptionArea);
-        formData.setWidth("80%");
-        formData.add(dataAndParticipants, participants);
-    }
-
-    private void selectGroupsize(){
         List<String> groups = getGroups();
         groupSize.setLabel("Gruppen wählen");
-        groupSize.setWidth("25%");
         groupSize.setItems(groups);
+
+        //add(infoText, titleField, descriptionArea, participants, groupSize);
+        add(createLayout());
+
     }
 
+    //Für die Select-Box der Gruppengrößen
     private List<String> getGroups() {
         List<String> groups = new ArrayList<>();
-        if(allParticipants.isEmpty()){
-            groups.add("Error: Keine Teilnehmer. Kann keine Gruppen erstellen");
+        if(participants.getSelectedItems().isEmpty()){
+            groups.add("Error: Keine Teilnehmer ausgewählt. Kann keine Gruppen erstellen");
             return groups;
         }
-        groups = groupNumbersAndSizes(allParticipants.size());
+        groups = groupNumbersAndSizes(participants.getSelectedItems().size());
         return groups;
     }
 
-    private void descriptionArea() {
-        descriptionArea.setWidthFull();
-        descriptionArea.setHeight("150px");
-    }
-
+    //Für die Felder der Teilnehmer in der ListBox
     private void participants() {
-        participants.setItems(allParticipants);
+        allParticipants.addAll(teilnehmerService.findAllTeilnehmer());
+        Set<String> stringParticipants = new HashSet<>();
+        for(Teilnehmer t:allParticipants){
+            stringParticipants.add(t.toString());
+        }
+        participants.setItems(stringParticipants);
+        for(String s:stringParticipants){
+            participants.select(s);
+        }
+        participants.addSelectionListener(event -> {
+            List<String> groups = getGroups();
+            groupSize.setItems(groups);
+
+        });
         participants.setWidth("30%");
     }
 
+
+    //Berechnet die maximale Anzahl an Gruppen bei gegebener Teilnehmergröße
     private int groupMax(int participants){
         return participants/2;
     }
 
+    //Berechnet alle möglichen Gruppenanzahlen bei gegebener maximaler Gruppenanzahl
+    //Das sind dann alle ab 2 bis zur maximalen Anzahl
     private int[] groupNumbers(int groupMax){
         int[] groupNumbers = new int[groupMax-1];
         for(int i=0; i<groupMax-1; i++){
@@ -115,6 +101,7 @@ public class GruppenarbeitHinzufuegenView extends VerticalLayout {
         return groupNumbers;
     }
 
+    //Berechnet die Gruppengröße bei gegebener Gruppen- und Gesamtteilnehmeranzahl
     private int[] groupSizes(int groups, int participants){
         if(participants%groups == 0){
             return new int[]{participants/groups};
@@ -124,6 +111,7 @@ public class GruppenarbeitHinzufuegenView extends VerticalLayout {
         }
     }
 
+    //Gibt alle möglichen Gruppengrößen und zugehörige Teilnehmeranzahlen als Strings in einer Liste zurück
     private List<String> groupNumbersAndSizes(int participants){
         List<String> groupStrings = new ArrayList<String>();
         int groupsTotal = groupMax(participants);
@@ -147,6 +135,25 @@ public class GruppenarbeitHinzufuegenView extends VerticalLayout {
             groupStrings.add(str);
         }
     return groupStrings;
+    }
+
+    //Layout des Fensters
+    private VerticalLayout createLayout(){
+        VerticalLayout mainPageLayout = new VerticalLayout();
+        HorizontalLayout gruppenarbeitData = new HorizontalLayout();
+        VerticalLayout gruppenarbeitText = new VerticalLayout();
+
+        gruppenarbeitText.add(titleField);
+        gruppenarbeitText.add(descriptionArea);
+
+        gruppenarbeitData.add(gruppenarbeitText);
+        gruppenarbeitData.add(participants);
+
+        mainPageLayout.add(infoText);
+        mainPageLayout.add(gruppenarbeitData);
+        mainPageLayout.add(groupSize);
+
+        return mainPageLayout;
     }
 
 
