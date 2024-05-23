@@ -1,5 +1,5 @@
 package com.example.application.views.test;
-import com.example.application.models.Test;
+import com.example.application.models.*;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
@@ -12,29 +12,36 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.shared.Registration;
+import jakarta.persistence.*;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Route(value = "testContact")
 public class TestContactForm extends FormLayout{
-    TextField testid = new TextField("Test ID");
-    TextField testname = new TextField("Test Name");
-    ComboBox<Test> test = new ComboBox<>("Test");
+    TextField titelVeranstaltung = new TextField("titelVeranstaltung");
+
+    //TextField veranstaltungstermine = new TextField("Test ID");
+    //TextField teilnehmer = new TextField("Test Name");
+
+    ComboBox<Auswertung> auswertung = new ComboBox<>("Auswertung");
+
 
     Button save = new Button("Save");
     Button delete = new Button("Delete");
     Button close = new Button("Cancel");
 
-    public TestContactForm(List<Test> tests) {
+    public TestContactForm(List<Auswertung> auswertungen) {
         addClassName("test-contact-form");
 
-        test.setItems(tests);
-        test.setItemLabelGenerator(Test::gettestname);
+        auswertung.setItems(auswertungen);
+        auswertung.setItemLabelGenerator(Auswertung::getTitelVeranstaltung);
 
         add(
-                testid,
-                testname,
-                test,
+                titelVeranstaltung,
                 createButtonsLayout()
         );
     }
