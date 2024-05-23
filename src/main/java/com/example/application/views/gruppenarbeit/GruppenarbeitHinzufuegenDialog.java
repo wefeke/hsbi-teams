@@ -43,7 +43,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     private final VeranstaltungsterminService veranstaltungsterminService;
 
     //Data
-    Set<Teilnehmer> allParticipants = new HashSet<>();
+    List<Teilnehmer> allParticipants = new ArrayList<>();
 
     //Binder
     Binder<Gruppenarbeit> binderGruppenarbeit = new Binder<>(Gruppenarbeit.class);
@@ -52,7 +52,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     TextField titleField = new TextField("Titel");
     TextArea descriptionArea = new TextArea("Beschreibung");
     H2 infoText = new H2("Gruppenarbeit anlegen");
-    MultiSelectListBox<String> participants = new MultiSelectListBox<>();
+    MultiSelectListBox<Teilnehmer> participants = new MultiSelectListBox<>();
     Select<String> groupSize = new Select<>();
 
     //Konstruktor
@@ -111,7 +111,25 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
                 }
 
                 //TODO: aus participants ausgewählte Teilnehmer zufallsgesteuert auf Gruppen verteilen
-                gruppen.get(0).addTeilnehmer(new Teilnehmer("Ben", "Test"));
+                Set<Teilnehmer> selectedParticipants = participants.getSelectedItems();
+                List<Teilnehmer> selectedParticipantsList = new ArrayList<>(selectedParticipants.stream().toList());
+
+                Collections.shuffle(selectedParticipantsList);
+                Iterator<Teilnehmer> teilnehmerIterator = selectedParticipantsList.iterator();
+
+
+
+                for(int j = 0; j<sizes[sizes.length-1];j++) {
+                    for (int i = 0; i < numberOfGroups; i++) {
+                        if(teilnehmerIterator.hasNext()){
+                            gruppen.get(i).addTeilnehmer(teilnehmerIterator.next());
+                        }
+                        else{
+                            break;
+                        }
+                    }
+                }
+
 
                 groupsGrid.setItems(gruppen);
 
@@ -145,13 +163,10 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     //Für die Felder der Teilnehmer in der ListBox
     private void participants() {
         allParticipants.addAll(teilnehmerService.findAllTeilnehmer());
-        Set<String> stringParticipants = new HashSet<>();
-        for(Teilnehmer t:allParticipants){
-            stringParticipants.add(t.toString());
-        }
-        participants.setItems(stringParticipants);
-        for(String s:stringParticipants){
-            participants.select(s);
+
+        participants.setItems(allParticipants);
+        for(Teilnehmer p:allParticipants){
+            participants.select(p);
         }
         participants.addSelectionListener(event -> {
             List<String> groups = getGroups();
@@ -170,11 +185,21 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
     //Berechnet alle möglichen Gruppenanzahlen bei gegebener maximaler Gruppenanzahl
     //Das sind dann alle ab 2 bis zur maximalen Anzahl
-    private int[] groupNumbers(int groupMax){
-        int[] groupNumbers = new int[groupMax-1];
-        for(int i=0; i<groupMax-1; i++){
-            groupNumbers[i] = i+2;
+//    private int[] groupNumbers(int groupMax){
+//        int[] groupNumbers = new int[groupMax];
+//        for(int i=0; i<groupMax; i++){
+//            groupNumbers[i] = i+1;
+//        }
+//        return groupNumbers;
+//    }
+
+    private int[] groupNumbers(int participants){
+        int groupMax = groupMax(participants);
+        int[] groupNumbers = new int[groupMax+1];
+        for(int i=0; i<groupMax; i++){
+            groupNumbers[i] = i+1;
         }
+        groupNumbers[groupMax] = participants;
         return groupNumbers;
     }
 
@@ -191,13 +216,12 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     //Gibt alle möglichen Gruppengrößen und zugehörige Teilnehmeranzahlen als Strings in einer Liste zurück
     private List<String> groupNumbersAndSizes(int participants){
         List<String> groupStrings = new ArrayList<String>();
-        int groupsTotal = groupMax(participants);
-        for(int i:groupNumbers(groupsTotal))
+        for(int i:groupNumbers(participants))
         {
             String str = "";
             str += i;
             str += " x ";
-            //for(int j:groupSizes(i, participants)){
+
             for(Iterator<Integer> it = Arrays.stream(groupSizes(i, participants)).iterator(); it.hasNext();){
                 String nextSize = it.next().toString();
                 if(it.hasNext()){
