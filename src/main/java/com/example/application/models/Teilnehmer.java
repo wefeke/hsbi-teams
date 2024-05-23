@@ -51,6 +51,11 @@ public class Teilnehmer {
 
     }
 
+    public Teilnehmer(String vorname, String nachname){
+        this.vorname = vorname;
+        this.nachname = nachname;
+    }
+
     public List<Veranstaltung> getVeranstaltungen() {
         return veranstaltungen;
     }

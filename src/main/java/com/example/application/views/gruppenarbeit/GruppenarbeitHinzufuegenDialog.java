@@ -1,18 +1,27 @@
 package com.example.application.views.gruppenarbeit;
 
+import com.example.application.models.Gruppe;
+import com.example.application.models.Gruppenarbeit;
 import com.example.application.models.Teilnehmer;
 import com.example.application.services.GruppenarbeitService;
 import com.example.application.services.TeilnehmerService;
+import com.example.application.services.VeranstaltungsterminService;
 import com.example.application.views.MainLayout;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.listbox.MultiSelectListBox;
+import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +33,20 @@ import java.util.*;
 @Route(value = "gruppenarbeiten", layout = MainLayout.class)
 public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
+    //TestStuff
+    Button saveBtn = new Button("Gruppenarbeit speichern");
+    Grid<Gruppe> groupsGrid = new Grid<>(Gruppe.class, false);
+
     //Services
     private final GruppenarbeitService gruppenarbeitService;
     private final TeilnehmerService teilnehmerService;
+    private final VeranstaltungsterminService veranstaltungsterminService;
 
     //Data
     Set<Teilnehmer> allParticipants = new HashSet<>();
+
+    //Binder
+    Binder<Gruppenarbeit> binderGruppenarbeit = new Binder<>(Gruppenarbeit.class);
 
     //Dialog Items
     TextField titleField = new TextField("Titel");
@@ -40,9 +57,10 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
     //Konstruktor
     @Autowired
-    public GruppenarbeitHinzufuegenDialog(GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService) {
+    public GruppenarbeitHinzufuegenDialog(GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, VeranstaltungsterminService veranstaltungsterminService) {
         this.gruppenarbeitService = gruppenarbeitService;
         this.teilnehmerService = teilnehmerService;
+        this.veranstaltungsterminService = veranstaltungsterminService;
 
         participants();
 
@@ -50,9 +68,67 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         groupSize.setLabel("Gruppen wählen");
         groupSize.setItems(groups);
 
-        //add(infoText, titleField, descriptionArea, participants, groupSize);
-        add(createLayout());
+        bindFields();
 
+        //TestStuff
+        //TODO: funktionierendes vernünftig in die Klasse in Methoden etc. integrieren
+
+        saveBtn.addClickListener(event -> {
+            Gruppenarbeit gruppenarbeit = new Gruppenarbeit();
+            if(binderGruppenarbeit.writeBeanIfValid(gruppenarbeit)){
+                //Testweise hier hardgecodeter Termin
+                gruppenarbeit.setVeranstaltungstermin(veranstaltungsterminService.findVeranstaltungsterminById(1L));
+                gruppenarbeitService.save(gruppenarbeit);
+                Notification.show("Gruppenarbeit angelegt!");
+                close();
+                clearFields();
+                UI.getCurrent().getPage().reload();
+            }
+            else {
+                Notification.show("Fehler");
+            }
+        });
+
+        //TODO: in Kacheln umbauen
+        groupsGrid.setVisible(false);
+        groupsGrid.addColumn(Gruppe::getNummer).setHeader("Gruppennummer");
+        groupsGrid.addColumn(Gruppe::getTeilnehmer).setHeader("Teilnehmer");
+
+        groupSize.addValueChangeListener(event -> {
+            if(groupSize.getOptionalValue().isEmpty()){
+                Notification.show("Empty!");
+            }
+            else{
+                groupsGrid.setVisible(true);
+                char num = groupSize.getValue().charAt(0);
+                int numberOfGroups = Integer.parseInt(num+"");
+
+                int[] sizes = groupSizes(numberOfGroups, participants.getSelectedItems().size());
+                List<Gruppe> gruppen = new ArrayList<Gruppe>();
+
+                for(int i=0;i<numberOfGroups;i++){
+                    gruppen.add(new Gruppe((long) i+1));
+                }
+
+                //TODO: aus participants ausgewählte Teilnehmer zufallsgesteuert auf Gruppen verteilen
+                gruppen.get(0).addTeilnehmer(new Teilnehmer("Ben", "Test"));
+
+                groupsGrid.setItems(gruppen);
+
+                Notification.show(numberOfGroups+"");
+            }
+        });
+
+
+
+        //Finales Zeugs
+        add(createLayout(), saveBtn, groupsGrid);
+
+    }
+
+    private void clearFields() {
+        titleField.clear();
+        descriptionArea.clear();
     }
 
     //Für die Select-Box der Gruppengrößen
@@ -80,6 +156,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         participants.addSelectionListener(event -> {
             List<String> groups = getGroups();
             groupSize.setItems(groups);
+            groupsGrid.setVisible(false);
 
         });
         participants.setWidth("30%");
@@ -155,6 +232,17 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
         return mainPageLayout;
     }
+
+    //Felder binden
+    private void bindFields(){
+        binderGruppenarbeit.forField(titleField)
+                            .asRequired("Titel muss gefüllt sein")
+                            .bind(Gruppenarbeit::getTitel, Gruppenarbeit::setTitel);
+        binderGruppenarbeit.forField(descriptionArea)
+                            .bind(Gruppenarbeit::getBeschreibung, Gruppenarbeit::setBeschreibung);
+    }
+
+
 
 
 

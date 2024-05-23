@@ -20,6 +20,15 @@ public class Gruppe {
     @ManyToMany
     private List<Teilnehmer> teilnehmer = new ArrayList<>();
 
+    public Gruppe(){
+
+    }
+
+    public Gruppe(Long nummer){
+        this.nummer = nummer;
+        this.gruppenarbeit = null;
+        this.teilnehmer = new ArrayList<Teilnehmer>();
+    }
     public Long getId() {
         return id;
     }
@@ -34,5 +43,17 @@ public class Gruppe {
 
     public void setNummer(Long nummer) {
         this.nummer = nummer;
+    }
+
+    public String toString(){
+        return "Gruppe " + this.nummer;
+    }
+
+    public List<Teilnehmer> getTeilnehmer() {
+        return new ArrayList<Teilnehmer>(this.teilnehmer);
+    }
+
+    public void addTeilnehmer(Teilnehmer teilnehmer) {
+        this.teilnehmer.add(teilnehmer);
     }
 }
