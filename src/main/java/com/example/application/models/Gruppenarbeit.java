@@ -19,7 +19,7 @@ public class Gruppenarbeit {
     @ManyToOne
     private Veranstaltungstermin veranstaltungstermin = new Veranstaltungstermin();
     @OneToMany
-    private List<Gruppe> gruppe = new ArrayList<>();
+    private List<Gruppe> gruppen = new ArrayList<>();
     @ManyToMany
     private List<Teilnehmer> teilnehmer = new ArrayList<>();
 
@@ -45,5 +45,13 @@ public class Gruppenarbeit {
 
     public void setTitel(String titel) {
         this.titel = titel;
+    }
+
+    public void setVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin) {
+        this.veranstaltungstermin = veranstaltungstermin;
+    }
+
+    public void setGruppe(List<Gruppe> gruppen){
+        this.gruppen = gruppen;
     }
 }

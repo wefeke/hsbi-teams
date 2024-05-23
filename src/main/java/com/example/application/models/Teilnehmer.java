@@ -51,6 +51,11 @@ public class Teilnehmer {
 
     }
 
+    public Teilnehmer(String vorname, String nachname){
+        this.vorname = vorname;
+        this.nachname = nachname;
+    }
+
     public List<Veranstaltung> getVeranstaltungen() {
         return veranstaltungen;
     }
@@ -61,5 +66,9 @@ public class Teilnehmer {
 
     public void addVerastaltung (Veranstaltung veranstaltung){
         this.veranstaltungen.add(veranstaltung);
+    }
+
+    public String toString(){
+        return this.nachname + ", " + this.vorname;
     }
 }
