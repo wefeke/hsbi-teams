@@ -282,7 +282,6 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         veranstaltungsterminDialog = new VeranstaltungsterminDialog(veranstaltungService, veranstaltungsterminService, veranstaltungIdString);
     }
 
-    //Lilli
     public void createGruppenarbeitHinzufuegenDialog() {
         gruppenarbeitHinzufuegenDialog = new GruppenarbeitHinzufuegenDialog(gruppenarbeitService, teilnehmerService, veranstaltungsterminService);
         gruppenarbeitHinzufuegenDialog.setWidth("1500px");
