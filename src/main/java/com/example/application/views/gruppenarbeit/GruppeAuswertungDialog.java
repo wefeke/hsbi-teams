@@ -96,6 +96,7 @@ public class GruppeAuswertungDialog extends Dialog {
             close();
             clearFields();
         });
+
     }
 
 
