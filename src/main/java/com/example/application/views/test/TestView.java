@@ -49,6 +49,7 @@ public class TestView extends VerticalLayout {
         configureForm();
         add(getToolbar(), getContent());
         updateList();
+
         createAuswertungsDialog();
         gruppeAuswertungDialog.open();
     }
