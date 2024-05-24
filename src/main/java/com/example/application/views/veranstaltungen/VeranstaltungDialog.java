@@ -102,12 +102,12 @@ public class VeranstaltungDialog extends Dialog {
             }
 
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+    });
 
         cancelButton.addClickListener(e -> {
             clearFields();
             close();
         });
-    });
     }
 
     private void bindFields() {
