@@ -7,12 +7,12 @@ INSERT INTO public.veranstaltung (veranstaltungs_id, semester, titel, user_usern
 
 
 INSERT INTO public.veranstaltungstermin (id, datum, end_zeit, notizen, ort, start_zeit, veranstaltung_veranstaltungs_id) VALUES
-(1, '2024-06-01', '12:00:00', 'Einführung in SE', 'Raum 101', '10:00:00', 1001),
-(2, '2024-06-02', '16:00:00', 'Fortgeschrittene Themen in SE', 'Raum 102', '14:00:00', 1001),
-(3, '2024-06-03', '11:00:00', 'Gruppenarbeit Präsentation', 'Raum 103', '09:00:00', 1001),
-(4, '2024-06-04', '13:00:00', 'Projektbesprechung', 'Raum 104', '11:00:00', 1002),
-(5, '2024-06-05', '15:00:00', 'Gastvortrag', 'Raum 105', '13:00:00', 1002),
-(6, '2024-06-06', '17:00:00', 'Abschlusspräsentation', 'Raum 106', '15:00:00', 1002),
+                                                                                                                             (1, '2024-06-01', '12:00:00', 'Einführung in SE', 'Raum 101', '10:00:00', 1001),
+                                                                                                                             (2, '2024-06-02', '16:00:00', 'Fortgeschrittene Themen in SE', 'Raum 102', '14:00:00', 1001),
+                                                                                                                             (3, '2024-06-03', '11:00:00', 'Gruppenarbeit Präsentation', 'Raum 103', '09:00:00', 1001),
+                                                                                                                             (4, '2024-06-04', '13:00:00', 'Projektbesprechung', 'Raum 104', '11:00:00', 1002),
+                                                                                                                             (5, '2024-06-05', '15:00:00', 'Gastvortrag', 'Raum 105', '13:00:00', 1002),
+                                                                                                                             (6, '2024-06-06', '17:00:00', 'Abschlusspräsentation', 'Raum 106', '15:00:00', 1002),
                                                                                                                              (7, '2024-06-07', '11:00:00', 'Feedback-Runde', 'Raum 107', '09:00:00', 1003),
                                                                                                                              (8, '2024-06-08', '12:00:00', 'Diskussion über Ergebnisse', 'Raum 108', '10:00:00', 1003),
                                                                                                                              (9, '2024-06-09', '14:00:00', 'Team-Meeting', 'Raum 109', '12:00:00', 1003),
@@ -265,7 +265,35 @@ INSERT INTO public.veranstaltungstermin_gruppenarbeiten (veranstaltungstermin_id
                                                                                                           (9, 24),
                                                                                                           (10, 25);
 
-INSERT INTO public.gruppenarbeit_gruppe (gruppenarbeit_id, gruppe_id) VALUES
+INSERT INTO public.teilnehmer_gruppen (teilnehmer_matrikel_nr, gruppen_id) VALUES
+                                                                               (1000001, 1),
+                                                                               (1000002, 1),
+                                                                               (1000003, 1),
+                                                                               (1000004, 1),
+                                                                               (1000004, 1),
+                                                                               (1000005, 1),
+                                                                               (1000006, 1),
+                                                                               (1000007, 1),
+                                                                               (1000008, 1),
+                                                                               (1000001, 2),
+                                                                               (1000002, 2),
+                                                                               (1000003, 2),
+                                                                               (1000004, 2),
+                                                                               (1000004, 2),
+                                                                               (1000005, 2),
+                                                                               (1000006, 2),
+                                                                               (1000007, 2),
+                                                                               (1000008, 2),
+                                                                               (1000001, 3),
+                                                                               (1000002, 3),
+                                                                               (1000003, 3),
+                                                                               (1000004, 3),
+                                                                               (1000004, 3),
+                                                                               (1000005, 3),
+                                                                               (1000006, 3),
+                                                                               (1000007, 3);
+
+INSERT INTO public.gruppenarbeit_gruppen (gruppenarbeit_id, gruppen_id) VALUES
                                                                           (1, 1),
                                                                           (1, 2),
                                                                           (1, 3),
@@ -416,7 +444,6 @@ INSERT INTO public.veranstaltung_teilnehmer (veranstaltung_veranstaltungs_id, te
                                                                                                           (1001, 1000071),
                                                                                                           (1001, 1000072),
                                                                                                           (1001, 1000073),
-
                                                                                                           (1002, 1000001),
                                                                                                           (1002, 1000002),
                                                                                                           (1002, 1000003),

@@ -1,5 +1,6 @@
 package com.example.application.services;
 
+import com.example.application.models.Gruppe;
 import com.example.application.models.Gruppenarbeit;
 import com.example.application.repositories.GruppenarbeitRepository;
 import org.springframework.stereotype.Service;
@@ -22,5 +23,10 @@ public class GruppenarbeitService {
         } else {
             System.err.println("Gruppenarbeit is null. Are you sure you have connected your form to the application?");
         }
+    }
+
+    public Gruppenarbeit findGruppenarbeitByIdWithGruppen(Long id) {
+        Gruppenarbeit gruppenarbeit = gruppenarbeitRepository.findByIdWithGruppen(id);
+        return gruppenarbeit;
     }
 }
