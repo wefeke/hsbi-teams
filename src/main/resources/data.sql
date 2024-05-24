@@ -12,7 +12,7 @@ INSERT INTO public.veranstaltungstermin (id, datum, end_zeit, notizen, ort, star
 (3, '2024-06-03', '11:00:00', 'Gruppenarbeit Präsentation', 'Raum 103', '09:00:00', 1001),
 (4, '2024-06-04', '13:00:00', 'Projektbesprechung', 'Raum 104', '11:00:00', 1002),
 (5, '2024-06-05', '15:00:00', 'Gastvortrag', 'Raum 105', '13:00:00', 1002),
-                                                                                                                             (6, '2024-06-06', '17:00:00', 'Abschlusspräsentation', 'Raum 106', '15:00:00', 1002),
+(6, '2024-06-06', '17:00:00', 'Abschlusspräsentation', 'Raum 106', '15:00:00', 1002),
                                                                                                                              (7, '2024-06-07', '11:00:00', 'Feedback-Runde', 'Raum 107', '09:00:00', 1003),
                                                                                                                              (8, '2024-06-08', '12:00:00', 'Diskussion über Ergebnisse', 'Raum 108', '10:00:00', 1003),
                                                                                                                              (9, '2024-06-09', '14:00:00', 'Team-Meeting', 'Raum 109', '12:00:00', 1003),
