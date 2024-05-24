@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface AuswertungRepository extends JpaRepository<Auswertung, Long> {
 
-    @Query(value = "select t.matrikel_nr as id, t.vorname as name, v.titel as titel_veranstaltung, g.titel as titel_Gruppenarbeit, gt.punkte from teilnehmer t \n" +
+    @Query(value = "select t.matrikel_nr as id, t.vorname as name, v.titel as titel_veranstaltung, g.titel as titel_Gruppenarbeit from teilnehmer t \n" +
             "\tinner join teilnehmer_veranstaltungen tv \n" +
             "\t\ton t.matrikel_nr = tv.teilnehmer_matrikel_nr \n" +
             "\tinner join veranstaltung v \n" +

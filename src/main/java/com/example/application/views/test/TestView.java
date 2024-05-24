@@ -6,6 +6,8 @@ import com.example.application.models.Veranstaltung;
 import com.example.application.services.AuswertungService;
 import com.example.application.services.TestService;
 import com.example.application.services.VeranstaltungenService;
+import com.example.application.views.gruppenarbeit.GruppeAuswertungDialog;
+import com.example.application.views.veranstaltungen.VeranstaltungDialog;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
@@ -35,6 +37,10 @@ public class TestView extends VerticalLayout {
     TestContactForm form;
     AuswertungService auswertungService;
 
+
+    private GruppeAuswertungDialog gruppeAuswertungDialog;
+
+
     public TestView(AuswertungService auswertungService) {
         this.auswertungService = auswertungService;
         addClassName("test-view");
@@ -43,6 +49,13 @@ public class TestView extends VerticalLayout {
         configureForm();
         add(getToolbar(), getContent());
         updateList();
+
+        createAuswertungsDialog();
+        gruppeAuswertungDialog.open();
+    }
+
+    private void createAuswertungsDialog() {
+        gruppeAuswertungDialog = new GruppeAuswertungDialog();
     }
 
     private Component getContent() {
@@ -62,7 +75,7 @@ public class TestView extends VerticalLayout {
     private void configureGrid() {
         grid.addClassNames("contact-grid");
         grid.setSizeFull();
-        grid.setColumns("name","titelVeranstaltung","titelGruppenarbeit","punkte");
+        grid.setColumns("name","titelVeranstaltung","titelGruppenarbeit");
         //grid.addColumn(Test::gettestid).setHeader("Test ID");
         //grid.addColumn(Test::gettestname).setHeader("Test Name");
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
