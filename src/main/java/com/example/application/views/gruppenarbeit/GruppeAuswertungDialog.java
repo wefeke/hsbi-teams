@@ -92,7 +92,7 @@ public class GruppeAuswertungDialog extends Dialog {
         });
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        cancelButton.addClickListener( e -> {
+        cancelButton.addClickListener( e ->{
             close();
             clearFields();
         });
