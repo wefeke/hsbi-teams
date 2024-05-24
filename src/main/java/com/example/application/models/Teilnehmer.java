@@ -9,7 +9,7 @@ import java.util.List;
 @Entity
 public class Teilnehmer {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+
     @Column(name = "matrikelNr", nullable = false)
     private Long matrikelNr;
     private String vorname;
