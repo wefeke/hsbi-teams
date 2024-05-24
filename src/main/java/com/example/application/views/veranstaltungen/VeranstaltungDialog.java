@@ -71,11 +71,11 @@ public class VeranstaltungDialog extends Dialog {
     private void configureElements() {
 
         //Combobox
-        comboBox.setItems(teilnehmerService.findAllTeilnehmer());
+        comboBox.setItems(teilnehmerService.findAllTeilnehmer2());
         comboBox.setItemLabelGenerator(Teilnehmer::getVorname);
 
         //Grid
-        grid.setItems(teilnehmerService.findAllTeilnehmer());
+        grid.setItems(teilnehmerService.findAllTeilnehmer2());
         grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
         //grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
         // grid.addColumn(Teilnehmer::getId).setHeader("ID");
