@@ -1,36 +1,23 @@
 //Author: Joris
 package com.example.application.views.veranstaltungen;
 
-import com.example.application.models.Teilnehmer;
 import com.example.application.models.Veranstaltung;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
 import com.example.application.views.MainLayout;
-import com.example.application.views.veranstaltungstermin.VeranstaltungsterminDialog;
 import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @PageTitle("Veranstaltungen")
@@ -225,8 +212,6 @@ public class VeranstaltungenView extends VerticalLayout {
         });
 
         neueVeranstaltungKachel.addClickListener(e -> {
-            // Create a Dialog
-
             // Add the VeranstaltungDetailView to the Dialog
             veranstaltungDialog.open();
         });
