@@ -1,18 +1,18 @@
 
 
 INSERT INTO public.veranstaltung (veranstaltungs_id, semester, titel, user_username) VALUES
-                                                                                         (1001, '2024-05-01', 'Mathe', null),
-                                                                                         (1002, '2024-05-01', 'Datenbanken', null),
-                                                                                         (1003, '2024-05-26', 'Programmieren 1', null);
+(1001, '2024-05-01', 'Mathe', null),
+(1002, '2024-05-01', 'Datenbanken', null),
+(1003, '2024-05-26', 'Programmieren 1', null);
 
 
 INSERT INTO public.veranstaltungstermin (id, datum, end_zeit, notizen, ort, start_zeit, veranstaltung_veranstaltungs_id) VALUES
-                                                                                                                             (1, '2024-06-01', '12:00:00', 'Einführung in SE', 'Raum 101', '10:00:00', 1001),
-                                                                                                                             (2, '2024-06-02', '16:00:00', 'Fortgeschrittene Themen in SE', 'Raum 102', '14:00:00', 1001),
-                                                                                                                             (3, '2024-06-03', '11:00:00', 'Gruppenarbeit Präsentation', 'Raum 103', '09:00:00', 1001),
-                                                                                                                             (4, '2024-06-04', '13:00:00', 'Projektbesprechung', 'Raum 104', '11:00:00', 1002),
-                                                                                                                             (5, '2024-06-05', '15:00:00', 'Gastvortrag', 'Raum 105', '13:00:00', 1002),
-                                                                                                                             (6, '2024-06-06', '17:00:00', 'Abschlusspräsentation', 'Raum 106', '15:00:00', 1002),
+(1, '2024-06-01', '12:00:00', 'Einführung in SE', 'Raum 101', '10:00:00', 1001),
+(2, '2024-06-02', '16:00:00', 'Fortgeschrittene Themen in SE', 'Raum 102', '14:00:00', 1001),
+(3, '2024-06-03', '11:00:00', 'Gruppenarbeit Präsentation', 'Raum 103', '09:00:00', 1001),
+(4, '2024-06-04', '13:00:00', 'Projektbesprechung', 'Raum 104', '11:00:00', 1002),
+(5, '2024-06-05', '15:00:00', 'Gastvortrag', 'Raum 105', '13:00:00', 1002),
+(6, '2024-06-06', '17:00:00', 'Abschlusspräsentation', 'Raum 106', '15:00:00', 1002),
                                                                                                                              (7, '2024-06-07', '11:00:00', 'Feedback-Runde', 'Raum 107', '09:00:00', 1003),
                                                                                                                              (8, '2024-06-08', '12:00:00', 'Diskussion über Ergebnisse', 'Raum 108', '10:00:00', 1003),
                                                                                                                              (9, '2024-06-09', '14:00:00', 'Team-Meeting', 'Raum 109', '12:00:00', 1003),
