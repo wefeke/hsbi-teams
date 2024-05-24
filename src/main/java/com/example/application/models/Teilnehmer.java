@@ -69,6 +69,6 @@ public class Teilnehmer {
     }
 
     public String toString(){
-        return this.nachname + ", " + this.vorname;
+        return this.vorname + " " + this.nachname;
     }
 }
