@@ -1,24 +1,23 @@
 package com.example.application.views.veranstaltungstermin;
 
-import com.example.application.models.Gruppenarbeit;
-import com.example.application.models.Veranstaltung;
-import com.example.application.models.Veranstaltungstermin;
-import com.example.application.services.GruppenarbeitService;
-import com.example.application.services.TeilnehmerService;
-import com.example.application.services.VeranstaltungenService;
-import com.example.application.services.VeranstaltungsterminService;
+import com.example.application.models.*;
+import com.example.application.services.*;
 import com.example.application.views.MainLayout;
+import com.example.application.views.gruppenarbeit.GruppeAuswertungDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitHinzufuegenDialog;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Hr;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.virtuallist.VirtualList;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.*;
 import java.util.List;
 
@@ -31,34 +30,36 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private final VeranstaltungsterminService veranstaltungsterminService;
     private final GruppenarbeitService gruppenarbeitService;
     private final TeilnehmerService teilnehmerService;
+    private final GruppeService gruppeService;
 
     //Data
     private String veranstaltungIdString;
-    private long veranstaltungIdLong;
     private Veranstaltung veranstaltung;
     private List<Veranstaltungstermin> termine;
     private Div aktiveKachelVeranstaltungstermin = null;
     private Div aktiveKachelGruppenarbeit = null;
 
     //UI Elements
-    private Div veranstaltungsterminContainer;
-    private Div gruppenarbeitContainer;
-    private Div gruppenContainer;
-    private H1 veranstaltungTitle;
+    private final Div veranstaltungsterminContainer;
+    private final Div gruppenarbeitContainer;
+    private final Div gruppenContainer;
+    private final H1 veranstaltungTitle;
 
     //Dialog Instance
     private VeranstaltungsterminDialog veranstaltungsterminDialog;
     private GruppenarbeitHinzufuegenDialog gruppenarbeitHinzufuegenDialog;
+    private GruppeAuswertungDialog gruppeAuswertungDialog;
 
     //Layout
     private final VerticalLayout mainLayout;
     private HorizontalLayout gruppenarbeitLinie;
     private HorizontalLayout gruppenLinie;
 
-    public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService) {
+    public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, GruppeService gruppeService) {
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
         this.gruppenarbeitService = gruppenarbeitService;
+        this.gruppeService = gruppeService;
 
         this.mainLayout = new VerticalLayout();
         mainLayout.setSizeFull();
@@ -88,7 +89,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         if (!segments.isEmpty()) {
             this.veranstaltungIdString = segments.get(segments.size() - 1);
             try {
-                veranstaltungIdLong = Long.parseLong(veranstaltungIdString);
+                long veranstaltungIdLong = Long.parseLong(veranstaltungIdString);
                 termine = veranstaltungsterminService.findVeranstaltungstermineByVeranstaltungId(veranstaltungIdLong);
                 veranstaltung = veranstaltungService.findVeranstaltungById(veranstaltungIdLong);
             } catch (NumberFormatException e) {
@@ -99,7 +100,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         }
 
         createVeranstaltungsterminDialog();
-        createGruppenarbeitHinzufuegenDialog();
+        createGruppenarbeitDialog();
+
         //init Methode ist wichtig, da erst hier die termine gesetzt werden, weil sonst im Konstruktor die termine noch nicht gesetzt sind,
         // wenn er aufgerufen wird, wodurch es zu einem Fehler kommt.
         init();
@@ -235,7 +237,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         veranstaltungsterminDialog = new VeranstaltungsterminDialog(veranstaltungService, veranstaltungsterminService, veranstaltungIdString);
     }
 
-    public void createGruppenarbeitHinzufuegenDialog() {
+    public void createGruppenarbeitDialog() {
         gruppenarbeitHinzufuegenDialog = new GruppenarbeitHinzufuegenDialog(gruppenarbeitService, teilnehmerService, veranstaltungsterminService);
         gruppenarbeitHinzufuegenDialog.setWidth("1500px");
     }
@@ -314,7 +316,16 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                     mainLayout.add(gruppenLinie, gruppenContainer);
                 }
 
-                //hier jetzt Code zur Erstellung der Gruppen hinzufügen und zu dem gruppenContainer hinzufpgen
+                Gruppenarbeit fullGruppenarbeit = gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId());
+
+                if (fullGruppenarbeit.getGruppen() != null) {
+                    for (Gruppe gruppe : fullGruppenarbeit.getGruppen()) {
+                        gruppenContainer.add(gruppenKachel(gruppe));
+                    }
+                } else {
+                    System.out.println("Keine Gruppen gefunden.");
+                    //hier was einbauen, um Nutzer anzuzeigen, dass es keine Gruppen gibt
+                }
 
                 gruppenLinie.setVisible(true);
                 gruppenContainer.setVisible(true);
@@ -347,7 +358,6 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         return neueGruppenarbeitKachel;
     }
 
-
     private HorizontalLayout createLineWithText(String text) {
         Hr lineBefore = new Hr();
         lineBefore.addClassName("line-before");
@@ -361,6 +371,51 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         lineWithText.addClassName("line-with-text");
 
         return lineWithText;
+    }
+
+    private Div gruppenKachel(Gruppe gruppe) {
+        // Laden der Gruppe mit den Teilnehmern
+        Gruppe fullGruppe = gruppeService.findGruppeByIdWithTeilnehmer(gruppe.getId());
+
+        Div gruppenInfo = new Div();
+        gruppenInfo.setText("Gruppe " + fullGruppe.getNummer());
+        gruppenInfo.addClassName("text-center");
+
+        // Erstellen der Teilnehmerliste
+        VirtualList<Teilnehmer> teilnehmerList = new VirtualList<>();
+        teilnehmerList.setItems(fullGruppe.getTeilnehmer());
+        teilnehmerList.setRenderer(new ComponentRenderer<>(teilnehmer -> {
+            Div teilnehmerDiv = new Div();
+            teilnehmerDiv.addClassName("teilnehmer-item");
+
+            // Profilbild mit Initialen
+            Span profilbild = new Span();
+            profilbild.setText(teilnehmer.getVorname().charAt(0) + "" + teilnehmer.getNachname().charAt(0));
+            profilbild.addClassName("profilbild");
+
+            // Name des Teilnehmers
+            Span name = new Span(teilnehmer.getVorname() + " " + teilnehmer.getNachname());
+            name.addClassName("teilnehmer-name");
+
+            teilnehmerDiv.add(profilbild, name);
+
+            // Klick-Listener für Teilnehmer
+            teilnehmerDiv.addClickListener(e -> {
+                gruppeAuswertungDialog = new GruppeAuswertungDialog(teilnehmer);
+                gruppeAuswertungDialog.open();
+            });
+
+            return teilnehmerDiv;
+        }));
+
+        // Hinzufügen der Teilnehmerliste zur Kachel
+        Div kachelContent = new Div(gruppenInfo, teilnehmerList);
+        kachelContent.addClassName("kachel-content");
+
+        Div kachel = new Div(kachelContent);
+        kachel.addClassName("kachel-gruppen");
+
+        return kachel;
     }
 
 }
