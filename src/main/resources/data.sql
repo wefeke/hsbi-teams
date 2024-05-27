@@ -18,7 +18,7 @@ INSERT INTO public.veranstaltungstermin (id, datum, end_zeit, notizen, ort, star
                                                                                                                              (10, '2024-06-10', '16:00:00', 'Klausurvorbereitung', 'Raum 110', '14:00:00', 1003);
 INSERT INTO public.users
 (is_admin, id, hashed_password, "name", username, profile_picture)
-VALUES(false, 1, '$2a$10$jpLNVNeA7Ar/ZQ2DKbKCm.MuT2ESe.Qop96jipKMq7RaUgCoQedV.', 'admin', 'admin', 0);
+VALUES(true, 1, '$2a$10$jpLNVNeA7Ar/ZQ2DKbKCm.MuT2ESe.Qop96jipKMq7RaUgCoQedV.', 'admin', 'admin', null);
 
 INSERT INTO public.user_roles
 (user_id, roles)
