@@ -9,7 +9,6 @@ public class Auswertung {
     private String name;
     private String titelVeranstaltung;
     private String titelGruppenarbeit;
-    private Double punkte;
 
 
     public Auswertung() {
@@ -49,11 +48,5 @@ public class Auswertung {
         this.titelGruppenarbeit = titelGruppenarbeit;
     }
 
-    public Double getPunkte() {
-        return punkte;
-    }
 
-    public void setPunkte(Double punkte) {
-        this.punkte = punkte;
-    }
 }

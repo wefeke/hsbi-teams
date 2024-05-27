@@ -180,7 +180,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
     //Für die Felder der Teilnehmer in der ListBox
     private void participants() {
-        allParticipants.addAll(teilnehmerService.findAllTeilnehmer());
+       allParticipants.addAll(teilnehmerService.findAllTeilnehmer2());
 
         participants.setItems(allParticipants);
         for(Teilnehmer p:allParticipants){

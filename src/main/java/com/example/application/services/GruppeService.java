@@ -17,4 +17,8 @@ public class GruppeService {
     public void save(Gruppe gruppe) {
         gruppenRepository.save(gruppe);
     }
+
+    public Gruppe findGruppeByIdWithTeilnehmer(Long id) {
+        return gruppenRepository.findByIdWithTeilnehmer(id);
+    }
 }

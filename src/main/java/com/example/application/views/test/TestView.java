@@ -1,11 +1,8 @@
 package com.example.application.views.test;
 
 import com.example.application.models.Auswertung;
-import com.example.application.models.Test;
-import com.example.application.models.Veranstaltung;
 import com.example.application.services.AuswertungService;
-import com.example.application.services.TestService;
-import com.example.application.services.VeranstaltungenService;
+import com.example.application.views.gruppenarbeit.GruppeAuswertungDialog;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
@@ -20,10 +17,8 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
-
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
-import java.util.Collections;
 import java.util.stream.Stream;
 
 //LEON
@@ -35,6 +30,10 @@ public class TestView extends VerticalLayout {
     TestContactForm form;
     AuswertungService auswertungService;
 
+
+    //private GruppeAuswertungDialog gruppeAuswertungDialog;
+
+
     public TestView(AuswertungService auswertungService) {
         this.auswertungService = auswertungService;
         addClassName("test-view");
@@ -43,6 +42,14 @@ public class TestView extends VerticalLayout {
         configureForm();
         add(getToolbar(), getContent());
         updateList();
+
+        createAuswertungsDialog();
+        //gruppeAuswertungDialog.open();
+    }
+
+    // auskommentiert da auch ein Teilnehmer jetzt übergeben werden muss
+    private void createAuswertungsDialog() {
+        //gruppeAuswertungDialog = new GruppeAuswertungDialog();
     }
 
     private Component getContent() {
@@ -62,7 +69,7 @@ public class TestView extends VerticalLayout {
     private void configureGrid() {
         grid.addClassNames("contact-grid");
         grid.setSizeFull();
-        grid.setColumns("name","titelVeranstaltung","titelGruppenarbeit","punkte");
+        grid.setColumns("name","titelVeranstaltung","titelGruppenarbeit");
         //grid.addColumn(Test::gettestid).setHeader("Test ID");
         //grid.addColumn(Test::gettestname).setHeader("Test Name");
         grid.getColumns().forEach(col -> col.setAutoWidth(true));

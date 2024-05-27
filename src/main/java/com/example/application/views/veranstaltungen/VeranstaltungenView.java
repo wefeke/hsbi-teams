@@ -1,36 +1,23 @@
 //Author: Joris
 package com.example.application.views.veranstaltungen;
 
-import com.example.application.models.Teilnehmer;
 import com.example.application.models.Veranstaltung;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
 import com.example.application.views.MainLayout;
-import com.example.application.views.veranstaltungstermin.VeranstaltungsterminDialog;
 import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @PageTitle("Veranstaltungen")
@@ -46,10 +33,10 @@ public class VeranstaltungenView extends VerticalLayout {
     private VeranstaltungDialog veranstaltungDialog;
 
     //UI Elements
-    private H1 username;
-    private Text text;
-    private Hr lineBefore;
-    private Hr lineAfter;
+    private final H1 username;
+    private final Text text;
+    private final Hr lineBefore;
+    private final Hr lineAfter;
 
     @Autowired
     public VeranstaltungenView(VeranstaltungenService veranstaltungenService, UserService userService, TeilnehmerService teilnehmerService) {
@@ -96,7 +83,7 @@ public class VeranstaltungenView extends VerticalLayout {
         }
 
         // Kachel für neue Veranstaltung hinzufügen
-        kachelContainer.add(createKachel("add-veranstaltung"));
+        kachelContainer.add(createKachel());
 
         mainLayout.add(username, lineWithText, kachelContainer);
         add(mainLayout);
@@ -183,16 +170,7 @@ public class VeranstaltungenView extends VerticalLayout {
         return kachel;
     }
 
-    /**
-     * Erstellt eine Kachel mit einem spezifischen Navigationsziel.
-     *
-     * Diese Kachel zeigt ein Pluszeichen und navigiert zur angegebenen Route, wenn sie angeklickt wird.
-     * Die Kachel hat eine Hover-Effekt, der die Hintergrundfarbe der Kachel ändert, wenn der Mauszeiger darüber schwebt.
-     *
-     * @param navigationalTarget Die Route, zu der navigiert wird, wenn auf die Kachel geklickt wird.
-     * @return Die erstellte Kachel als {@link Div}-Element, bereit zum Hinzufügen zum Container.
-     */
-    private Div createKachel(String navigationalTarget) {
+    private Div createKachel() {
         //Ich kann diese Methode nicht als static machen, weil getUi() nicht statisch ist.
         //Dadurch muss ich diese Methode in jeder Klasse neu einbauen, wo ich sie verwenden möchte.
         Div plusSymbol = new Div();
@@ -225,8 +203,6 @@ public class VeranstaltungenView extends VerticalLayout {
         });
 
         neueVeranstaltungKachel.addClickListener(e -> {
-            // Create a Dialog
-
             // Add the VeranstaltungDetailView to the Dialog
             veranstaltungDialog.open();
         });
