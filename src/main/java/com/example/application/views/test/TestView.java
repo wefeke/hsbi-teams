@@ -31,7 +31,7 @@ public class TestView extends VerticalLayout {
     AuswertungService auswertungService;
 
 
-    private GruppeAuswertungDialog gruppeAuswertungDialog;
+    //private GruppeAuswertungDialog gruppeAuswertungDialog;
 
 
     public TestView(AuswertungService auswertungService) {
