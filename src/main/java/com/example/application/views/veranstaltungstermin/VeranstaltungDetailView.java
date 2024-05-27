@@ -19,10 +19,13 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.virtuallist.VirtualList;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.*;
+import jakarta.annotation.security.RolesAllowed;
+
 import java.util.List;
 
 @PageTitle("Veranstaltung Detail")
 @Route(value = "veranstaltung-detail/:veranstaltungId", layout = MainLayout.class)
+@RolesAllowed({"ADMIN"})
 public class VeranstaltungDetailView extends VerticalLayout implements HasUrlParameter<String> {
 
     //Services
