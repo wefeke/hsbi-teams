@@ -32,6 +32,12 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 
         super.configure(http);
         setLoginView(http, LoginView.class);
-    }
 
+        http.formLogin(
+                formLogin -> {
+                    formLogin.loginPage("/login");
+                    formLogin.loginProcessingUrl("/login");
+                    formLogin.defaultSuccessUrl("/", true);
+                });
+    }
 }
