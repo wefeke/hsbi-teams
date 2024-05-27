@@ -51,8 +51,12 @@ public class Gruppenarbeit {
         this.veranstaltungstermin = veranstaltungstermin;
     }
 
-    public void setGruppe(List<Gruppe> gruppen) {
+    public void setGruppe(List<Gruppe> gruppen){
         this.gruppen = gruppen;
+    }
+
+    public void setTeilnehmer(List<Teilnehmer> teilnehmer){
+        this.teilnehmer = teilnehmer;
     }
 
     public List<Gruppe> getGruppen() {

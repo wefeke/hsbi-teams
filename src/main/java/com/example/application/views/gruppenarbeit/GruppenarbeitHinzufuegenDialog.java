@@ -3,6 +3,7 @@ package com.example.application.views.gruppenarbeit;
 import com.example.application.models.Gruppe;
 import com.example.application.models.Gruppenarbeit;
 import com.example.application.models.Teilnehmer;
+import com.example.application.services.GruppeService;
 import com.example.application.services.GruppenarbeitService;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.VeranstaltungsterminService;
@@ -33,9 +34,9 @@ import java.util.*;
 @Route(value = "gruppenarbeiten", layout = MainLayout.class)
 public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
+    private final GruppeService gruppeService;
     //TestStuff
     Button saveBtn = new Button("Gruppenarbeit speichern");
-    Grid<Gruppe> groupsGrid = new Grid<>(Gruppe.class, false);
 
     //Services
     private final GruppenarbeitService gruppenarbeitService;
@@ -44,6 +45,8 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
     //Data
     List<Teilnehmer> allParticipants = new ArrayList<>();
+    Set<Teilnehmer> selectedParticipants;
+    List<Teilnehmer> selectedParticipantsList;
 
     //Binder
     Binder<Gruppenarbeit> binderGruppenarbeit = new Binder<>(Gruppenarbeit.class);
@@ -54,70 +57,52 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     H2 infoText = new H2("Gruppenarbeit anlegen");
     MultiSelectListBox<Teilnehmer> participants = new MultiSelectListBox<>();
     Select<String> groupSize = new Select<>();
+    Grid<Gruppe> groupsGrid = new Grid<>(Gruppe.class, false);
 
     //Konstruktor
     @Autowired
-    public GruppenarbeitHinzufuegenDialog(GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, VeranstaltungsterminService veranstaltungsterminService) {
+    public GruppenarbeitHinzufuegenDialog(GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService) {
         this.gruppenarbeitService = gruppenarbeitService;
         this.teilnehmerService = teilnehmerService;
         this.veranstaltungsterminService = veranstaltungsterminService;
 
         participants();
-
-        List<String> groups = getGroups();
-        groupSize.setLabel("Gruppen wählen");
-        groupSize.setItems(groups);
-
+        groupsGridVisual();
+        groupSizeSelect();
         bindFields();
 
         //TestStuff
         //TODO: funktionierendes vernünftig in die Klasse in Methoden etc. integrieren
-
-        saveBtn.addClickListener(event -> {
-            Gruppenarbeit gruppenarbeit = new Gruppenarbeit();
-            if(binderGruppenarbeit.writeBeanIfValid(gruppenarbeit)){
-                //Testweise hier hardgecodeter Termin
-                gruppenarbeit.setVeranstaltungstermin(veranstaltungsterminService.findVeranstaltungsterminById(1L));
-                gruppenarbeitService.save(gruppenarbeit);
-                Notification.show("Gruppenarbeit angelegt!");
-                close();
-                clearFields();
-                UI.getCurrent().getPage().reload();
-            }
-            else {
-                Notification.show("Fehler");
-            }
-        });
-
-        //TODO: in Kacheln umbauen
-        groupsGrid.setVisible(false);
-        groupsGrid.addColumn(Gruppe::getNummer).setHeader("Gruppennummer");
-        groupsGrid.addColumn(Gruppe::getTeilnehmer).setHeader("Teilnehmer");
+        Gruppenarbeit gruppenarbeit = new Gruppenarbeit();
+        List<Gruppe> gruppen = new ArrayList<Gruppe>();
 
         groupSize.addValueChangeListener(event -> {
             if(groupSize.getOptionalValue().isEmpty()){
                 Notification.show("Empty!");
             }
+            else if(Objects.equals(groupSize.getValue(), "Error: Keine Teilnehmer ausgewählt. Kann keine Gruppen erstellen")){
+                Notification.show("Fehler");
+            }
             else{
+                if(!gruppen.isEmpty()) {
+                    gruppen.clear();
+                }
+
                 groupsGrid.setVisible(true);
                 char num = groupSize.getValue().charAt(0);
                 int numberOfGroups = Integer.parseInt(num+"");
 
                 int[] sizes = groupSizes(numberOfGroups, participants.getSelectedItems().size());
-                List<Gruppe> gruppen = new ArrayList<Gruppe>();
 
                 for(int i=0;i<numberOfGroups;i++){
                     gruppen.add(new Gruppe((long) i+1));
                 }
 
-                //TODO: aus participants ausgewählte Teilnehmer zufallsgesteuert auf Gruppen verteilen
-                Set<Teilnehmer> selectedParticipants = participants.getSelectedItems();
-                List<Teilnehmer> selectedParticipantsList = new ArrayList<>(selectedParticipants.stream().toList());
+                selectedParticipants = participants.getSelectedItems();
+                selectedParticipantsList = new ArrayList<>(selectedParticipants.stream().toList());
 
                 Collections.shuffle(selectedParticipantsList);
                 Iterator<Teilnehmer> teilnehmerIterator = selectedParticipantsList.iterator();
-
-
 
                 for(int j = 0; j<sizes[sizes.length-1];j++) {
                     for (int i = 0; i < numberOfGroups; i++) {
@@ -132,8 +117,29 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
 
                 groupsGrid.setItems(gruppen);
+            }
+        });
 
-                Notification.show(numberOfGroups+"");
+        saveBtn.addClickListener(event -> {
+            if(binderGruppenarbeit.writeBeanIfValid(gruppenarbeit)){
+                //Testweise hier hardgecodeter Termin
+                gruppenarbeit.setVeranstaltungstermin(veranstaltungsterminService.findVeranstaltungsterminById(1L));
+
+                for(int i = 0; i<gruppen.size(); i++){
+                    gruppeService.save(gruppen.get(i));
+                }
+
+                gruppenarbeit.setGruppe(gruppen);
+                gruppenarbeit.setTeilnehmer(selectedParticipantsList);
+
+                gruppenarbeitService.save(gruppenarbeit);
+                Notification.show("Gruppenarbeit angelegt!");
+                close();
+                clearFields();
+                UI.getCurrent().getPage().reload();
+            }
+            else {
+                Notification.show("Fehler");
             }
         });
 
@@ -141,7 +147,19 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
         //Finales Zeugs
         add(createLayout(), saveBtn, groupsGrid);
+        this.gruppeService = gruppeService;
+    }
 
+    private void groupsGridVisual() {
+        groupsGrid.setVisible(false);
+        groupsGrid.addColumn(Gruppe::getNummer).setHeader("Gruppennummer");
+        groupsGrid.addColumn(Gruppe::getTeilnehmer).setHeader("Teilnehmer");
+    }
+
+    private void groupSizeSelect() {
+        List<String> groups = getGroups();
+        groupSize.setLabel("Gruppen wählen");
+        groupSize.setItems(groups);
     }
 
     private void clearFields() {

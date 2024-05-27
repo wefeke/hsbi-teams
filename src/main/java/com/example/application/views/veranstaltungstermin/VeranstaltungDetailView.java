@@ -1,5 +1,9 @@
 package com.example.application.views.veranstaltungstermin;
 
+import com.example.application.models.Gruppenarbeit;
+import com.example.application.models.Veranstaltung;
+import com.example.application.models.Veranstaltungstermin;
+import com.example.application.services.*;
 import com.example.application.models.*;
 import com.example.application.services.*;
 import com.example.application.views.MainLayout;
@@ -241,7 +245,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     }
 
     public void createGruppenarbeitDialog() {
-        gruppenarbeitHinzufuegenDialog = new GruppenarbeitHinzufuegenDialog(gruppenarbeitService, teilnehmerService, veranstaltungsterminService);
+        gruppenarbeitHinzufuegenDialog = new GruppenarbeitHinzufuegenDialog(gruppenarbeitService, teilnehmerService, veranstaltungsterminService, gruppeService);
         gruppenarbeitHinzufuegenDialog.setWidth("1500px");
     }
 
