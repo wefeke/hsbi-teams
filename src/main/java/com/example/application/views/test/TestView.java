@@ -1,13 +1,8 @@
 package com.example.application.views.test;
 
 import com.example.application.models.Auswertung;
-import com.example.application.models.Test;
-import com.example.application.models.Veranstaltung;
 import com.example.application.services.AuswertungService;
-import com.example.application.services.TestService;
-import com.example.application.services.VeranstaltungenService;
 import com.example.application.views.gruppenarbeit.GruppeAuswertungDialog;
-import com.example.application.views.veranstaltungen.VeranstaltungDialog;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
@@ -22,10 +17,8 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
-
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
-import java.util.Collections;
 import java.util.stream.Stream;
 
 //LEON
@@ -51,7 +44,7 @@ public class TestView extends VerticalLayout {
         updateList();
 
         createAuswertungsDialog();
-        gruppeAuswertungDialog.open();
+        //gruppeAuswertungDialog.open();
     }
 
     // auskommentiert da auch ein Teilnehmer jetzt übergeben werden muss

@@ -17,7 +17,6 @@ import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.data.binder.*;
-import org.aspectj.weaver.ast.Not;
 
 import java.time.LocalDate;
 

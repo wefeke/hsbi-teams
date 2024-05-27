@@ -1,21 +1,15 @@
-
 package com.example.application.views.test;
 
-import com.example.application.models.Test;
+
 import com.example.application.models.Veranstaltung;
-import com.example.application.services.TestService;
 import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-import org.springframework.context.annotation.Bean;
-
 import java.time.LocalDate;
-import java.util.Date;
 
 @Route("persistenceVeranstaltung")
 public class PersistenceVeranstaltung extends VerticalLayout {
