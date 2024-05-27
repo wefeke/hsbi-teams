@@ -26,8 +26,8 @@ import java.time.LocalDate;
 
 @Route(value = "gruppeauswertungsdialog")
 public class GruppeAuswertungDialog extends Dialog {
-    //Services
 
+    private Teilnehmer teilnehmer;
 
     // Dialog Elemente
     private final NumberField auswertungsWert = new NumberField();
@@ -41,14 +41,15 @@ public class GruppeAuswertungDialog extends Dialog {
     Binder<TeilnehmerGruppenarbeitId> binder = new Binder<>(TeilnehmerGruppenarbeitId.class);
 
 
-    public GruppeAuswertungDialog() {
+    public GruppeAuswertungDialog(Teilnehmer teilnehmer) {
+        this.teilnehmer = teilnehmer;
         add(createLayout());
         configureElements();
     }
 
 
     private VerticalLayout createLayout() {
-        setHeaderTitle("Auswertung vornehmen");
+        setHeaderTitle("Punkte für " + teilnehmer.getVorname() + " " + teilnehmer.getNachname());
         getHeader().add(incrementButton);
         getHeader().add(decrementButton);
         getFooter().add(cancelButton);
@@ -97,11 +98,6 @@ public class GruppeAuswertungDialog extends Dialog {
         });
 
     }
-
-
-
-
-
 
     public void clearFields(){
         //Clear all Fields after saving

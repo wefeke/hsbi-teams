@@ -102,7 +102,6 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         createVeranstaltungsterminDialog();
         createGruppenarbeitHinzufuegenDialog();
-        createGruppeAuswertungDialog();
 
         //init Methode ist wichtig, da erst hier die termine gesetzt werden, weil sonst im Konstruktor die termine noch nicht gesetzt sind,
         // wenn er aufgerufen wird, wodurch es zu einem Fehler kommt.
@@ -242,10 +241,6 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     public void createGruppenarbeitHinzufuegenDialog() {
         gruppenarbeitHinzufuegenDialog = new GruppenarbeitHinzufuegenDialog(gruppenarbeitService, teilnehmerService, veranstaltungsterminService);
         gruppenarbeitHinzufuegenDialog.setWidth("1500px");
-    }
-
-    public void createGruppeAuswertungDialog() {
-        gruppeAuswertungDialog = new GruppeAuswertungDialog();
     }
 
     private Div gruppenarbeitKachel(Gruppenarbeit gruppenarbeit) {
@@ -407,6 +402,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
             // Klick-Listener für Teilnehmer
             teilnehmerDiv.addClickListener(e -> {
+                gruppeAuswertungDialog = new GruppeAuswertungDialog(teilnehmer);
                 gruppeAuswertungDialog.open();
             });
 

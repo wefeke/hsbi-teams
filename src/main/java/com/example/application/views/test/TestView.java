@@ -54,8 +54,9 @@ public class TestView extends VerticalLayout {
         gruppeAuswertungDialog.open();
     }
 
+    // auskommentiert da auch ein Teilnehmer jetzt übergeben werden muss
     private void createAuswertungsDialog() {
-        gruppeAuswertungDialog = new GruppeAuswertungDialog();
+        //gruppeAuswertungDialog = new GruppeAuswertungDialog();
     }
 
     private Component getContent() {
