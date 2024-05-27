@@ -1,6 +1,5 @@
 
-
-INSERT INTO public.veranstaltung (veranstaltungs_id, semester, titel, user_username) VALUES
+INSERT INTO public.veranstaltung (veranstaltungs_id, semester, titel, user_id) VALUES
 (1001, '2024-05-01', 'Mathe', null),
 (1002, '2024-05-01', 'Datenbanken', null),
 (1003, '2024-05-26', 'Programmieren 1', null);
@@ -17,7 +16,13 @@ INSERT INTO public.veranstaltungstermin (id, datum, end_zeit, notizen, ort, star
                                                                                                                              (8, '2024-06-08', '12:00:00', 'Diskussion über Ergebnisse', 'Raum 108', '10:00:00', 1003),
                                                                                                                              (9, '2024-06-09', '14:00:00', 'Team-Meeting', 'Raum 109', '12:00:00', 1003),
                                                                                                                              (10, '2024-06-10', '16:00:00', 'Klausurvorbereitung', 'Raum 110', '14:00:00', 1003);
+INSERT INTO public.users
+(is_admin, id, hashed_password, "name", username, profile_picture)
+VALUES(false, 1, '$2a$10$jpLNVNeA7Ar/ZQ2DKbKCm.MuT2ESe.Qop96jipKMq7RaUgCoQedV.', 'admin', 'admin', 0);
 
+INSERT INTO public.user_roles
+(user_id, roles)
+VALUES(1, 'ADMIN');
 
 INSERT INTO public.gruppenarbeit (id, beschreibung, titel, veranstaltungstermin_id) VALUES
                                                                                         (1, 'Analyse von Markttrends und Erstellung eines Berichts', 'Marktanalyse', 1),
@@ -2020,6 +2025,4 @@ INSERT INTO public.gruppenarbeit_teilnehmer (gruppenarbeit_id, teilnehmer_matrik
 (25, 1000044),
 (25, 1000045),
 (25, 1000046);
-
-
 
