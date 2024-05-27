@@ -34,17 +34,16 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
     //Data
     private String veranstaltungIdString;
-    private long veranstaltungIdLong;
     private Veranstaltung veranstaltung;
     private List<Veranstaltungstermin> termine;
     private Div aktiveKachelVeranstaltungstermin = null;
     private Div aktiveKachelGruppenarbeit = null;
 
     //UI Elements
-    private Div veranstaltungsterminContainer;
-    private Div gruppenarbeitContainer;
-    private Div gruppenContainer;
-    private H1 veranstaltungTitle;
+    private final Div veranstaltungsterminContainer;
+    private final Div gruppenarbeitContainer;
+    private final Div gruppenContainer;
+    private final H1 veranstaltungTitle;
 
     //Dialog Instance
     private VeranstaltungsterminDialog veranstaltungsterminDialog;
@@ -90,7 +89,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         if (!segments.isEmpty()) {
             this.veranstaltungIdString = segments.get(segments.size() - 1);
             try {
-                veranstaltungIdLong = Long.parseLong(veranstaltungIdString);
+                long veranstaltungIdLong = Long.parseLong(veranstaltungIdString);
                 termine = veranstaltungsterminService.findVeranstaltungstermineByVeranstaltungId(veranstaltungIdLong);
                 veranstaltung = veranstaltungService.findVeranstaltungById(veranstaltungIdLong);
             } catch (NumberFormatException e) {
@@ -101,7 +100,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         }
 
         createVeranstaltungsterminDialog();
-        createGruppenarbeitHinzufuegenDialog();
+        createGruppenarbeitDialog();
 
         //init Methode ist wichtig, da erst hier die termine gesetzt werden, weil sonst im Konstruktor die termine noch nicht gesetzt sind,
         // wenn er aufgerufen wird, wodurch es zu einem Fehler kommt.
@@ -238,7 +237,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         veranstaltungsterminDialog = new VeranstaltungsterminDialog(veranstaltungService, veranstaltungsterminService, veranstaltungIdString);
     }
 
-    public void createGruppenarbeitHinzufuegenDialog() {
+    public void createGruppenarbeitDialog() {
         gruppenarbeitHinzufuegenDialog = new GruppenarbeitHinzufuegenDialog(gruppenarbeitService, teilnehmerService, veranstaltungsterminService);
         gruppenarbeitHinzufuegenDialog.setWidth("1500px");
     }

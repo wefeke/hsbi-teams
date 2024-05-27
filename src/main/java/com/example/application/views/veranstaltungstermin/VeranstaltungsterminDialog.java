@@ -25,7 +25,7 @@ public class VeranstaltungsterminDialog extends Dialog {
     //Services
     private final VeranstaltungenService veranstaltungService;
     private final VeranstaltungsterminService veranstaltungsterminService;
-    private String veranstaltungId;
+    private final String veranstaltungId;
 
     //Dialog Items
     private final DatePicker startDatePicker = new DatePicker("Termin Datum");
