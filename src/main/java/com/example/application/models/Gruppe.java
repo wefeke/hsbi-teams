@@ -21,7 +21,6 @@ public class Gruppe {
     private List<Teilnehmer> teilnehmer = new ArrayList<>();
 
     public Gruppe(){
-
     }
 
     public Gruppe(Long nummer){
@@ -50,7 +49,7 @@ public class Gruppe {
     }
 
     public List<Teilnehmer> getTeilnehmer() {
-        return new ArrayList<Teilnehmer>(this.teilnehmer);
+        return this.teilnehmer;
     }
 
     public void addTeilnehmer(Teilnehmer teilnehmer) {

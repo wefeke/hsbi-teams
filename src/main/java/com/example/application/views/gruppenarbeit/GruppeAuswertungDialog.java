@@ -25,7 +25,6 @@ import com.vaadin.flow.router.Route;
 import java.time.LocalDate;
 
 @Route(value = "gruppeauswertungsdialog")
-
 public class GruppeAuswertungDialog extends Dialog {
     //Services
 
