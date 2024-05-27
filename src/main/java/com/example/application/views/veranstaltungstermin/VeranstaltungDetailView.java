@@ -3,6 +3,7 @@ package com.example.application.views.veranstaltungstermin;
 import com.example.application.models.*;
 import com.example.application.services.*;
 import com.example.application.views.MainLayout;
+import com.example.application.views.gruppenarbeit.GruppeAuswertungDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitHinzufuegenDialog;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
@@ -48,6 +49,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     //Dialog Instance
     private VeranstaltungsterminDialog veranstaltungsterminDialog;
     private GruppenarbeitHinzufuegenDialog gruppenarbeitHinzufuegenDialog;
+    private GruppeAuswertungDialog gruppeAuswertungDialog;
 
     //Layout
     private final VerticalLayout mainLayout;
@@ -100,6 +102,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         createVeranstaltungsterminDialog();
         createGruppenarbeitHinzufuegenDialog();
+        createGruppeAuswertungDialog();
+
         //init Methode ist wichtig, da erst hier die termine gesetzt werden, weil sonst im Konstruktor die termine noch nicht gesetzt sind,
         // wenn er aufgerufen wird, wodurch es zu einem Fehler kommt.
         init();
@@ -238,6 +242,10 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     public void createGruppenarbeitHinzufuegenDialog() {
         gruppenarbeitHinzufuegenDialog = new GruppenarbeitHinzufuegenDialog(gruppenarbeitService, teilnehmerService, veranstaltungsterminService);
         gruppenarbeitHinzufuegenDialog.setWidth("1500px");
+    }
+
+    public void createGruppeAuswertungDialog() {
+        gruppeAuswertungDialog = new GruppeAuswertungDialog();
     }
 
     private Div gruppenarbeitKachel(Gruppenarbeit gruppenarbeit) {
@@ -399,11 +407,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
             // Klick-Listener für Teilnehmer
             teilnehmerDiv.addClickListener(e -> {
-                Dialog teilnehmerDialog = new Dialog();
-                teilnehmerDialog.add(new Text("Teilnehmer: " + teilnehmer.getVorname() + " " + teilnehmer.getNachname()));
-                Button closeButton = new Button("Schließen", event -> teilnehmerDialog.close());
-                teilnehmerDialog.add(closeButton);
-                teilnehmerDialog.open();
+                gruppeAuswertungDialog.open();
             });
 
             return teilnehmerDiv;
