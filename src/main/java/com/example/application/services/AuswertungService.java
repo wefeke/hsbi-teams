@@ -1,9 +1,7 @@
 package com.example.application.services;
 
 import com.example.application.models.Auswertung;
-import com.example.application.models.Teilnehmer;
 import com.example.application.repositories.AuswertungRepository;
-import com.example.application.repositories.TeilnehmerRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
