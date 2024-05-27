@@ -29,4 +29,7 @@ public interface TeilnehmerRepository extends JpaRepository<Teilnehmer, Long> {
 
     */
 
+    @Query("SELECT t FROM Teilnehmer t JOIN t.veranstaltungen v WHERE v.veranstaltungsId = :veranstaltungId")
+    List<Teilnehmer> findByVeranstaltungId(@Param("veranstaltungId") Long veranstaltungId);
+
 }
