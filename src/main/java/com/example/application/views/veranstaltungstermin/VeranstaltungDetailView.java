@@ -3,10 +3,7 @@ package com.example.application.views.veranstaltungstermin;
 import com.example.application.models.Gruppenarbeit;
 import com.example.application.models.Veranstaltung;
 import com.example.application.models.Veranstaltungstermin;
-import com.example.application.services.GruppenarbeitService;
-import com.example.application.services.TeilnehmerService;
-import com.example.application.services.VeranstaltungenService;
-import com.example.application.services.VeranstaltungsterminService;
+import com.example.application.services.*;
 import com.example.application.views.MainLayout;
 import com.example.application.views.gruppenarbeit.GruppenarbeitHinzufuegenDialog;
 import com.vaadin.flow.component.Text;
@@ -31,6 +28,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private final VeranstaltungsterminService veranstaltungsterminService;
     private final GruppenarbeitService gruppenarbeitService;
     private final TeilnehmerService teilnehmerService;
+    private final GruppeService gruppeService;
 
     //Data
     private String veranstaltungIdString;
@@ -52,7 +50,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private final VerticalLayout mainLayout;
     private HorizontalLayout gruppenarbeitline;
 
-    public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService) {
+    public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, GruppeService gruppeService) {
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
         this.gruppenarbeitService = gruppenarbeitService;
@@ -76,6 +74,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         mainLayout.add(veranstaltungTitle, createLineWithText("Veranstaltungstermine"), veranstaltungsterminContainer);
         add(mainLayout);
         this.teilnehmerService = teilnehmerService;
+        this.gruppeService = gruppeService;
     }
 
     @Override
@@ -284,7 +283,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
     //Lilli
     public void createGruppenarbeitHinzufuegenDialog() {
-        gruppenarbeitHinzufuegenDialog = new GruppenarbeitHinzufuegenDialog(gruppenarbeitService, teilnehmerService, veranstaltungsterminService);
+        gruppenarbeitHinzufuegenDialog = new GruppenarbeitHinzufuegenDialog(gruppenarbeitService, teilnehmerService, veranstaltungsterminService, gruppeService);
         gruppenarbeitHinzufuegenDialog.setWidth("1500px");
     }
 

@@ -54,4 +54,8 @@ public class Gruppenarbeit {
     public void setGruppe(List<Gruppe> gruppen){
         this.gruppen = gruppen;
     }
+
+    public void setTeilnehmer(List<Teilnehmer> teilnehmer){
+        this.teilnehmer = teilnehmer;
+    }
 }
