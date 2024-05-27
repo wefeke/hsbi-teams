@@ -8,6 +8,7 @@ import com.example.application.services.VeranstaltungenService;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Hr;
@@ -17,11 +18,13 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 @PageTitle("Veranstaltungen")
 @Route(value = "", layout = MainLayout.class)
+@RolesAllowed("ADMIN")
 public class VeranstaltungenView extends VerticalLayout {
 
     //Services
@@ -29,8 +32,7 @@ public class VeranstaltungenView extends VerticalLayout {
     private final TeilnehmerService teilnehmerService;
     private final UserService userService;
 
-    //Dialog Instance
-    private VeranstaltungDialog veranstaltungDialog;
+    private Div kachelContainer = new Div();
 
     //UI Elements
     private final H1 username;
@@ -42,14 +44,10 @@ public class VeranstaltungenView extends VerticalLayout {
     public VeranstaltungenView(VeranstaltungenService veranstaltungenService, UserService userService, TeilnehmerService teilnehmerService) {
         this.veranstaltungenService = veranstaltungenService;
         this.teilnehmerService = teilnehmerService;
+        this.userService = userService;
 
         VerticalLayout mainLayout = new VerticalLayout();
         mainLayout.setSizeFull();
-
-        Div kachelContainer = new Div();
-        kachelContainer.addClassName("veranstaltungen-container");
-        kachelContainer.getStyle().set("display", "flex");
-        kachelContainer.getStyle().set("flexWrap", "wrap");
 
         //Hier später noch die Logik für den Namen des Users einbauen.
         this.username = new H1("Herzlich Willkommen, XY");
@@ -74,6 +72,19 @@ public class VeranstaltungenView extends VerticalLayout {
         lineWithText.setWidth("100%");
         lineWithText.setAlignItems(Alignment.CENTER);
 
+        kachelContainer.addClassName("veranstaltungen-container");
+        kachelContainer.getStyle().set("display", "flex");
+        kachelContainer.getStyle().set("flexWrap", "wrap");
+
+        updateKachelContainer();
+        mainLayout.add(username, lineWithText, kachelContainer);
+        add(mainLayout);
+    }
+
+    public void updateKachelContainer() {
+        kachelContainer.removeAll();
+
+
         // Alle Veranstaltungen aus der Datenbank abrufen
         List<Veranstaltung> veranstaltungen = veranstaltungenService.findAllVeranstaltungen();
 
@@ -85,11 +96,6 @@ public class VeranstaltungenView extends VerticalLayout {
         // Kachel für neue Veranstaltung hinzufügen
         kachelContainer.add(createKachel());
 
-        mainLayout.add(username, lineWithText, kachelContainer);
-        add(mainLayout);
-        this.userService = userService;
-
-        createVeranstaltungDialog();
     }
 
     /**
@@ -128,38 +134,71 @@ public class VeranstaltungenView extends VerticalLayout {
         deleteIcon.getStyle().set("right", "5px");
         deleteIcon.getStyle().set("visibility", "hidden");
 
-        Dialog confirmationDialog = new Dialog();
-        confirmationDialog.add(new Text("Möchten Sie die Veranstaltung " + veranstaltung.getTitel() + " wirklich löschen?"));
+        Div editIcon = new Div();
+        editIcon.setText("✏️");
+        editIcon.addClassName("edit-icon");
+        editIcon.getStyle().set("position", "absolute");
+        editIcon.getStyle().set("bottom", "5px");
+        editIcon.getStyle().set("left", "5px");
+        editIcon.getStyle().set("visibility", "hidden");
 
-        Button yesButton = new Button("Ja", event -> {
+
+        //Confirm-Dialog initialisieren
+        Dialog confirmationDialog = new Dialog();
+        //Bearbeiten-Dialog initialisieren
+        VeranstaltungBearbeiten editDialog = new VeranstaltungBearbeiten(veranstaltungenService, teilnehmerService, userService, veranstaltung, this);
+
+        Button confirmbutton = new Button("Ja", event -> {
             veranstaltungenService.deleteVeranstaltung(veranstaltung);
             Notification.show("Veranstaltung gelöscht");
-            getUI().ifPresent(ui -> ui.getPage().reload());
+            this.updateKachelContainer();
+            //getUI().ifPresent(ui -> ui.getPage().reload());
             confirmationDialog.close();
         });
 
-        Button noButton = new Button("Nein", event -> {
+        Button cancelButton = new Button("Nein", event -> {
             confirmationDialog.close();
             kachel.getStyle().set("background-color", "");
-            deleteIcon.getStyle().set("visibility", "hidden");
         });
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
 
-        confirmationDialog.add(yesButton, noButton);
+        VerticalLayout verticalLayout = new VerticalLayout(
+                new Text("Möchten Sie die Veranstaltung (" + veranstaltung.getTitel() + ") wirklich löschen?"),
+                new HorizontalLayout(
+                        confirmbutton,
+                        cancelButton
+                )
+        );
 
+        verticalLayout.setAlignItems(Alignment.CENTER);
+
+        confirmationDialog.add(
+                verticalLayout
+        );
+
+        //Icons
         deleteIcon.getElement().addEventListener("click", e -> {
             confirmationDialog.open();
         }).addEventData("event.stopPropagation()");
 
+        editIcon.getElement().addEventListener("click", e-> {
+            editDialog.open();
+            editDialog.readBean();
+        }).addEventData("event.stopPropagation()");
+
         kachel.add(deleteIcon);
+        kachel.add(editIcon);
 
         kachel.getElement().addEventListener("mouseover", e -> {
             kachel.getStyle().set("background-color", "lightblue");
             deleteIcon.getStyle().set("visibility", "visible");
+            editIcon.getStyle().set("visibility", "visible");
         });
 
         kachel.getElement().addEventListener("mouseout", e -> {
             kachel.getStyle().set("background-color", "");
             deleteIcon.getStyle().set("visibility", "hidden");
+            editIcon.getStyle().set("visibility", "hidden");
         });
 
         kachel.addClickListener(e -> {
@@ -202,17 +241,16 @@ public class VeranstaltungenView extends VerticalLayout {
             neueVeranstaltungKachel.getStyle().set("background-color", "");
         });
 
+        //
+        VeranstaltungDialog createDialog = new VeranstaltungDialog(veranstaltungenService, teilnehmerService, userService, this);
+
         neueVeranstaltungKachel.addClickListener(e -> {
-            // Add the VeranstaltungDetailView to the Dialog
-            veranstaltungDialog.open();
+            createDialog.open();
         });
 
         return neueVeranstaltungKachel;
     }
 
-    public void createVeranstaltungDialog () {
-        veranstaltungDialog = new VeranstaltungDialog(veranstaltungenService, teilnehmerService, userService);
-    }
 }
 
 

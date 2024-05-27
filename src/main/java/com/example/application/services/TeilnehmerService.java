@@ -45,6 +45,11 @@ public List<Teilnehmer> findAllTeilnehmer2(){return teilnehmerRepository.findAll
             System.err.println("Test is null. Are you sure you have connected your form to the application?");
     }
 
+    @Transactional
+    public List<Teilnehmer> findTeilnehmerByVeranstaltungId(Long id) {
+        return teilnehmerRepository.findByVeranstaltungId(id);
+    }
+
 }
 
 
