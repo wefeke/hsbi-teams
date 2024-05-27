@@ -18,7 +18,7 @@ public class Gruppenarbeit {
     //Beziehungen
     @ManyToOne
     private Veranstaltungstermin veranstaltungstermin = new Veranstaltungstermin();
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<Gruppe> gruppen = new ArrayList<>();
     @ManyToMany
     private List<Teilnehmer> teilnehmer = new ArrayList<>();
@@ -51,7 +51,11 @@ public class Gruppenarbeit {
         this.veranstaltungstermin = veranstaltungstermin;
     }
 
-    public void setGruppe(List<Gruppe> gruppen){
+    public void setGruppe(List<Gruppe> gruppen) {
         this.gruppen = gruppen;
+    }
+
+    public List<Gruppe> getGruppen() {
+        return gruppen;
     }
 }

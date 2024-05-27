@@ -85,9 +85,49 @@
 }
 
 /* Container Styles */
-.veranstaltungen-container, .gruppenarbeiten-container, .gruppen-container {
+.veranstaltungen-container, .gruppenarbeiten-container {
     display: flex;
     flex-wrap: wrap;
 }
 
+.gruppen-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.kachel-gruppen {
+    width: 200px;
+    height: auto; /* wird irgendwie nicht genommen*/
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.teilnehmer-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 5px 0;
+    cursor: pointer;
+}
+
+.profilbild {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.teilnehmer-name {
+    font-size: 16px;
+}
 

@@ -35,10 +35,10 @@ public class VeranstaltungenView extends VerticalLayout {
     private Div kachelContainer = new Div();
 
     //UI Elements
-    private H1 username;
-    private Text text;
-    private Hr lineBefore;
-    private Hr lineAfter;
+    private final H1 username;
+    private final Text text;
+    private final Hr lineBefore;
+    private final Hr lineAfter;
 
     @Autowired
     public VeranstaltungenView(VeranstaltungenService veranstaltungenService, UserService userService, TeilnehmerService teilnehmerService) {
@@ -94,7 +94,7 @@ public class VeranstaltungenView extends VerticalLayout {
         }
 
         // Kachel für neue Veranstaltung hinzufügen
-        kachelContainer.add(createKachel("add-veranstaltung"));
+        kachelContainer.add(createKachel());
 
     }
 
@@ -209,16 +209,7 @@ public class VeranstaltungenView extends VerticalLayout {
         return kachel;
     }
 
-    /**
-     * Erstellt eine Kachel mit einem spezifischen Navigationsziel.
-     *
-     * Diese Kachel zeigt ein Pluszeichen und navigiert zur angegebenen Route, wenn sie angeklickt wird.
-     * Die Kachel hat eine Hover-Effekt, der die Hintergrundfarbe der Kachel ändert, wenn der Mauszeiger darüber schwebt.
-     *
-     * @param navigationalTarget Die Route, zu der navigiert wird, wenn auf die Kachel geklickt wird.
-     * @return Die erstellte Kachel als {@link Div}-Element, bereit zum Hinzufügen zum Container.
-     */
-    private Div createKachel(String navigationalTarget) {
+    private Div createKachel() {
         //Ich kann diese Methode nicht als static machen, weil getUi() nicht statisch ist.
         //Dadurch muss ich diese Methode in jeder Klasse neu einbauen, wo ich sie verwenden möchte.
         Div plusSymbol = new Div();

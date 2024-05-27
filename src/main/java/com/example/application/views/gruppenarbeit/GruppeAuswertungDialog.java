@@ -2,33 +2,20 @@ package com.example.application.views.gruppenarbeit;
 
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.TeilnehmerGruppenarbeitId;
-import com.example.application.models.Veranstaltung;
-import com.example.application.models.Veranstaltungstermin;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
-import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
 import com.vaadin.flow.component.textfield.NumberField;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Route;
 
-import java.time.LocalDate;
-
 @Route(value = "gruppeauswertungsdialog")
-
 public class GruppeAuswertungDialog extends Dialog {
-    //Services
 
+    private Teilnehmer teilnehmer;
 
     // Dialog Elemente
     private final NumberField auswertungsWert = new NumberField();
@@ -42,14 +29,15 @@ public class GruppeAuswertungDialog extends Dialog {
     Binder<TeilnehmerGruppenarbeitId> binder = new Binder<>(TeilnehmerGruppenarbeitId.class);
 
 
-    public GruppeAuswertungDialog() {
+    public GruppeAuswertungDialog(Teilnehmer teilnehmer) {
+        this.teilnehmer = teilnehmer;
         add(createLayout());
         configureElements();
     }
 
 
     private VerticalLayout createLayout() {
-        setHeaderTitle("Auswertung vornehmen");
+        setHeaderTitle("Punkte für " + teilnehmer.getVorname() + " " + teilnehmer.getNachname());
         getHeader().add(incrementButton);
         getHeader().add(decrementButton);
         getFooter().add(cancelButton);
@@ -98,11 +86,6 @@ public class GruppeAuswertungDialog extends Dialog {
         });
 
     }
-
-
-
-
-
 
     public void clearFields(){
         //Clear all Fields after saving
