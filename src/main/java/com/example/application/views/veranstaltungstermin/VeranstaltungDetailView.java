@@ -95,7 +95,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         List<String> segments = location.getSegments();
 
         if (!segments.isEmpty()) {
-            this.veranstaltungIdString = segments.get(segments.size() - 1);
+            this.veranstaltungIdString = segments.getLast();
             try {
                 long veranstaltungIdLong = Long.parseLong(veranstaltungIdString);
                 termine = veranstaltungsterminService.findVeranstaltungstermineByVeranstaltungId(veranstaltungIdLong);
@@ -149,35 +149,22 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         Div kachel = new Div(kachelContent);
         kachel.addClassName("kachel");
 
-        Div deleteIcon = new Div();
-        deleteIcon.setText("🗑️");
-        deleteIcon.addClassName("delete-icon");
-
-        Dialog confirmationDialog = new Dialog();
-        HorizontalLayout buttonLayout = new HorizontalLayout(
-                new Button("Ja", event -> {
+        Dialog confirmationDialog = createDeleteConfirmationDialog(
+                "Möchten Sie den Veranstaltungstermin für " + veranstaltungstermin.getNotizen() + " am " + veranstaltungstermin.getDatum() + " wirklich löschen?",
+                () -> {
                     veranstaltungsterminService.deleteVeranstaltungstermin(veranstaltungstermin);
                     Notification.show("Veranstaltungstermin gelöscht");
                     getUI().ifPresent(ui -> ui.getPage().reload());
-                    confirmationDialog.close();
-                }),
-                new Button("Nein", event -> {
-                    confirmationDialog.close();
-                    kachel.removeClassName("kachel-active");
-                    deleteIcon.getStyle().set("visibility", "hidden");
-                })
-        );
-        buttonLayout.setAlignItems(FlexComponent.Alignment.CENTER);
-
-        confirmationDialog.add(
-                new VerticalLayout(
-                        new Text("Möchten Sie den Veranstaltungstermin für den " + veranstaltungstermin.getDatum() + " wirklich löschen?"),
-                        buttonLayout
-                )
+                }
         );
 
-        deleteIcon.getElement().addEventListener("click", e ->
-                confirmationDialog.open()).addEventData("event.stopPropagation()");
+        Div deleteIcon = createDeleteIcon(confirmationDialog);
+
+        confirmationDialog.addOpenedChangeListener(e -> {
+            if (!e.isOpened()) {
+                deleteIcon.getStyle().set("visibility", "hidden");
+            }
+        });
 
         kachel.add(deleteIcon);
 
@@ -284,33 +271,22 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         String tooltipText = "Titel: " + gruppenarbeit.getTitel() + "\nBeschreibung: " + gruppenarbeit.getBeschreibung();
         kachel.getElement().setProperty("title", tooltipText);
 
-        Div deleteIcon = new Div();
-        deleteIcon.setText("🗑️");
-        deleteIcon.addClassName("delete-icon");
-
-        Dialog confirmationDialog = new Dialog();
-        HorizontalLayout buttonLayout = new HorizontalLayout(
-                new Button("Ja", event -> {
-                    gruppenarbeitService.deleteGruppenarbeit(gruppenarbeit);
-                    confirmationDialog.close();
-                }),
-                new Button("Nein", event -> {
-                    confirmationDialog.close();
-                    kachel.removeClassName("kachel-active");
-                    deleteIcon.getStyle().set("visibility", "hidden");
-                })
-        );
-        buttonLayout.setAlignItems(FlexComponent.Alignment.CENTER);
-
-        confirmationDialog.add(
-                new VerticalLayout(
-                        new Text("Möchten Sie die Gruppenarbeit " + gruppenarbeit.getTitel() + " wirklich löschen?"),
-                        buttonLayout
-                )
+        Dialog confirmationDialog = createDeleteConfirmationDialog(
+            "Möchten Sie die Gruppenarbeit " + gruppenarbeit.getTitel() + " wirklich löschen?",
+            () -> {
+                gruppenarbeitService.deleteGruppenarbeit(gruppenarbeit);
+                Notification.show("Gruppenarbeit gelöscht");
+                getUI().ifPresent(ui -> ui.getPage().reload());
+            }
         );
 
-        deleteIcon.getElement().addEventListener("click", e ->
-                confirmationDialog.open()).addEventData("event.stopPropagation()");
+        Div deleteIcon = createDeleteIcon(confirmationDialog);
+
+        confirmationDialog.addOpenedChangeListener(e -> {
+            if (!e.isOpened()) {
+                deleteIcon.getStyle().set("visibility", "hidden");
+            }
+        });
 
         kachel.add(deleteIcon);
 
@@ -460,4 +436,36 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         return kachel;
     }
 
+    private Div createDeleteIcon(Dialog confirmationDialog) {
+        Div deleteIcon = new Div();
+        deleteIcon.setText("🗑️");
+        deleteIcon.addClassName("delete-icon");
+        deleteIcon.getElement().addEventListener("click", e ->
+                confirmationDialog.open()
+        ).addEventData("event.stopPropagation()");
+        return deleteIcon;
+    }
+
+    private Dialog createDeleteConfirmationDialog(String confirmationText, Runnable onDelete) {
+        Dialog confirmationDialog = new Dialog();
+        HorizontalLayout buttonLayout = new HorizontalLayout(
+                new Button("Ja", event -> {
+                    onDelete.run();
+                    confirmationDialog.close();
+                }),
+                new Button("Nein", event ->
+                        confirmationDialog.close()
+                )
+        );
+        buttonLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+
+        confirmationDialog.add(
+                new VerticalLayout(
+                        new Text(confirmationText),
+                        buttonLayout
+                )
+        );
+
+        return confirmationDialog;
+    }
 }

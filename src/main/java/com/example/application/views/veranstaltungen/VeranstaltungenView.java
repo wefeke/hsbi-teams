@@ -32,13 +32,7 @@ public class VeranstaltungenView extends VerticalLayout {
     private final TeilnehmerService teilnehmerService;
     private final UserService userService;
 
-    private Div kachelContainer = new Div();
-
-    //UI Elements
-    private final H1 username;
-    private final Text text;
-    private final Hr lineBefore;
-    private final Hr lineAfter;
+    private final Div kachelContainer = new Div();
 
     @Autowired
     public VeranstaltungenView(VeranstaltungenService veranstaltungenService, UserService userService, TeilnehmerService teilnehmerService) {
@@ -50,19 +44,19 @@ public class VeranstaltungenView extends VerticalLayout {
         mainLayout.setSizeFull();
 
         //Hier später noch die Logik für den Namen des Users einbauen.
-        this.username = new H1("Herzlich Willkommen, XY");
+        H1 username = new H1("Herzlich Willkommen, XY");
         username.getStyle().set("font-size", "28px");
 
-        this.text = new Text("Veranstaltungen");
+        Text text = new Text("Veranstaltungen");
 
-        this.lineBefore = new Hr();
+        Hr lineBefore = new Hr();
         lineBefore.getStyle().set("flex-grow", "0");
         lineBefore.getStyle().set("flex-shrink", "0");
         lineBefore.getStyle().set("width", "30px");
         lineBefore.getStyle().set("margin-top", "15px");
         lineBefore.getStyle().set("margin-right", "-8px");
 
-        this.lineAfter = new Hr();
+        Hr lineAfter = new Hr();
         lineAfter.getStyle().set("flex-grow", "1");
         lineAfter.getStyle().set("flex-shrink", "0");
         lineAfter.getStyle().set("margin-top", "15px");
@@ -105,12 +99,12 @@ public class VeranstaltungenView extends VerticalLayout {
      * @return Die erstellte Kachel als {@link Div}-Element, fertig zum Hinzufügen zum Container.
      */
     private Div createVeranstaltungKachel(Veranstaltung veranstaltung) {
-        Div veranstaltungsInfo = new Div();
-        veranstaltungsInfo.setText(veranstaltung.getTitel());
-        veranstaltungsInfo.getStyle().set("text-align", "center");
-        veranstaltungsInfo.getStyle().set("margin", "auto");
+        Div veranstaltungInfo = new Div();
+        veranstaltungInfo.setText(veranstaltung.getTitel());
+        veranstaltungInfo.getStyle().set("text-align", "center");
+        veranstaltungInfo.getStyle().set("margin", "auto");
 
-        Div kachelContent = new Div(veranstaltungsInfo);
+        Div kachelContent = new Div(veranstaltungInfo);
         kachelContent.getStyle().set("display", "flex");
         kachelContent.getStyle().set("flex-direction", "column");
 
@@ -177,9 +171,9 @@ public class VeranstaltungenView extends VerticalLayout {
         );
 
         //Icons
-        deleteIcon.getElement().addEventListener("click", e -> {
-            confirmationDialog.open();
-        }).addEventData("event.stopPropagation()");
+        deleteIcon.getElement().addEventListener("click", e ->
+            confirmationDialog.open()
+        ).addEventData("event.stopPropagation()");
 
         editIcon.getElement().addEventListener("click", e-> {
             editDialog.open();
@@ -233,20 +227,20 @@ public class VeranstaltungenView extends VerticalLayout {
         neueVeranstaltungKachel.setWidth("150px");
         neueVeranstaltungKachel.setHeight("150px");
 
-        neueVeranstaltungKachel.getElement().addEventListener("mouseover", e -> {
-            neueVeranstaltungKachel.getStyle().set("background-color", "lightblue");
-        });
+        neueVeranstaltungKachel.getElement().addEventListener("mouseover", e ->
+            neueVeranstaltungKachel.getStyle().set("background-color", "lightblue")
+        );
 
-        neueVeranstaltungKachel.getElement().addEventListener("mouseout", e -> {
-            neueVeranstaltungKachel.getStyle().set("background-color", "");
-        });
+        neueVeranstaltungKachel.getElement().addEventListener("mouseout", e ->
+            neueVeranstaltungKachel.getStyle().set("background-color", "")
+        );
 
         //
         VeranstaltungDialog createDialog = new VeranstaltungDialog(veranstaltungenService, teilnehmerService, userService, this);
 
-        neueVeranstaltungKachel.addClickListener(e -> {
-            createDialog.open();
-        });
+        neueVeranstaltungKachel.addClickListener(e ->
+            createDialog.open()
+        );
 
         return neueVeranstaltungKachel;
     }
