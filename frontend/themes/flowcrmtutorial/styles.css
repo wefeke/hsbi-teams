@@ -98,12 +98,12 @@
 
 .kachel-gruppen {
     width: 200px;
-    height: auto; /* wird irgendwie nicht genommen*/
     border: 1px solid #ccc;
     padding: 10px;
     margin: 10px;
-    border-radius: 5px;
+    border-radius: 10px;
     background-color: #f9f9f9;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2);
 }
 
 .teilnehmer-item {
@@ -115,8 +115,8 @@
 }
 
 .profilbild {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     background-color: #007bff;
     color: #fff;
@@ -131,3 +131,21 @@
     font-size: 16px;
 }
 
+.termin-datum {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    font-size: 0.8em;
+}
+
+.termin-notiz {
+    text-align: center;
+    margin-top: 6px;
+}
+
+.termin-zeit {
+    font-size: 0.8em;
+    text-align: right;
+    margin-right: -5px;
+    margin-top: 8px;
+}

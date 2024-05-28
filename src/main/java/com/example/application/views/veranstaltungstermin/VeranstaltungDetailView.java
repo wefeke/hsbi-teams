@@ -5,7 +5,6 @@ import com.example.application.models.Veranstaltung;
 import com.example.application.models.Veranstaltungstermin;
 import com.example.application.services.*;
 import com.example.application.models.*;
-import com.example.application.services.*;
 import com.example.application.views.MainLayout;
 import com.example.application.views.gruppenarbeit.GruppeAuswertungDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitHinzufuegenDialog;
@@ -25,6 +24,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.*;
 import jakarta.annotation.security.RolesAllowed;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @PageTitle("Veranstaltung Detail")
@@ -45,6 +45,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private List<Veranstaltungstermin> termine;
     private Div aktiveKachelVeranstaltungstermin = null;
     private Div aktiveKachelGruppenarbeit = null;
+    private int maxListHeight = 0;
 
     //UI Elements
     private final Div veranstaltungsterminContainer;
@@ -125,11 +126,24 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     }
 
     private Div veranstaltungsterminKachel(Veranstaltungstermin veranstaltungstermin) {
-        Div terminInfo = new Div();
-        terminInfo.setText(veranstaltungstermin.getDatum().toString());
-        terminInfo.addClassName("text-center");
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
-        Div kachelContent = new Div(terminInfo);
+        Div terminDatum = new Div();
+        terminDatum.setText(veranstaltungstermin.getDatum().format(dateFormatter));
+        terminDatum.addClassName("termin-datum");
+
+        Div terminZeit = new Div();
+        String startZeit = veranstaltungstermin.getStartZeit().format(timeFormatter);
+        String endZeit = veranstaltungstermin.getEndZeit().format(timeFormatter);
+        terminZeit.setText(startZeit + "-" + endZeit);
+        terminZeit.addClassName("termin-zeit");
+
+        Div terminNotiz = new Div();
+        terminNotiz.setText(veranstaltungstermin.getNotizen());
+        terminNotiz.addClassName("termin-notiz");
+
+        Div kachelContent = new Div(terminDatum, terminZeit, terminNotiz);
         kachelContent.addClassName("kachel-content");
 
         Div kachel = new Div(kachelContent);
@@ -182,6 +196,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         });
 
         kachel.addClickListener(e -> {
+            maxListHeight = 0;
+
             if (kachel.equals(aktiveKachelVeranstaltungstermin)) {
                 gruppenarbeitContainer.removeAll();
                 gruppenarbeitLinie.setVisible(false);
@@ -212,6 +228,10 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 kachel.addClassName("kachel-active");
                 aktiveKachelVeranstaltungstermin = kachel;
             }
+
+            gruppenLinie.setVisible(false);
+            gruppenContainer.removeAll();
+            gruppenContainer.setVisible(false);
         });
 
         return kachel;
@@ -260,6 +280,10 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         Div kachel = new Div(kachelContent);
         kachel.addClassName("kachel");
 
+        //Tooltip
+        String tooltipText = "Titel: " + gruppenarbeit.getTitel() + "\nBeschreibung: " + gruppenarbeit.getBeschreibung();
+        kachel.getElement().setProperty("title", tooltipText);
+
         Div deleteIcon = new Div();
         deleteIcon.setText("🗑️");
         deleteIcon.addClassName("delete-icon");
@@ -305,6 +329,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         });
 
         kachel.addClickListener(e -> {
+            maxListHeight = 0;
+
             if (kachel.equals(aktiveKachelGruppenarbeit)) {
                 gruppenContainer.removeAll();
                 gruppenLinie.setVisible(false);
@@ -414,6 +440,15 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
             return teilnehmerDiv;
         }));
+
+        int itemHeight = 48;
+        int listHeight = fullGruppe.getTeilnehmer().size() * itemHeight;
+
+        if (listHeight > maxListHeight) {
+            maxListHeight = listHeight;
+        }
+        // Setzen der Höhe der Liste auf die maximale Höhe aller Gruppen für diese Gruppenarbeit
+        teilnehmerList.setHeight(maxListHeight + "px");
 
         // Hinzufügen der Teilnehmerliste zur Kachel
         Div kachelContent = new Div(gruppenInfo, teilnehmerList);
