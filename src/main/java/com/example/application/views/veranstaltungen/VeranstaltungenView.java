@@ -101,41 +101,21 @@ public class VeranstaltungenView extends VerticalLayout {
     private Div createVeranstaltungKachel(Veranstaltung veranstaltung) {
         Div veranstaltungInfo = new Div();
         veranstaltungInfo.setText(veranstaltung.getTitel());
-        veranstaltungInfo.getStyle().set("text-align", "center");
-        veranstaltungInfo.getStyle().set("margin", "auto");
+        veranstaltungInfo.addClassName("text-center");
 
         Div kachelContent = new Div(veranstaltungInfo);
-        kachelContent.getStyle().set("display", "flex");
-        kachelContent.getStyle().set("flex-direction", "column");
+        kachelContent.addClassName("kachel-content");
 
         Div kachel = new Div(kachelContent);
-        kachel.getStyle()
-                .set("position", "relative")
-                .set("border", "2px solid var(--lumo-contrast-20pct)")
-                .set("border-radius", "10px")
-                .set("padding", "1em")
-                .set("margin", "0.5em")
-                .set("cursor", "pointer")
-                .set("box-shadow", "0 4px 8px 0 rgba(0,0,0,0.2)");
-        kachel.setWidth("150px");
-        kachel.setHeight("150px");
+        kachel.addClassName("kachel");
 
         Div deleteIcon = new Div();
         deleteIcon.setText("🗑️");
         deleteIcon.addClassName("delete-icon");
-        deleteIcon.getStyle().set("position", "absolute");
-        deleteIcon.getStyle().set("bottom", "5px");
-        deleteIcon.getStyle().set("right", "5px");
-        deleteIcon.getStyle().set("visibility", "hidden");
 
         Div editIcon = new Div();
         editIcon.setText("✏️");
         editIcon.addClassName("edit-icon");
-        editIcon.getStyle().set("position", "absolute");
-        editIcon.getStyle().set("bottom", "5px");
-        editIcon.getStyle().set("left", "5px");
-        editIcon.getStyle().set("visibility", "hidden");
-
 
         //Confirm-Dialog initialisieren
         Dialog confirmationDialog = new Dialog();
@@ -208,34 +188,19 @@ public class VeranstaltungenView extends VerticalLayout {
         //Dadurch muss ich diese Methode in jeder Klasse neu einbauen, wo ich sie verwenden möchte.
         Div plusSymbol = new Div();
         plusSymbol.setText("+");
-        plusSymbol.getStyle()
-                .set("font-size", "40px")
-                .set("text-align", "center")
-                .set("margin", "auto");
+        plusSymbol.addClassName("plus-symbol");
 
         Div neueVeranstaltungKachel = new Div(plusSymbol);
-        neueVeranstaltungKachel.getStyle()
-                .set("border", "1px solid var(--lumo-contrast-20pct)")
-                .set("border-radius", "10px")
-                .set("padding", "1em")
-                .set("margin", "0.5em")
-                .set("cursor", "pointer")
-                .set("box-shadow", "0 4px 8px 0 rgba(0,0,0,0.2)")
-                .set("display", "flex")
-                .set("align-items", "center")
-                .set("justify-content", "center");
-        neueVeranstaltungKachel.setWidth("150px");
-        neueVeranstaltungKachel.setHeight("150px");
+        neueVeranstaltungKachel.addClassName("neue-veranstaltung-kachel");
 
         neueVeranstaltungKachel.getElement().addEventListener("mouseover", e ->
-            neueVeranstaltungKachel.getStyle().set("background-color", "lightblue")
+            neueVeranstaltungKachel.addClassName("hover")
         );
 
         neueVeranstaltungKachel.getElement().addEventListener("mouseout", e ->
-            neueVeranstaltungKachel.getStyle().set("background-color", "")
+            neueVeranstaltungKachel.removeClassName("hover")
         );
 
-        //
         VeranstaltungDialog createDialog = new VeranstaltungDialog(veranstaltungenService, teilnehmerService, userService, this);
 
         neueVeranstaltungKachel.addClickListener(e ->

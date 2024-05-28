@@ -231,19 +231,20 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         plusSymbol.setText("+");
         plusSymbol.addClassName("plus-symbol");
 
-        Div neueVeranstaltungKachel = new Div(plusSymbol);
-        neueVeranstaltungKachel.addClassName("neue-veranstaltung-kachel");
+        Div neueVeranstaltungsterminKachel = new Div(plusSymbol);
+        neueVeranstaltungsterminKachel.addClassName("neue-veranstaltungstermin-kachel");
 
-        neueVeranstaltungKachel.getElement().addEventListener("mouseover", e ->
-                neueVeranstaltungKachel.addClassName("hover"));
+        neueVeranstaltungsterminKachel.getElement().addEventListener("mouseover", e ->
+                neueVeranstaltungsterminKachel.addClassName("hover"));
 
-        neueVeranstaltungKachel.getElement().addEventListener("mouseout", e ->
-                neueVeranstaltungKachel.removeClassName("hover"));
+        neueVeranstaltungsterminKachel.getElement().addEventListener("mouseout", e ->
+                neueVeranstaltungsterminKachel.removeClassName("hover"));
 
-        neueVeranstaltungKachel.addClickListener(e ->
-                veranstaltungsterminDialog.open());
+        neueVeranstaltungsterminKachel.addClickListener(e ->
+                veranstaltungsterminDialog.open()
+        );
 
-        return neueVeranstaltungKachel;
+        return neueVeranstaltungsterminKachel;
     }
 
 

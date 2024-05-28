@@ -16,7 +16,7 @@
     height: 150px;
 }
 
-.kachel:hover, .neue-veranstaltung-kachel:hover, .neue-gruppenarbeit-kachel:hover {
+.kachel:hover, .neue-veranstaltung-kachel:hover, .neue-veranstaltungstermin-kachel:hover, .neue-gruppenarbeit-kachel:hover {
     background-color: lightblue;
 }
 
@@ -28,6 +28,13 @@
 .delete-icon {
     position: absolute;
     bottom: 5px;
+    right: 5px;
+    visibility: hidden;
+}
+
+.edit-icon {
+    position: absolute;
+    top: 5px;
     right: 5px;
     visibility: hidden;
 }
@@ -44,7 +51,7 @@
 }
 
 /* Specific Kachel Styles */
-.neue-veranstaltung-kachel, .neue-gruppenarbeit-kachel {
+.neue-veranstaltung-kachel, .neue-veranstaltungstermin-kachel, .neue-gruppenarbeit-kachel {
     border: 1px solid var(--lumo-contrast-20pct);
     border-radius: 10px;
     padding: 1em;
