@@ -1,10 +1,8 @@
 //Author: Joris
 package com.example.application.views;
 
-import com.example.application.models.Role;
 import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
-import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -23,8 +21,6 @@ import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 
 import java.io.ByteArrayInputStream;
 import java.util.Optional;
-import java.util.Set;
-
 
 //MainLayout ist die Hauptansicht der Anwendung, die die Navigationsleiste enthält
 public class MainLayout extends AppLayout {
@@ -57,7 +53,7 @@ public class MainLayout extends AppLayout {
         header.setWidthFull();
         header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
         header.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
-        header.getStyle().set("background", "transparent"); // Transparenter Hintergrund
+        header.getStyle().set("background", "transparent");
 
         // (First Element) Logo-Button, das als Home-Button fungiert
         Button logoButton = new Button("H.S.B.I TeamBuilder", e -> getUI().ifPresent(ui -> ui.navigate("")));
@@ -80,9 +76,15 @@ public class MainLayout extends AppLayout {
             User user = maybeUser.get();
 
             Avatar avatar = new Avatar(user.getName());
-            StreamResource resource = new StreamResource("profile-pic",
-                    () -> new ByteArrayInputStream(user.getProfilePicture()));
-            avatar.setImageResource(resource);
+            byte[] profilePicture = user.getProfilePicture();
+            if (profilePicture != null) {
+                StreamResource resource = new StreamResource("profile-pic",
+                        () -> new ByteArrayInputStream(profilePicture));
+                avatar.setImageResource(resource);
+            } else {
+                String initials = user.getName().substring(0, 2).toUpperCase();
+                avatar.setName(initials);
+            }
             avatar.setThemeName("xsmall");
             avatar.getElement().setAttribute("tabindex", "-1");
 
@@ -99,9 +101,9 @@ public class MainLayout extends AppLayout {
             div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
             div.getElement().getStyle().set("margin", "0 10px");
             userName.add(div);
-            userName.getSubMenu().addItem("Sign out", e -> {
-                authenticatedUser.logout();
-            });
+            userName.getSubMenu().addItem("Sign out", e ->
+                authenticatedUser.logout()
+            );
             settingItems.add(userMenu); //zur rechten Seite hinzufügen
         } else {
             Anchor loginLink = new Anchor("login", "Sign in");
