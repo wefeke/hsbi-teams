@@ -156,3 +156,25 @@
     margin-right: -5px;
     margin-top: 8px;
 }
+
+.teilnehmer-liste {
+    position: fixed;
+    right: 25px;
+    top: 8%;
+    height: 86%;
+    overflow-y: auto;
+    width: 300px; /* adjust as needed */
+    padding: 1em;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    border-radius: 15px;
+}
+
+.left-container {
+    flex-grow: 1;
+    overflow: auto;
+}
+
+.right-container {
+    width: 320px; /* adjust as needed */
+}

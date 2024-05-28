@@ -23,6 +23,7 @@ public List<Teilnehmer> findAllTeilnehmer2(){return teilnehmerRepository.findAll
             return teilnehmerRepository.search(filterText);
         }
     }
+
     public Optional<Teilnehmer> findByMatrikelNr(Long matrikelNr) {
         return teilnehmerRepository.findByMatrikelNr(matrikelNr);
     }

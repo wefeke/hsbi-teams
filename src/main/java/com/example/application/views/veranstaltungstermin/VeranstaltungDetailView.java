@@ -19,11 +19,11 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.virtuallist.VirtualList;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.*;
 import jakarta.annotation.security.RolesAllowed;
-
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -52,6 +52,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private final Div gruppenarbeitContainer;
     private final Div gruppenContainer;
     private final H1 veranstaltungTitle;
+    private final Div teilnehmerListe;
 
     //Dialog Instance
     private VeranstaltungsterminDialog veranstaltungsterminDialog;
@@ -59,7 +60,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private GruppeAuswertungDialog gruppeAuswertungDialog;
 
     //Layout
-    private final VerticalLayout mainLayout;
+    private final VerticalLayout mainLayoutLeft;
     private HorizontalLayout gruppenarbeitLinie;
     private HorizontalLayout gruppenLinie;
 
@@ -69,8 +70,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         this.gruppenarbeitService = gruppenarbeitService;
         this.gruppeService = gruppeService;
 
-        this.mainLayout = new VerticalLayout();
-        mainLayout.setSizeFull();
+        this.mainLayoutLeft = new VerticalLayout();
+        mainLayoutLeft.setSizeFull();
 
         this.veranstaltungTitle = new H1();
         veranstaltungTitle.addClassName("veranstaltung-title");
@@ -84,9 +85,25 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         this.gruppenContainer = new Div();
         gruppenContainer.addClassName("gruppen-container");
 
-        mainLayout.add(veranstaltungTitle, createLineWithText("Veranstaltungstermine"), veranstaltungsterminContainer);
-        add(mainLayout);
+        mainLayoutLeft.add(veranstaltungTitle, createLineWithText("Veranstaltungstermine"), veranstaltungsterminContainer);
         this.teilnehmerService = teilnehmerService;
+
+        this.teilnehmerListe = new Div();
+
+        // Create a container for the left side
+        Div leftContainer = new Div();
+        leftContainer.addClassName("left-container");
+        leftContainer.add(mainLayoutLeft);
+
+        // Create a container for the right side
+        Div rightContainer = new Div();
+        rightContainer.addClassName("right-container");
+        rightContainer.add(teilnehmerListe);
+
+        // Add both containers to a horizontal layout
+        HorizontalLayout mainLayout = new HorizontalLayout(leftContainer, rightContainer);
+        mainLayout.setSizeFull();
+        add(mainLayout);
     }
 
     @Override
@@ -123,6 +140,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         }
 
         veranstaltungsterminContainer.add(createVeranstaltungsterminKachel());
+
+        teilnehmerListe.add(createTeilnehmerListe());
     }
 
     private Div veranstaltungsterminKachel(Veranstaltungstermin veranstaltungstermin) {
@@ -200,7 +219,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
                 if (gruppenarbeitLinie == null) {
                     gruppenarbeitLinie = createLineWithText("Gruppenarbeiten");
-                    mainLayout.add(gruppenarbeitLinie, gruppenarbeitContainer);
+                    mainLayoutLeft.add(gruppenarbeitLinie, gruppenarbeitContainer);
                 }
 
                 for (Gruppenarbeit gruppenarbeit : veranstaltungstermin.getGruppenarbeiten()) {
@@ -216,8 +235,10 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 aktiveKachelVeranstaltungstermin = kachel;
             }
 
-            gruppenLinie.setVisible(false);
-            gruppenContainer.removeAll();
+            if (gruppenLinie != null) {
+                gruppenLinie.setVisible(false);
+                gruppenContainer.removeAll();
+            }
             gruppenContainer.setVisible(false);
         });
 
@@ -323,7 +344,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
                 if (gruppenLinie == null) {
                     gruppenLinie = createLineWithText("Gruppen");
-                    mainLayout.add(gruppenLinie, gruppenContainer);
+                    mainLayoutLeft.add(gruppenLinie, gruppenContainer);
                 }
 
                 Gruppenarbeit fullGruppenarbeit = gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId());
@@ -395,19 +416,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         VirtualList<Teilnehmer> teilnehmerList = new VirtualList<>();
         teilnehmerList.setItems(fullGruppe.getTeilnehmer());
         teilnehmerList.setRenderer(new ComponentRenderer<>(teilnehmer -> {
-            Div teilnehmerDiv = new Div();
-            teilnehmerDiv.addClassName("teilnehmer-item");
-
-            // Profilbild mit Initialen
-            Span profilbild = new Span();
-            profilbild.setText(teilnehmer.getVorname().charAt(0) + "" + teilnehmer.getNachname().charAt(0));
-            profilbild.addClassName("profilbild");
-
-            // Name des Teilnehmers
-            Span name = new Span(teilnehmer.getVorname() + " " + teilnehmer.getNachname());
-            name.addClassName("teilnehmer-name");
-
-            teilnehmerDiv.add(profilbild, name);
+            Div teilnehmerDiv = createTeilnehmerDiv(teilnehmer);
 
             // Klick-Listener für Teilnehmer
             teilnehmerDiv.addClickListener(e -> {
@@ -468,5 +477,58 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         );
 
         return confirmationDialog;
+    }
+
+    private Div createTeilnehmerListe() {
+        Div teilnehmerListe = new Div();
+        teilnehmerListe.addClassName("teilnehmer-liste");
+        teilnehmerListe.getStyle().set("overflow-y", "hidden");
+
+        TextField searchField = new TextField();
+        searchField.setPlaceholder("Suche...");
+        searchField.setWidthFull();
+
+        List<Teilnehmer> teilnehmer = teilnehmerService.findTeilnehmerByVeranstaltungId(veranstaltung.getVeranstaltungsId());
+
+        Div teilnehmerItems = new Div();
+        for (Teilnehmer t : teilnehmer) {
+            Div teilnehmerDiv = createTeilnehmerDiv(t);
+            teilnehmerItems.add(teilnehmerDiv);
+        }
+
+        Div scrollableList = new Div(teilnehmerItems);
+        scrollableList.getStyle().set("overflow-y", "auto");
+        scrollableList.getStyle().set("height", "calc(100% - 40px)");
+
+        searchField.addValueChangeListener(e -> {
+            String searchTerm = e.getValue().toLowerCase();
+            teilnehmerItems.removeAll();
+            for (Teilnehmer t : teilnehmer) {
+                if (t.getVorname().toLowerCase().contains(searchTerm) || t.getNachname().toLowerCase().contains(searchTerm)) {
+                    Div teilnehmerDiv = createTeilnehmerDiv(t);
+                    teilnehmerItems.add(teilnehmerDiv);
+                }
+            }
+        });
+
+        teilnehmerListe.add(searchField, scrollableList);
+
+        return teilnehmerListe;
+    }
+
+    private Div createTeilnehmerDiv(Teilnehmer t) {
+        Div teilnehmerDiv = new Div();
+        teilnehmerDiv.addClassName("teilnehmer-item");
+
+        Span profilbild = new Span();
+        profilbild.setText(t.getVorname().charAt(0) + "" + t.getNachname().charAt(0));
+        profilbild.addClassName("profilbild");
+
+        Span name = new Span(t.getVorname() + " " + t.getNachname());
+        name.addClassName("teilnehmer-name");
+
+        teilnehmerDiv.add(profilbild, name);
+
+        return teilnehmerDiv;
     }
 }
