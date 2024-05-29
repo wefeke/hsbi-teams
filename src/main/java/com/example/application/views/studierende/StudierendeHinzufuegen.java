@@ -1,6 +1,8 @@
 package com.example.application.views.studierende;
 
+import com.example.application.DoubleToLongConverter;
 import com.example.application.models.Teilnehmer;
+import com.example.application.models.Veranstaltungstermin;
 import com.example.application.services.TeilnehmerService;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.Key;
@@ -10,9 +12,11 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import com.vaadin.flow.data.converter.StringToLongConverter;
 
 import java.util.Optional;
 
@@ -25,9 +29,9 @@ public class StudierendeHinzufuegen extends FormLayout {
     TextField firstName = new TextField("Vorname");
     TextField lastName = new TextField("Nachname");
     NumberField matrikelNr = new NumberField("Matrikelnummer");
-
     Button save = new Button("Save");
     private Teilnehmer teilnehmer;
+    Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
 
     @Autowired
     public StudierendeHinzufuegen(TeilnehmerService teilnehmerService) {
@@ -93,5 +97,15 @@ public class StudierendeHinzufuegen extends FormLayout {
         teilnehmer.setNachname(lastName.getValue());
         teilnehmer.setId(matrikelNr.getValue().longValue());
         teilnehmerService.saveTeilnehmer(teilnehmer);
+    }
+
+    private void bindFields(){
+        binder.forField(firstName)
+                .bind(Teilnehmer::getVorname, Teilnehmer::setVorname);
+        binder.forField(lastName)
+                .bind(Teilnehmer::getNachname, Teilnehmer::setNachname);
+        binder.forField(matrikelNr)
+                .withConverter(new DoubleToLongConverter())
+                .bind(Teilnehmer::getId, Teilnehmer::setId);
     }
 }
