@@ -9,7 +9,8 @@ import java.util.List;
 @Entity
 public class Gruppe {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(generator = "generator")
+    @SequenceGenerator(name="generator", sequenceName = "GENERATOR", allocationSize = 50, initialValue = 100)
     @Column(name = "id", nullable = false)
     private Long id;
     private Long nummer;
