@@ -276,7 +276,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     }
 
     public void createGruppenarbeitDialog() {
-        gruppenarbeitHinzufuegenDialog = new GruppenarbeitHinzufuegenDialog(gruppenarbeitService, teilnehmerService, veranstaltungsterminService, gruppeService);
+        gruppenarbeitHinzufuegenDialog = new GruppenarbeitHinzufuegenDialog(veranstaltung, gruppenarbeitService, teilnehmerService, veranstaltungsterminService, gruppeService);
         gruppenarbeitHinzufuegenDialog.setWidth("1500px");
     }
 
