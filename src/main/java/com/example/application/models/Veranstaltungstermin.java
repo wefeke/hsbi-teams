@@ -85,4 +85,8 @@ public class Veranstaltungstermin {
     public List<Gruppenarbeit> getGruppenarbeiten() {
         return gruppenarbeiten;
     }
+
+    public void addGruppenarbeit (Gruppenarbeit gruppenarbeit) {
+        this.gruppenarbeiten.add(gruppenarbeit);
+    }
 }

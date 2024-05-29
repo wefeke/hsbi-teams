@@ -1,8 +1,6 @@
 package com.example.application.views.gruppenarbeit;
 
-import com.example.application.models.Gruppe;
-import com.example.application.models.Gruppenarbeit;
-import com.example.application.models.Teilnehmer;
+import com.example.application.models.*;
 import com.example.application.services.GruppeService;
 import com.example.application.services.GruppenarbeitService;
 import com.example.application.services.TeilnehmerService;
@@ -47,6 +45,8 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     List<Teilnehmer> allParticipants = new ArrayList<>();
     Set<Teilnehmer> selectedParticipants;
     List<Teilnehmer> selectedParticipantsList;
+    Veranstaltungstermin veranstaltungstermin;
+    Veranstaltung veranstaltung;
 
     //Binder
     Binder<Gruppenarbeit> binderGruppenarbeit = new Binder<>(Gruppenarbeit.class);
@@ -60,13 +60,20 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     Grid<Gruppe> groupsGrid = new Grid<>(Gruppe.class, false);
 
     //Konstruktor
-    @Autowired
-    public GruppenarbeitHinzufuegenDialog(GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService) {
+    //@Autowired
+    public GruppenarbeitHinzufuegenDialog(Veranstaltung veranstaltung, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService) {
+        this.veranstaltung = veranstaltung;
         this.gruppenarbeitService = gruppenarbeitService;
         this.teilnehmerService = teilnehmerService;
         this.veranstaltungsterminService = veranstaltungsterminService;
+        this.veranstaltungstermin = null;
+        if(this.veranstaltung!=null){
+            participants();
+        }
 
-        participants();
+        participants.setHeight("400px");
+
+
         groupsGridVisual();
         groupSizeSelect();
         bindFields();
@@ -122,8 +129,8 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
         saveBtn.addClickListener(event -> {
             if(binderGruppenarbeit.writeBeanIfValid(gruppenarbeit)){
-                //Testweise hier hardgecodeter Termin
-                gruppenarbeit.setVeranstaltungstermin(veranstaltungsterminService.findVeranstaltungsterminById(1L));
+
+                gruppenarbeit.setVeranstaltungstermin(this.veranstaltungstermin);
 
                 for(int i = 0; i<gruppen.size(); i++){
                     gruppeService.save(gruppen.get(i));
@@ -133,10 +140,16 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
                 gruppenarbeit.setTeilnehmer(selectedParticipantsList);
 
                 gruppenarbeitService.save(gruppenarbeit);
+
+                //Gruppenarbeit zum Veranstaltungstermin hinzufügen
+                veranstaltungstermin.addGruppenarbeit(gruppenarbeit);
+                veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
                 Notification.show("Gruppenarbeit angelegt!");
                 close();
                 clearFields();
                 UI.getCurrent().getPage().reload();
+
+
             }
             else {
                 Notification.show("Fehler");
@@ -180,7 +193,8 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
     //Für die Felder der Teilnehmer in der ListBox
     private void participants() {
-       allParticipants.addAll(teilnehmerService.findAllTeilnehmer2());
+        allParticipants.addAll(teilnehmerService.findTeilnehmerByVeranstaltungId(this.veranstaltung.getVeranstaltungsId()));
+
 
         participants.setItems(allParticipants);
         for(Teilnehmer p:allParticipants){
@@ -284,8 +298,8 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
                             .bind(Gruppenarbeit::getBeschreibung, Gruppenarbeit::setBeschreibung);
     }
 
-
-
-
+    public void setVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin){
+        this.veranstaltungstermin = veranstaltungstermin;
+    }
 
 }

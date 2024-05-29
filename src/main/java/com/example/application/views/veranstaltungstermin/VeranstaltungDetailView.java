@@ -231,6 +231,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 gruppenarbeitLinie.setVisible(true);
                 gruppenarbeitContainer.setVisible(true);
 
+                gruppenarbeitHinzufuegenDialog.setVeranstaltungstermin(veranstaltungstermin);
+
                 kachel.addClassName("kachel-active");
                 aktiveKachelVeranstaltungstermin = kachel;
             }
@@ -274,7 +276,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     }
 
     public void createGruppenarbeitDialog() {
-        gruppenarbeitHinzufuegenDialog = new GruppenarbeitHinzufuegenDialog(gruppenarbeitService, teilnehmerService, veranstaltungsterminService, gruppeService);
+        gruppenarbeitHinzufuegenDialog = new GruppenarbeitHinzufuegenDialog(veranstaltung, gruppenarbeitService, teilnehmerService, veranstaltungsterminService, gruppeService);
         gruppenarbeitHinzufuegenDialog.setWidth("1500px");
     }
 
