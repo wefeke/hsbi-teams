@@ -231,6 +231,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 gruppenarbeitLinie.setVisible(true);
                 gruppenarbeitContainer.setVisible(true);
 
+                gruppenarbeitHinzufuegenDialog.setVeranstaltungstermin(veranstaltungstermin);
+
                 kachel.addClassName("kachel-active");
                 aktiveKachelVeranstaltungstermin = kachel;
             }
