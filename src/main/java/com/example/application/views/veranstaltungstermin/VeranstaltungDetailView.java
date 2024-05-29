@@ -62,6 +62,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private VeranstaltungsterminDialog veranstaltungsterminDialog;
     private GruppenarbeitHinzufuegenDialog gruppenarbeitHinzufuegenDialog;
     private GruppeAuswertungDialog gruppeAuswertungDialog;
+    private TeilnehmerHinzufuegenDialog teilnehmerHinzufuegenDialog;
 
     //Layout
     private final VerticalLayout mainLayoutLeft;
@@ -169,6 +170,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         createVeranstaltungsterminDialog();
         createGruppenarbeitDialog();
+        createTeilnehmerDialog();
 
         //init Methode ist wichtig, da erst hier die termine gesetzt werden, weil sonst im Konstruktor die termine noch nicht gesetzt sind,
         // wenn er aufgerufen wird, wodurch es zu einem Fehler kommt.
@@ -321,6 +323,10 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     public void createGruppenarbeitDialog() {
         gruppenarbeitHinzufuegenDialog = new GruppenarbeitHinzufuegenDialog(veranstaltung, gruppenarbeitService, teilnehmerService, veranstaltungsterminService, gruppeService);
         gruppenarbeitHinzufuegenDialog.setWidth("1500px");
+    }
+
+    public void createTeilnehmerDialog() {
+        teilnehmerHinzufuegenDialog = new TeilnehmerHinzufuegenDialog(veranstaltungService, teilnehmerService, veranstaltung.getVeranstaltungsId());
     }
 
     private Div gruppenarbeitKachel(Gruppenarbeit gruppenarbeit) {
@@ -532,6 +538,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         TextField searchField = new TextField();
         searchField.setPlaceholder("Suche...");
         searchField.setWidthFull();
+        searchField.getStyle().set("margin-top", "-10px");
 
         List<Teilnehmer> teilnehmer = teilnehmerService.findTeilnehmerByVeranstaltungId(veranstaltung.getVeranstaltungsId());
 
@@ -543,7 +550,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         Div scrollableList = new Div(teilnehmerItems);
         scrollableList.getStyle().set("overflow-y", "auto");
-        scrollableList.getStyle().set("height", "calc(100% - 40px)");
+        scrollableList.getStyle().set("height", "calc(100% - 70px)");
 
         searchField.addValueChangeListener(e -> {
             String searchTerm = e.getValue().toLowerCase();
@@ -556,7 +563,13 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             }
         });
 
-        teilnehmerListe.add(searchField, scrollableList);
+        Button teilnehmerHinzufuegenButton = new Button();
+        teilnehmerHinzufuegenButton.setText("Teilnehmer hinzufügen");
+        teilnehmerHinzufuegenButton.setWidthFull();
+
+        teilnehmerHinzufuegenButton.addClickListener(e -> teilnehmerHinzufuegenDialog.open());
+
+        teilnehmerListe.add(searchField, scrollableList, teilnehmerHinzufuegenButton);
 
         return teilnehmerListe;
     }
