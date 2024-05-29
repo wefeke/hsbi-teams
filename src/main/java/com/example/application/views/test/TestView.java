@@ -2,6 +2,7 @@ package com.example.application.views.test;
 
 import com.example.application.models.Auswertung;
 import com.example.application.services.AuswertungService;
+import com.example.application.views.MainLayout;
 import com.example.application.views.gruppenarbeit.GruppeAuswertungDialog;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
@@ -17,13 +18,16 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
+import jakarta.annotation.security.RolesAllowed;
+
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.util.stream.Stream;
 
 //LEON
-@Route(value = "test")
-@PageTitle("Tests | Vaadin CRM")
+@Route(value = "auswertung/:veranstaltungId", layout = MainLayout.class)
+@PageTitle("Auswertungen")
+@RolesAllowed({"ADMIN"})
 public class TestView extends VerticalLayout {
     Grid<Auswertung> grid = new Grid<>(Auswertung.class);
     TextField filterText = new TextField();

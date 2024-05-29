@@ -9,11 +9,14 @@ import com.example.application.views.MainLayout;
 import com.example.application.views.gruppenarbeit.GruppeAuswertungDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitHinzufuegenDialog;
 import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -53,11 +56,13 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private final Div gruppenContainer;
     private final H1 veranstaltungTitle;
     private final Div teilnehmerListe;
+    private final Button toggleTeilnehmerListeButton;
 
     //Dialog Instance
     private VeranstaltungsterminDialog veranstaltungsterminDialog;
     private GruppenarbeitHinzufuegenDialog gruppenarbeitHinzufuegenDialog;
     private GruppeAuswertungDialog gruppeAuswertungDialog;
+    private TeilnehmerHinzufuegenDialog teilnehmerHinzufuegenDialog;
 
     //Layout
     private final VerticalLayout mainLayoutLeft;
@@ -70,11 +75,65 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         this.gruppenarbeitService = gruppenarbeitService;
         this.gruppeService = gruppeService;
 
+        this.teilnehmerListe = new Div();
+
         this.mainLayoutLeft = new VerticalLayout();
         mainLayoutLeft.setSizeFull();
 
+        Div leftContainer = new Div();
+        leftContainer.addClassName("left-container");
+        leftContainer.add(mainLayoutLeft);
+
+        Div rightContainer = new Div();
+        rightContainer.addClassName("right-container");
+        rightContainer.add(teilnehmerListe);
+
+        HorizontalLayout mainLayout = new HorizontalLayout(leftContainer, rightContainer);
+        mainLayout.setSizeFull();
+
         this.veranstaltungTitle = new H1();
         veranstaltungTitle.addClassName("veranstaltung-title");
+
+        Button auswertungButton = new Button();
+        auswertungButton.setText("Auswertung");
+        auswertungButton.addClassName("auswertung-button");
+
+        auswertungButton.addClickListener(e -> {
+            String route = "auswertung/" + veranstaltung.getVeranstaltungsId();
+            UI.getCurrent().navigate(route);
+        });
+
+        Icon toggleIcon = new Icon(VaadinIcon.ANGLE_RIGHT);
+        this.toggleTeilnehmerListeButton = new Button(toggleIcon);
+        this.toggleTeilnehmerListeButton.addClickListener(e -> {
+            // Umschalten der Sichtbarkeit der Teilnehmerliste
+            teilnehmerListe.setVisible(!teilnehmerListe.isVisible());
+
+            String display = teilnehmerListe.getStyle().get("display");
+            boolean isVisible = display != null && display.equals("none");
+            teilnehmerListe.getStyle().set("display", isVisible ? "block" : "none");
+
+            if (isVisible) {
+                toggleTeilnehmerListeButton.setIcon(new Icon(VaadinIcon.ANGLE_RIGHT));
+                leftContainer.getStyle().set("width", "calc(100% - 325px)");
+                rightContainer.getStyle().set("width", "320px");
+            } else {
+                toggleTeilnehmerListeButton.setIcon(new Icon(VaadinIcon.ANGLE_LEFT));
+                leftContainer.getStyle().set("width", "100%");
+                rightContainer.getStyle().set("width", "0");
+            }
+        });
+
+        HorizontalLayout titleLayout = new HorizontalLayout();
+        titleLayout.setAlignItems(Alignment.CENTER);
+        titleLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        titleLayout.setWidthFull();
+
+        titleLayout.add(veranstaltungTitle);
+        Div spacer = new Div();
+        titleLayout.add(spacer);
+        titleLayout.setFlexGrow(1, spacer);
+        titleLayout.add(auswertungButton, toggleTeilnehmerListeButton);
 
         this.veranstaltungsterminContainer = new Div();
         veranstaltungsterminContainer.addClassName("veranstaltungen-container");
@@ -85,24 +144,9 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         this.gruppenContainer = new Div();
         gruppenContainer.addClassName("gruppen-container");
 
-        mainLayoutLeft.add(veranstaltungTitle, createLineWithText("Veranstaltungstermine"), veranstaltungsterminContainer);
+        mainLayoutLeft.add(titleLayout, createLineWithText("Veranstaltungstermine"), veranstaltungsterminContainer);
         this.teilnehmerService = teilnehmerService;
 
-        this.teilnehmerListe = new Div();
-
-        // Create a container for the left side
-        Div leftContainer = new Div();
-        leftContainer.addClassName("left-container");
-        leftContainer.add(mainLayoutLeft);
-
-        // Create a container for the right side
-        Div rightContainer = new Div();
-        rightContainer.addClassName("right-container");
-        rightContainer.add(teilnehmerListe);
-
-        // Add both containers to a horizontal layout
-        HorizontalLayout mainLayout = new HorizontalLayout(leftContainer, rightContainer);
-        mainLayout.setSizeFull();
         add(mainLayout);
     }
 
@@ -126,6 +170,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         createVeranstaltungsterminDialog();
         createGruppenarbeitDialog();
+        createTeilnehmerDialog();
 
         //init Methode ist wichtig, da erst hier die termine gesetzt werden, weil sonst im Konstruktor die termine noch nicht gesetzt sind,
         // wenn er aufgerufen wird, wodurch es zu einem Fehler kommt.
@@ -278,6 +323,10 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     public void createGruppenarbeitDialog() {
         gruppenarbeitHinzufuegenDialog = new GruppenarbeitHinzufuegenDialog(veranstaltung, gruppenarbeitService, teilnehmerService, veranstaltungsterminService, gruppeService);
         gruppenarbeitHinzufuegenDialog.setWidth("1500px");
+    }
+
+    public void createTeilnehmerDialog() {
+        teilnehmerHinzufuegenDialog = new TeilnehmerHinzufuegenDialog(veranstaltungService, teilnehmerService, veranstaltung.getVeranstaltungsId());
     }
 
     private Div gruppenarbeitKachel(Gruppenarbeit gruppenarbeit) {
@@ -489,6 +538,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         TextField searchField = new TextField();
         searchField.setPlaceholder("Suche...");
         searchField.setWidthFull();
+        searchField.getStyle().set("margin-top", "-10px");
 
         List<Teilnehmer> teilnehmer = teilnehmerService.findTeilnehmerByVeranstaltungId(veranstaltung.getVeranstaltungsId());
 
@@ -500,7 +550,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         Div scrollableList = new Div(teilnehmerItems);
         scrollableList.getStyle().set("overflow-y", "auto");
-        scrollableList.getStyle().set("height", "calc(100% - 40px)");
+        scrollableList.getStyle().set("height", "calc(100% - 70px)");
 
         searchField.addValueChangeListener(e -> {
             String searchTerm = e.getValue().toLowerCase();
@@ -513,7 +563,13 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             }
         });
 
-        teilnehmerListe.add(searchField, scrollableList);
+        Button teilnehmerHinzufuegenButton = new Button();
+        teilnehmerHinzufuegenButton.setText("Teilnehmer hinzufügen");
+        teilnehmerHinzufuegenButton.setWidthFull();
+
+        teilnehmerHinzufuegenButton.addClickListener(e -> teilnehmerHinzufuegenDialog.open());
+
+        teilnehmerListe.add(searchField, scrollableList, teilnehmerHinzufuegenButton);
 
         return teilnehmerListe;
     }
