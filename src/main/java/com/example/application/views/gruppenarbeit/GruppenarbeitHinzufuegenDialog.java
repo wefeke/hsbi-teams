@@ -10,10 +10,10 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.listbox.MultiSelectListBox;
-import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -32,7 +32,6 @@ import java.util.*;
 @Route(value = "gruppenarbeiten", layout = MainLayout.class)
 public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
-    private final GruppeService gruppeService;
     //TestStuff
     Button saveBtn = new Button("Gruppenarbeit speichern");
 
@@ -40,6 +39,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     private final GruppenarbeitService gruppenarbeitService;
     private final TeilnehmerService teilnehmerService;
     private final VeranstaltungsterminService veranstaltungsterminService;
+    private final GruppeService gruppeService;
 
     //Data
     List<Teilnehmer> allParticipants = new ArrayList<>();
@@ -58,21 +58,24 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     MultiSelectListBox<Teilnehmer> participants = new MultiSelectListBox<>();
     Select<String> groupSize = new Select<>();
     Grid<Gruppe> groupsGrid = new Grid<>(Gruppe.class, false);
+    TextField gruppenGroesse = new TextField("Teilnehmeranzahl");
+    VerticalLayout groupsArea = new VerticalLayout();
 
     //Konstruktor
-    //@Autowired
+    @Autowired
     public GruppenarbeitHinzufuegenDialog(Veranstaltung veranstaltung, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService) {
         this.veranstaltung = veranstaltung;
         this.gruppenarbeitService = gruppenarbeitService;
         this.teilnehmerService = teilnehmerService;
         this.veranstaltungsterminService = veranstaltungsterminService;
+        this.gruppeService = gruppeService;
         this.veranstaltungstermin = null;
+
+        gruppenGroesse.setReadOnly(true);
+
         if(this.veranstaltung!=null){
-            participants();
+            listBoxParticipants();
         }
-
-        participants.setHeight("400px");
-
 
         groupsGridVisual();
         groupSizeSelect();
@@ -82,10 +85,11 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         //TODO: funktionierendes vernünftig in die Klasse in Methoden etc. integrieren
         Gruppenarbeit gruppenarbeit = new Gruppenarbeit();
         List<Gruppe> gruppen = new ArrayList<Gruppe>();
+        List<Grid<Teilnehmer>> gruppenGrids = new ArrayList<Grid<Teilnehmer>>();
 
         groupSize.addValueChangeListener(event -> {
             if(groupSize.getOptionalValue().isEmpty()){
-                Notification.show("Empty!");
+                Notification.show("Leer");
             }
             else if(Objects.equals(groupSize.getValue(), "Error: Keine Teilnehmer ausgewählt. Kann keine Gruppen erstellen")){
                 Notification.show("Fehler");
@@ -95,15 +99,32 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
                     gruppen.clear();
                 }
 
+                if(!(groupsArea.getComponentCount()==0)){
+                    groupsArea.removeAll();
+                }
+
                 groupsGrid.setVisible(true);
-                char num = groupSize.getValue().charAt(0);
-                int numberOfGroups = Integer.parseInt(num+"");
+                String num = groupSize.getValue();
+                String[] splitString = num.split(" ");
+
+                int numberOfGroups = Integer.parseInt(splitString[0]);
 
                 int[] sizes = groupSizes(numberOfGroups, participants.getSelectedItems().size());
 
                 for(int i=0;i<numberOfGroups;i++){
                     gruppen.add(new Gruppe((long) i+1));
+                    Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class, false);
+                    grid.addColumn(Teilnehmer::getId).setHeader("Matrikelnummer");
+                    grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
+                    grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
+                    groupsArea.add(new H5("Gruppe " + (i+1)));
+                    groupsArea.add(grid);
                 }
+
+
+
+//              changeLabelText(numberOfGroups, participants.getSelectedItems().size());
+                Notification.show(gruppenGroesse.getValue());
 
                 selectedParticipants = participants.getSelectedItems();
                 selectedParticipantsList = new ArrayList<>(selectedParticipants.stream().toList());
@@ -121,7 +142,6 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
                         }
                     }
                 }
-
 
                 groupsGrid.setItems(gruppen);
             }
@@ -156,11 +176,8 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
             }
         });
 
-
-
         //Finales Zeugs
-        add(createLayout(), saveBtn, groupsGrid);
-        this.gruppeService = gruppeService;
+        add(createLayout(), saveBtn, groupsGrid, groupsArea);
     }
 
     private void groupsGridVisual() {
@@ -192,7 +209,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     }
 
     //Für die Felder der Teilnehmer in der ListBox
-    private void participants() {
+    private void listBoxParticipants() {
         allParticipants.addAll(teilnehmerService.findTeilnehmerByVeranstaltungId(this.veranstaltung.getVeranstaltungsId()));
 
 
@@ -206,7 +223,6 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
             groupsGrid.setVisible(false);
 
         });
-        participants.setWidth("30%");
     }
 
 
@@ -215,27 +231,22 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         return participants/2;
     }
 
-    //Berechnet alle möglichen Gruppenanzahlen bei gegebener maximaler Gruppenanzahl
-    //Das sind dann alle ab 2 bis zur maximalen Anzahl
-//    private int[] groupNumbers(int groupMax){
-//        int[] groupNumbers = new int[groupMax];
-//        for(int i=0; i<groupMax; i++){
-//            groupNumbers[i] = i+1;
-//        }
-//        return groupNumbers;
-//    }
-
+    //Berechnet alle möglichen Gruppenanzahlen
+    //Das sind dann eine mit allen Teilnehmern, 2 bis zur maximalen Anzahl und dann noch eine Gruppengröße, um alle
+    //Teilnehmer in eine eigene Gruppe zu packen
     private int[] groupNumbers(int participants){
         int groupMax = groupMax(participants);
         int[] groupNumbers = new int[groupMax+1];
+        //Gruppen von 1 bis zum Maximum
         for(int i=0; i<groupMax; i++){
             groupNumbers[i] = i+1;
         }
+        //Gruppenanzahl in der Anzahl der Teilnehmer, s.d. man jeden Teilnehmer in eigene Gruppe packen kann
         groupNumbers[groupMax] = participants;
         return groupNumbers;
     }
 
-    //Berechnet die Gruppengröße bei gegebener Gruppen- und Gesamtteilnehmeranzahl
+    //Berechnet die Gruppengröße(n) bei gegebener Gruppen- und Gesamtteilnehmeranzahl
     private int[] groupSizes(int groups, int participants){
         if(participants%groups == 0){
             return new int[]{participants/groups};
@@ -276,10 +287,15 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         HorizontalLayout gruppenarbeitData = new HorizontalLayout();
         VerticalLayout gruppenarbeitText = new VerticalLayout();
 
+        titleField.setWidth("300px");
         gruppenarbeitText.add(titleField);
+        descriptionArea.setHeight("270px");
+        descriptionArea.setWidth("300px");
         gruppenarbeitText.add(descriptionArea);
 
         gruppenarbeitData.add(gruppenarbeitText);
+        participants.setWidth("250px");
+        participants.setHeight("400px");
         gruppenarbeitData.add(participants);
 
         mainPageLayout.add(infoText);
@@ -301,5 +317,23 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     public void setVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin){
         this.veranstaltungstermin = veranstaltungstermin;
     }
+
+//    private void changeLabelText(int groups, int participants) {
+//        int[] sizes = groupSizes(groups, participants);
+//        String str = "";
+//        for(Iterator<Integer> it = Arrays.stream(sizes).iterator(); it.hasNext();){
+//            String nextSize = it.next().toString();
+//            if(it.hasNext()){
+//                str += nextSize;
+//                str += " ";
+//            }
+//            else{
+//                str += " und ";
+//                str += nextSize;
+//                str += " Teilnehmer";
+//            }
+//        }
+//        gruppenGroesse.setValue(str);
+//        }
 
 }
