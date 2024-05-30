@@ -202,5 +202,10 @@
 .gruppen-gruppenarbeit {
     display: flex;
     flex-direction: column;
-    padding: 10px;
+    padding: 10px 5px;
+}
+
+/*Addes by Lilli*/
+.gruppen-gruppenarbeit-title {
+    padding-bottom: 10px;
 }

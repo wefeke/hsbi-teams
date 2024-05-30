@@ -39,6 +39,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
     //TestStuff
     Button saveBtn = new Button("Gruppenarbeit speichern");
+    Button randomizeBtn = new Button("Neu mischen");
 
     //Services
     private final GruppenarbeitService gruppenarbeitService;
@@ -92,9 +93,11 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         List<Gruppe> gruppen = new ArrayList<Gruppe>();
         List<Grid<Teilnehmer>> gruppenGrids = new ArrayList<Grid<Teilnehmer>>();
 
-        groupSize.addValueChangeListener(event -> {
+        randomizeBtn.addClickListener(event -> {
             if(groupSize.getOptionalValue().isEmpty()){
-                Notification.show("Leer");
+                if(!(groupsArea.getComponentCount()==0)){
+                    groupsArea.removeAll();
+                }
             }
             else if(Objects.equals(groupSize.getValue(), "Error: Keine Teilnehmer ausgewählt. Kann keine Gruppen erstellen")){
                 Notification.show("Fehler");
@@ -152,9 +155,83 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
                     grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
                     grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
                     grid.setItems(gruppen.get(i).getTeilnehmer());
-                    grid.setWidth("380px");
+                    grid.setWidth("400px");
                     grid.addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS);
-                    H5 title = new H5("Gruppe " + (i+1));
+                    H5 title = new H5("Gruppe " + (i+1) + ": " + gruppen.get(i).getTeilnehmer().size() + " Teilnehmer");
+                    title.addClassName("gruppen-gruppenarbeit-title");
+                    Div titleAndGroups = new Div(title, grid);
+                    titleAndGroups.addClassName("gruppen-gruppenarbeit");
+                    groupsArea.add(titleAndGroups);
+                }
+            }
+        });
+
+        groupSize.addValueChangeListener(event -> {
+            if(groupSize.getOptionalValue().isEmpty()){
+                if(!(groupsArea.getComponentCount()==0)){
+                    groupsArea.removeAll();
+                }
+            }
+            else if(Objects.equals(groupSize.getValue(), "Error: Keine Teilnehmer ausgewählt. Kann keine Gruppen erstellen")){
+                Notification.show("Fehler");
+            }
+            else{
+                if(!gruppen.isEmpty()) {
+                    gruppen.clear();
+                }
+
+                if(!(groupsArea.getComponentCount()==0)){
+                    groupsArea.removeAll();
+                }
+
+                groupsGrid.setVisible(true);
+                String num = groupSize.getValue();
+                String[] splitString = num.split(" ");
+
+                int numberOfGroups = Integer.parseInt(splitString[0]);
+
+                int[] sizes = groupSizes(numberOfGroups, participants.getSelectedItems().size());
+
+                for(int i=0;i<numberOfGroups;i++){
+                    gruppen.add(new Gruppe((long) i+1));
+                }
+
+
+
+//              changeLabelText(numberOfGroups, participants.getSelectedItems().size());
+                Notification.show(gruppenGroesse.getValue());
+
+                selectedParticipants = participants.getSelectedItems();
+                selectedParticipantsList = new ArrayList<>(selectedParticipants.stream().toList());
+
+                Collections.shuffle(selectedParticipantsList);
+                Iterator<Teilnehmer> teilnehmerIterator = selectedParticipantsList.iterator();
+
+                for(int j = 0; j<sizes[sizes.length-1];j++) {
+                    for (int i = 0; i < numberOfGroups; i++) {
+                        if(teilnehmerIterator.hasNext()){
+                            gruppen.get(i).addTeilnehmer(teilnehmerIterator.next());
+                        }
+                        else{
+                            break;
+                        }
+                    }
+                }
+
+                groupsArea.setWidth("100%");
+                groupsArea.setClassName("gruppen-container-gruppenarbeiten");
+
+                groupsGrid.setItems(gruppen);
+                for(int i=0;i<numberOfGroups;i++){
+                    Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class, false);
+                    grid.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");
+                    grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
+                    grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
+                    grid.setItems(gruppen.get(i).getTeilnehmer());
+                    grid.setWidth("400px");
+                    grid.addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS);
+                    H5 title = new H5("Gruppe " + (i+1) + ": " + gruppen.get(i).getTeilnehmer().size() + " Teilnehmer");
+                    title.addClassName("gruppen-gruppenarbeit-title");
                     Div titleAndGroups = new Div(title, grid);
                     titleAndGroups.addClassName("gruppen-gruppenarbeit");
                     groupsArea.add(titleAndGroups);
@@ -192,7 +269,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         });
 
         //Finales Zeugs
-        add(createLayout(), saveBtn, groupsArea);
+        add(createLayout());
     }
 
     private void groupsGridVisual() {
@@ -301,21 +378,26 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         VerticalLayout mainPageLayout = new VerticalLayout();
         HorizontalLayout gruppenarbeitData = new HorizontalLayout();
         VerticalLayout gruppenarbeitText = new VerticalLayout();
+        VerticalLayout buttonsLayout = new VerticalLayout();
 
-        titleField.setWidth("300px");
+        titleField.setWidth("400px");
         gruppenarbeitText.add(titleField);
         descriptionArea.setHeight("270px");
-        descriptionArea.setWidth("300px");
+        descriptionArea.setWidth("400px");
         gruppenarbeitText.add(descriptionArea);
+
+        groupSize.setWidth("230px");
+        buttonsLayout.add(groupSize, saveBtn, randomizeBtn);
 
         gruppenarbeitData.add(gruppenarbeitText);
         participants.setWidth("250px");
         participants.setHeight("400px");
         gruppenarbeitData.add(participants);
+        gruppenarbeitData.add(buttonsLayout);
 
-        mainPageLayout.add(infoText);
-        mainPageLayout.add(gruppenarbeitData);
-        mainPageLayout.add(groupSize);
+        mainPageLayout.add(infoText, gruppenarbeitData, new H3("Gruppen"), groupsArea);
+
+
 
         return mainPageLayout;
     }
