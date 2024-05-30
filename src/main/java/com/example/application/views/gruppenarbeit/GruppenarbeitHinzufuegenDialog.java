@@ -6,10 +6,14 @@ import com.example.application.services.GruppenarbeitService;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.VeranstaltungsterminService;
 import com.example.application.views.MainLayout;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H5;
@@ -26,6 +30,7 @@ import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
+import java.util.List;
 
 //Lilli
 @PageTitle("Gruppenarbeiten")
@@ -59,7 +64,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     Select<String> groupSize = new Select<>();
     Grid<Gruppe> groupsGrid = new Grid<>(Gruppe.class, false);
     TextField gruppenGroesse = new TextField("Teilnehmeranzahl");
-    VerticalLayout groupsArea = new VerticalLayout();
+    Div groupsArea = new Div();
 
     //Konstruktor
     @Autowired
@@ -113,12 +118,6 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
                 for(int i=0;i<numberOfGroups;i++){
                     gruppen.add(new Gruppe((long) i+1));
-                    Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class, false);
-                    grid.addColumn(Teilnehmer::getId).setHeader("Matrikelnummer");
-                    grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
-                    grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
-                    groupsArea.add(new H5("Gruppe " + (i+1)));
-                    groupsArea.add(grid);
                 }
 
 
@@ -143,7 +142,23 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
                     }
                 }
 
+                groupsArea.setWidth("100%");
+                groupsArea.setClassName("gruppen-container-gruppenarbeiten");
+
                 groupsGrid.setItems(gruppen);
+                for(int i=0;i<numberOfGroups;i++){
+                    Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class, false);
+                    grid.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");
+                    grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
+                    grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
+                    grid.setItems(gruppen.get(i).getTeilnehmer());
+                    grid.setWidth("380px");
+                    grid.addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS);
+                    H5 title = new H5("Gruppe " + (i+1));
+                    Div titleAndGroups = new Div(title, grid);
+                    titleAndGroups.addClassName("gruppen-gruppenarbeit");
+                    groupsArea.add(titleAndGroups);
+                }
             }
         });
 
@@ -177,7 +192,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         });
 
         //Finales Zeugs
-        add(createLayout(), saveBtn, groupsGrid, groupsArea);
+        add(createLayout(), saveBtn, groupsArea);
     }
 
     private void groupsGridVisual() {
