@@ -97,6 +97,12 @@
     flex-wrap: wrap;
 }
 
+/* Added by Lilli */
+.gruppen-container-gruppenarbeiten {
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .gruppen-container {
     display: flex;
     flex-wrap: wrap;
@@ -190,4 +196,11 @@
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
+}
+
+/* Added by Lilli */
+.gruppen-gruppenarbeit {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
 }
