@@ -16,7 +16,7 @@ public class Teilnehmer {
     private String nachname;
 
     //Beziehungen
-    @ManyToMany
+    @ManyToMany (fetch = FetchType.EAGER)
     private List<Veranstaltung> veranstaltungen = new ArrayList<>();
     @ManyToMany
     private List<Gruppenarbeit> gruppenarbeit = new ArrayList<>();
@@ -70,5 +70,11 @@ public class Teilnehmer {
 
     public String toString(){
         return this.vorname + " " + this.nachname;
+    }
+
+    public List<Gruppe> getGruppen() {return gruppen;}
+
+    public List<Gruppenarbeit> getGruppenarbeit() {
+        return gruppenarbeit;
     }
 }

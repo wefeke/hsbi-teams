@@ -47,6 +47,10 @@ public List<Teilnehmer> findAllTeilnehmer2(){return teilnehmerRepository.findAll
     public boolean isTeilnehmerInVeranstaltung(Teilnehmer teilnehmer) {
         return !teilnehmer.getVeranstaltungen().isEmpty();
     }
+    @Transactional
+    public List<Teilnehmer> findTeilnehmerByVeranstaltungId(Long id) {
+        return teilnehmerRepository.findByVeranstaltungId(id);
+    }
 }
 
 

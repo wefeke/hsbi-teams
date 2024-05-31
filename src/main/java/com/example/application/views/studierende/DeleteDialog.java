@@ -21,12 +21,12 @@ public class DeleteDialog extends Dialog {
         removeAll();
 
         if (teilnehmerService.isTeilnehmerInVeranstaltung(teilnehmer)) {
-            Dialog veranstaltungenDialog = new Dialog();
-            veranstaltungenDialog.add(new Text("Der Studierende ist noch in folgenden Veranstaltungen gespeichert:"));
+            add(new Text("Der Studierende " + teilnehmer.getVorname() + " " + teilnehmer.getNachname() + " ist noch in folgenden Veranstaltungen gespeichert:"));
 
-            Grid<Veranstaltung> grid = new Grid<>(Veranstaltung.class);
+            Grid<Veranstaltung> grid = new Grid<>();
+            grid.addColumn(Veranstaltung::toString).setHeader("Veranstaltungen");
             grid.setItems(teilnehmer.getVeranstaltungen());
-            veranstaltungenDialog.add(grid);
+            add(grid);
 
             Button deleteButton = new Button("Löschen", event -> {
                 teilnehmer.getVeranstaltungen().clear();
@@ -34,14 +34,12 @@ public class DeleteDialog extends Dialog {
                 teilnehmer.getGruppenarbeit().clear();
                 teilnehmerService.saveTeilnehmer(teilnehmer);
                 Notification.show("Studierender aus Veranstaltungen, Gruppen und Gruppenarbeiten entfernt");
-                veranstaltungenDialog.close();
                 close();
             });
 
-            Button cancelButton = new Button("Abbrechen", event -> veranstaltungenDialog.close());
+            Button cancelButton = new Button("Abbrechen", event -> close());
 
-            veranstaltungenDialog.add(deleteButton, cancelButton);
-            veranstaltungenDialog.open();
+            add(deleteButton, cancelButton);
         } else {
             add(new Text("Möchten Sie den Studierenden " + teilnehmer.getVorname() + " " + teilnehmer.getNachname() + " wirklich löschen?"));
 
@@ -57,4 +55,24 @@ public class DeleteDialog extends Dialog {
         }
         open();
     }
+//    public void openDeleteDialog(Teilnehmer teilnehmer) {
+//    removeAll(); // Clear previous content
+//
+//    add(new Text("Möchten Sie den Studierenden " + teilnehmer.getVorname() + " " + teilnehmer.getNachname() + " wirklich löschen?"));
+//
+//    Button yesButton = new Button("Ja", event -> {
+//        if (teilnehmerService.isTeilnehmerInVeranstaltung(teilnehmer)) {
+//            Notification.show("Der Studierende ist noch in einer Veranstaltung gespeichert und kann nicht gelöscht werden.");
+//        } else {
+//            teilnehmerService.deleteTeilnehmer(teilnehmer);
+//            Notification.show("Studierender gelöscht");
+//            close();
+//        }
+//    });
+//
+//    Button noButton = new Button("Nein", event -> close());
+//
+//    add(yesButton, noButton);
+//    open();
+//}
 }
