@@ -25,12 +25,15 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
 
 @Route(value = "studierende", layout = MainLayout.class)
-@PageTitle("Studierende")
+@PageTitle(value = "Studierende")
+@RolesAllowed({"ADMIN"})
+
 public class StudierendeView extends VerticalLayout {
     private final TeilnehmerService teilnehmerService;
     private final Grid<Teilnehmer> grid = new Grid<>();

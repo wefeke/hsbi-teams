@@ -9,6 +9,9 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.notification.Notification;
 import com.example.application.models.Veranstaltung;
+import jakarta.annotation.security.RolesAllowed;
+
+@RolesAllowed({"ADMIN"})
 
 public class DeleteDialog extends Dialog {
     private final TeilnehmerService teilnehmerService;
