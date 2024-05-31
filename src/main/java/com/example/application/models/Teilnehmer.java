@@ -2,8 +2,11 @@
 package com.example.application.models;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -14,6 +17,12 @@ public class Teilnehmer {
     private Long matrikelNr;
     private String vorname;
     private String nachname;
+
+    // für Timestamp
+
+    @CreationTimestamp
+    @Column(name = "hinzugefügt am", updatable = false)
+    private LocalDateTime hinzugefuegtAm;
 
     //Beziehungen
     @ManyToMany (fetch = FetchType.EAGER)
