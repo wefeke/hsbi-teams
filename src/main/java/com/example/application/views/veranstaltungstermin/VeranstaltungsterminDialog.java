@@ -17,7 +17,6 @@ import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.data.binder.*;
-import org.aspectj.weaver.ast.Not;
 
 import java.time.LocalDate;
 
@@ -26,7 +25,7 @@ public class VeranstaltungsterminDialog extends Dialog {
     //Services
     private final VeranstaltungenService veranstaltungService;
     private final VeranstaltungsterminService veranstaltungsterminService;
-    private String veranstaltungId;
+    private final String veranstaltungId;
 
     //Dialog Items
     private final DatePicker startDatePicker = new DatePicker("Termin Datum");

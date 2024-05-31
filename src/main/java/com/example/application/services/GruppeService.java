@@ -1,3 +1,4 @@
+//Autor: Lilli
 package com.example.application.services;
 
 import com.example.application.models.Gruppe;
@@ -16,5 +17,9 @@ public class GruppeService {
 
     public void save(Gruppe gruppe) {
         gruppenRepository.save(gruppe);
+    }
+
+    public Gruppe findGruppeByIdWithTeilnehmer(Long id) {
+        return gruppenRepository.findByIdWithTeilnehmer(id);
     }
 }

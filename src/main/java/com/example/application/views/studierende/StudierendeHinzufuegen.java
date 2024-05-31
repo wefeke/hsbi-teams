@@ -14,6 +14,7 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.UIScope;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.vaadin.flow.data.converter.StringToLongConverter;
@@ -22,6 +23,7 @@ import java.util.Optional;
 
 @Component
 @UIScope
+@RolesAllowed({"ADMIN"})
 public class StudierendeHinzufuegen extends FormLayout {
 
     private final TeilnehmerService teilnehmerService;

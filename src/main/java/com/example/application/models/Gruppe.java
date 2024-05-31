@@ -9,7 +9,8 @@ import java.util.List;
 @Entity
 public class Gruppe {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(generator = "generator")
+    @SequenceGenerator(name="generator", sequenceName = "GENERATOR", allocationSize = 50, initialValue = 100)
     @Column(name = "id", nullable = false)
     private Long id;
     private Long nummer;
@@ -21,7 +22,6 @@ public class Gruppe {
     private List<Teilnehmer> teilnehmer = new ArrayList<>();
 
     public Gruppe(){
-
     }
 
     public Gruppe(Long nummer){
@@ -50,7 +50,7 @@ public class Gruppe {
     }
 
     public List<Teilnehmer> getTeilnehmer() {
-        return new ArrayList<Teilnehmer>(this.teilnehmer);
+        return this.teilnehmer;
     }
 
     public void addTeilnehmer(Teilnehmer teilnehmer) {

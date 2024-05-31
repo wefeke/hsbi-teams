@@ -16,7 +16,7 @@
     height: 150px;
 }
 
-.kachel:hover, .neue-veranstaltung-kachel:hover, .neue-gruppenarbeit-kachel:hover {
+.kachel:hover, .neue-veranstaltung-kachel:hover, .neue-veranstaltungstermin-kachel:hover, .neue-gruppenarbeit-kachel:hover {
     background-color: lightblue;
 }
 
@@ -32,6 +32,13 @@
     visibility: hidden;
 }
 
+.edit-icon {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    visibility: hidden;
+}
+
 .kachel-active {
     background-color: #4682B4;
 }
@@ -44,7 +51,7 @@
 }
 
 /* Specific Kachel Styles */
-.neue-veranstaltung-kachel, .neue-gruppenarbeit-kachel {
+.neue-veranstaltung-kachel, .neue-veranstaltungstermin-kachel, .neue-gruppenarbeit-kachel {
     border: 1px solid var(--lumo-contrast-20pct);
     border-radius: 10px;
     padding: 1em;
@@ -85,9 +92,120 @@
 }
 
 /* Container Styles */
-.veranstaltungen-container, .gruppenarbeiten-container, .gruppen-container {
+.veranstaltungen-container, .gruppenarbeiten-container {
     display: flex;
     flex-wrap: wrap;
 }
 
+/* Added by Lilli */
+.gruppen-container-gruppenarbeiten {
+    display: flex;
+    flex-wrap: wrap;
+}
 
+.gruppen-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.kachel-gruppen {
+    width: 200px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2);
+}
+
+.teilnehmer-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 5px 0;
+    cursor: pointer;
+}
+
+.profilbild {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.teilnehmer-name {
+    font-size: 16px;
+}
+
+.termin-datum {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    font-size: 0.8em;
+}
+
+.termin-notiz {
+    text-align: center;
+    margin-top: 6px;
+}
+
+.termin-zeit {
+    font-size: 0.8em;
+    text-align: right;
+    margin-right: -5px;
+    margin-top: 8px;
+}
+
+.teilnehmer-liste {
+    position: fixed;
+    right: 25px;
+    top: 8%;
+    height: 87.5%;
+    overflow-y: auto;
+    width: 300px; /* adjust as needed */
+    padding: 1em;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    border-radius: 15px;
+}
+
+.left-container {
+    flex-grow: 1;
+    overflow: auto;
+}
+
+.right-container {
+    width: 320px; /* adjust as needed */
+}
+
+.auswertung-button {
+    background-color: #ff7f7f;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+/* Added by Lilli */
+.gruppen-gruppenarbeit {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 5px;
+}
+
+/*Addes by Lilli*/
+.gruppen-gruppenarbeit-title {
+    padding-bottom: 10px;
+}
