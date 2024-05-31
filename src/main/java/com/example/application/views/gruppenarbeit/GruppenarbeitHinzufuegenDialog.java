@@ -91,7 +91,12 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
         //TODO: funktionierendes vernünftig in die Klasse in Methoden etc. integrieren
         randomizeBtn.addClickListener(event -> {
-            randomize(gruppen);
+            if(gruppen.isEmpty()){
+                Notification.show("Es existieren keine Gruppen. Kann nicht neu mischen.");
+            }
+            else {
+                randomize(gruppen);
+            }
         });
 
         groupSize.addValueChangeListener(event -> {
@@ -139,6 +144,8 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         }
         else if(Objects.equals(groupSize.getValue(), "Keine Teilnehmer ausgewählt.")){
             Notification.show("Kann keine Gruppen erstellen, da keine Teilnehmer ausgewählt sind.");
+            clearGroupsArea();
+            clearGroupsList(gruppen);
         }
         else{
             clearGroupsList(gruppen);
