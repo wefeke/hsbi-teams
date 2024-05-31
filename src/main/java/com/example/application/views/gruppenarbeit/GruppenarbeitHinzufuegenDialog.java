@@ -6,13 +6,11 @@ import com.example.application.services.GruppenarbeitService;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.VeranstaltungsterminService;
 import com.example.application.views.MainLayout;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
@@ -53,6 +51,9 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     List<Teilnehmer> selectedParticipantsList;
     Veranstaltungstermin veranstaltungstermin;
     Veranstaltung veranstaltung;
+    Gruppenarbeit gruppenarbeit = new Gruppenarbeit();
+    List<Gruppe> gruppen = new ArrayList<Gruppe>();
+
 
     //Binder
     Binder<Gruppenarbeit> binderGruppenarbeit = new Binder<>(Gruppenarbeit.class);
@@ -64,7 +65,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     MultiSelectListBox<Teilnehmer> participants = new MultiSelectListBox<>();
     Select<String> groupSize = new Select<>();
     Grid<Gruppe> groupsGrid = new Grid<>(Gruppe.class, false);
-    TextField gruppenGroesse = new TextField("Teilnehmeranzahl");
+    //TextField gruppenGroesse = new TextField("Teilnehmeranzahl");
     Div groupsArea = new Div();
 
     //Konstruktor
@@ -77,166 +78,24 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         this.gruppeService = gruppeService;
         this.veranstaltungstermin = null;
 
-        gruppenGroesse.setReadOnly(true);
+        //gruppenGroesse.setReadOnly(true);
 
         if(this.veranstaltung!=null){
             listBoxParticipants();
         }
 
-        groupsGridVisual();
+        configureGroupsArea();
+
         groupSizeSelect();
         bindFields();
 
-        //TestStuff
         //TODO: funktionierendes vernünftig in die Klasse in Methoden etc. integrieren
-        Gruppenarbeit gruppenarbeit = new Gruppenarbeit();
-        List<Gruppe> gruppen = new ArrayList<Gruppe>();
-        List<Grid<Teilnehmer>> gruppenGrids = new ArrayList<Grid<Teilnehmer>>();
-
         randomizeBtn.addClickListener(event -> {
-            if(groupSize.getOptionalValue().isEmpty()){
-                if(!(groupsArea.getComponentCount()==0)){
-                    groupsArea.removeAll();
-                }
-            }
-            else if(Objects.equals(groupSize.getValue(), "Error: Keine Teilnehmer ausgewählt. Kann keine Gruppen erstellen")){
-                Notification.show("Fehler");
-            }
-            else{
-                if(!gruppen.isEmpty()) {
-                    gruppen.clear();
-                }
-
-                if(!(groupsArea.getComponentCount()==0)){
-                    groupsArea.removeAll();
-                }
-
-                groupsGrid.setVisible(true);
-                String num = groupSize.getValue();
-                String[] splitString = num.split(" ");
-
-                int numberOfGroups = Integer.parseInt(splitString[0]);
-
-                int[] sizes = groupSizes(numberOfGroups, participants.getSelectedItems().size());
-
-                for(int i=0;i<numberOfGroups;i++){
-                    gruppen.add(new Gruppe((long) i+1));
-                }
-
-
-
-//              changeLabelText(numberOfGroups, participants.getSelectedItems().size());
-                Notification.show(gruppenGroesse.getValue());
-
-                selectedParticipants = participants.getSelectedItems();
-                selectedParticipantsList = new ArrayList<>(selectedParticipants.stream().toList());
-
-                Collections.shuffle(selectedParticipantsList);
-                Iterator<Teilnehmer> teilnehmerIterator = selectedParticipantsList.iterator();
-
-                for(int j = 0; j<sizes[sizes.length-1];j++) {
-                    for (int i = 0; i < numberOfGroups; i++) {
-                        if(teilnehmerIterator.hasNext()){
-                            gruppen.get(i).addTeilnehmer(teilnehmerIterator.next());
-                        }
-                        else{
-                            break;
-                        }
-                    }
-                }
-
-                groupsArea.setWidth("100%");
-                groupsArea.setClassName("gruppen-container-gruppenarbeiten");
-
-                groupsGrid.setItems(gruppen);
-                for(int i=0;i<numberOfGroups;i++){
-                    Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class, false);
-                    grid.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");
-                    grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
-                    grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
-                    grid.setItems(gruppen.get(i).getTeilnehmer());
-                    grid.setWidth("400px");
-                    grid.addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS);
-                    H5 title = new H5("Gruppe " + (i+1) + ": " + gruppen.get(i).getTeilnehmer().size() + " Teilnehmer");
-                    title.addClassName("gruppen-gruppenarbeit-title");
-                    Div titleAndGroups = new Div(title, grid);
-                    titleAndGroups.addClassName("gruppen-gruppenarbeit");
-                    groupsArea.add(titleAndGroups);
-                }
-            }
+            randomize(gruppen);
         });
 
         groupSize.addValueChangeListener(event -> {
-            if(groupSize.getOptionalValue().isEmpty()){
-                if(!(groupsArea.getComponentCount()==0)){
-                    groupsArea.removeAll();
-                }
-            }
-            else if(Objects.equals(groupSize.getValue(), "Error: Keine Teilnehmer ausgewählt. Kann keine Gruppen erstellen")){
-                Notification.show("Fehler");
-            }
-            else{
-                if(!gruppen.isEmpty()) {
-                    gruppen.clear();
-                }
-
-                if(!(groupsArea.getComponentCount()==0)){
-                    groupsArea.removeAll();
-                }
-
-                groupsGrid.setVisible(true);
-                String num = groupSize.getValue();
-                String[] splitString = num.split(" ");
-
-                int numberOfGroups = Integer.parseInt(splitString[0]);
-
-                int[] sizes = groupSizes(numberOfGroups, participants.getSelectedItems().size());
-
-                for(int i=0;i<numberOfGroups;i++){
-                    gruppen.add(new Gruppe((long) i+1));
-                }
-
-
-
-//              changeLabelText(numberOfGroups, participants.getSelectedItems().size());
-                Notification.show(gruppenGroesse.getValue());
-
-                selectedParticipants = participants.getSelectedItems();
-                selectedParticipantsList = new ArrayList<>(selectedParticipants.stream().toList());
-
-                Collections.shuffle(selectedParticipantsList);
-                Iterator<Teilnehmer> teilnehmerIterator = selectedParticipantsList.iterator();
-
-                for(int j = 0; j<sizes[sizes.length-1];j++) {
-                    for (int i = 0; i < numberOfGroups; i++) {
-                        if(teilnehmerIterator.hasNext()){
-                            gruppen.get(i).addTeilnehmer(teilnehmerIterator.next());
-                        }
-                        else{
-                            break;
-                        }
-                    }
-                }
-
-                groupsArea.setWidth("100%");
-                groupsArea.setClassName("gruppen-container-gruppenarbeiten");
-
-                groupsGrid.setItems(gruppen);
-                for(int i=0;i<numberOfGroups;i++){
-                    Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class, false);
-                    grid.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");
-                    grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
-                    grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
-                    grid.setItems(gruppen.get(i).getTeilnehmer());
-                    grid.setWidth("400px");
-                    grid.addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS);
-                    H5 title = new H5("Gruppe " + (i+1) + ": " + gruppen.get(i).getTeilnehmer().size() + " Teilnehmer");
-                    title.addClassName("gruppen-gruppenarbeit-title");
-                    Div titleAndGroups = new Div(title, grid);
-                    titleAndGroups.addClassName("gruppen-gruppenarbeit");
-                    groupsArea.add(titleAndGroups);
-                }
-            }
+            randomize(gruppen);
         });
 
         saveBtn.addClickListener(event -> {
@@ -272,10 +131,97 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         add(createLayout());
     }
 
-    private void groupsGridVisual() {
-        groupsGrid.setVisible(false);
-        groupsGrid.addColumn(Gruppe::getNummer).setHeader("Gruppennummer");
-        groupsGrid.addColumn(Gruppe::getTeilnehmer).setHeader("Teilnehmer");
+    //Teilt ausgewählte Teilnehmer zufällig auf Gruppen zu und zeigt diese Zufallseinteilung dann mithilfe von Grids an
+    private void randomize(List<Gruppe> gruppen) {
+        if(groupSize.getOptionalValue().isEmpty()){
+            clearGroupsArea();
+            clearGroupsList(gruppen);
+        }
+        else if(Objects.equals(groupSize.getValue(), "Keine Teilnehmer ausgewählt.")){
+            Notification.show("Kann keine Gruppen erstellen, da keine Teilnehmer ausgewählt sind.");
+        }
+        else{
+            clearGroupsList(gruppen);
+            clearGroupsArea();
+            int numberOfGroups = getNumberOfGroups();
+            int[] sizes = groupSizes(numberOfGroups, participants.getSelectedItems().size());
+            makeGroups(numberOfGroups, gruppen);
+            //changeLabelText(numberOfGroups, participants.getSelectedItems().size());
+            //Notification.show(gruppenGroesse.getValue());
+            randomizeParticipants(sizes, numberOfGroups, gruppen);
+            groupGrids(numberOfGroups, gruppen);
+        }
+    }
+
+    //Erstellt die Grids für die Gruppen
+    private void groupGrids(int numberOfGroups, List<Gruppe> gruppen) {
+        for(int i = 0; i< numberOfGroups; i++){
+            Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class, false);
+            grid.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");
+            grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
+            grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
+            grid.setItems(gruppen.get(i).getTeilnehmer());
+            grid.setWidth("400px");
+            grid.addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS);
+            H5 title = new H5("Gruppe " + (i+1) + ": " + gruppen.get(i).getTeilnehmer().size() + " Teilnehmer");
+            title.addClassName("gruppen-gruppenarbeit-title");
+            Div titleAndGroups = new Div(title, grid);
+            titleAndGroups.addClassName("gruppen-gruppenarbeit");
+            groupsArea.add(titleAndGroups);
+        }
+    }
+
+    //Konfiguriert den Bereich, in dem die Gruppen-Grids angezeigt werden
+    private void configureGroupsArea() {
+        groupsArea.setWidth("100%");
+        groupsArea.setClassName("gruppen-container-gruppenarbeiten");
+    }
+
+    //Teilt Teilnehmer zufällig auf Gruppen zu
+    private void randomizeParticipants(int[] sizes, int numberOfGroups, List<Gruppe> gruppen) {
+        selectedParticipants = participants.getSelectedItems();
+        selectedParticipantsList = new ArrayList<>(selectedParticipants.stream().toList());
+        Collections.shuffle(selectedParticipantsList);
+        Iterator<Teilnehmer> teilnehmerIterator = selectedParticipantsList.iterator();
+
+        for(int j = 0; j< sizes[sizes.length-1]; j++) {
+            for (int i = 0; i < numberOfGroups; i++) {
+                if(teilnehmerIterator.hasNext()){
+                    gruppen.get(i).addTeilnehmer(teilnehmerIterator.next());
+                }
+                else{
+                    break;
+                }
+            }
+        }
+    }
+
+    //Erstellt benötigte Anzahl an Gruppen
+    private static void makeGroups(int numberOfGroups, List<Gruppe> gruppen) {
+        for(int i = 0; i< numberOfGroups; i++){
+            gruppen.add(new Gruppe((long) i+1));
+        }
+    }
+
+    //Holt benötigte Anzahl an Gruppen aus der ausgewählten Option des Drop-Down-Feldes
+    private int getNumberOfGroups() {
+        String num = groupSize.getValue();
+        String[] splitString = num.split(" ");
+        return Integer.parseInt(splitString[0]);
+    }
+
+    //Leert die Gruppenliste
+    private static void clearGroupsList(List<Gruppe> gruppen) {
+        if(!gruppen.isEmpty()) {
+            gruppen.clear();
+        }
+    }
+
+    //Leert die Anzeige der Gruppen
+    private void clearGroupsArea() {
+        if(!(groupsArea.getComponentCount()==0)){
+            groupsArea.removeAll();
+        }
     }
 
     private void groupSizeSelect() {
@@ -293,7 +239,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     private List<String> getGroups() {
         List<String> groups = new ArrayList<>();
         if(participants.getSelectedItems().isEmpty()){
-            groups.add("Error: Keine Teilnehmer ausgewählt. Kann keine Gruppen erstellen");
+            groups.add("Keine Teilnehmer ausgewählt.");
             return groups;
         }
         groups = groupNumbersAndSizes(participants.getSelectedItems().size());
