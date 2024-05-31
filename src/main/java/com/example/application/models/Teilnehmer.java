@@ -27,9 +27,9 @@ public class Teilnehmer {
     //Beziehungen
     @ManyToMany (fetch = FetchType.EAGER)
     private List<Veranstaltung> veranstaltungen = new ArrayList<>();
-    @ManyToMany
-    private List<Gruppenarbeit> gruppenarbeit = new ArrayList<>();
-    @ManyToMany
+    @ManyToMany (fetch = FetchType.EAGER)
+    private List<Gruppenarbeit> gruppenarbeiten = new ArrayList<>();
+    @ManyToMany (fetch = FetchType.EAGER)
     private List<Gruppe> gruppen = new ArrayList<>();
 
     public Long getId() {
@@ -83,7 +83,7 @@ public class Teilnehmer {
 
     public List<Gruppe> getGruppen() {return gruppen;}
 
-    public List<Gruppenarbeit> getGruppenarbeit() {
-        return gruppenarbeit;
+    public List<Gruppenarbeit> getGruppenarbeiten() {
+        return gruppenarbeiten;
     }
 }

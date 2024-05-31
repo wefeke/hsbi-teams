@@ -62,4 +62,8 @@ public class Gruppenarbeit {
     public List<Gruppe> getGruppen() {
         return gruppen;
     }
+
+    public List<Teilnehmer> getTeilnehmer() {
+        return teilnehmer;
+    }
 }
