@@ -44,7 +44,9 @@ public List<Teilnehmer> findAllTeilnehmer2(){return teilnehmerRepository.findAll
         else
             System.err.println("Test is null. Are you sure you have connected your form to the application?");
     }
-
+    public boolean isTeilnehmerInVeranstaltung(Teilnehmer teilnehmer) {
+        return !teilnehmer.getVeranstaltungen().isEmpty();
+    }
 }
 
 

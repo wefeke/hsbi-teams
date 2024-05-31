@@ -40,9 +40,12 @@ public class StudierendeView extends VerticalLayout {
     private H2 users = new H2("Studierende");
     private final Button delete = new Button("Studierenden löschen");
     private final Button aendern = new Button ("Studierende ändern");
-    private Component addStudiernedenButtonIcon;
-    private Component deleteIcon;
-    private Component aendernIcon;
+    private final Component addStudiernedenButtonIcon;
+    private final Component deleteIcon;
+    private final Component aendernIcon;
+    private final Button importButton = new Button("Importieren");
+    private final Button exportButton = new Button("Exportieren");
+
     Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
 
     TextField vorname = new TextField("Vorname");
@@ -54,7 +57,7 @@ public class StudierendeView extends VerticalLayout {
     @Autowired
     public StudierendeView(TeilnehmerService teilnehmerService) {
         this.teilnehmerService = teilnehmerService;
-
+        DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService);
         addStudiernedenButtonIcon = addStudiernedenButton.getIcon();
         deleteIcon = delete.getIcon();
         aendernIcon = aendern.getIcon();
@@ -65,7 +68,8 @@ public class StudierendeView extends VerticalLayout {
         configureGrid();
         add(
                 getToolbar(),
-                getContent()
+                getContent(),
+                getToolbar2()
         );
         updateStudierendeView();
         addStudiernedenButton.addClickListener(event -> openDialog());
@@ -84,7 +88,7 @@ public class StudierendeView extends VerticalLayout {
         delete.addClickListener(event -> {
             Teilnehmer selectedTeilnehmer = grid.asSingleSelect().getValue();
             if (selectedTeilnehmer != null) {
-                deleteDialog(selectedTeilnehmer);
+                deleteDialog.openDeleteDialog(selectedTeilnehmer);
             }
         });
         // Click-Listener für den Ändern-Button
@@ -151,6 +155,14 @@ public class StudierendeView extends VerticalLayout {
 
         return toolbar;
     }
+    private Component getToolbar2() {
+
+        HorizontalLayout toolbar2 = new HorizontalLayout(importButton, exportButton);
+
+        toolbar2.addClassName("toolbar");
+
+        return toolbar2;
+    }
 
 
     private void openDialog() {
@@ -165,24 +177,6 @@ public class StudierendeView extends VerticalLayout {
 
     }
 
-    private void deleteDialog(Teilnehmer teilnehmer) {
-        Dialog confirmationDialog = new Dialog();
-        confirmationDialog.add(new Text("Möchten Sie den Studierenden " + teilnehmer.getVorname()+" " + teilnehmer.getNachname()+ " wirklich löschen?"));
-
-        Button yesButton = new Button("Ja", event -> {
-            teilnehmerService.deleteTeilnehmer(teilnehmer);
-            Notification.show("Studierender gelöscht");
-            updateStudierendeView();
-            confirmationDialog.close();
-        });
-
-        Button noButton = new Button("Nein", event -> {
-            confirmationDialog.close();
-        });
-
-        confirmationDialog.add(yesButton, noButton);
-        confirmationDialog.open();
-    }
 
     private void setTeilnehmer(Teilnehmer teilnehmer) {
         vorname.setValue(teilnehmer.getVorname());
