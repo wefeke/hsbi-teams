@@ -7,6 +7,7 @@ import com.example.application.services.*;
 import com.example.application.models.*;
 import com.example.application.views.MainLayout;
 import com.example.application.views.gruppenarbeit.GruppeAuswertungDialog;
+import com.example.application.views.gruppenarbeit.GruppenarbeitBearbeitenDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitHinzufuegenDialog;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
@@ -61,6 +62,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     //Dialog Instance
     private VeranstaltungsterminDialog veranstaltungsterminDialog;
     private GruppenarbeitHinzufuegenDialog gruppenarbeitHinzufuegenDialog;
+    private GruppenarbeitBearbeitenDialog gruppenarbeitBearbeitenDialog;
     private GruppeAuswertungDialog gruppeAuswertungDialog;
     private TeilnehmerHinzufuegenDialog teilnehmerHinzufuegenDialog;
 
@@ -169,7 +171,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         }
 
         createVeranstaltungsterminDialog();
-        createGruppenarbeitDialog();
+        createGruppenarbeitHinzufuegenDialog();
+        createGruppenarbeitBearbeitenDialog();
         createTeilnehmerDialog();
 
         //init Methode ist wichtig, da erst hier die termine gesetzt werden, weil sonst im Konstruktor die termine noch nicht gesetzt sind,
@@ -320,10 +323,18 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         veranstaltungsterminDialog = new VeranstaltungsterminDialog(veranstaltungService, veranstaltungsterminService, veranstaltungIdString);
     }
 
-    public void createGruppenarbeitDialog() {
+    //Lilli
+    public void createGruppenarbeitHinzufuegenDialog() {
         gruppenarbeitHinzufuegenDialog = new GruppenarbeitHinzufuegenDialog(veranstaltung, gruppenarbeitService, teilnehmerService, veranstaltungsterminService, gruppeService);
         gruppenarbeitHinzufuegenDialog.setWidth("1500px");
     }
+
+    //Lilli
+    public void createGruppenarbeitBearbeitenDialog() {
+        gruppenarbeitBearbeitenDialog = new GruppenarbeitBearbeitenDialog(gruppenarbeitService);
+    }
+
+
 
     public void createTeilnehmerDialog() {
         teilnehmerHinzufuegenDialog = new TeilnehmerHinzufuegenDialog(veranstaltungService, teilnehmerService, veranstaltung.getVeranstaltungsId());
@@ -354,6 +365,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         );
 
         Div deleteIcon = createDeleteIcon(confirmationDialog);
+        Div editIcon = createEditIcon(gruppenarbeitBearbeitenDialog);
 
         confirmationDialog.addOpenedChangeListener(e -> {
             if (!e.isOpened()) {
@@ -361,7 +373,14 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             }
         });
 
+        gruppenarbeitBearbeitenDialog.addOpenedChangeListener(e -> {
+            if (!e.isOpened()) {
+                editIcon.getStyle().set("visibility", "hidden");
+            }
+        });
+
         kachel.add(deleteIcon);
+        kachel.add(editIcon);
 
         kachel.getElement().addEventListener("mouseover", e -> {
             if (!kachel.equals(aktiveKachelGruppenarbeit)) {
@@ -412,8 +431,13 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 gruppenLinie.setVisible(true);
                 gruppenContainer.setVisible(true);
 
+                gruppenarbeitBearbeitenDialog.setGruppenarbeit(gruppenarbeit);
+                gruppenarbeitBearbeitenDialog.readBean();
+                editIcon.getStyle().set("visibility", "visible");
+
                 kachel.addClassName("kachel-active");
                 aktiveKachelGruppenarbeit = kachel;
+
             }
         });
 
@@ -505,6 +529,17 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 confirmationDialog.open()
         ).addEventData("event.stopPropagation()");
         return deleteIcon;
+    }
+
+    //Lilli
+    private Div createEditIcon(Dialog editDialog) {
+        Div editIcon = new Div();
+        editIcon.setText("✏️");
+        editIcon.addClassName("edit-icon");
+        editIcon.getElement().addEventListener("click", e ->
+                editDialog.open()
+        ).addEventData("event.stopPropagation()");
+        return editIcon;
     }
 
     private Dialog createDeleteConfirmationDialog(String confirmationText, Runnable onDelete) {
