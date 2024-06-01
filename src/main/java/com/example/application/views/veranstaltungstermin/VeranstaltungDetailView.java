@@ -387,7 +387,6 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 kachel.addClassName("kachel-hover");
             }
             deleteIcon.getStyle().set("visibility", "visible");
-            editIcon.getStyle().set("visibility", "visible");
         });
 
         kachel.getElement().addEventListener("mouseout", e -> {
@@ -395,7 +394,6 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 kachel.removeClassName("kachel-hover");
             }
             deleteIcon.getStyle().set("visibility", "hidden");
-            editIcon.getStyle().set("visibility", "hidden");
         });
 
         kachel.addClickListener(e -> {
@@ -433,8 +431,13 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 gruppenLinie.setVisible(true);
                 gruppenContainer.setVisible(true);
 
+                gruppenarbeitBearbeitenDialog.setGruppenarbeit(gruppenarbeit);
+                gruppenarbeitBearbeitenDialog.readBean();
+                editIcon.getStyle().set("visibility", "visible");
+
                 kachel.addClassName("kachel-active");
                 aktiveKachelGruppenarbeit = kachel;
+
             }
         });
 
