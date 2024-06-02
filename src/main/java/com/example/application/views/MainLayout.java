@@ -128,7 +128,11 @@ public class MainLayout extends AppLayout {
 
         header.add(navItems, settingItems);  //Linke und rechte Seite in die Navigationsbar
         addToNavbar(header);
+
+
     }
+
+
 
     /**
      * Konfiguriert das Aussehen eines Buttons.
