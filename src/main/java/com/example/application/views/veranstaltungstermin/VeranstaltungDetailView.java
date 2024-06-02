@@ -365,7 +365,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         );
 
         Div deleteIcon = createDeleteIcon(confirmationDialog);
-        Div editIcon = createEditIcon(gruppenarbeitBearbeitenDialog);
+        Div editIcon = createEditIcon(gruppenarbeitBearbeitenDialog, deleteIcon);
 
         confirmationDialog.addOpenedChangeListener(e -> {
             if (!e.isOpened()) {
@@ -387,6 +387,9 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 kachel.addClassName("kachel-hover");
             }
             deleteIcon.getStyle().set("visibility", "visible");
+            gruppenarbeitBearbeitenDialog.setGruppenarbeit(gruppenarbeit);
+            gruppenarbeitBearbeitenDialog.readBean();
+            editIcon.getStyle().set("visibility", "visible");
         });
 
         kachel.getElement().addEventListener("mouseout", e -> {
@@ -394,6 +397,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 kachel.removeClassName("kachel-hover");
             }
             deleteIcon.getStyle().set("visibility", "hidden");
+            editIcon.getStyle().set("visibility", "hidden");
         });
 
         kachel.addClickListener(e -> {
@@ -430,10 +434,6 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
                 gruppenLinie.setVisible(true);
                 gruppenContainer.setVisible(true);
-
-                gruppenarbeitBearbeitenDialog.setGruppenarbeit(gruppenarbeit);
-                gruppenarbeitBearbeitenDialog.readBean();
-                editIcon.getStyle().set("visibility", "visible");
 
                 kachel.addClassName("kachel-active");
                 aktiveKachelGruppenarbeit = kachel;
@@ -532,12 +532,14 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     }
 
     //Lilli
-    private Div createEditIcon(Dialog editDialog) {
+    private Div createEditIcon(Dialog editDialog, Div deleteIcon) {
         Div editIcon = new Div();
         editIcon.setText("✏️");
         editIcon.addClassName("edit-icon");
-        editIcon.getElement().addEventListener("click", e ->
-                editDialog.open()
+        editIcon.getElement().addEventListener("click", e ->{
+            editDialog.open();
+            deleteIcon.getStyle().set("visibility", "hidden");
+                }
         ).addEventData("event.stopPropagation()");
         return editIcon;
     }
