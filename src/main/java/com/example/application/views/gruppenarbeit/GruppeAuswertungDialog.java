@@ -109,6 +109,7 @@ public class GruppeAuswertungDialog extends Dialog {
         //Footer Button Implementation
 
 
+
         saveButton.addClickListener( event -> {
             if (teilnehmerGruppenarbeitService.exists(teilnehmerGruppenarbeit)) {
                 teilnehmerGruppenarbeitService.update(teilnehmerGruppenarbeit);
