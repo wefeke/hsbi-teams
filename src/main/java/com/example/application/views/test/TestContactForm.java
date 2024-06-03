@@ -24,7 +24,6 @@ import java.util.Set;
 @Route(value = "testContact")
 public class TestContactForm extends FormLayout{
     TextField titelVeranstaltung = new TextField("titelVeranstaltung");
-
     //TextField veranstaltungstermine = new TextField("Test ID");
     //TextField teilnehmer = new TextField("Test Name");
 
@@ -46,6 +45,7 @@ public class TestContactForm extends FormLayout{
                 createButtonsLayout()
         );
     }
+
 
     private HorizontalLayout createButtonsLayout() {
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);

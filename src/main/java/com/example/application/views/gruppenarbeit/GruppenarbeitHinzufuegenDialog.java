@@ -350,8 +350,6 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
         mainPageLayout.add(infoText, gruppenarbeitData, new H3("Gruppen"), groupsArea);
 
-
-
         return mainPageLayout;
     }
 

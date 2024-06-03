@@ -4,6 +4,7 @@ import com.example.application.models.Auswertung;
 
 import com.example.application.models.Test;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -29,6 +30,6 @@ public interface AuswertungRepository extends JpaRepository<Auswertung, Long> {
             "\t\n", nativeQuery = true)
     List<Auswertung> findAllAuswertungen();
 
-
-
+    @Override
+    boolean existsById(Long aLong);
 }
