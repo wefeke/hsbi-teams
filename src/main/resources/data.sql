@@ -1,3 +1,4 @@
+
 INSERT INTO public.veranstaltung (veranstaltungs_id, semester, titel, user_id) VALUES
 (1001, '2024-05-01', 'Mathe', null),
 (1002, '2024-05-01', 'Datenbanken', null),

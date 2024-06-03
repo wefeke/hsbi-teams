@@ -10,6 +10,16 @@ public class Auswertung {
     private String titelVeranstaltung;
     private String titelGruppenarbeit;
 
+    public Float getPunkte() {
+        return punkte;
+    }
+
+    public void setPunkte(Float punkte) {
+        this.punkte = punkte;
+    }
+
+    private Float punkte;
+
 
     public Auswertung() {
 

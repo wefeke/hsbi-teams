@@ -17,4 +17,12 @@ public class AuswertungService {
         return auswertungRepository.findAllAuswertungen();
     }
 
+    public void persistAuswertung(Auswertung auswertung) {
+        if (auswertungRepository.existsById(auswertung.getId())) {
+            Auswertung fromDBAuswertung = auswertungRepository.getReferenceById(auswertung.getId());
+            fromDBAuswertung.setPunkte(auswertung.getPunkte());
+        } else {
+            auswertungRepository.save(auswertung);
+        }
+    }
 }
