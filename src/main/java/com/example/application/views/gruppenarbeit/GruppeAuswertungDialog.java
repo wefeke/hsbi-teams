@@ -107,7 +107,6 @@ public class GruppeAuswertungDialog extends Dialog {
         incrementButton.addClickListener(event -> incrementValueByHalf());
         decrementButton.addClickListener(event -> decrementValueByHalf());
         //Footer Button Implementation
-
         saveButton.addClickListener( event -> {
             if (teilnehmerGruppenarbeitService.exists(teilnehmerGruppenarbeit)) {
                 teilnehmerGruppenarbeitService.update(teilnehmerGruppenarbeit);
