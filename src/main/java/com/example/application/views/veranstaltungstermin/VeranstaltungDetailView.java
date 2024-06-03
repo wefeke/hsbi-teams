@@ -9,6 +9,7 @@ import com.example.application.views.MainLayout;
 import com.example.application.views.gruppenarbeit.GruppeAuswertungDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitBearbeitenDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitHinzufuegenDialog;
+import com.example.application.views.gruppenarbeit.GruppenarbeitLoeschenDialog;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -64,6 +65,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private VeranstaltungsterminDialog veranstaltungsterminDialog;
     private GruppenarbeitHinzufuegenDialog gruppenarbeitHinzufuegenDialog;
     private GruppenarbeitBearbeitenDialog gruppenarbeitBearbeitenDialog;
+    private GruppenarbeitLoeschenDialog gruppenarbeitLoeschenDialog;
     private GruppeAuswertungDialog gruppeAuswertungDialog;
     private TeilnehmerHinzufuegenDialog teilnehmerHinzufuegenDialog;
 
@@ -175,6 +177,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         createVeranstaltungsterminDialog();
         createGruppenarbeitHinzufuegenDialog();
         createGruppenarbeitBearbeitenDialog();
+        createGruppenarbeitLoeschenDialog();
         createTeilnehmerDialog();
 
         //init Methode ist wichtig, da erst hier die termine gesetzt werden, weil sonst im Konstruktor die termine noch nicht gesetzt sind,
@@ -227,28 +230,28 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 }
         );
 
-        Div deleteIcon = createDeleteIcon(confirmationDialog);
+        Div deleteIconTermin = createDeleteIcon();
+        Div editIconTermin = createEditIcon();
 
-        confirmationDialog.addOpenedChangeListener(e -> {
-            if (!e.isOpened()) {
-                deleteIcon.getStyle().set("visibility", "hidden");
-            }
-        });
+        deleteIconFunctionality(deleteIconTermin, editIconTermin, confirmationDialog);
+        editIconFunctionality(editIconTermin, deleteIconTermin, new Dialog());
 
-        kachel.add(deleteIcon);
+        kachel.add(deleteIconTermin, editIconTermin);
 
         kachel.getElement().addEventListener("mouseover", e -> {
             if (!kachel.equals(aktiveKachelVeranstaltungstermin)) {
                 kachel.addClassName("kachel-hover");
             }
-            deleteIcon.getStyle().set("visibility", "visible");
+            deleteIconTermin.getStyle().set("visibility", "visible");
+            editIconTermin.getStyle().set("visibility", "visible");
         });
 
         kachel.getElement().addEventListener("mouseout", e -> {
             if (!kachel.equals(aktiveKachelVeranstaltungstermin)) {
                 kachel.removeClassName("kachel-hover");
             }
-            deleteIcon.getStyle().set("visibility", "hidden");
+            deleteIconTermin.getStyle().set("visibility", "hidden");
+            editIconTermin.getStyle().set("visibility", "hidden");
         });
 
         kachel.addClickListener(e -> {
@@ -336,6 +339,11 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         gruppenarbeitBearbeitenDialog = new GruppenarbeitBearbeitenDialog(gruppenarbeitService);
     }
 
+    //Lilli
+    public void createGruppenarbeitLoeschenDialog() {
+        gruppenarbeitLoeschenDialog = new GruppenarbeitLoeschenDialog(gruppenarbeitService);
+    }
+
 
 
     public void createTeilnehmerDialog() {
@@ -366,40 +374,31 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             }
         );
 
-        Div deleteIcon = createDeleteIcon(confirmationDialog);
-        Div editIcon = createEditIcon(gruppenarbeitBearbeitenDialog, deleteIcon);
+        Div deleteIconGruppenarbeit = createDeleteIcon();
+        Div editIconGruppenarbeit = createEditIcon();
 
-        confirmationDialog.addOpenedChangeListener(e -> {
-            if (!e.isOpened()) {
-                deleteIcon.getStyle().set("visibility", "hidden");
-            }
-        });
+        deleteIconFunctionality(deleteIconGruppenarbeit, editIconGruppenarbeit, gruppenarbeitLoeschenDialog);
+        editIconFunctionality(editIconGruppenarbeit, deleteIconGruppenarbeit, gruppenarbeitBearbeitenDialog);
 
-        gruppenarbeitBearbeitenDialog.addOpenedChangeListener(e -> {
-            if (!e.isOpened()) {
-                editIcon.getStyle().set("visibility", "hidden");
-            }
-        });
-
-        kachel.add(deleteIcon);
-        kachel.add(editIcon);
+        kachel.add(deleteIconGruppenarbeit);
+        kachel.add(editIconGruppenarbeit);
 
         kachel.getElement().addEventListener("mouseover", e -> {
             if (!kachel.equals(aktiveKachelGruppenarbeit)) {
                 kachel.addClassName("kachel-hover");
             }
-            deleteIcon.getStyle().set("visibility", "visible");
+            deleteIconGruppenarbeit.getStyle().set("visibility", "visible");
             gruppenarbeitBearbeitenDialog.setGruppenarbeit(gruppenarbeit);
             gruppenarbeitBearbeitenDialog.readBean();
-            editIcon.getStyle().set("visibility", "visible");
+            editIconGruppenarbeit.getStyle().set("visibility", "visible");
         });
 
         kachel.getElement().addEventListener("mouseout", e -> {
             if (!kachel.equals(aktiveKachelGruppenarbeit)) {
                 kachel.removeClassName("kachel-hover");
             }
-            deleteIcon.getStyle().set("visibility", "hidden");
-            editIcon.getStyle().set("visibility", "hidden");
+            deleteIconGruppenarbeit.getStyle().set("visibility", "hidden");
+            editIconGruppenarbeit.getStyle().set("visibility", "hidden");
         });
 
         kachel.addClickListener(e -> {
@@ -523,27 +522,47 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         return kachel;
     }
 
-    private Div createDeleteIcon(Dialog confirmationDialog) {
+    private Div createDeleteIcon() {
         Div deleteIcon = new Div();
         deleteIcon.setText("🗑️");
         deleteIcon.addClassName("delete-icon");
-        deleteIcon.getElement().addEventListener("click", e ->
-                confirmationDialog.open()
-        ).addEventData("event.stopPropagation()");
         return deleteIcon;
     }
 
     //Lilli
-    private Div createEditIcon(Dialog editDialog, Div deleteIcon) {
+    private void deleteIconFunctionality(Div deleteIcon, Div editIcon, Dialog deleteDialog){
+        deleteIcon.getElement().addEventListener("click", e -> {
+                    deleteDialog.open();
+                    editIcon.getStyle().set("visibility", "hidden");
+                }
+        ).addEventData("event.stopPropagation()");
+        deleteDialog.addOpenedChangeListener(e -> {
+            if (!e.isOpened()) {
+                deleteIcon.getStyle().set("visibility", "hidden");
+            }
+        });
+    }
+
+    //Lilli
+    private Div createEditIcon() {
         Div editIcon = new Div();
         editIcon.setText("✏️");
         editIcon.addClassName("edit-icon");
-        editIcon.getElement().addEventListener("click", e ->{
-            editDialog.open();
-            deleteIcon.getStyle().set("visibility", "hidden");
+        return editIcon;
+    }
+
+    //Lilli
+    private void editIconFunctionality(Div editIcon, Div deleteIcon, Dialog editDialog){
+        editIcon.getElement().addEventListener("click", e -> {
+                    editDialog.open();
+                    deleteIcon.getStyle().set("visibility", "hidden");
                 }
         ).addEventData("event.stopPropagation()");
-        return editIcon;
+        editDialog.addOpenedChangeListener(e -> {
+            if (!e.isOpened()) {
+                editIcon.getStyle().set("visibility", "hidden");
+            }
+        });
     }
 
     private Dialog createDeleteConfirmationDialog(String confirmationText, Runnable onDelete) {
