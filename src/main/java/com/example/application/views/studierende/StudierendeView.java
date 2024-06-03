@@ -56,11 +56,13 @@ public class StudierendeView extends VerticalLayout {
     NumberField matrikelNr = new NumberField("Matrikelnummer");
     Button save = new Button("Save");
     Button cancel = new Button ("Cancel");
+    Button aufraeumenButton = new Button("Aufräumen");
 
     @Autowired
     public StudierendeView(TeilnehmerService teilnehmerService) {
         this.teilnehmerService = teilnehmerService;
         DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService);
+        Aufraeumen aufraeumenDialog = new Aufraeumen(teilnehmerService);
         addStudiernedenButtonIcon = addStudiernedenButton.getIcon();
         deleteIcon = delete.getIcon();
         aendernIcon = aendern.getIcon();
@@ -108,6 +110,8 @@ public class StudierendeView extends VerticalLayout {
                 restoreButtons();
             }
         });
+
+        aufraeumenButton.addClickListener(event -> aufraeumenDialog.open());
        /* UI.getCurrent().getPage().addBrowserWindowResizeListener(event -> {
             if (event.getWidth() > 500) {
                 restoreButtons();
@@ -160,7 +164,7 @@ public class StudierendeView extends VerticalLayout {
     }
     private Component getToolbar2() {
 
-        HorizontalLayout toolbar2 = new HorizontalLayout(importButton, exportButton);
+        HorizontalLayout toolbar2 = new HorizontalLayout(importButton, exportButton, aufraeumenButton);
 
         toolbar2.addClassName("toolbar");
 

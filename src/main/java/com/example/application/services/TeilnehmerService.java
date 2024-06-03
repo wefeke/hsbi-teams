@@ -3,6 +3,9 @@ package com.example.application.services;
 import com.example.application.models.Teilnehmer;
 import com.example.application.repositories.TeilnehmerRepository;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
@@ -51,6 +54,11 @@ public List<Teilnehmer> findAllTeilnehmer2(){return teilnehmerRepository.findAll
     public List<Teilnehmer> findTeilnehmerByVeranstaltungId(Long id) {
         return teilnehmerRepository.findByVeranstaltungId(id);
     }
+    public List<Teilnehmer> findStudierendeVorVierJahren() {
+        LocalDateTime vierJahreZurueck = LocalDateTime.now().minusYears(4);
+        return teilnehmerRepository.findStudierendeVorVierJahren(vierJahreZurueck);
+    }
+
 }
 
 
