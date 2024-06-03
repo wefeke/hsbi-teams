@@ -115,6 +115,7 @@ public class GruppeAuswertungDialog extends Dialog {
             }
                 close();
                 clearFields();
+
                 UI.getCurrent().getPage().reload();
         });
 
