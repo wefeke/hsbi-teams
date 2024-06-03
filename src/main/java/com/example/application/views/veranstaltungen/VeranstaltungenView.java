@@ -12,6 +12,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Hr;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -78,7 +79,6 @@ public class VeranstaltungenView extends VerticalLayout {
     public void updateKachelContainer() {
         kachelContainer.removeAll();
 
-
         // Alle Veranstaltungen aus der Datenbank abrufen
         List<Veranstaltung> veranstaltungen = veranstaltungenService.findAllVeranstaltungen();
 
@@ -109,46 +109,47 @@ public class VeranstaltungenView extends VerticalLayout {
         Div kachel = new Div(kachelContent);
         kachel.addClassName("kachel");
 
-        Div deleteIcon = new Div();
-        deleteIcon.setText("🗑️");
+        Div deleteIcon = new Div(VaadinIcon.TRASH.create());
         deleteIcon.addClassName("delete-icon");
 
-        Div editIcon = new Div();
-        editIcon.setText("✏️");
+        Div editIcon = new Div(VaadinIcon.EDIT.create());
         editIcon.addClassName("edit-icon");
 
         //Confirm-Dialog initialisieren
         Dialog confirmationDialog = new Dialog();
+            Button confirmbutton = new Button("Ja", event -> {
+                veranstaltungenService.deleteVeranstaltung(veranstaltung);
+                Notification.show("Veranstaltung gelöscht");
+                this.updateKachelContainer();
+                //getUI().ifPresent(ui -> ui.getPage().reload());
+                confirmationDialog.close();
+            });
+
+            Button cancelButton = new Button("Nein", event -> {
+                confirmationDialog.close();
+                kachel.getStyle().set("background-color", "");
+            });
+            cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+
+            VerticalLayout verticalLayout = new VerticalLayout(
+                    new Text("Möchten Sie die Veranstaltung (" + veranstaltung.getTitel() + ") wirklich löschen?"),
+                    new HorizontalLayout(
+                            confirmbutton,
+                            cancelButton
+                    )
+            );
+            verticalLayout.setAlignItems(Alignment.CENTER);
+            confirmationDialog.add( verticalLayout );
+
         //Bearbeiten-Dialog initialisieren
         VeranstaltungBearbeiten editDialog = new VeranstaltungBearbeiten(veranstaltungenService, teilnehmerService, userService, veranstaltung, this);
-
-        Button confirmbutton = new Button("Ja", event -> {
-            veranstaltungenService.deleteVeranstaltung(veranstaltung);
-            Notification.show("Veranstaltung gelöscht");
-            this.updateKachelContainer();
-            //getUI().ifPresent(ui -> ui.getPage().reload());
-            confirmationDialog.close();
+        editDialog.addOpenedChangeListener(e -> {
+            if (!e.isOpened()) {
+                deleteIcon.getStyle().set("visibility", "hidden");
+                editIcon.getStyle().set("visibility", "hidden");
+                kachel.getStyle().set("background-color", "");
+            }
         });
-
-        Button cancelButton = new Button("Nein", event -> {
-            confirmationDialog.close();
-            kachel.getStyle().set("background-color", "");
-        });
-        cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
-
-        VerticalLayout verticalLayout = new VerticalLayout(
-                new Text("Möchten Sie die Veranstaltung (" + veranstaltung.getTitel() + ") wirklich löschen?"),
-                new HorizontalLayout(
-                        confirmbutton,
-                        cancelButton
-                )
-        );
-
-        verticalLayout.setAlignItems(Alignment.CENTER);
-
-        confirmationDialog.add(
-                verticalLayout
-        );
 
         //Icons
         deleteIcon.getElement().addEventListener("click", e ->

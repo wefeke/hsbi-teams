@@ -63,7 +63,8 @@ public class VeranstaltungDialog extends Dialog {
 
         //Combobox
         comboBox.setItems(teilnehmerService.findAllTeilnehmer(""));
-        comboBox.setItemLabelGenerator(Teilnehmer::getVorname);
+        comboBox.setItemLabelGenerator(Teilnehmer::getNachname);
+
 
 
         //Buttons

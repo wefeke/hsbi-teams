@@ -9,6 +9,7 @@ import com.example.application.views.MainLayout;
 import com.example.application.views.gruppenarbeit.GruppeAuswertungDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitBearbeitenDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitHinzufuegenDialog;
+import com.example.application.views.veranstaltungen.VeranstaltungBearbeiten;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -180,7 +181,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         init();
     }
 
-    private void init() {
+    public void init() {
         veranstaltungTitle.setText(veranstaltung.getTitel());
 
         for (Veranstaltungstermin termin : termine) {
@@ -188,8 +189,18 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         }
 
         veranstaltungsterminContainer.add(createVeranstaltungsterminKachel());
-
         teilnehmerListe.add(createTeilnehmerListe());
+
+    }
+
+    public void update () {
+        veranstaltungsterminContainer.removeAll();
+
+        termine = veranstaltungsterminService.findVeranstaltungstermineByVeranstaltungId(veranstaltung.getVeranstaltungsId());
+        for (Veranstaltungstermin termin : termine) {
+            veranstaltungsterminContainer.add(veranstaltungsterminKachel(termin));
+        }
+        veranstaltungsterminContainer.add(createVeranstaltungsterminKachel());
     }
 
     private Div veranstaltungsterminKachel(Veranstaltungstermin veranstaltungstermin) {
@@ -216,6 +227,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         Div kachel = new Div(kachelContent);
         kachel.addClassName("kachel");
 
+        //Initialize Dialogs
         Dialog confirmationDialog = createDeleteConfirmationDialog(
                 "Möchten Sie den Veranstaltungstermin für " + veranstaltungstermin.getNotizen() + " am " + veranstaltungstermin.getDatum() + " wirklich löschen?",
                 () -> {
@@ -225,20 +237,48 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 }
         );
 
-        Div deleteIcon = createDeleteIcon(confirmationDialog);
+        VeranstaltungsterminBearbeiten editDialog = new VeranstaltungsterminBearbeiten(veranstaltungService, veranstaltungsterminService, this, veranstaltungIdString, veranstaltungstermin.getId());
 
+
+        //Delete Icon
+        Div deleteIcon = createDeleteIcon(confirmationDialog);
+        deleteIcon.addClassName("delete-icon");
+
+        //Edit Icon
+        Div editIcon = new Div(VaadinIcon.EDIT.create());
+        editIcon.addClassName("edit-icon");
+
+        editIcon.getElement().addEventListener("click", e-> {
+            editDialog.open();
+            editDialog.readBean();
+        }).addEventData("event.stopPropagation()");
+
+        kachel.add(deleteIcon);
+        kachel.add(editIcon);
+
+        //Confirm Dialog Deselect Implementation
         confirmationDialog.addOpenedChangeListener(e -> {
             if (!e.isOpened()) {
+                kachel.getStyle().setBackgroundColor("");
                 deleteIcon.getStyle().set("visibility", "hidden");
+                editIcon.getStyle().set("visibility", "hidden");
             }
         });
 
-        kachel.add(deleteIcon);
+        //Confirm Dialog Deselect Implementation
+        editDialog.addOpenedChangeListener(e -> {
+            if (!e.isOpened()) {
+                kachel.getStyle().setBackgroundColor("");
+                deleteIcon.getStyle().set("visibility", "hidden");
+                editIcon.getStyle().set("visibility", "hidden");
+            }
+        });
 
         kachel.getElement().addEventListener("mouseover", e -> {
             if (!kachel.equals(aktiveKachelVeranstaltungstermin)) {
                 kachel.addClassName("kachel-hover");
             }
+            editIcon.getStyle().set("visibility", "visible");
             deleteIcon.getStyle().set("visibility", "visible");
         });
 
@@ -246,6 +286,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             if (!kachel.equals(aktiveKachelVeranstaltungstermin)) {
                 kachel.removeClassName("kachel-hover");
             }
+            editIcon.getStyle().set("visibility", "hidden");
             deleteIcon.getStyle().set("visibility", "hidden");
         });
 

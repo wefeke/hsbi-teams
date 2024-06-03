@@ -84,6 +84,7 @@ public class VeranstaltungBearbeiten extends Dialog {
 
         //Combobox
         comboBox.setItems(teilnehmerService.findAllTeilnehmer(""));
+        comboBox.setValue(veranstaltung.getTeilnehmer());
         comboBox.setItemLabelGenerator(Teilnehmer::getVorname);
 
         for (Teilnehmer t : veranstaltung.getTeilnehmer()) {
@@ -92,13 +93,12 @@ public class VeranstaltungBearbeiten extends Dialog {
 
         // Populate the MultiSelectListBox with items
         teilnehmerListe.setItems(teilnehmerService.findAllTeilnehmer(""));
+        teilnehmerListe.setValue(veranstaltung.getTeilnehmer());
         teilnehmerListe.setItemLabelGenerator(Teilnehmer::getVorname);
         teilnehmerListe.setMaxHeight("260px");
         for (Teilnehmer t : veranstaltung.getTeilnehmer()) {
-            teilnehmerListe.isSelected(t);
+            teilnehmerListe.select(t);
         }
-
-
 
         //Buttons
         saveButton.addClickListener(event -> {
