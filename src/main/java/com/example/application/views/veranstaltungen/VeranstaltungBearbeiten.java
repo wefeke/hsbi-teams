@@ -132,8 +132,12 @@ public class VeranstaltungBearbeiten extends Dialog {
             if (binder.writeBeanIfValid(veranstaltung)) {
                 veranstaltung.setUser(userService.findAdmin()); //Angemeldeten User holen
                 veranstaltung.setId(veranstaltungId); //Sichergehen das auch die richtige Veranstaltung bearbeitet wird
+                Optional<User> maybeUser = authenticatedUser.get();
+                if (maybeUser.isPresent()) {
+                    User user = maybeUser.get();
+                    veranstaltung.setUser(user);
+                }
                 veranstaltungenService.saveVeranstaltung(veranstaltung);
-
                 clearFields();
                 close();
                 veranstaltungenView.updateKachelContainer();

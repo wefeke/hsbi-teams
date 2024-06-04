@@ -1,7 +1,9 @@
 package com.example.application.views.veranstaltungstermin;
 
+import com.example.application.models.User;
 import com.example.application.models.Veranstaltung;
 import com.example.application.models.Veranstaltungstermin;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.VeranstaltungenService;
 import com.example.application.services.VeranstaltungsterminService;
@@ -18,6 +20,8 @@ import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.data.binder.*;
+
+import java.util.Optional;
 
 public class VeranstaltungsterminBearbeiten extends Dialog {
 
@@ -37,15 +41,18 @@ public class VeranstaltungsterminBearbeiten extends Dialog {
     private final VeranstaltungDetailView veranstaltungDetailView;
     private final Long veranstaltungsterminId;
 
+    private AuthenticatedUser authenticatedUser;
+
     //Data Binder
     Binder<Veranstaltungstermin> binder = new Binder<>(Veranstaltungstermin.class);
 
-    public VeranstaltungsterminBearbeiten(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungDetailView veranstaltungDetailView, String veranstaltungId, Long veranstaltungsterminId) {
+    public VeranstaltungsterminBearbeiten(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungDetailView veranstaltungDetailView, String veranstaltungId, Long veranstaltungsterminId, AuthenticatedUser authenticatedUser) {
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
         this.veranstaltungId = veranstaltungId;
         this.veranstaltungDetailView = veranstaltungDetailView;
         this.veranstaltungsterminId = veranstaltungsterminId;
+        this.authenticatedUser = authenticatedUser;
 
         add(createLayout());
         configureElements();
@@ -124,8 +131,12 @@ public class VeranstaltungsterminBearbeiten extends Dialog {
     public void persistVeranstaltungstermin (Veranstaltungstermin veranstaltungstermin) {
         if (binder.writeBeanIfValid(veranstaltungstermin)){ //Validierung der neuen Instanz
             veranstaltungstermin.setId(veranstaltungsterminId);
-            veranstaltungstermin.setVeranstaltung(veranstaltungService.findVeranstaltungById(Long.parseLong(veranstaltungId)));
-
+            Optional<User> maybeUser = authenticatedUser.get();
+            if (maybeUser.isPresent()) {
+                User user = maybeUser.get();
+                veranstaltungstermin.setUser(user);
+                veranstaltungstermin.setVeranstaltung(veranstaltungService.findVeranstaltungById(Long.parseLong(veranstaltungId), user));
+            }
             veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
             Notification.show("Veranstaltungstermin " + veranstaltungstermin.getNotizen() + " bearbeitet!");
         }

@@ -216,7 +216,11 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     public void update () {
         veranstaltungsterminContainer.removeAll();
 
-        termine = veranstaltungsterminService.findVeranstaltungstermineByVeranstaltungId(veranstaltung.getVeranstaltungsId());
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+            termine = veranstaltungsterminService.findVeranstaltungstermineByVeranstaltungId(veranstaltung.getId(), user);
+        }
         for (Veranstaltungstermin termin : termine) {
             veranstaltungsterminContainer.add(veranstaltungsterminKachel(termin));
         }
@@ -257,7 +261,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 }
         );
 
-        VeranstaltungsterminBearbeiten editDialog = new VeranstaltungsterminBearbeiten(veranstaltungService, veranstaltungsterminService, this, veranstaltungIdString, veranstaltungstermin.getId());
+        VeranstaltungsterminBearbeiten editDialog = new VeranstaltungsterminBearbeiten(veranstaltungService, veranstaltungsterminService, this, veranstaltungIdString, veranstaltungstermin.getId(), authenticatedUser);
 
 
         //Delete Icon
@@ -419,8 +423,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         String tooltipText = "Titel: " + gruppenarbeit.getTitel() + "\nBeschreibung: " + gruppenarbeit.getBeschreibung();
         kachel.getElement().setProperty("title", tooltipText);
 
-        Div deleteIconGruppenarbeit = createDeleteIcon();
-        Div editIconGruppenarbeit = createEditIcon();
+        Div deleteIconGruppenarbeit = createDeleteIcon(gruppenarbeitLoeschenDialog);
+        Div editIconGruppenarbeit = createEditIcon(gruppenarbeitBearbeitenDialog, deleteIconGruppenarbeit);
 
         deleteIconFunctionality(deleteIconGruppenarbeit, editIconGruppenarbeit, gruppenarbeitLoeschenDialog);
         editIconFunctionality(editIconGruppenarbeit, deleteIconGruppenarbeit, gruppenarbeitBearbeitenDialog);
@@ -703,7 +707,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
     private Button createEditButton() {
     Button editButton = new Button();
-    editButton.setText("✏️");
+    editButton.setIcon(LineAwesomeIcon.EDIT.create());
     editButton.addClassName("edit-button");
 
     editButton.addClickListener(e -> {

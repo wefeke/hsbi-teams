@@ -168,7 +168,6 @@ public class VeranstaltungenView extends VerticalLayout {
             confirmationDialog.add( verticalLayout );
 
         //Bearbeiten-Dialog initialisieren
-        VeranstaltungBearbeiten editDialog = new VeranstaltungBearbeiten(veranstaltungenService, teilnehmerService, userService, veranstaltung, this);
         editDialog.addOpenedChangeListener(e -> {
             if (!e.isOpened()) {
                 deleteIcon.getStyle().set("visibility", "hidden");
