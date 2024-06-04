@@ -34,7 +34,7 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
         i18n.setAdditionalInformation(null);
         setI18n(i18n);
 
-        Button registerButton = new Button("Register", event -> {
+        Button registerButton = new Button("Registrieren", event -> {
             getUI().ifPresent(ui -> ui.navigate("registration"));
         });
         registerButton.setWidthFull();

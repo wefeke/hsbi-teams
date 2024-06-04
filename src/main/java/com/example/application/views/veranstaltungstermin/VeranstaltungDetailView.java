@@ -29,6 +29,8 @@ import com.vaadin.flow.component.virtuallist.VirtualList;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.*;
 import jakarta.annotation.security.RolesAllowed;
+import org.vaadin.lineawesome.LineAwesomeIcon;
+
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -245,7 +247,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         deleteIcon.addClassName("delete-icon");
 
         //Edit Icon
-        Div editIcon = new Div(VaadinIcon.EDIT.create());
+        Div editIcon = new Div(LineAwesomeIcon.EDIT.create());
         editIcon.addClassName("edit-icon");
 
         editIcon.getElement().addEventListener("click", e-> {
@@ -563,8 +565,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     }
 
     private Div createDeleteIcon(Dialog confirmationDialog) {
-        Div deleteIcon = new Div();
-        deleteIcon.setText("🗑️");
+        Div deleteIcon = new Div(LineAwesomeIcon.TRASH_ALT.create());
         deleteIcon.addClassName("delete-icon");
         deleteIcon.getElement().addEventListener("click", e ->
                 confirmationDialog.open()
@@ -574,8 +575,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
     //Lilli
     private Div createEditIcon(Dialog editDialog, Div deleteIcon) {
-        Div editIcon = new Div();
-        editIcon.setText("✏️");
+        Div editIcon = new Div(LineAwesomeIcon.EDIT.create());
         editIcon.addClassName("edit-icon");
         editIcon.getElement().addEventListener("click", e ->{
             editDialog.open();

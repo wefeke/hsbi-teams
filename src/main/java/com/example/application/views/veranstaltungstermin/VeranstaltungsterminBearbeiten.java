@@ -19,9 +19,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.data.binder.*;
 
-import java.time.LocalDate;
-
-
 public class VeranstaltungsterminBearbeiten extends Dialog {
 
     //Services

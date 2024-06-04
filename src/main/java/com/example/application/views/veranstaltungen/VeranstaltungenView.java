@@ -21,11 +21,13 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.vaadin.lineawesome.LineAwesomeIcon;
+
 import java.util.List;
 
 @PageTitle("Veranstaltungen")
 @Route(value = "", layout = MainLayout.class)
-@RolesAllowed("ADMIN")
+@RolesAllowed({"ADMIN", "USER"})
 public class VeranstaltungenView extends VerticalLayout {
 
     //Services
@@ -109,10 +111,11 @@ public class VeranstaltungenView extends VerticalLayout {
         Div kachel = new Div(kachelContent);
         kachel.addClassName("kachel");
 
-        Div deleteIcon = new Div(VaadinIcon.TRASH.create());
+        Div deleteIcon = new Div(LineAwesomeIcon.TRASH_ALT.create());
+        deleteIcon.add();
         deleteIcon.addClassName("delete-icon");
 
-        Div editIcon = new Div(VaadinIcon.EDIT.create());
+        Div editIcon = new Div(LineAwesomeIcon.EDIT.create());
         editIcon.addClassName("edit-icon");
 
         //Confirm-Dialog initialisieren
