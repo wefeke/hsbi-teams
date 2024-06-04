@@ -3,6 +3,7 @@ package com.example.application.views.veranstaltungstermin;
 import com.example.application.models.Gruppenarbeit;
 import com.example.application.models.Veranstaltung;
 import com.example.application.models.Veranstaltungstermin;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.*;
 import com.example.application.models.*;
 import com.example.application.views.MainLayout;
@@ -10,6 +11,7 @@ import com.example.application.views.gruppenarbeit.GruppeAuswertungDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitBearbeitenDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitHinzufuegenDialog;
 import com.example.application.views.veranstaltungen.VeranstaltungBearbeiten;
+import com.example.application.views.gruppenarbeit.GruppenarbeitLoeschenDialog;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -33,10 +35,11 @@ import org.vaadin.lineawesome.LineAwesomeIcon;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @PageTitle("Veranstaltung Detail")
 @Route(value = "veranstaltung-detail/:veranstaltungId", layout = MainLayout.class)
-@RolesAllowed({"ADMIN"})
+@RolesAllowed({"ADMIN", "USER"})
 public class VeranstaltungDetailView extends VerticalLayout implements HasUrlParameter<String> {
 
     //Services
@@ -45,6 +48,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private final GruppenarbeitService gruppenarbeitService;
     private final TeilnehmerService teilnehmerService;
     private final GruppeService gruppeService;
+    private final TeilnehmerGruppenarbeitService teilnehmerGruppenarbeitService;
 
     //Data
     private String veranstaltungIdString;
@@ -53,6 +57,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private Div aktiveKachelVeranstaltungstermin = null;
     private Div aktiveKachelGruppenarbeit = null;
     private int maxListHeight = 0;
+    private final AuthenticatedUser authenticatedUser;
 
     //UI Elements
     private final Div veranstaltungsterminContainer;
@@ -66,6 +71,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private VeranstaltungsterminDialog veranstaltungsterminDialog;
     private GruppenarbeitHinzufuegenDialog gruppenarbeitHinzufuegenDialog;
     private GruppenarbeitBearbeitenDialog gruppenarbeitBearbeitenDialog;
+    private GruppenarbeitLoeschenDialog gruppenarbeitLoeschenDialog;
     private GruppeAuswertungDialog gruppeAuswertungDialog;
     private TeilnehmerHinzufuegenDialog teilnehmerHinzufuegenDialog;
 
@@ -74,11 +80,13 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private HorizontalLayout gruppenarbeitLinie;
     private HorizontalLayout gruppenLinie;
 
-    public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, GruppeService gruppeService) {
+    public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, GruppeService gruppeService,TeilnehmerGruppenarbeitService teilnehmerGruppenarbeitService, AuthenticatedUser authenticatedUser) {
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
         this.gruppenarbeitService = gruppenarbeitService;
         this.gruppeService = gruppeService;
+        this.teilnehmerGruppenarbeitService = teilnehmerGruppenarbeitService;
+        this.authenticatedUser = authenticatedUser;
 
         this.teilnehmerListe = new Div();
 
@@ -104,7 +112,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         auswertungButton.addClassName("auswertung-button");
 
         auswertungButton.addClickListener(e -> {
-            String route = "auswertung/" + veranstaltung.getVeranstaltungsId();
+            String route = "auswertung/" + veranstaltung.getId();
             UI.getCurrent().navigate(route);
         });
 
@@ -164,8 +172,16 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             this.veranstaltungIdString = segments.getLast();
             try {
                 long veranstaltungIdLong = Long.parseLong(veranstaltungIdString);
-                termine = veranstaltungsterminService.findVeranstaltungstermineByVeranstaltungId(veranstaltungIdLong);
-                veranstaltung = veranstaltungService.findVeranstaltungById(veranstaltungIdLong);
+                Optional<User> maybeUser = authenticatedUser.get();
+                if (maybeUser.isPresent()) {
+                    User user = maybeUser.get();
+
+                    termine = veranstaltungsterminService.findVeranstaltungstermineByVeranstaltungId(veranstaltungIdLong, user);
+                    veranstaltung = veranstaltungService.findVeranstaltungById(veranstaltungIdLong, user);
+                } else {
+                    Notification.show("Bitte melden Sie sich an, um Ihre Veranstaltungstermine zu sehen.");
+                    getUI().ifPresent(ui -> ui.navigate("login"));
+                }
             } catch (NumberFormatException e) {
                 System.err.println("Invalid veranstaltungId: " + veranstaltungIdString);
             }
@@ -176,6 +192,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         createVeranstaltungsterminDialog();
         createGruppenarbeitHinzufuegenDialog();
         createGruppenarbeitBearbeitenDialog();
+        createGruppenarbeitLoeschenDialog();
         createTeilnehmerDialog();
 
         //init Methode ist wichtig, da erst hier die termine gesetzt werden, weil sonst im Konstruktor die termine noch nicht gesetzt sind,
@@ -191,6 +208,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         }
 
         veranstaltungsterminContainer.add(createVeranstaltungsterminKachel());
+
         teilnehmerListe.add(createTeilnehmerListe());
 
     }
@@ -363,7 +381,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
 
     public void createVeranstaltungsterminDialog () {
-        veranstaltungsterminDialog = new VeranstaltungsterminDialog(veranstaltungService, veranstaltungsterminService, veranstaltungIdString);
+        veranstaltungsterminDialog = new VeranstaltungsterminDialog(veranstaltungService, veranstaltungsterminService, veranstaltungIdString, authenticatedUser);
     }
 
     //Lilli
@@ -377,10 +395,13 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         gruppenarbeitBearbeitenDialog = new GruppenarbeitBearbeitenDialog(gruppenarbeitService);
     }
 
-
+    //Lilli
+    public void createGruppenarbeitLoeschenDialog() {
+        gruppenarbeitLoeschenDialog = new GruppenarbeitLoeschenDialog(gruppenarbeitService);
+    }
 
     public void createTeilnehmerDialog() {
-        teilnehmerHinzufuegenDialog = new TeilnehmerHinzufuegenDialog(veranstaltungService, teilnehmerService, veranstaltung.getVeranstaltungsId());
+        teilnehmerHinzufuegenDialog = new TeilnehmerHinzufuegenDialog(veranstaltungService, teilnehmerService, veranstaltung.getId());
     }
 
     private Div gruppenarbeitKachel(Gruppenarbeit gruppenarbeit) {
@@ -398,49 +419,31 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         String tooltipText = "Titel: " + gruppenarbeit.getTitel() + "\nBeschreibung: " + gruppenarbeit.getBeschreibung();
         kachel.getElement().setProperty("title", tooltipText);
 
-        Dialog confirmationDialog = createDeleteConfirmationDialog(
-            "Möchten Sie die Gruppenarbeit " + gruppenarbeit.getTitel() + " wirklich löschen?",
-            () -> {
-                gruppenarbeitService.deleteGruppenarbeit(gruppenarbeit);
-                Notification.show("Gruppenarbeit gelöscht");
-                getUI().ifPresent(ui -> ui.getPage().reload());
-            }
-        );
+        Div deleteIconGruppenarbeit = createDeleteIcon();
+        Div editIconGruppenarbeit = createEditIcon();
 
-        Div deleteIcon = createDeleteIcon(confirmationDialog);
-        Div editIcon = createEditIcon(gruppenarbeitBearbeitenDialog, deleteIcon);
+        deleteIconFunctionality(deleteIconGruppenarbeit, editIconGruppenarbeit, gruppenarbeitLoeschenDialog);
+        editIconFunctionality(editIconGruppenarbeit, deleteIconGruppenarbeit, gruppenarbeitBearbeitenDialog);
 
-        confirmationDialog.addOpenedChangeListener(e -> {
-            if (!e.isOpened()) {
-                deleteIcon.getStyle().set("visibility", "hidden");
-            }
-        });
-
-        gruppenarbeitBearbeitenDialog.addOpenedChangeListener(e -> {
-            if (!e.isOpened()) {
-                editIcon.getStyle().set("visibility", "hidden");
-            }
-        });
-
-        kachel.add(deleteIcon);
-        kachel.add(editIcon);
+        kachel.add(deleteIconGruppenarbeit);
+        kachel.add(editIconGruppenarbeit);
 
         kachel.getElement().addEventListener("mouseover", e -> {
             if (!kachel.equals(aktiveKachelGruppenarbeit)) {
                 kachel.addClassName("kachel-hover");
             }
-            deleteIcon.getStyle().set("visibility", "visible");
+            deleteIconGruppenarbeit.getStyle().set("visibility", "visible");
             gruppenarbeitBearbeitenDialog.setGruppenarbeit(gruppenarbeit);
             gruppenarbeitBearbeitenDialog.readBean();
-            editIcon.getStyle().set("visibility", "visible");
+            editIconGruppenarbeit.getStyle().set("visibility", "visible");
         });
 
         kachel.getElement().addEventListener("mouseout", e -> {
             if (!kachel.equals(aktiveKachelGruppenarbeit)) {
                 kachel.removeClassName("kachel-hover");
             }
-            deleteIcon.getStyle().set("visibility", "hidden");
-            editIcon.getStyle().set("visibility", "hidden");
+            deleteIconGruppenarbeit.getStyle().set("visibility", "hidden");
+            editIconGruppenarbeit.getStyle().set("visibility", "hidden");
         });
 
         kachel.addClickListener(e -> {
@@ -460,7 +463,18 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 gruppenContainer.removeAll();
 
                 if (gruppenLinie == null) {
-                    gruppenLinie = createLineWithText("Gruppen");
+                    HorizontalLayout lineWithText = createLineWithText("Gruppen");
+
+                    Button editButton = createEditButton();
+
+                    Hr lineAfter = new Hr();
+                    lineAfter.addClassName("line-after-icon");
+
+                    gruppenLinie = new HorizontalLayout(lineWithText, editButton, lineAfter);
+                    gruppenLinie.setAlignItems(Alignment.CENTER);
+                    gruppenLinie.setJustifyContentMode(JustifyContentMode.BETWEEN);
+                    gruppenLinie.setWidthFull();
+
                     mainLayoutLeft.add(gruppenLinie, gruppenContainer);
                 }
 
@@ -538,14 +552,14 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
             // Klick-Listener für Teilnehmer
             teilnehmerDiv.addClickListener(e -> {
-                gruppeAuswertungDialog = new GruppeAuswertungDialog(teilnehmer);
+                gruppeAuswertungDialog = new GruppeAuswertungDialog(teilnehmer,fullGruppe.getGruppenarbeit(),teilnehmerGruppenarbeitService);
                 gruppeAuswertungDialog.open();
             });
 
             return teilnehmerDiv;
         }));
 
-        int itemHeight = 48;
+        int itemHeight = 52;
         int listHeight = fullGruppe.getTeilnehmer().size() * itemHeight;
 
         if (listHeight > maxListHeight) {
@@ -567,22 +581,41 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private Div createDeleteIcon(Dialog confirmationDialog) {
         Div deleteIcon = new Div(LineAwesomeIcon.TRASH_ALT.create());
         deleteIcon.addClassName("delete-icon");
-        deleteIcon.getElement().addEventListener("click", e ->
-                confirmationDialog.open()
-        ).addEventData("event.stopPropagation()");
         return deleteIcon;
     }
 
     //Lilli
+    private void deleteIconFunctionality(Div deleteIcon, Div editIcon, Dialog deleteDialog){
+        deleteIcon.getElement().addEventListener("click", e -> {
+                    deleteDialog.open();
+                    editIcon.getStyle().set("visibility", "hidden");
+                }
+        ).addEventData("event.stopPropagation()");
+        deleteDialog.addOpenedChangeListener(e -> {
+            if (!e.isOpened()) {
+                deleteIcon.getStyle().set("visibility", "hidden");
+            }
+        });
+    }
+
     private Div createEditIcon(Dialog editDialog, Div deleteIcon) {
         Div editIcon = new Div(LineAwesomeIcon.EDIT.create());
         editIcon.addClassName("edit-icon");
-        editIcon.getElement().addEventListener("click", e ->{
-            editDialog.open();
-            deleteIcon.getStyle().set("visibility", "hidden");
+        return editIcon;
+    }
+
+    //Lilli
+    private void editIconFunctionality(Div editIcon, Div deleteIcon, Dialog editDialog){
+        editIcon.getElement().addEventListener("click", e -> {
+                    editDialog.open();
+                    deleteIcon.getStyle().set("visibility", "hidden");
                 }
         ).addEventData("event.stopPropagation()");
-        return editIcon;
+        editDialog.addOpenedChangeListener(e -> {
+            if (!e.isOpened()) {
+                editIcon.getStyle().set("visibility", "hidden");
+            }
+        });
     }
 
     private Dialog createDeleteConfirmationDialog(String confirmationText, Runnable onDelete) {
@@ -618,7 +651,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         searchField.setWidthFull();
         searchField.getStyle().set("margin-top", "-10px");
 
-        List<Teilnehmer> teilnehmer = teilnehmerService.findTeilnehmerByVeranstaltungId(veranstaltung.getVeranstaltungsId());
+        List<Teilnehmer> teilnehmer = teilnehmerService.findTeilnehmerByVeranstaltungId(veranstaltung.getId());
 
         Div teilnehmerItems = new Div();
         for (Teilnehmer t : teilnehmer) {
@@ -667,4 +700,16 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         return teilnehmerDiv;
     }
+
+    private Button createEditButton() {
+    Button editButton = new Button();
+    editButton.setText("✏️");
+    editButton.addClassName("edit-button");
+
+    editButton.addClickListener(e -> {
+
+    });
+
+    return editButton;
+}
 }

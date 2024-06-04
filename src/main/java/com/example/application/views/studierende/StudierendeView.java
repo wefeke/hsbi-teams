@@ -1,8 +1,10 @@
 package com.example.application.views.studierende;
 
+import com.example.application.DoubleToLongConverter;
 import com.example.application.models.Teilnehmer;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.views.MainLayout;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
@@ -11,6 +13,8 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -20,14 +24,15 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.awt.*;
+import java.util.Collection;
 
 @Route(value = "studierende", layout = MainLayout.class)
-@PageTitle("Studierende")
-@RolesAllowed({"ADMIN"})
+@PageTitle(value = "Studierende")
+@RolesAllowed({"ADMIN", "USER"})
 public class StudierendeView extends VerticalLayout {
     private final TeilnehmerService teilnehmerService;
     private final Grid<Teilnehmer> grid = new Grid<>();
@@ -37,18 +42,38 @@ public class StudierendeView extends VerticalLayout {
     private H2 users = new H2("Studierende");
     private final Button delete = new Button("Studierenden löschen");
     private final Button aendern = new Button ("Studierende ändern");
+    private final Component addStudiernedenButtonIcon;
+    private final Component deleteIcon;
+    private final Component aendernIcon;
+    private final Button importButton = new Button("Importieren");
+    private final Button exportButton = new Button("Exportieren");
+
     Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
+
+    TextField vorname = new TextField("Vorname");
+    TextField nachname = new TextField("Nachname");
+    NumberField matrikelNr = new NumberField("Matrikelnummer");
+    Button save = new Button("Save");
+    Button cancel = new Button ("Cancel");
+    Button aufraeumenButton = new Button("Aufräumen");
 
     @Autowired
     public StudierendeView(TeilnehmerService teilnehmerService) {
         this.teilnehmerService = teilnehmerService;
+        DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService);
+        Aufraeumen aufraeumenDialog = new Aufraeumen(teilnehmerService);
+        addStudiernedenButtonIcon = addStudiernedenButton.getIcon();
+        deleteIcon = delete.getIcon();
+        aendernIcon = aendern.getIcon();
+
         addClassName("Studierenden-view");
 
         setSizeFull();
         configureGrid();
         add(
                 getToolbar(),
-                getContent()
+                getContent(),
+                getToolbar2()
         );
         updateStudierendeView();
         addStudiernedenButton.addClickListener(event -> openDialog());
@@ -67,16 +92,33 @@ public class StudierendeView extends VerticalLayout {
         delete.addClickListener(event -> {
             Teilnehmer selectedTeilnehmer = grid.asSingleSelect().getValue();
             if (selectedTeilnehmer != null) {
-                deleteDialog(selectedTeilnehmer);
+                deleteDialog.openDeleteDialog(selectedTeilnehmer);
             }
         });
-
+        // Click-Listener für den Ändern-Button
         aendern.addClickListener(event -> {
             Teilnehmer selectedTeilnehmer = grid.asSingleSelect().getValue();
             if (selectedTeilnehmer != null) {
-                saveDiolog(selectedTeilnehmer);
+                aendernDiolog(selectedTeilnehmer);
             }
         });
+        UI.getCurrent().getPage().addBrowserWindowResizeListener(event -> {
+            if (event.getWidth() <= 1000) {
+                makeButtonsSmall();
+            } else {
+                restoreButtons();
+            }
+        });
+
+        aufraeumenButton.addClickListener(event -> aufraeumenDialog.open());
+       /* UI.getCurrent().getPage().addBrowserWindowResizeListener(event -> {
+            if (event.getWidth() > 500) {
+                restoreButtons();
+            } else {
+                makeButtonsSmall();
+            }
+        });
+*/
     }
 
     public void updateStudierendeView() {
@@ -89,20 +131,22 @@ public class StudierendeView extends VerticalLayout {
         content.addClassName("content");
         content.setSizeFull();
 
+
         return content;
     }
 
     private void configureGrid() {
+        grid.setSizeFull();
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
-        grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
-        grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
-        grid.addColumn(Teilnehmer::getId).setHeader("MatrikelNr");
+        grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname").setSortable(true);;
+        grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname").setSortable(true);;
+        grid.addColumn(Teilnehmer::getId).setHeader("MatrikelNr").setSortable(true);;
         grid.addSelectionListener(selection -> {
             int size = selection.getAllSelectedItems().size();
             delete.setEnabled(size != 0);
             aendern.setEnabled(size != 0);
         });
-        grid.setSizeFull();
+        grid.setMultiSort(true, Grid.MultiSortPriority.APPEND);
     }
 
     private Component getToolbar() {
@@ -117,6 +161,15 @@ public class StudierendeView extends VerticalLayout {
 
         return toolbar;
     }
+    private Component getToolbar2() {
+
+        HorizontalLayout toolbar2 = new HorizontalLayout(importButton, exportButton, aufraeumenButton);
+
+        toolbar2.addClassName("toolbar");
+
+        return toolbar2;
+    }
+
 
     private void openDialog() {
         dialog.open();
@@ -130,44 +183,74 @@ public class StudierendeView extends VerticalLayout {
 
     }
 
-    private void deleteDialog(Teilnehmer teilnehmer) {
-        Dialog confirmationDialog = new Dialog();
-        confirmationDialog.add(new Text("Möchten Sie den Studierenden " + teilnehmer.getVorname()+" " + teilnehmer.getNachname()+ " wirklich löschen?"));
 
-        Button yesButton = new Button("Ja", event -> {
-            teilnehmerService.deleteTeilnehmer(teilnehmer);
-            Notification.show("Studierender gelöscht");
-            updateStudierendeView();
-            confirmationDialog.close();
-        });
-
-        Button noButton = new Button("Nein", event -> {
-            confirmationDialog.close();
-        });
-
-        confirmationDialog.add(yesButton, noButton);
-        confirmationDialog.open();
+    private void setTeilnehmer(Teilnehmer teilnehmer) {
+        vorname.setValue(teilnehmer.getVorname());
+        nachname.setValue(teilnehmer.getNachname());
+        matrikelNr.setValue(teilnehmer.getId().doubleValue());
     }
 
-    private void saveDiolog (Teilnehmer teilnehmer){
+    private void aendernDiolog (Teilnehmer teilnehmer) {
         FormLayout form = new FormLayout();
-        Dialog saveDialog = new Dialog(form);
-        TextField Vorname = new TextField("Vorname");
-        TextField Nachname = new TextField("Nachname");
-        NumberField matrikelNr = new NumberField("Matrikelnummer");
-        Button save = new Button("Save");
-        Button cancel = new Button ("Cancel");
+        Dialog aendernDiolog = new Dialog(form);
+
+        //bindFields();
+        setTeilnehmer(teilnehmer);
+
+        form.add(vorname, nachname, matrikelNr, save, cancel);
+        aendernDiolog.add(form);
+
+        aendernDiolog.open();
+        aendernDiolog.setWidth("450px");
+        aendernDiolog.setHeight("350px");
+
+        save.addClickListener(event -> {
+            Teilnehmer selectedTeilnehmer = grid.asSingleSelect().getValue();
+            if (selectedTeilnehmer != null) {
+                selectedTeilnehmer.setVorname(vorname.getValue());
+                selectedTeilnehmer.setNachname(nachname.getValue());
+                selectedTeilnehmer.setId(matrikelNr.getValue().longValue());
+                teilnehmerService.saveTeilnehmer(selectedTeilnehmer);
+                Notification.show("Daten erfolgreich aktualisiert");
+                updateStudierendeView();
+                aendernDiolog.close();
+            }
+        });
+        cancel.addClickListener(event -> {
+            aendernDiolog.close();
+        });
+    }
+    private void makeButtonsSmall() {
 
 
-        saveDialog.add(Vorname);
-        saveDialog.add(Nachname);
-        saveDialog.add(matrikelNr);
-        saveDialog.add(save);
-        saveDialog.add(cancel);
+        addStudiernedenButton.setText("+");
 
-        saveDialog.open();
-        saveDialog.setWidth("400px");
-        saveDialog.setHeight("300px");
+
+        delete.setText("-");
+
+
+        aendern.setText("...");
     }
 
+    private void restoreButtons() {
+        addStudiernedenButton.setIcon(addStudiernedenButtonIcon);
+        addStudiernedenButton.setText("Studierenden hinzufügen");
+
+        delete.setIcon(deleteIcon);
+        delete.setText("Studierenden löschen");
+
+        aendern.setIcon(aendernIcon);
+        aendern.setText("Studierende ändern");
+    }
 }
+/*
+    private void bindFields(){
+        binder.forField(vorname)
+                .bind(Teilnehmer::getVorname, Teilnehmer::setVorname);
+        binder.forField(nachname)
+                .bind(Teilnehmer::getNachname, Teilnehmer::setNachname);
+        binder.forField(matrikelNr)
+                .withConverter(new DoubleToLongConverter())
+                .bind(Teilnehmer::getId, Teilnehmer::setId);
+    }
+*/

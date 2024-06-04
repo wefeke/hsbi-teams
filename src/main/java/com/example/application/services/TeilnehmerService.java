@@ -3,6 +3,9 @@ package com.example.application.services;
 import com.example.application.models.Teilnehmer;
 import com.example.application.repositories.TeilnehmerRepository;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
@@ -23,7 +26,6 @@ public List<Teilnehmer> findAllTeilnehmer2(){return teilnehmerRepository.findAll
             return teilnehmerRepository.search(filterText);
         }
     }
-
     public Optional<Teilnehmer> findByMatrikelNr(Long matrikelNr) {
         return teilnehmerRepository.findByMatrikelNr(matrikelNr);
     }
@@ -45,10 +47,16 @@ public List<Teilnehmer> findAllTeilnehmer2(){return teilnehmerRepository.findAll
         else
             System.err.println("Test is null. Are you sure you have connected your form to the application?");
     }
-
+    public boolean isTeilnehmerInVeranstaltung(Teilnehmer teilnehmer) {
+        return !teilnehmer.getVeranstaltungen().isEmpty();
+    }
     @Transactional
     public List<Teilnehmer> findTeilnehmerByVeranstaltungId(Long id) {
         return teilnehmerRepository.findByVeranstaltungId(id);
+    }
+    public List<Teilnehmer> findStudierendeVorVierJahren() {
+        LocalDateTime vierJahreZurueck = LocalDateTime.now().minusYears(4);
+        return teilnehmerRepository.findStudierendeVorVierJahren(vierJahreZurueck);
     }
 
 }

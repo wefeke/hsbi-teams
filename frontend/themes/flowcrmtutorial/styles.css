@@ -86,6 +86,14 @@
     align-items: center;
 }
 
+.line-after-icon {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 30px;
+    margin-top: 24px;
+    margin-right: -8px;
+}
+
 /* Title Styles */
 .veranstaltung-title {
     font-size: 28px;

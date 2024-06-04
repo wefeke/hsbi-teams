@@ -26,7 +26,7 @@ import jakarta.annotation.security.RolesAllowed;
 import java.util.List;
 
 @Route(value = "addDialog")
-@RolesAllowed({"ADMIN"})
+@RolesAllowed({"ADMIN", "USER"})
 public class VeranstaltungDialog extends Dialog {
 
     //Services

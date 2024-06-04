@@ -2,8 +2,11 @@
 package com.example.application.models;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,13 +19,29 @@ public class Teilnehmer {
     private String vorname;
     private String nachname;
 
+    // für Timestamp
+    @CreationTimestamp
+    @Column(name = "hinzugefügt am", updatable = false)
+    private LocalDateTime hinzugefuegtAm;
+
     //Beziehungen
-    @ManyToMany
+    @ManyToOne()
+    private User user;
+    @ManyToMany (fetch = FetchType.EAGER)
     private List<Veranstaltung> veranstaltungen = new ArrayList<>();
-    @ManyToMany
-    private List<Gruppenarbeit> gruppenarbeit = new ArrayList<>();
-    @ManyToMany
+    @ManyToMany (fetch = FetchType.EAGER)
+    private List<Gruppenarbeit> gruppenarbeiten = new ArrayList<>();
+    @ManyToMany (fetch = FetchType.EAGER)
     private List<Gruppe> gruppen = new ArrayList<>();
+
+    public Teilnehmer() {
+    }
+
+    public Teilnehmer(String vorname, String nachname, User user){
+        this.vorname = vorname;
+        this.nachname = nachname;
+        this.user = user;
+    }
 
     public Long getId() {
         return matrikelNr;
@@ -46,10 +65,6 @@ public class Teilnehmer {
 
     public void setNachname(String nachname) {
         this.nachname = nachname;
-    }
-
-    public Teilnehmer() {
-
     }
 
     public Teilnehmer(String vorname, String nachname){
@@ -84,5 +99,13 @@ public class Teilnehmer {
     @Override
     public int hashCode() {
         return Objects.hash(matrikelNr);
+    }
+
+    public List<Gruppe> getGruppen() {
+        return gruppen;
+    }
+
+    public List<Gruppenarbeit> getGruppenarbeiten() {
+        return gruppenarbeiten;
     }
 }

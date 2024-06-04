@@ -1,10 +1,9 @@
 
 package com.example.application.services;
 
+import com.example.application.models.User;
 import com.example.application.models.Veranstaltung;
-import com.example.application.models.Veranstaltungstermin;
 import com.example.application.repositories.VeranstaltungenRepository;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,15 +18,12 @@ public class VeranstaltungenService {
         this.veranstaltungenRepository = veranstaltungenRepository;
     }
 
-    public List<Veranstaltung> findAllVeranstaltungen() {
-
-            return veranstaltungenRepository.findAll();
-
+    public List<Veranstaltung> findAllVeranstaltungenByUser(User user) {
+        return veranstaltungenRepository.findByUser(user);
     }
 
-    public Veranstaltung findVeranstaltungById(Long id) {
-        return veranstaltungenRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Invalid Veranstaltung Id:" + id));
+    public Veranstaltung findVeranstaltungById(Long id, User user) {
+        return veranstaltungenRepository.findByIdAndUser(id, user);
     }
 
     @Transactional

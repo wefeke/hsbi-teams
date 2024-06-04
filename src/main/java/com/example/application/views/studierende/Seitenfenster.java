@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.awt.*;
 
 @Route(value = "seitenfenster", layout = MainLayout.class)
-@RolesAllowed({"ADMIN"})
+@RolesAllowed({"ADMIN", "USER"})
 public class Seitenfenster extends VerticalLayout {
     private final TeilnehmerService teilnehmerService;
     private final Grid<Teilnehmer> grid = new Grid<>();
