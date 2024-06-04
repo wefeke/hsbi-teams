@@ -14,6 +14,8 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Hr;
+import com.vaadin.flow.component.icon.SvgIcon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -22,6 +24,8 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.vaadin.lineawesome.LineAwesomeIcon;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -123,12 +127,15 @@ public class VeranstaltungenView extends VerticalLayout {
         Div kachel = new Div(kachelContent);
         kachel.addClassName("kachel");
 
-        Div deleteIcon = new Div();
-        deleteIcon.setText("🗑️");
+        SvgIcon deleteIconSvg = LineAwesomeIcon.TRASH_ALT.create();
+        deleteIconSvg.setColor("#D2042D");
+        Div deleteIcon = new Div(deleteIconSvg);
+        deleteIcon.add();
         deleteIcon.addClassName("delete-icon");
 
-        Div editIcon = new Div();
-        editIcon.setText("✏️");
+        SvgIcon editIconSvg = LineAwesomeIcon.EDIT.create();
+        editIconSvg.setColor("#2B64D6");
+        Div editIcon = new Div(editIconSvg);
         editIcon.addClassName("edit-icon");
 
         //Confirm-Dialog initialisieren
@@ -144,25 +151,30 @@ public class VeranstaltungenView extends VerticalLayout {
             confirmationDialog.close();
         });
 
-        Button cancelButton = new Button("Nein", event -> {
-            confirmationDialog.close();
-            kachel.getStyle().set("background-color", "");
+            Button cancelButton = new Button("Nein", event -> {
+                confirmationDialog.close();
+                kachel.getStyle().set("background-color", "");
+            });
+            cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+
+            VerticalLayout verticalLayout = new VerticalLayout(
+                    new Text("Möchten Sie die Veranstaltung (" + veranstaltung.getTitel() + ") wirklich löschen?"),
+                    new HorizontalLayout(
+                            confirmbutton,
+                            cancelButton
+                    )
+            );
+            verticalLayout.setAlignItems(Alignment.CENTER);
+            confirmationDialog.add( verticalLayout );
+
+        //Bearbeiten-Dialog initialisieren
+        editDialog.addOpenedChangeListener(e -> {
+            if (!e.isOpened()) {
+                deleteIcon.getStyle().set("visibility", "hidden");
+                editIcon.getStyle().set("visibility", "hidden");
+                kachel.getStyle().set("background-color", "");
+            }
         });
-        cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
-
-        VerticalLayout verticalLayout = new VerticalLayout(
-                new Text("Möchten Sie die Veranstaltung (" + veranstaltung.getTitel() + ") wirklich löschen?"),
-                new HorizontalLayout(
-                        confirmbutton,
-                        cancelButton
-                )
-        );
-
-        verticalLayout.setAlignItems(Alignment.CENTER);
-
-        confirmationDialog.add(
-                verticalLayout
-        );
 
         //Icons
         deleteIcon.getElement().addEventListener("click", e ->

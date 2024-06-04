@@ -217,3 +217,35 @@
 .gruppen-gruppenarbeit-title {
     padding-bottom: 10px;
 }
+
+.logo-button :hover {
+    background-color: var(--lumo-contrast-5pct);
+}
+
+.nav-list a:any-link {
+    text-decoration: none;
+    padding: 0 var(--lumo-space-s);
+    border-radius: var(--lumo-border-radius-m);
+    outline: 0;
+}
+
+.nav-list a:hover {
+    color: var(--lumo-header-text-color);
+    background-color: var(--lumo-contrast-5pct);
+}
+
+.nav-list a:active {
+    background-color: var(--lumo-contrast-5pct);
+}
+
+.nav-list a:focus-visible {
+    box-shadow: 0 0 0 2px var(--lumo-primary-color-50pct);
+}
+
+.nav-list a[highlight] vaadin-icon {
+    color: var(--lumo-primary-text-color);
+}
+
+.nav-list a[highlight] {
+    background-color: var(--lumo-primary-color-10pct);
+}

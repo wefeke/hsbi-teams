@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Teilnehmer {
@@ -66,6 +67,11 @@ public class Teilnehmer {
         this.nachname = nachname;
     }
 
+    public Teilnehmer(String vorname, String nachname){
+        this.vorname = vorname;
+        this.nachname = nachname;
+    }
+
     public List<Veranstaltung> getVeranstaltungen() {
         return veranstaltungen;
     }
@@ -80,6 +86,19 @@ public class Teilnehmer {
 
     public String toString(){
         return this.vorname + " " + this.nachname;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Teilnehmer that = (Teilnehmer) o;
+        return Objects.equals(matrikelNr, that.matrikelNr);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(matrikelNr);
     }
 
     public List<Gruppe> getGruppen() {

@@ -13,6 +13,7 @@ import java.util.Set;
 @Table(name = "users") // Ändern Sie den Tabellennamen auf "users"
 public class User {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String username;
     private String name;
@@ -54,7 +55,7 @@ public class User {
         return hashedPassword;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(String hashedPassword) {
         this.hashedPassword = hashedPassword;
     }
 

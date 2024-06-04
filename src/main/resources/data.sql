@@ -609,6 +609,9 @@ INSERT INTO public.teilnehmer_veranstaltungen (teilnehmer_matrikel_nr, veranstal
                                                                                                               (1000110, 1004),
                                                                                                               (1000111, 1004);
 
+
+
+
 INSERT INTO public.veranstaltung_teilnehmer (teilnehmer_matrikel_nr, veranstaltung_id) VALUES
                                                                                                           (1000001, 1001),
                                                                                                           (1000002, 1001),
@@ -782,7 +785,19 @@ INSERT INTO public.veranstaltung_teilnehmer (teilnehmer_matrikel_nr, veranstaltu
                                                                                                             (1000052, 1003),
                                                                                                             (1000053, 1003),
                                                                                                             (1000054, 1003),
-                                                                                                            (1000055, 1003);
+                                                                                                            (1000055, 1003),
+
+                                                                                                          (1000101, 1004),
+                                                                                                          (1000102, 1004),
+                                                                                                          (1000103, 1004),
+                                                                                                          (1000104, 1004),
+                                                                                                          (1000105, 1004),
+                                                                                                          (1000106, 1004),
+                                                                                                          (1000107, 1004),
+                                                                                                          (1000108, 1004),
+                                                                                                          (1000109, 1004),
+                                                                                                          (1000110, 1004),
+                                                                                                          (1000111, 1004);
 
 INSERT INTO public.gruppenarbeit_teilnehmer (gruppenarbeit_id, teilnehmer_matrikel_nr) VALUES
     (1, 1000001),
