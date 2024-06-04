@@ -3,6 +3,7 @@ package com.example.application.views.veranstaltungstermin;
 import com.example.application.models.Gruppenarbeit;
 import com.example.application.models.Veranstaltung;
 import com.example.application.models.Veranstaltungstermin;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.*;
 import com.example.application.models.*;
 import com.example.application.views.MainLayout;
@@ -31,10 +32,11 @@ import com.vaadin.flow.router.*;
 import jakarta.annotation.security.RolesAllowed;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @PageTitle("Veranstaltung Detail")
 @Route(value = "veranstaltung-detail/:veranstaltungId", layout = MainLayout.class)
-@RolesAllowed({"ADMIN"})
+@RolesAllowed({"ADMIN", "USER"})
 public class VeranstaltungDetailView extends VerticalLayout implements HasUrlParameter<String> {
 
     //Services
@@ -52,6 +54,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private Div aktiveKachelVeranstaltungstermin = null;
     private Div aktiveKachelGruppenarbeit = null;
     private int maxListHeight = 0;
+    private final AuthenticatedUser authenticatedUser;
 
     //UI Elements
     private final Div veranstaltungsterminContainer;
@@ -74,12 +77,13 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private HorizontalLayout gruppenarbeitLinie;
     private HorizontalLayout gruppenLinie;
 
-    public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, GruppeService gruppeService,TeilnehmerGruppenarbeitService teilnehmerGruppenarbeitService) {
+    public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, GruppeService gruppeService,TeilnehmerGruppenarbeitService teilnehmerGruppenarbeitService, AuthenticatedUser authenticatedUser) {
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
         this.gruppenarbeitService = gruppenarbeitService;
         this.gruppeService = gruppeService;
         this.teilnehmerGruppenarbeitService = teilnehmerGruppenarbeitService;
+        this.authenticatedUser = authenticatedUser;
 
         this.teilnehmerListe = new Div();
 
@@ -105,7 +109,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         auswertungButton.addClassName("auswertung-button");
 
         auswertungButton.addClickListener(e -> {
-            String route = "auswertung/" + veranstaltung.getVeranstaltungsId();
+            String route = "auswertung/" + veranstaltung.getId();
             UI.getCurrent().navigate(route);
         });
 
@@ -165,8 +169,16 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             this.veranstaltungIdString = segments.getLast();
             try {
                 long veranstaltungIdLong = Long.parseLong(veranstaltungIdString);
-                termine = veranstaltungsterminService.findVeranstaltungstermineByVeranstaltungId(veranstaltungIdLong);
-                veranstaltung = veranstaltungService.findVeranstaltungById(veranstaltungIdLong);
+                Optional<User> maybeUser = authenticatedUser.get();
+                if (maybeUser.isPresent()) {
+                    User user = maybeUser.get();
+
+                    termine = veranstaltungsterminService.findVeranstaltungstermineByVeranstaltungId(veranstaltungIdLong, user);
+                    veranstaltung = veranstaltungService.findVeranstaltungById(veranstaltungIdLong, user);
+                } else {
+                    Notification.show("Bitte melden Sie sich an, um Ihre Veranstaltungstermine zu sehen.");
+                    getUI().ifPresent(ui -> ui.navigate("login"));
+                }
             } catch (NumberFormatException e) {
                 System.err.println("Invalid veranstaltungId: " + veranstaltungIdString);
             }
@@ -325,7 +337,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
 
     public void createVeranstaltungsterminDialog () {
-        veranstaltungsterminDialog = new VeranstaltungsterminDialog(veranstaltungService, veranstaltungsterminService, veranstaltungIdString);
+        veranstaltungsterminDialog = new VeranstaltungsterminDialog(veranstaltungService, veranstaltungsterminService, veranstaltungIdString, authenticatedUser);
     }
 
     //Lilli
@@ -344,10 +356,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         gruppenarbeitLoeschenDialog = new GruppenarbeitLoeschenDialog(gruppenarbeitService);
     }
 
-
-
     public void createTeilnehmerDialog() {
-        teilnehmerHinzufuegenDialog = new TeilnehmerHinzufuegenDialog(veranstaltungService, teilnehmerService, veranstaltung.getVeranstaltungsId());
+        teilnehmerHinzufuegenDialog = new TeilnehmerHinzufuegenDialog(veranstaltungService, teilnehmerService, veranstaltung.getId());
     }
 
     private Div gruppenarbeitKachel(Gruppenarbeit gruppenarbeit) {
@@ -364,15 +374,6 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         //Tooltip
         String tooltipText = "Titel: " + gruppenarbeit.getTitel() + "\nBeschreibung: " + gruppenarbeit.getBeschreibung();
         kachel.getElement().setProperty("title", tooltipText);
-
-        Dialog confirmationDialog = createDeleteConfirmationDialog(
-            "Möchten Sie die Gruppenarbeit " + gruppenarbeit.getTitel() + " wirklich löschen?",
-            () -> {
-                gruppenarbeitService.deleteGruppenarbeit(gruppenarbeit);
-                Notification.show("Gruppenarbeit gelöscht");
-                getUI().ifPresent(ui -> ui.getPage().reload());
-            }
-        );
 
         Div deleteIconGruppenarbeit = createDeleteIcon();
         Div editIconGruppenarbeit = createEditIcon();
@@ -418,7 +419,18 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 gruppenContainer.removeAll();
 
                 if (gruppenLinie == null) {
-                    gruppenLinie = createLineWithText("Gruppen");
+                    HorizontalLayout lineWithText = createLineWithText("Gruppen");
+
+                    Button editButton = createEditButton();
+
+                    Hr lineAfter = new Hr();
+                    lineAfter.addClassName("line-after-icon");
+
+                    gruppenLinie = new HorizontalLayout(lineWithText, editButton, lineAfter);
+                    gruppenLinie.setAlignItems(Alignment.CENTER);
+                    gruppenLinie.setJustifyContentMode(JustifyContentMode.BETWEEN);
+                    gruppenLinie.setWidthFull();
+
                     mainLayoutLeft.add(gruppenLinie, gruppenContainer);
                 }
 
@@ -503,7 +515,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             return teilnehmerDiv;
         }));
 
-        int itemHeight = 48;
+        int itemHeight = 52;
         int listHeight = fullGruppe.getTeilnehmer().size() * itemHeight;
 
         if (listHeight > maxListHeight) {
@@ -598,7 +610,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         searchField.setWidthFull();
         searchField.getStyle().set("margin-top", "-10px");
 
-        List<Teilnehmer> teilnehmer = teilnehmerService.findTeilnehmerByVeranstaltungId(veranstaltung.getVeranstaltungsId());
+        List<Teilnehmer> teilnehmer = teilnehmerService.findTeilnehmerByVeranstaltungId(veranstaltung.getId());
 
         Div teilnehmerItems = new Div();
         for (Teilnehmer t : teilnehmer) {
@@ -647,4 +659,16 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         return teilnehmerDiv;
     }
+    
+    private Button createEditButton() {
+    Button editButton = new Button();
+    editButton.setText("✏️");
+    editButton.addClassName("edit-button");
+    
+    editButton.addClickListener(e -> {
+
+    });
+
+    return editButton;
+}
 }

@@ -1,5 +1,6 @@
 package com.example.application.services;
 
+import com.example.application.models.User;
 import com.example.application.models.Veranstaltung;
 import com.example.application.models.Veranstaltungstermin;
 import com.example.application.repositories.VeranstaltungsterminRepository;
@@ -24,8 +25,8 @@ public class VeranstaltungsterminService {
         return veranstaltungsterminRepository.findAll();
     }
 
-    public List<Veranstaltungstermin> findVeranstaltungstermineByVeranstaltungId(Long veranstaltungsId) {
-        return veranstaltungsterminRepository.findVeranstaltungstermineByVeranstaltungVeranstaltungsId(veranstaltungsId);
+    public List<Veranstaltungstermin> findVeranstaltungstermineByVeranstaltungId(Long id, User user) {
+        return veranstaltungsterminRepository.findVeranstaltungstermineByVeranstaltungIdAndUser(id, user);
     }
 
     public Veranstaltungstermin findVeranstaltungsterminById(Long id) {

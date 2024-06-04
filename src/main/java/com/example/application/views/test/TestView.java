@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 //LEON
 @Route(value = "auswertung/:veranstaltungId", layout = MainLayout.class)
 @PageTitle("Auswertungen")
-@RolesAllowed({"ADMIN"})
+@RolesAllowed({"ADMIN", "USER"})
 public class TestView extends VerticalLayout {
     Grid<Auswertung> grid = new Grid<>(Auswertung.class);
     TextField filterText = new TextField();

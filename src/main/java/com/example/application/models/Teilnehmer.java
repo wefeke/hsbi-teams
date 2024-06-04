@@ -19,18 +19,28 @@ public class Teilnehmer {
     private String nachname;
 
     // für Timestamp
-
     @CreationTimestamp
     @Column(name = "hinzugefügt am", updatable = false)
     private LocalDateTime hinzugefuegtAm;
 
     //Beziehungen
+    @ManyToOne()
+    private User user;
     @ManyToMany (fetch = FetchType.EAGER)
     private List<Veranstaltung> veranstaltungen = new ArrayList<>();
     @ManyToMany (fetch = FetchType.EAGER)
     private List<Gruppenarbeit> gruppenarbeiten = new ArrayList<>();
     @ManyToMany (fetch = FetchType.EAGER)
     private List<Gruppe> gruppen = new ArrayList<>();
+
+    public Teilnehmer() {
+    }
+
+    public Teilnehmer(String vorname, String nachname, User user){
+        this.vorname = vorname;
+        this.nachname = nachname;
+        this.user = user;
+    }
 
     public Long getId() {
         return matrikelNr;
@@ -56,15 +66,6 @@ public class Teilnehmer {
         this.nachname = nachname;
     }
 
-    public Teilnehmer() {
-
-    }
-
-    public Teilnehmer(String vorname, String nachname){
-        this.vorname = vorname;
-        this.nachname = nachname;
-    }
-
     public List<Veranstaltung> getVeranstaltungen() {
         return veranstaltungen;
     }
@@ -81,7 +82,9 @@ public class Teilnehmer {
         return this.vorname + " " + this.nachname;
     }
 
-    public List<Gruppe> getGruppen() {return gruppen;}
+    public List<Gruppe> getGruppen() {
+        return gruppen;
+    }
 
     public List<Gruppenarbeit> getGruppenarbeiten() {
         return gruppenarbeiten;

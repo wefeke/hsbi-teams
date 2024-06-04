@@ -21,10 +21,26 @@ public class Veranstaltungstermin {
     private String notizen;
 
     //Beziehungen
+    @ManyToOne()
+    private User user;
     @ManyToOne
     private Veranstaltung veranstaltung;
     @OneToMany(fetch = FetchType.EAGER)
     private List<Gruppenarbeit> gruppenarbeiten = new ArrayList<>();
+
+    public Veranstaltungstermin() {
+
+    }
+
+    public Veranstaltungstermin(LocalDate datum, LocalTime startZeit, LocalTime endZeit, String ort, String notizen, User user, Veranstaltung veranstaltung) {
+        this.datum = datum;
+        this.startZeit = startZeit;
+        this.endZeit = endZeit;
+        this.ort = ort;
+        this.notizen = notizen;
+        this.user = user;
+        this.veranstaltung = veranstaltung;
+    }
 
     public Long getId() {
         return id;
@@ -89,4 +105,5 @@ public class Veranstaltungstermin {
     public void addGruppenarbeit (Gruppenarbeit gruppenarbeit) {
         this.gruppenarbeiten.add(gruppenarbeit);
     }
+
 }
