@@ -13,7 +13,7 @@ public class Veranstaltung implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long veranstaltungsId; // Primary Key
+    private Long id; // Primary Key
     private LocalDate semester;          // Semester-Nummer
     private String titel;
 
@@ -29,20 +29,20 @@ public class Veranstaltung implements Serializable {
 
     }
 
-    public Veranstaltung(Long veranstaltungsId, LocalDate semester, String titel, User user) {
-        this.veranstaltungsId = veranstaltungsId;
+    public Veranstaltung(Long id, LocalDate semester, String titel, User user) {
+        this.id = id;
         this.semester = semester;
         this.titel = titel;
         this.user = user;
     }
 
     // Getter und Setter
-    public Long getVeranstaltungsId() {
-        return veranstaltungsId;
+    public Long getId() {
+        return id;
     }
 
-    public void setVeranstaltungsId(Long veranstaltungsId) {
-        this.veranstaltungsId = veranstaltungsId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public LocalDate getSemester() {
@@ -70,19 +70,19 @@ public class Veranstaltung implements Serializable {
         if (this == o) return true;
         if (!(o instanceof Veranstaltung)) return false;
         Veranstaltung semester = (Veranstaltung) o;
-        return Objects.equals(veranstaltungsId, semester.veranstaltungsId);
+        return Objects.equals(id, semester.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(veranstaltungsId);
+        return Objects.hash(id);
     }
 
     // toString Methode, um das Objekt als String darzustellen, nützlich für Logging
     @Override
     public String toString() {
         return "Semester{" +
-                "veranstaltungsId=" + veranstaltungsId +
+                "id=" + id +
                 ", semester=" + semester +
                 ", titel='" + titel + '\'' +
                 '}';

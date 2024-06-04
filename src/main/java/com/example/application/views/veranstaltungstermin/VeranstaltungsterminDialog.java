@@ -1,7 +1,9 @@
 package com.example.application.views.veranstaltungstermin;
 
+import com.example.application.models.User;
 import com.example.application.models.Veranstaltung;
 import com.example.application.models.Veranstaltungstermin;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.VeranstaltungenService;
 import com.example.application.services.VeranstaltungsterminService;
 import com.vaadin.flow.component.UI;
@@ -19,6 +21,7 @@ import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.data.binder.*;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 public class VeranstaltungsterminDialog extends Dialog {
 
@@ -38,13 +41,16 @@ public class VeranstaltungsterminDialog extends Dialog {
     private final Button cancelButton= new Button("Cancel");
     private final Button saveButton= new Button("Save");
 
+    private AuthenticatedUser authenticatedUser;
+
     //Data Binder
     Binder<Veranstaltungstermin> binder = new Binder<>(Veranstaltungstermin.class);
 
-    public VeranstaltungsterminDialog(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, String veranstaltungId) {
+    public VeranstaltungsterminDialog(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, String veranstaltungId, AuthenticatedUser authenticatedUser) {
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
         this.veranstaltungId = veranstaltungId;
+        this.authenticatedUser = authenticatedUser;
 
         add(createLayout());
         configureElements();
@@ -180,13 +186,19 @@ public class VeranstaltungsterminDialog extends Dialog {
 
     public void persistVeranstaltungstermin (Veranstaltungstermin veranstaltungstermin) {
 
-        Veranstaltung veranstaltung = veranstaltungService.findVeranstaltungById(Long.parseLong(veranstaltungId));
-        veranstaltung.addVeranstaltungstermin(veranstaltungstermin); //Lazy Load Problem
-        veranstaltungstermin.setVeranstaltung(veranstaltung);
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+            Veranstaltung veranstaltung = veranstaltungService.findVeranstaltungById(Long.parseLong(veranstaltungId), user);
+            veranstaltung.addVeranstaltungstermin(veranstaltungstermin); //Lazy Load Problem
+            veranstaltungstermin.setVeranstaltung(veranstaltung);
 
-        veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
-        veranstaltungService.saveVeranstaltung(veranstaltung);
-        Notification.show("Veranstaltungstermin angelegt!");
+            veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
+            veranstaltungService.saveVeranstaltung(veranstaltung);
+            Notification.show("Veranstaltungstermin angelegt!");
+        } else {
+            Notification.show("Bitte melden Sie sich an, um Ihre Veranstaltungstermine zu sehen.");
+        }
     }
 
     public void clearFields(){

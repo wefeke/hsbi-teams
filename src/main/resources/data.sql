@@ -6,14 +6,14 @@ INSERT INTO public.user_roles (user_id, roles) VALUES
                                                    (1, 'ADMIN'),
                                                    (2, 'USER');
 
-INSERT INTO public.veranstaltung (veranstaltungs_id, semester, titel, user_id) VALUES
+INSERT INTO public.veranstaltung (id, semester, titel, user_id) VALUES
 (1001, '2024-05-01', 'Mathe', 1),
 (1002, '2024-05-01', 'Datenbanken', 1),
 (1003, '2024-05-26', 'Programmieren 1', 1),
 (1004, '2024-05-30', 'Webtechnologien', 2);
 
 
-INSERT INTO public.veranstaltungstermin (id, datum, end_zeit, notizen, ort, start_zeit, veranstaltung_veranstaltungs_id, user_id) VALUES
+INSERT INTO public.veranstaltungstermin (id, datum, end_zeit, notizen, ort, start_zeit, veranstaltung_id, user_id) VALUES
                                                                                                                              (1, '2024-06-01', '12:00:00', 'Einführung in SE', 'Raum 101', '10:00:00', 1001, 1),
                                                                                                                              (2, '2024-06-02', '16:00:00', 'Fortgeschrittene Themen in SE', 'Raum 102', '14:00:00', 1001, 1),
                                                                                                                              (3, '2024-06-03', '11:00:00', 'Gruppenarbeit Präsentation', 'Raum 103', '09:00:00', 1001, 1),
@@ -248,7 +248,7 @@ INSERT INTO public.teilnehmer (matrikel_nr, nachname, vorname, "hinzugefügt am"
                                                                    (1000112, 'Lange', 'Charlotte', now(), 2),
                                                                    (1000113, 'Hartmann', 'Paul', now(), 2);
 
-INSERT INTO public.veranstaltung_veranstaltungstermine (veranstaltung_veranstaltungs_id, veranstaltungstermine_id) VALUES
+INSERT INTO public.veranstaltung_veranstaltungstermine (veranstaltung_id, veranstaltungstermine_id) VALUES
                                                                                                                        (1001, 1),
                                                                                                                        (1001, 2),
                                                                                                                        (1001, 3),
@@ -414,7 +414,7 @@ INSERT INTO public.gruppenarbeit_gruppen (gruppenarbeit_id, gruppen_id) VALUES
                                                                           (25, 74),
                                                                           (25, 75);
 
-INSERT INTO public.teilnehmer_veranstaltungen (teilnehmer_matrikel_nr, veranstaltungen_veranstaltungs_id) VALUES
+INSERT INTO public.teilnehmer_veranstaltungen (teilnehmer_matrikel_nr, veranstaltungen_id) VALUES
                                                                                                               (1000001, 1001),
                                                                                                               (1000002, 1001),
                                                                                                               (1000003, 1001),
@@ -601,7 +601,7 @@ INSERT INTO public.teilnehmer_veranstaltungen (teilnehmer_matrikel_nr, veranstal
                                                                                                               (1000110, 1004),
                                                                                                               (1000111, 1004);
 
-INSERT INTO public.veranstaltung_teilnehmer (teilnehmer_matrikel_nr, veranstaltung_veranstaltungs_id) VALUES
+INSERT INTO public.veranstaltung_teilnehmer (teilnehmer_matrikel_nr, veranstaltung_id) VALUES
                                                                                                           (1000001, 1001),
                                                                                                           (1000002, 1001),
                                                                                                           (1000003, 1001),

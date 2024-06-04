@@ -88,18 +88,22 @@ public class VeranstaltungenView extends VerticalLayout {
     public void updateKachelContainer() {
         kachelContainer.removeAll();
 
+        // Alle Veranstaltungen des angemeldeten Benutzers aus der Datenbank abrufen
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+            List<Veranstaltung> veranstaltungen = veranstaltungenService.findAllVeranstaltungenByUser(user);
 
-        // Alle Veranstaltungen aus der Datenbank abrufen
-        List<Veranstaltung> veranstaltungen = veranstaltungenService.findAllVeranstaltungen();
-
-        // Kacheln für vorhandene Veranstaltungen erstellen
-        for (Veranstaltung veranstaltung : veranstaltungen) {
-            kachelContainer.add(createVeranstaltungKachel(veranstaltung));
+            // Kacheln für vorhandene Veranstaltungen erstellen
+            for (Veranstaltung veranstaltung : veranstaltungen) {
+                kachelContainer.add(createVeranstaltungKachel(veranstaltung));
+            }
+        } else {
+            Notification.show("Bitte melden Sie sich an, um Ihre Veranstaltungen zu sehen.");
         }
 
         // Kachel für neue Veranstaltung hinzufügen
         kachelContainer.add(createKachel());
-
     }
 
     /**
@@ -130,7 +134,7 @@ public class VeranstaltungenView extends VerticalLayout {
         //Confirm-Dialog initialisieren
         Dialog confirmationDialog = new Dialog();
         //Bearbeiten-Dialog initialisieren
-        VeranstaltungBearbeiten editDialog = new VeranstaltungBearbeiten(veranstaltungenService, teilnehmerService, userService, veranstaltung, this);
+        VeranstaltungBearbeiten editDialog = new VeranstaltungBearbeiten(veranstaltungenService, teilnehmerService, userService, veranstaltung, this, authenticatedUser);
 
         Button confirmbutton = new Button("Ja", event -> {
             veranstaltungenService.deleteVeranstaltung(veranstaltung);
@@ -186,7 +190,7 @@ public class VeranstaltungenView extends VerticalLayout {
         });
 
         kachel.addClickListener(e -> {
-            String veranstaltungID = veranstaltung.getVeranstaltungsId().toString();
+            String veranstaltungID = veranstaltung.getId().toString();
             getUI().ifPresent(ui -> ui.navigate("veranstaltung-detail/" + veranstaltungID));
         });
 

@@ -28,8 +28,8 @@ public interface TeilnehmerRepository extends JpaRepository<Teilnehmer, Long> {
 List<Teilnehmer> search(@Param("searchTerm") String searchTerm);
 
     Optional<Teilnehmer> findByMatrikelNr(Long matrikelNr);
-    @Query("SELECT t FROM Teilnehmer t JOIN t.veranstaltungen v WHERE v.veranstaltungsId = :veranstaltungId")
-    List<Teilnehmer> findByVeranstaltungId(@Param("veranstaltungId") Long veranstaltungId);
+    @Query("SELECT t FROM Teilnehmer t JOIN t.veranstaltungen v WHERE v.id = :id")
+    List<Teilnehmer> findByVeranstaltungId(@Param("id") Long id);
 
     @Query("SELECT t FROM Teilnehmer t WHERE t.hinzugefuegtAm<:vierJahreZurueck")
     List<Teilnehmer> findStudierendeVorVierJahren(@Param("vierJahreZurueck") LocalDateTime vierJahreZurueck);

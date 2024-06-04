@@ -255,7 +255,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
     //Für die Felder der Teilnehmer in der ListBox
     private void listBoxParticipants() {
-        allParticipants.addAll(teilnehmerService.findTeilnehmerByVeranstaltungId(this.veranstaltung.getVeranstaltungsId()));
+        allParticipants.addAll(teilnehmerService.findTeilnehmerByVeranstaltungId(this.veranstaltung.getId()));
 
 
         participants.setItems(allParticipants);
