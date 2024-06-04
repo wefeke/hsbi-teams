@@ -4,29 +4,33 @@ package com.example.application.views;
 import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.VeranstaltungenService;
+import com.example.application.views.studierende.StudierendeView;
+import com.example.application.views.veranstaltungen.VeranstaltungenView;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.MenuItem;
-import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
+import com.vaadin.flow.theme.lumo.LumoUtility;
+import org.vaadin.lineawesome.LineAwesomeIcon;
 
 import java.io.ByteArrayInputStream;
 import java.util.Optional;
 
+
+
 //MainLayout ist die Hauptansicht der Anwendung, die die Navigationsleiste enthält
 public class MainLayout extends AppLayout {
-
-    private Button veranstaltungenButton;
-    private Button studierendeButton;
 
     private final VeranstaltungenService veranstaltungenService;
 
@@ -38,6 +42,42 @@ public class MainLayout extends AppLayout {
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
         createHeader();
+    }
+
+    public static class MenuItemInfo extends ListItem {
+
+        private final Class<? extends Component> view;
+
+        public MenuItemInfo(String menuTitle, Component icon, Class<? extends Component> view) {
+            this.view = view;
+            RouterLink link = new RouterLink();
+            // Use Lumo classnames for various styling
+            link.addClassNames(LumoUtility.Display.FLEX, LumoUtility.Gap.XSMALL, LumoUtility.Height.MEDIUM, LumoUtility.AlignItems.CENTER, LumoUtility.Padding.Horizontal.SMALL,
+                    LumoUtility.TextColor.BODY);
+            link.setRoute(view);
+
+            Span text = new Span(menuTitle);
+            // Use Lumo classnames for various styling
+            text.addClassNames(LumoUtility.FontWeight.MEDIUM, LumoUtility.FontSize.MEDIUM, LumoUtility.Whitespace.NOWRAP);
+
+            if (icon != null) {
+                link.add(icon);
+            }
+            link.add(text);
+            add(link);
+        }
+
+        public Class<?> getView() {
+            return view;
+        }
+
+    }
+
+    private MenuItemInfo[] createMenuItems() {
+        return new MenuItemInfo[]{ //
+                new MenuItemInfo("Veranstaltungen", LineAwesomeIcon.UNIVERSITY_SOLID.create(), VeranstaltungenView.class), //
+                new MenuItemInfo("Studierende", LineAwesomeIcon.ID_BADGE.create(), StudierendeView.class),
+        };
     }
 
     /**
@@ -57,18 +97,23 @@ public class MainLayout extends AppLayout {
 
         // (First Element) Logo-Button, das als Home-Button fungiert
         Button logoButton = new Button("H.S.B.I TeamBuilder", e -> getUI().ifPresent(ui -> ui.navigate("")));
+        logoButton.addClassName("logo-button");
         configureButton(logoButton, "24px", false);
         logoButton.getStyle().set("padding-left", "20px");
 
-        // (Second Element) Navigationsbutton für die Veranstaltungen
-        veranstaltungenButton = new Button("Veranstaltungen", e -> getUI().ifPresent(ui -> ui.navigate("")));
-        configureButton(veranstaltungenButton, "16px", true);
+        // Wrap the links in a list; improves accessibility
+        UnorderedList list = new UnorderedList();
+        list.addClassName("nav-list");
+        list.addClassNames(LumoUtility.Display.FLEX, LumoUtility.Gap.SMALL, LumoUtility.ListStyleType.NONE, LumoUtility.Margin.NONE, LumoUtility.Padding.NONE);
+        navItems.add(list);
 
-        // (Third Element) Navigationsbutton für die Studierenden
-        studierendeButton = new Button("Studierende", e -> getUI().ifPresent(ui -> ui.navigate("studierende")));
-        configureButton(studierendeButton, "16px", true);
+        navItems.add(logoButton, list);
 
-        navItems.add(logoButton, veranstaltungenButton, studierendeButton); //Zur rechten Seite hinzufügens
+        for (MenuItemInfo menuItem : createMenuItems()) {
+            if (accessChecker.hasAccess(menuItem.getView())) {
+                list.add(menuItem);
+            }
+        }
 
         // (Fifth Element) Login-Button
         Optional<User> maybeUser = authenticatedUser.get();
