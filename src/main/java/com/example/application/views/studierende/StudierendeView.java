@@ -102,6 +102,7 @@ public class StudierendeView extends VerticalLayout {
             delete.setEnabled(size != 0);
             aendern.setEnabled(size != 0);
         });
+        grid.setSizeFull();
     }
 
     private Component getToolbar() {

@@ -170,6 +170,8 @@ public class RegistrationView extends VerticalLayout {
                 .bind(User::getName, User::setName);
         binder.forField(username)
                 .asRequired("Username muss gefüllt sein")
+                .withValidator(this::isUsernameAvailable, "Username bereits vergeben")
+                .withValidator(username -> username.equals(username.toLowerCase()), "Username muss klein geschrieben sein")
                 .bind(User::getUsername, User::setUsername);
         binder.forField(password)
                 .asRequired("Password muss gefüllt sein")
@@ -183,5 +185,10 @@ public class RegistrationView extends VerticalLayout {
         username.clear();
         password.clear();
         password_check.clear();
+    }
+
+    private boolean isUsernameAvailable(String username) {
+        User user = userService.findUserByUsername(username);
+        return user == null;
     }
 }

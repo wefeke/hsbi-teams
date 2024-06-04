@@ -31,6 +31,10 @@ public class UserService {
         return userRepository.findAll(filter, pageable);
     }
 
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
     public void saveUser(User user) {
         if (user != null) {
             userRepository.save(user);
