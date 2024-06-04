@@ -515,7 +515,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             return teilnehmerDiv;
         }));
 
-        int itemHeight = 48;
+        int itemHeight = 52;
         int listHeight = fullGruppe.getTeilnehmer().size() * itemHeight;
 
         if (listHeight > maxListHeight) {
