@@ -419,7 +419,18 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 gruppenContainer.removeAll();
 
                 if (gruppenLinie == null) {
-                    gruppenLinie = createLineWithText("Gruppen");
+                    HorizontalLayout lineWithText = createLineWithText("Gruppen");
+
+                    Button editButton = createEditButton();
+
+                    Hr lineAfter = new Hr();
+                    lineAfter.addClassName("line-after-icon");
+
+                    gruppenLinie = new HorizontalLayout(lineWithText, editButton, lineAfter);
+                    gruppenLinie.setAlignItems(Alignment.CENTER);
+                    gruppenLinie.setJustifyContentMode(JustifyContentMode.BETWEEN);
+                    gruppenLinie.setWidthFull();
+
                     mainLayoutLeft.add(gruppenLinie, gruppenContainer);
                 }
 
@@ -648,4 +659,16 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         return teilnehmerDiv;
     }
+    
+    private Button createEditButton() {
+    Button editButton = new Button();
+    editButton.setText("✏️");
+    editButton.addClassName("edit-button");
+    
+    editButton.addClickListener(e -> {
+
+    });
+
+    return editButton;
+}
 }

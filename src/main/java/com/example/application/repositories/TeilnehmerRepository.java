@@ -25,9 +25,10 @@ public interface TeilnehmerRepository extends JpaRepository<Teilnehmer, Long> {
         "where lower(c.vorname) like lower(concat('%', :searchTerm, '%')) " +
         "or lower(c.nachname) like lower(concat('%', :searchTerm, '%')) " +
         "or cast(c.matrikelNr as string) like lower(concat('%', :searchTerm, '%'))")
-List<Teilnehmer> search(@Param("searchTerm") String searchTerm);
+    List<Teilnehmer> search(@Param("searchTerm") String searchTerm);
 
     Optional<Teilnehmer> findByMatrikelNr(Long matrikelNr);
+
     @Query("SELECT t FROM Teilnehmer t JOIN t.veranstaltungen v WHERE v.id = :id")
     List<Teilnehmer> findByVeranstaltungId(@Param("id") Long id);
 
