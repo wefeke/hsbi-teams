@@ -12,6 +12,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Hr;
+import com.vaadin.flow.component.icon.SvgIcon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -111,11 +112,15 @@ public class VeranstaltungenView extends VerticalLayout {
         Div kachel = new Div(kachelContent);
         kachel.addClassName("kachel");
 
-        Div deleteIcon = new Div(LineAwesomeIcon.TRASH_ALT.create());
+        SvgIcon deleteIconSvg = LineAwesomeIcon.TRASH_ALT.create();
+        deleteIconSvg.setColor("#D2042D");
+        Div deleteIcon = new Div(deleteIconSvg);
         deleteIcon.add();
         deleteIcon.addClassName("delete-icon");
 
-        Div editIcon = new Div(LineAwesomeIcon.EDIT.create());
+        SvgIcon editIconSvg = LineAwesomeIcon.EDIT.create();
+        editIconSvg.setColor("#2B64D6");
+        Div editIcon = new Div(editIconSvg);
         editIcon.addClassName("edit-icon");
 
         //Confirm-Dialog initialisieren
