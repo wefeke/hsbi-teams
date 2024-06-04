@@ -34,7 +34,7 @@ import java.util.List;
 
 @PageTitle("Veranstaltung Detail")
 @Route(value = "veranstaltung-detail/:veranstaltungId", layout = MainLayout.class)
-@RolesAllowed({"ADMIN"})
+@RolesAllowed({"ADMIN", "USER"})
 public class VeranstaltungDetailView extends VerticalLayout implements HasUrlParameter<String> {
 
     //Services

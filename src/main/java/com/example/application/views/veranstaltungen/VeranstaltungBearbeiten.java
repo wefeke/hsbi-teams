@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.HashSet;
 
 @Route(value = "editDialog")
-@RolesAllowed({"ADMIN"})
+@RolesAllowed({"ADMIN", "USER"})
 public class VeranstaltungBearbeiten extends Dialog {
 
     //Services

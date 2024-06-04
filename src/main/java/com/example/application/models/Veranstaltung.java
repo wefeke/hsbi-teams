@@ -19,19 +19,21 @@ public class Veranstaltung implements Serializable {
 
     //Beziehungen
     @ManyToOne()
-    private User user = new User();
+    private User user;
     @OneToMany(fetch = FetchType.EAGER)
     private List<Veranstaltungstermin> veranstaltungstermine = new ArrayList<>();
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Teilnehmer> teilnehmer = new HashSet<>();
 
     public Veranstaltung() {
+
     }
 
-    public Veranstaltung(Long veranstaltungsId, LocalDate semester, String titel) {
+    public Veranstaltung(Long veranstaltungsId, LocalDate semester, String titel, User user) {
         this.veranstaltungsId = veranstaltungsId;
         this.semester = semester;
         this.titel = titel;
+        this.user = user;
     }
 
     // Getter und Setter

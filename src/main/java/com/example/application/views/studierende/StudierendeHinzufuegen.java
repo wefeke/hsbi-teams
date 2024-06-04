@@ -23,7 +23,7 @@ import java.util.Optional;
 
 @Component
 @UIScope
-@RolesAllowed({"ADMIN"})
+@RolesAllowed({"ADMIN", "USER"})
 public class StudierendeHinzufuegen extends FormLayout {
 
     private final TeilnehmerService teilnehmerService;

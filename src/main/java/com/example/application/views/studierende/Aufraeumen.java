@@ -10,7 +10,7 @@ import jakarta.annotation.security.RolesAllowed;
 
 import java.util.List;
 
-@RolesAllowed({"ADMIN"})
+@RolesAllowed({"ADMIN", "USER"})
 public class Aufraeumen extends Dialog{
     private final TeilnehmerService teilnehmerService;
     private final Button deleteButton= new Button("löschen");

@@ -19,7 +19,7 @@ import com.vaadin.flow.data.binder.Binder;
 import jakarta.annotation.security.RolesAllowed;
 
 @Route(value = "addDialog")
-@RolesAllowed({"ADMIN"})
+@RolesAllowed({"ADMIN", "USER"})
 public class VeranstaltungDialog extends Dialog {
 
     //Services

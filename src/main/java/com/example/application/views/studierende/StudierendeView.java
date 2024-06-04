@@ -32,8 +32,7 @@ import java.util.Collection;
 
 @Route(value = "studierende", layout = MainLayout.class)
 @PageTitle(value = "Studierende")
-@RolesAllowed({"ADMIN"})
-
+@RolesAllowed({"ADMIN", "USER"})
 public class StudierendeView extends VerticalLayout {
     private final TeilnehmerService teilnehmerService;
     private final Grid<Teilnehmer> grid = new Grid<>();

@@ -1,7 +1,9 @@
 //Author: Joris
 package com.example.application.views.veranstaltungen;
 
+import com.example.application.models.User;
 import com.example.application.models.Veranstaltung;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
@@ -21,31 +23,39 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
+import java.util.Optional;
 
 @PageTitle("Veranstaltungen")
 @Route(value = "", layout = MainLayout.class)
-@RolesAllowed("ADMIN")
+@RolesAllowed({"ADMIN", "USER"})
 public class VeranstaltungenView extends VerticalLayout {
 
     //Services
     private final VeranstaltungenService veranstaltungenService;
     private final TeilnehmerService teilnehmerService;
     private final UserService userService;
+    private AuthenticatedUser authenticatedUser;
 
     private final Div kachelContainer = new Div();
 
     @Autowired
-    public VeranstaltungenView(VeranstaltungenService veranstaltungenService, UserService userService, TeilnehmerService teilnehmerService) {
+    public VeranstaltungenView(VeranstaltungenService veranstaltungenService, UserService userService, TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
         this.veranstaltungenService = veranstaltungenService;
         this.teilnehmerService = teilnehmerService;
         this.userService = userService;
+        this.authenticatedUser = authenticatedUser;
 
         VerticalLayout mainLayout = new VerticalLayout();
         mainLayout.setSizeFull();
 
-        //Hier später noch die Logik für den Namen des Users einbauen.
-        H1 username = new H1("Herzlich Willkommen, XY");
+        H1 username = new H1("Herzlich Willkommen!");
         username.getStyle().set("font-size", "28px");
+
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+            username.setText("Herzlich Willkommen, " + user.getName() + "!");
+        }
 
         Text text = new Text("Veranstaltungen");
 
