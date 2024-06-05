@@ -96,7 +96,7 @@ public class MainLayout extends AppLayout {
         header.getStyle().set("background", "transparent");
 
         // (First Element) Logo-Button, das als Home-Button fungiert
-        Button logoButton = new Button("H.S.B.I TeamBuilder", e -> getUI().ifPresent(ui -> ui.navigate("")));
+        Button logoButton = new Button("HSBI TeamBuilder", e -> getUI().ifPresent(ui -> ui.navigate("")));
         logoButton.addClassName("logo-button");
         configureButton(logoButton, "24px", false);
         logoButton.getStyle().set("padding-left", "20px");

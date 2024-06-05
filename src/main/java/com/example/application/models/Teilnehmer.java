@@ -13,7 +13,6 @@ import java.util.Objects;
 @Entity
 public class Teilnehmer {
     @Id
-
     @Column(name = "matrikelNr", nullable = false)
     private Long matrikelNr;
     private String vorname;
@@ -37,7 +36,8 @@ public class Teilnehmer {
     public Teilnehmer() {
     }
 
-    public Teilnehmer(String vorname, String nachname, User user){
+    public Teilnehmer(Long matrikelNr, String vorname, String nachname, User user){
+        this.matrikelNr = matrikelNr;
         this.vorname = vorname;
         this.nachname = nachname;
         this.user = user;
