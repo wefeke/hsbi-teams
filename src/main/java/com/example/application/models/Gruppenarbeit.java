@@ -73,7 +73,7 @@ public class Gruppenarbeit {
     }
 
     public List<Gruppe> getGruppen() {
-        return gruppen;
+        return new ArrayList<>(gruppen);
     }
 
     public List<Teilnehmer> getTeilnehmer() {
@@ -82,5 +82,13 @@ public class Gruppenarbeit {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public void removeGruppe(Gruppe gruppe){
+        this.gruppen.remove(gruppe);
+    }
+
+    public void removeAllGruppen(){
+        this.gruppen = new ArrayList<>();
     }
 }

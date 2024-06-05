@@ -800,6 +800,7 @@ INSERT INTO public.veranstaltung_teilnehmer (teilnehmer_matrikel_nr, veranstaltu
                                                                                                           (1000110, 1004),
                                                                                                           (1000111, 1004);
 
+
 INSERT INTO public.gruppenarbeit_teilnehmer (gruppenarbeit_id, teilnehmer_matrikel_nr) VALUES
     (1, 1000001),
     (1, 1000002),
