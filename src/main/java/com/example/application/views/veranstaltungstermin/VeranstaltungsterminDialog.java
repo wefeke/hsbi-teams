@@ -43,14 +43,17 @@ public class VeranstaltungsterminDialog extends Dialog {
 
     private AuthenticatedUser authenticatedUser;
 
+    private VeranstaltungDetailView veranstaltungDetailView;
+
     //Data Binder
     Binder<Veranstaltungstermin> binder = new Binder<>(Veranstaltungstermin.class);
 
-    public VeranstaltungsterminDialog(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, String veranstaltungId, AuthenticatedUser authenticatedUser) {
+    public VeranstaltungsterminDialog(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungDetailView veranstaltungDetailView, String veranstaltungId, AuthenticatedUser authenticatedUser) {
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
         this.veranstaltungId = veranstaltungId;
         this.authenticatedUser = authenticatedUser;
+        this.veranstaltungDetailView = veranstaltungDetailView;
 
         add(createLayout());
         configureElements();
@@ -108,7 +111,7 @@ public class VeranstaltungsterminDialog extends Dialog {
 
                 close();
                 clearFields();
-                UI.getCurrent().getPage().reload();
+                veranstaltungDetailView.update();
 
             }
         });
@@ -192,7 +195,7 @@ public class VeranstaltungsterminDialog extends Dialog {
             Veranstaltung veranstaltung = veranstaltungService.findVeranstaltungById(Long.parseLong(veranstaltungId), user);
             veranstaltung.addVeranstaltungstermin(veranstaltungstermin); //Lazy Load Problem
             veranstaltungstermin.setVeranstaltung(veranstaltung);
-
+            veranstaltungstermin.setUser(user);
             veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
             veranstaltungService.saveVeranstaltung(veranstaltung);
             Notification.show("Veranstaltungstermin angelegt!");
