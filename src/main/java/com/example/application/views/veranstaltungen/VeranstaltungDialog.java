@@ -103,6 +103,7 @@ public class VeranstaltungDialog extends Dialog {
                 veranstaltung.setUser(userService.findAdmin()); //Angemeldeten User holen
                 veranstaltungenService.saveVeranstaltung(veranstaltung);
                 veranstaltungenView.updateKachelContainer();
+
                 clearFields();
                 close();
 
