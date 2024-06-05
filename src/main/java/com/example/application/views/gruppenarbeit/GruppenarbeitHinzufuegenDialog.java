@@ -1,6 +1,7 @@
 package com.example.application.views.gruppenarbeit;
 
 import com.example.application.models.*;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.GruppeService;
 import com.example.application.services.GruppenarbeitService;
 import com.example.application.services.TeilnehmerService;
@@ -46,6 +47,9 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     private final VeranstaltungsterminService veranstaltungsterminService;
     private final GruppeService gruppeService;
 
+    //User
+    private AuthenticatedUser authenticatedUser;
+
     //Data
     List<Teilnehmer> allParticipants = new ArrayList<>();
     Set<Teilnehmer> selectedParticipants;
@@ -54,7 +58,6 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     Veranstaltung veranstaltung;
     Gruppenarbeit gruppenarbeit = new Gruppenarbeit();
     List<Gruppe> gruppen = new ArrayList<Gruppe>();
-
 
     //Binder
     Binder<Gruppenarbeit> binderGruppenarbeit = new Binder<>(Gruppenarbeit.class);
@@ -71,13 +74,14 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
     //Konstruktor
     @Autowired
-    public GruppenarbeitHinzufuegenDialog(Veranstaltung veranstaltung, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService) {
+    public GruppenarbeitHinzufuegenDialog(AuthenticatedUser authenticatedUser, Veranstaltung veranstaltung, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService) {
         this.veranstaltung = veranstaltung;
         this.gruppenarbeitService = gruppenarbeitService;
         this.teilnehmerService = teilnehmerService;
         this.veranstaltungsterminService = veranstaltungsterminService;
         this.gruppeService = gruppeService;
         this.veranstaltungstermin = null;
+        this.authenticatedUser = authenticatedUser;
 
         //gruppenGroesse.setReadOnly(true);
 
@@ -106,6 +110,11 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
         saveBtn.addClickListener(event -> {
             if(binderGruppenarbeit.writeBeanIfValid(gruppenarbeit)){
+                Optional<User> maybeUser = authenticatedUser.get();
+                if (maybeUser.isPresent()) {
+                    User user = maybeUser.get();
+                    gruppenarbeit.setUser(user);
+                }
 
                 gruppenarbeit.setVeranstaltungstermin(this.veranstaltungstermin);
 
