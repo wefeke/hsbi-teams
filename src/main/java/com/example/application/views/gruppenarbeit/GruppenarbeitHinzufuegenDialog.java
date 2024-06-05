@@ -6,23 +6,24 @@ import com.example.application.services.GruppenarbeitService;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.VeranstaltungsterminService;
 import com.example.application.views.MainLayout;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.H5;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.listbox.MultiSelectListBox;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -170,6 +171,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
             grid.setItems(gruppen.get(i).getTeilnehmer());
             grid.setWidth("400px");
             grid.addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS);
+
             H5 title = new H5("Gruppe " + (i+1) + ": " + gruppen.get(i).getTeilnehmer().size() + " Teilnehmer");
             title.addClassName("gruppen-gruppenarbeit-title");
             Div titleAndGroups = new Div(title, grid);
@@ -257,7 +259,6 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     private void listBoxParticipants() {
         allParticipants.addAll(teilnehmerService.findTeilnehmerByVeranstaltungId(this.veranstaltung.getId()));
 
-
         participants.setItems(allParticipants);
         for(Teilnehmer p:allParticipants){
             participants.select(p);
@@ -266,8 +267,29 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
             List<String> groups = getGroups();
             groupSize.setItems(groups);
             groupsGrid.setVisible(false);
-
         });
+        participants.setRenderer(new ComponentRenderer<>(participant ->{
+            HorizontalLayout row = new HorizontalLayout();
+            row.setAlignItems(FlexComponent.Alignment.CENTER);
+
+            Avatar avatar = new Avatar();
+            avatar.setName(participant.getFullName());
+            avatar.setImage(null);
+
+            Span name = new Span(participant.getFullName());
+            Span matrikelnr = new Span(String.valueOf(participant.getId()));
+            matrikelnr.getStyle()
+                    .set("color", "var(--lumo-secondary-text-color)")
+                    .set("font-size", "var(--lumo-font-size-s)");
+
+            VerticalLayout column = new VerticalLayout(name, matrikelnr);
+            column.setPadding(false);
+            column.setSpacing(false);
+
+            row.add(avatar, column);
+            row.getStyle().set("line-height", "var(--lumo-line-height-m)");
+            return row;
+        }));
     }
 
 
@@ -323,7 +345,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
             }
             groupStrings.add(str);
         }
-    return groupStrings;
+        return groupStrings;
     }
 
     //Layout des Fensters
@@ -341,12 +363,13 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
         groupSize.setWidth("230px");
         buttonsLayout.add(groupSize, saveBtn, randomizeBtn);
+        buttonsLayout.setAlignItems(FlexComponent.Alignment.CENTER);
 
         gruppenarbeitData.add(gruppenarbeitText);
-        participants.setWidth("250px");
         participants.setHeight("400px");
         gruppenarbeitData.add(participants);
         gruppenarbeitData.add(buttonsLayout);
+        gruppenarbeitData.setWidthFull();
 
         mainPageLayout.add(infoText, gruppenarbeitData, new H3("Gruppen"), groupsArea);
 
@@ -356,10 +379,10 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     //Felder binden
     private void bindFields(){
         binderGruppenarbeit.forField(titleField)
-                            .asRequired("Titel muss gefüllt sein")
-                            .bind(Gruppenarbeit::getTitel, Gruppenarbeit::setTitel);
+                .asRequired("Titel muss gefüllt sein")
+                .bind(Gruppenarbeit::getTitel, Gruppenarbeit::setTitel);
         binderGruppenarbeit.forField(descriptionArea)
-                            .bind(Gruppenarbeit::getBeschreibung, Gruppenarbeit::setBeschreibung);
+                .bind(Gruppenarbeit::getBeschreibung, Gruppenarbeit::setBeschreibung);
     }
 
     public void setVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin){
