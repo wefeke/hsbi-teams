@@ -385,7 +385,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
 
     public void createVeranstaltungsterminDialog () {
-        veranstaltungsterminDialog = new VeranstaltungsterminDialog(veranstaltungService, veranstaltungsterminService, veranstaltungIdString, authenticatedUser);
+        veranstaltungsterminDialog = new VeranstaltungsterminDialog(veranstaltungService, veranstaltungsterminService, this, veranstaltungIdString, authenticatedUser);
     }
 
     //Lilli
