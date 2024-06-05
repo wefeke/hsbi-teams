@@ -315,6 +315,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         });
 
         kachel.addClickListener(e -> {
+            gruppenarbeitLoeschenDialog.setVeranstaltungstermin(veranstaltungstermin);
             maxListHeight = 0;
 
             if (kachel.equals(aktiveKachelVeranstaltungstermin)) {
@@ -401,7 +402,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
     //Lilli
     public void createGruppenarbeitLoeschenDialog() {
-        gruppenarbeitLoeschenDialog = new GruppenarbeitLoeschenDialog(gruppenarbeitService);
+        gruppenarbeitLoeschenDialog = new GruppenarbeitLoeschenDialog(gruppenarbeitService, gruppeService, veranstaltungsterminService);
     }
 
     public void createTeilnehmerDialog() {
@@ -439,6 +440,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             deleteIconGruppenarbeit.getStyle().set("visibility", "visible");
             gruppenarbeitBearbeitenDialog.setGruppenarbeit(gruppenarbeit);
             gruppenarbeitBearbeitenDialog.readBean();
+            gruppenarbeitLoeschenDialog.setGruppenarbeit(gruppenarbeit);
             editIconGruppenarbeit.getStyle().set("visibility", "visible");
         });
 

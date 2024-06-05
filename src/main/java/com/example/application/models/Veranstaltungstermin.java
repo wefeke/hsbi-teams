@@ -113,4 +113,9 @@ public class Veranstaltungstermin {
     public void setUser(User user) {
         this.user = user;
     }
+
+    //Lilli
+    public void removeGruppenarbeit(Gruppenarbeit gruppenarbeit) {
+        this.gruppenarbeiten.remove(gruppenarbeit);
+    }
 }
