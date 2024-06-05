@@ -112,4 +112,8 @@ public class Veranstaltung implements Serializable {
         this.veranstaltungstermine.add(veranstaltungstermin);
     }
 
+    //Lilli
+    public void removeVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin){
+        this.veranstaltungstermine.remove(veranstaltungstermin);
+    }
 }

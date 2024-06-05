@@ -14,6 +14,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -33,7 +34,7 @@ public class GruppenarbeitLoeschenDialog extends Dialog {
     private GruppeService gruppeService;
 
     //UI-Elemente
-    H3 infoText = new H3("Empty");
+    H2 infoText = new H2("Empty");
     Paragraph warningText = new Paragraph("Empty");
     Paragraph noReturn = new Paragraph("Das kann nicht rückgängig gemacht werden!");
     Button deleteBtn = new Button("Gruppenarbeit endgültig löschen");
