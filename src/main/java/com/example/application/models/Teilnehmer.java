@@ -108,4 +108,8 @@ public class Teilnehmer {
     public List<Gruppenarbeit> getGruppenarbeiten() {
         return gruppenarbeiten;
     }
+
+    public String getFullName() {
+        return this.vorname + " " + this.nachname;
+    }
 }
