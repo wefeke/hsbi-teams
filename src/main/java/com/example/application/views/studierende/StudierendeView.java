@@ -126,9 +126,12 @@ public class StudierendeView extends VerticalLayout {
     }
 
     public void updateStudierendeView() {
-        grid.setItems(teilnehmerService.findAllTeilnehmer(filterText.getValue()));
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+            grid.setItems(teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue()));
+        }
     }
-
     private Component getContent() {
         HorizontalLayout content = new HorizontalLayout(grid);
         content.setFlexGrow(1, grid);
