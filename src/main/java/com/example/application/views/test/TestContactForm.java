@@ -38,7 +38,7 @@ public class TestContactForm extends FormLayout{
         addClassName("test-contact-form");
 
         auswertung.setItems(auswertungen);
-        auswertung.setItemLabelGenerator(Auswertung::getVeranstaltung);
+        auswertung.setItemLabelGenerator(Auswertung::getTitelVeranstaltung);
 
         add(
                 titelVeranstaltung,
