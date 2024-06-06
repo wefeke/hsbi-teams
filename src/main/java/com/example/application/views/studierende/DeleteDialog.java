@@ -53,7 +53,6 @@ public class DeleteDialog extends Dialog {
                     teilnehmer.getVeranstaltungen().remove(veranstaltung);
                 }
 
-
                 // Speichern Sie die Änderungen
                 teilnehmerService.saveTeilnehmer(teilnehmer);
 

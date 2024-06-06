@@ -2,7 +2,6 @@ package com.example.application.views.studierende;
 
 import com.example.application.DoubleToLongConverter;
 import com.example.application.models.Teilnehmer;
-import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.views.MainLayout;
@@ -31,12 +30,10 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
-import java.util.Optional;
 
 @Route(value = "studierende", layout = MainLayout.class)
 @PageTitle(value = "Studierende")
-@RolesAllowed({"ADMIN"})
-
+@RolesAllowed({"ADMIN", "USER"})
 public class StudierendeView extends VerticalLayout {
     private final TeilnehmerService teilnehmerService;
     private final Grid<Teilnehmer> grid = new Grid<>();
@@ -51,8 +48,7 @@ public class StudierendeView extends VerticalLayout {
     private final Component aendernIcon;
     private final Button importButton = new Button("Importieren");
     private final Button exportButton = new Button("Exportieren");
-    private final AuthenticatedUser authenticatedUser;
-
+    private AuthenticatedUser authenticatedUser;
     Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
 
     TextField vorname = new TextField("Vorname");
@@ -64,8 +60,8 @@ public class StudierendeView extends VerticalLayout {
 
     @Autowired
     public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
-        this.teilnehmerService = teilnehmerService;
         this.authenticatedUser = authenticatedUser;
+        this.teilnehmerService = teilnehmerService;
         DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService);
         Aufraeumen aufraeumenDialog = new Aufraeumen(teilnehmerService);
         addStudiernedenButtonIcon = addStudiernedenButton.getIcon();
@@ -213,16 +209,12 @@ public class StudierendeView extends VerticalLayout {
         save.addClickListener(event -> {
             Teilnehmer selectedTeilnehmer = grid.asSingleSelect().getValue();
             if (selectedTeilnehmer != null) {
+
+
                 selectedTeilnehmer.setVorname(vorname.getValue());
                 selectedTeilnehmer.setNachname(nachname.getValue());
                 selectedTeilnehmer.setId(matrikelNr.getValue().longValue());
                 teilnehmerService.saveTeilnehmer(selectedTeilnehmer);
-                Optional<User> maybeUser = authenticatedUser.get();
-                if (maybeUser.isPresent()) {
-                    User user = maybeUser.get();
-                    AuthenticatedUser authenticatedUser;
-
-                }
                 Notification.show("Daten erfolgreich aktualisiert");
                 updateStudierendeView();
                 aendernDiolog.close();
