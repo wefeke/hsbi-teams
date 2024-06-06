@@ -1,7 +1,9 @@
 package com.example.application.views.veranstaltungen;
 
 import com.example.application.models.Teilnehmer;
+import com.example.application.models.User;
 import com.example.application.models.Veranstaltung;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
@@ -11,7 +13,6 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -23,7 +24,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.data.binder.Binder;
 import jakarta.annotation.security.RolesAllowed;
 
-import java.util.List;
+import java.util.Optional;
 
 @Route(value = "addDialog")
 @RolesAllowed({"ADMIN", "USER"})
@@ -42,14 +43,18 @@ public class VeranstaltungDialog extends Dialog {
     private final Button cancelButton= new Button("Cancel");
     private final Button saveButton= new Button("Save");
 
+    //Security
+    private AuthenticatedUser authenticatedUser;
+
     //Data Binder
     Binder<Veranstaltung> binder = new Binder<>(Veranstaltung.class);
 
-    public VeranstaltungDialog(VeranstaltungenService veranstaltungenService, TeilnehmerService teilnehmerService, UserService userService, VeranstaltungenView veranstaltungenView) {
+    public VeranstaltungDialog(VeranstaltungenService veranstaltungenService, TeilnehmerService teilnehmerService, UserService userService, VeranstaltungenView veranstaltungenView, AuthenticatedUser authenticatedUser) {
         this.veranstaltungenService = veranstaltungenService;
         this.teilnehmerService = teilnehmerService;
         this.userService = userService;
         this.veranstaltungenView = veranstaltungenView;
+        this.authenticatedUser = authenticatedUser;
         add(createLayout());
         configureElements();
         bindFields();
@@ -100,7 +105,11 @@ public class VeranstaltungDialog extends Dialog {
             Veranstaltung veranstaltung = new Veranstaltung();
 
             if (binder.writeBeanIfValid(veranstaltung)) {
-                veranstaltung.setUser(userService.findAdmin()); //Angemeldeten User holen
+                Optional<User> maybeUser = authenticatedUser.get();
+                if (maybeUser.isPresent()) {
+                    User user = maybeUser.get();
+                    veranstaltung.setUser(user);
+                }
                 veranstaltungenService.saveVeranstaltung(veranstaltung);
                 veranstaltungenView.updateKachelContainer();
 
