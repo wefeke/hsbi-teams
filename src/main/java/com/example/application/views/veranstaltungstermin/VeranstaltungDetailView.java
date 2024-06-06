@@ -13,10 +13,7 @@ import com.example.application.views.gruppenarbeit.GruppenarbeitHinzufuegenDialo
 import com.example.application.views.gruppenarbeit.GruppenarbeitLoeschenDialog;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Hr;
@@ -229,7 +226,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         veranstaltungsterminContainer.add(createVeranstaltungsterminKachel());
 
-        teilnehmerListe.add(createTeilnehmerListe2());
+        teilnehmerListe.add(createTeilnehmerListe());
 
     }
 
@@ -665,38 +662,6 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         );
 
         return confirmationDialog;
-    }
-
-    private Div createTeilnehmerListe2() {
-        //AUTHOR LEON
-        final MultiSelectComboBox<Teilnehmer> comboBox = new MultiSelectComboBox<>("Teilnehmer");
-        //Combobox
-        comboBox.setItems(teilnehmerService.findAllTeilnehmer(""));
-        comboBox.setRenderer(new ComponentRenderer<>(teilnehmer -> {
-            HorizontalLayout row = new HorizontalLayout();
-            row.setAlignItems(FlexComponent.Alignment.CENTER);
-
-            Avatar avatar = new Avatar();
-            avatar.setName(teilnehmer.getNachname());
-            avatar.setImage(null);
-            avatar.setColorIndex(teilnehmer.getId().intValue() % 5);
-
-            Span nachname = new Span(teilnehmer.getNachname());
-            Span vorname = new Span(teilnehmer.getVorname());
-            vorname.getStyle()
-                    .set("color", "var(--lumo-secondary-text-color)")
-                    .set("font-size", "var(--lumo-font-size-s)");
-
-            VerticalLayout column = new VerticalLayout(vorname, nachname);
-            column.setPadding(false);
-            column.setSpacing(false);
-
-            row.add(avatar, column);
-            row.getStyle().set("line-height", "var(--lumo-line-height-m)");
-            return row;
-        }));
-        comboBox.setSizeFull();
-       return new Div(comboBox);
     }
 
     private Div createTeilnehmerListe() {

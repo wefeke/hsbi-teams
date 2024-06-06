@@ -75,6 +75,7 @@ public class RegistrationView extends VerticalLayout {
         configureElements();
         add(mainLayout);
         bindFields();
+        //
     }
 
     private VerticalLayout createElements(){
