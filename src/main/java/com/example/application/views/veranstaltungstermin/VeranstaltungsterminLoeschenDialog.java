@@ -16,6 +16,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
@@ -39,6 +40,7 @@ public class VeranstaltungsterminLoeschenDialog extends Dialog {
     Button cancelBtn = new Button("Abbrechen");
     Paragraph warningText = new Paragraph("Empty");
     Paragraph noReturn = new Paragraph("Empty");
+    Text forTesting = new Text("Empty");
 
     public VeranstaltungsterminLoeschenDialog(Veranstaltung veranstaltung, GruppeService gruppeService, GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungenService veranstaltungenService) {
         this.veranstaltungstermin=null;
@@ -53,22 +55,26 @@ public class VeranstaltungsterminLoeschenDialog extends Dialog {
         noReturn.getStyle().set("white-space", "pre-line");
 
         deleteBtn.addClickListener(event -> {
-            List<Gruppenarbeit> gruppenarbeiten = this.veranstaltungstermin.getGruppenarbeiten();
-            this.veranstaltungstermin.removeAllGruppenarbeiten();
-            for(Gruppenarbeit gruppenarbeit:gruppenarbeiten){
+            List<Gruppenarbeit> gruppenarbeiten = veranstaltungstermin.getGruppenarbeiten();
+            veranstaltungstermin.removeAllGruppenarbeiten();
+            veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
+
+            for(Gruppenarbeit gruppenarbeit: gruppenarbeiten){
                 List<Gruppe> gruppen = gruppenarbeit.getGruppen();
                 gruppenarbeit.removeAllGruppen();
-                for(Gruppe gruppe:gruppen){
+                gruppenarbeitService.save(gruppenarbeit);
+
+                for (Gruppe gruppe : gruppen) {
                     gruppeService.deleteGruppe(gruppe);
                 }
+
+                this.veranstaltungstermin.removeGruppenarbeit(gruppenarbeit);
+                veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
+
                 gruppenarbeitService.deleteGruppenarbeit(gruppenarbeit);
             }
-            veranstaltung.removeVeranstaltungstermin(veranstaltungstermin);
-            veranstaltungenService.saveVeranstaltung(veranstaltung);
-            veranstaltungsterminService.deleteVeranstaltungstermin(veranstaltungstermin);
 
-            close();
-            UI.getCurrent().getPage().reload();
+            veranstaltungsterminService.deleteVeranstaltungstermin(veranstaltungstermin);
 
         });
         deleteBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
