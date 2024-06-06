@@ -103,11 +103,11 @@ public class StudierendeHinzufuegen extends FormLayout {
         teilnehmer.setVorname(firstName.getValue());
         teilnehmer.setNachname(lastName.getValue());
         teilnehmer.setId(matrikelNr.getValue().longValue());
-        teilnehmerService.saveTeilnehmer(teilnehmer);
+
         Optional<User> maybeUser = authenticatedUser.get();
-        if (maybeUser.isPresent()) {
-            User user = maybeUser.get();
-            AuthenticatedUser authenticatedUser;
+        User user = maybeUser.get();
+        teilnehmerService.saveTeilnehmer(teilnehmer,user);
+
 
         }
 
@@ -121,5 +121,5 @@ public class StudierendeHinzufuegen extends FormLayout {
 //                .bind(Teilnehmer::getId, Teilnehmer::setId);
 //    }
     }
-}
+
 

@@ -63,7 +63,7 @@ public class StudierendeView extends VerticalLayout {
     public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
         this.authenticatedUser = authenticatedUser;
         this.teilnehmerService = teilnehmerService;
-        DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService);
+        DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService, authenticatedUser);
         Aufraeumen aufraeumenDialog = new Aufraeumen(teilnehmerService);
         addStudiernedenButtonIcon = addStudiernedenButton.getIcon();
         deleteIcon = delete.getIcon();
@@ -225,8 +225,10 @@ public class StudierendeView extends VerticalLayout {
         save.addClickListener(event -> {
             Teilnehmer selectedTeilnehmer = grid.asSingleSelect().getValue();
             if ((teilnehmer != null)) {
+                Optional<User> maybeUser = authenticatedUser.get();
+                User user = maybeUser.get();
                 binder.writeBeanIfValid(teilnehmer);
-                teilnehmerService.saveTeilnehmer(teilnehmer);
+                teilnehmerService.saveTeilnehmer(teilnehmer, user);
                 Notification.show("Daten erfolgreich aktualisiert");
                 updateStudierendeView();
                 aendernDiolog.close();

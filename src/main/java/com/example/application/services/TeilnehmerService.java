@@ -32,13 +32,13 @@ public List<Teilnehmer> findAllTeilnehmer2(){return teilnehmerRepository.findAll
         return teilnehmerRepository.findByMatrikelNr(matrikelNr);
     }
 
-    @Transactional
-    public void saveTeilnehmer(Teilnehmer teilnehmer) {
+    public void saveTeilnehmer(Teilnehmer teilnehmer, User user) {
         if (teilnehmer != null) {
+            teilnehmer.setUser(user);
             teilnehmerRepository.save(teilnehmer);
         }
         else
-            System.err.println("Test is null. Are you sure you have connected your form to the application?");
+            System.err.println("Teilnehmer is null. Are you sure you have connected your form to the application?");
     }
 
     @Transactional

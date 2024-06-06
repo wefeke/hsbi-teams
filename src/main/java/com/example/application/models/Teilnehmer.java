@@ -112,4 +112,8 @@ public class Teilnehmer {
     public String getFullName() {
         return this.vorname + " " + this.nachname;
     }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }
