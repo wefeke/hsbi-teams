@@ -227,7 +227,7 @@ public class VeranstaltungenView extends VerticalLayout {
             neueVeranstaltungKachel.removeClassName("hover")
         );
 
-        VeranstaltungDialog createDialog = new VeranstaltungDialog(veranstaltungenService, teilnehmerService, userService, this, authenticatedUser);
+        VeranstaltungDialog createDialog = new VeranstaltungDialog(veranstaltungenService, teilnehmerService, userService, this);
 
         neueVeranstaltungKachel.addClickListener(e ->
             createDialog.open()
