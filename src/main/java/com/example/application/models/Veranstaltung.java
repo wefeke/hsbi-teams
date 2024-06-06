@@ -13,34 +13,44 @@ public class Veranstaltung implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long veranstaltungsId; // Primary Key
+    private Long id; // Primary Key
     private LocalDate semester;          // Semester-Nummer
     private String titel;
 
     //Beziehungen
     @ManyToOne()
-    private User user = new User();
+    private User user;
     @OneToMany(fetch = FetchType.EAGER)
     private List<Veranstaltungstermin> veranstaltungstermine = new ArrayList<>();
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Teilnehmer> teilnehmer = new HashSet<>();
 
     public Veranstaltung() {
+
     }
 
-    public Veranstaltung(Long veranstaltungsId, LocalDate semester, String titel) {
-        this.veranstaltungsId = veranstaltungsId;
+    public Veranstaltung(LocalDate semester, String titel, User user, List<Veranstaltungstermin> veranstaltungstermine, Set<Teilnehmer> teilnehmer) {
         this.semester = semester;
         this.titel = titel;
+        this.user = user;
+        this.veranstaltungstermine = veranstaltungstermine;
+        this.teilnehmer = teilnehmer;
+    }
+
+    public Veranstaltung(Long id, LocalDate semester, String titel, User user) {
+        this.id = id;
+        this.semester = semester;
+        this.titel = titel;
+        this.user = user;
     }
 
     // Getter und Setter
-    public Long getVeranstaltungsId() {
-        return veranstaltungsId;
+    public Long getId() {
+        return id;
     }
 
-    public void setVeranstaltungsId(Long veranstaltungsId) {
-        this.veranstaltungsId = veranstaltungsId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public LocalDate getSemester() {
@@ -68,19 +78,19 @@ public class Veranstaltung implements Serializable {
         if (this == o) return true;
         if (!(o instanceof Veranstaltung)) return false;
         Veranstaltung semester = (Veranstaltung) o;
-        return Objects.equals(veranstaltungsId, semester.veranstaltungsId);
+        return Objects.equals(id, semester.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(veranstaltungsId);
+        return Objects.hash(id);
     }
 
     // toString Methode, um das Objekt als String darzustellen, nützlich für Logging
     @Override
     public String toString() {
         return "Semester{" +
-                "veranstaltungsId=" + veranstaltungsId +
+                "id=" + id +
                 ", semester=" + semester +
                 ", titel='" + titel + '\'' +
                 '}';

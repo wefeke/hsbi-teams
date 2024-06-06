@@ -15,15 +15,9 @@ public class Gruppe {
     private Long id;
     private Long nummer;
 
-    public Gruppenarbeit getGruppenarbeit() {
-        return gruppenarbeit;
-    }
-
-    public void setGruppenarbeit(Gruppenarbeit gruppenarbeit) {
-        this.gruppenarbeit = gruppenarbeit;
-    }
-
     //Beziehungen
+    @ManyToOne()
+    private User user;
     @ManyToOne
     private Gruppenarbeit gruppenarbeit = new Gruppenarbeit();
     @ManyToMany
@@ -37,6 +31,23 @@ public class Gruppe {
         this.gruppenarbeit = null;
         this.teilnehmer = new ArrayList<Teilnehmer>();
     }
+
+    public Gruppe(Long nummer, User user){
+        this.nummer = nummer;
+        this.user = user;
+        this.gruppenarbeit = null;
+        this.teilnehmer = new ArrayList<Teilnehmer>();
+    }
+
+
+    public Gruppenarbeit getGruppenarbeit() {
+        return gruppenarbeit;
+    }
+
+    public void setGruppenarbeit(Gruppenarbeit gruppenarbeit) {
+        this.gruppenarbeit = gruppenarbeit;
+    }
+
     public Long getId() {
         return id;
     }

@@ -1,7 +1,9 @@
 //Author: Joris
 package com.example.application.views.veranstaltungen;
 
+import com.example.application.models.User;
 import com.example.application.models.Veranstaltung;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
@@ -12,6 +14,8 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Hr;
+import com.vaadin.flow.component.icon.SvgIcon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -20,32 +24,42 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.vaadin.lineawesome.LineAwesomeIcon;
+
 import java.util.List;
+import java.util.Optional;
 
 @PageTitle("Veranstaltungen")
 @Route(value = "", layout = MainLayout.class)
-@RolesAllowed("ADMIN")
+@RolesAllowed({"ADMIN", "USER"})
 public class VeranstaltungenView extends VerticalLayout {
 
     //Services
     private final VeranstaltungenService veranstaltungenService;
     private final TeilnehmerService teilnehmerService;
     private final UserService userService;
+    private AuthenticatedUser authenticatedUser;
 
     private final Div kachelContainer = new Div();
 
     @Autowired
-    public VeranstaltungenView(VeranstaltungenService veranstaltungenService, UserService userService, TeilnehmerService teilnehmerService) {
+    public VeranstaltungenView(VeranstaltungenService veranstaltungenService, UserService userService, TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
         this.veranstaltungenService = veranstaltungenService;
         this.teilnehmerService = teilnehmerService;
         this.userService = userService;
+        this.authenticatedUser = authenticatedUser;
 
         VerticalLayout mainLayout = new VerticalLayout();
         mainLayout.setSizeFull();
 
-        //Hier später noch die Logik für den Namen des Users einbauen.
-        H1 username = new H1("Herzlich Willkommen, XY");
+        H1 username = new H1("Herzlich Willkommen!");
         username.getStyle().set("font-size", "28px");
+
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+            username.setText("Herzlich Willkommen, " + user.getName() + "!");
+        }
 
         Text text = new Text("Veranstaltungen");
 
@@ -78,18 +92,22 @@ public class VeranstaltungenView extends VerticalLayout {
     public void updateKachelContainer() {
         kachelContainer.removeAll();
 
+        // Alle Veranstaltungen des angemeldeten Benutzers aus der Datenbank abrufen
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+            List<Veranstaltung> veranstaltungen = veranstaltungenService.findAllVeranstaltungenByUser(user);
 
-        // Alle Veranstaltungen aus der Datenbank abrufen
-        List<Veranstaltung> veranstaltungen = veranstaltungenService.findAllVeranstaltungen();
-
-        // Kacheln für vorhandene Veranstaltungen erstellen
-        for (Veranstaltung veranstaltung : veranstaltungen) {
-            kachelContainer.add(createVeranstaltungKachel(veranstaltung));
+            // Kacheln für vorhandene Veranstaltungen erstellen
+            for (Veranstaltung veranstaltung : veranstaltungen) {
+                kachelContainer.add(createVeranstaltungKachel(veranstaltung));
+            }
+        } else {
+            Notification.show("Bitte melden Sie sich an, um Ihre Veranstaltungen zu sehen.");
         }
 
         // Kachel für neue Veranstaltung hinzufügen
         kachelContainer.add(createKachel());
-
     }
 
     /**
@@ -109,18 +127,21 @@ public class VeranstaltungenView extends VerticalLayout {
         Div kachel = new Div(kachelContent);
         kachel.addClassName("kachel");
 
-        Div deleteIcon = new Div();
-        deleteIcon.setText("🗑️");
+        SvgIcon deleteIconSvg = LineAwesomeIcon.TRASH_ALT.create();
+        deleteIconSvg.setColor("#D2042D");
+        Div deleteIcon = new Div(deleteIconSvg);
+        deleteIcon.add();
         deleteIcon.addClassName("delete-icon");
 
-        Div editIcon = new Div();
-        editIcon.setText("✏️");
+        SvgIcon editIconSvg = LineAwesomeIcon.EDIT.create();
+        editIconSvg.setColor("#2B64D6");
+        Div editIcon = new Div(editIconSvg);
         editIcon.addClassName("edit-icon");
 
         //Confirm-Dialog initialisieren
         Dialog confirmationDialog = new Dialog();
         //Bearbeiten-Dialog initialisieren
-        VeranstaltungBearbeiten editDialog = new VeranstaltungBearbeiten(veranstaltungenService, teilnehmerService, userService, veranstaltung, this);
+        VeranstaltungBearbeiten editDialog = new VeranstaltungBearbeiten(veranstaltungenService, teilnehmerService, userService, veranstaltung, this, authenticatedUser);
 
         Button confirmbutton = new Button("Ja", event -> {
             veranstaltungenService.deleteVeranstaltung(veranstaltung);
@@ -130,25 +151,30 @@ public class VeranstaltungenView extends VerticalLayout {
             confirmationDialog.close();
         });
 
-        Button cancelButton = new Button("Nein", event -> {
-            confirmationDialog.close();
-            kachel.getStyle().set("background-color", "");
+            Button cancelButton = new Button("Nein", event -> {
+                confirmationDialog.close();
+                kachel.getStyle().set("background-color", "");
+            });
+            cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+
+            VerticalLayout verticalLayout = new VerticalLayout(
+                    new Text("Möchten Sie die Veranstaltung (" + veranstaltung.getTitel() + ") wirklich löschen?"),
+                    new HorizontalLayout(
+                            confirmbutton,
+                            cancelButton
+                    )
+            );
+            verticalLayout.setAlignItems(Alignment.CENTER);
+            confirmationDialog.add( verticalLayout );
+
+        //Bearbeiten-Dialog initialisieren
+        editDialog.addOpenedChangeListener(e -> {
+            if (!e.isOpened()) {
+                deleteIcon.getStyle().set("visibility", "hidden");
+                editIcon.getStyle().set("visibility", "hidden");
+                kachel.getStyle().set("background-color", "");
+            }
         });
-        cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
-
-        VerticalLayout verticalLayout = new VerticalLayout(
-                new Text("Möchten Sie die Veranstaltung (" + veranstaltung.getTitel() + ") wirklich löschen?"),
-                new HorizontalLayout(
-                        confirmbutton,
-                        cancelButton
-                )
-        );
-
-        verticalLayout.setAlignItems(Alignment.CENTER);
-
-        confirmationDialog.add(
-                verticalLayout
-        );
 
         //Icons
         deleteIcon.getElement().addEventListener("click", e ->
@@ -176,7 +202,7 @@ public class VeranstaltungenView extends VerticalLayout {
         });
 
         kachel.addClickListener(e -> {
-            String veranstaltungID = veranstaltung.getVeranstaltungsId().toString();
+            String veranstaltungID = veranstaltung.getId().toString();
             getUI().ifPresent(ui -> ui.navigate("veranstaltung-detail/" + veranstaltungID));
         });
 

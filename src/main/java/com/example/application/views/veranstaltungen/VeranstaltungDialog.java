@@ -5,21 +5,28 @@ import com.example.application.models.Veranstaltung;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
+import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.data.binder.Binder;
 import jakarta.annotation.security.RolesAllowed;
 
+import java.util.List;
+
 @Route(value = "addDialog")
-@RolesAllowed({"ADMIN"})
+@RolesAllowed({"ADMIN", "USER"})
 public class VeranstaltungDialog extends Dialog {
 
     //Services
@@ -48,24 +55,45 @@ public class VeranstaltungDialog extends Dialog {
         bindFields();
     }
 
-    private HorizontalLayout createLayout() {
+    private VerticalLayout createLayout() {
         setHeaderTitle("Veranstaltung hinzufügen");
         getFooter().add(cancelButton);
         getFooter().add(saveButton);
 
         return (
-                new HorizontalLayout(
-                        new VerticalLayout(titelField, datePicker, comboBox)
-                ));
+                new VerticalLayout(titelField, datePicker, comboBox));
         }
 
     private void configureElements() {
 
         //Combobox
         comboBox.setItems(teilnehmerService.findAllTeilnehmer(""));
-        comboBox.setItemLabelGenerator(Teilnehmer::getVorname);
+        comboBox.setRenderer(new ComponentRenderer<>(teilnehmer -> {
+            HorizontalLayout row = new HorizontalLayout();
+            row.setAlignItems(FlexComponent.Alignment.CENTER);
 
+            Avatar avatar = new Avatar();
+            avatar.setName(teilnehmer.getNachname());
+            avatar.setImage(null);
+            avatar.setColorIndex(teilnehmer.getId().intValue() % 5);
 
+            Span nachname = new Span(teilnehmer.getNachname());
+            Span vorname = new Span(teilnehmer.getVorname());
+            vorname.getStyle()
+                    .set("color", "var(--lumo-secondary-text-color)")
+                    .set("font-size", "var(--lumo-font-size-s)");
+
+            VerticalLayout column = new VerticalLayout(vorname, nachname);
+            column.setPadding(false);
+            column.setSpacing(false);
+
+            row.add(avatar, column);
+            row.getStyle().set("line-height", "var(--lumo-line-height-m)");
+            return row;
+        }));
+        comboBox.setSizeFull();
+        datePicker.setSizeFull();
+        titelField.setSizeFull();
         //Buttons
         saveButton.addClickListener(event -> {
 
@@ -75,6 +103,7 @@ public class VeranstaltungDialog extends Dialog {
                 veranstaltung.setUser(userService.findAdmin()); //Angemeldeten User holen
                 veranstaltungenService.saveVeranstaltung(veranstaltung);
                 veranstaltungenView.updateKachelContainer();
+
                 clearFields();
                 close();
 

@@ -13,6 +13,7 @@ import java.util.Set;
 @Table(name = "users") // Ändern Sie den Tabellennamen auf "users"
 public class User {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String username;
     private String name;
@@ -32,6 +33,16 @@ public class User {
 
     public User() {
 
+    }
+
+    public User(String username, String name, String hashedPassword, boolean isAdmin, Set<Role> roles, byte[] profilePicture, List<Veranstaltung> veranstaltungen) {
+        this.username = username;
+        this.name = name;
+        this.hashedPassword = hashedPassword;
+        this.isAdmin = isAdmin;
+        this.roles = roles;
+        this.profilePicture = profilePicture;
+        this.veranstaltungen = veranstaltungen;
     }
 
     public String getUsername() {
@@ -54,7 +65,7 @@ public class User {
         return hashedPassword;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(String hashedPassword) {
         this.hashedPassword = hashedPassword;
     }
 
@@ -89,6 +100,18 @@ public class User {
         this.profilePicture = profilePicture;
     }
 
+    public List<Veranstaltung> getVeranstaltungen() {
+        return veranstaltungen;
+    }
+
+    public void setVeranstaltungen(List<Veranstaltung> veranstaltungen) {
+        this.veranstaltungen = veranstaltungen;
+    }
+
+    public void addVeranstaltungen (Veranstaltung veranstaltung) {
+        this.veranstaltungen.add(veranstaltung);
+    }
+
     @Override
     public int hashCode() {
         if (getId() != null) {
@@ -96,6 +119,7 @@ public class User {
         }
         return super.hashCode();
     }
+
 
     @Override
     public boolean equals(Object obj) {

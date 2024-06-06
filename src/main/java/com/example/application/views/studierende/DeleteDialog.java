@@ -14,8 +14,7 @@ import jakarta.annotation.security.RolesAllowed;
 
 import java.util.HashSet;
 
-@RolesAllowed({"ADMIN"})
-
+@RolesAllowed({"ADMIN", "USER"})
 public class DeleteDialog extends Dialog {
     private final TeilnehmerService teilnehmerService;
 

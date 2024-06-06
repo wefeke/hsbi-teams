@@ -8,29 +8,40 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Teilnehmer {
     @Id
-
     @Column(name = "matrikelNr", nullable = false)
     private Long matrikelNr;
     private String vorname;
     private String nachname;
 
     // für Timestamp
-
     @CreationTimestamp
     @Column(name = "hinzugefügt am", updatable = false)
     private LocalDateTime hinzugefuegtAm;
 
     //Beziehungen
+    @ManyToOne()
+    private User user;
     @ManyToMany (fetch = FetchType.EAGER)
     private List<Veranstaltung> veranstaltungen = new ArrayList<>();
     @ManyToMany (fetch = FetchType.EAGER)
     private List<Gruppenarbeit> gruppenarbeiten = new ArrayList<>();
     @ManyToMany (fetch = FetchType.EAGER)
     private List<Gruppe> gruppen = new ArrayList<>();
+
+    public Teilnehmer() {
+    }
+
+    public Teilnehmer(Long matrikelNr, String vorname, String nachname, User user){
+        this.matrikelNr = matrikelNr;
+        this.vorname = vorname;
+        this.nachname = nachname;
+        this.user = user;
+    }
 
     public Long getId() {
         return matrikelNr;
@@ -56,10 +67,6 @@ public class Teilnehmer {
         this.nachname = nachname;
     }
 
-    public Teilnehmer() {
-
-    }
-
     public Teilnehmer(String vorname, String nachname){
         this.vorname = vorname;
         this.nachname = nachname;
@@ -81,9 +88,28 @@ public class Teilnehmer {
         return this.vorname + " " + this.nachname;
     }
 
-    public List<Gruppe> getGruppen() {return gruppen;}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Teilnehmer that = (Teilnehmer) o;
+        return Objects.equals(matrikelNr, that.matrikelNr);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(matrikelNr);
+    }
+
+    public List<Gruppe> getGruppen() {
+        return gruppen;
+    }
 
     public List<Gruppenarbeit> getGruppenarbeiten() {
         return gruppenarbeiten;
+    }
+
+    public String getFullName() {
+        return this.vorname + " " + this.nachname;
     }
 }

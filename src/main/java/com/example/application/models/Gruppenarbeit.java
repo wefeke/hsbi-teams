@@ -9,19 +9,32 @@ import java.util.List;
 @Entity
 public class Gruppenarbeit {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(generator = "generator")
+    @SequenceGenerator(name="generator", sequenceName = "GENERATOR", allocationSize = 50, initialValue = 100)
     @Column(name = "id", nullable = false)
     private Long id;
     private String beschreibung;
     private String titel;
 
     //Beziehungen
+    @ManyToOne()
+    private User user;
     @ManyToOne
     private Veranstaltungstermin veranstaltungstermin = new Veranstaltungstermin();
     @OneToMany(fetch = FetchType.EAGER)
     private List<Gruppe> gruppen = new ArrayList<>();
     @ManyToMany
     private List<Teilnehmer> teilnehmer = new ArrayList<>();
+
+    public Gruppenarbeit(){
+    }
+
+    public Gruppenarbeit(String beschreibung, String titel, User user, Veranstaltungstermin veranstaltungstermin) {
+        this.beschreibung = beschreibung;
+        this.titel = titel;
+        this.user = user;
+        this.veranstaltungstermin = veranstaltungstermin;
+    }
 
     public Long getId() {
         return id;
@@ -60,10 +73,22 @@ public class Gruppenarbeit {
     }
 
     public List<Gruppe> getGruppen() {
-        return gruppen;
+        return new ArrayList<>(gruppen);
     }
 
     public List<Teilnehmer> getTeilnehmer() {
         return teilnehmer;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void removeGruppe(Gruppe gruppe){
+        this.gruppen.remove(gruppe);
+    }
+
+    public void removeAllGruppen(){
+        this.gruppen = new ArrayList<>();
     }
 }
