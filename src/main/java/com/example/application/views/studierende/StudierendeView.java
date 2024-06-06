@@ -2,6 +2,7 @@ package com.example.application.views.studierende;
 
 import com.example.application.DoubleToLongConverter;
 import com.example.application.models.Teilnehmer;
+import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.views.MainLayout;
@@ -30,6 +31,7 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Route(value = "studierende", layout = MainLayout.class)
 @PageTitle(value = "Studierende")
