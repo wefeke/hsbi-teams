@@ -42,4 +42,21 @@ public class UserService {
         else
             System.err.println("User is null. Are you sure you have connected your form to the application?");
     }
+    public void lockUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        user.setLocked(true);
+        userRepository.save(user);
+    }
+
+    public void unlockUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        user.setLocked(false);
+        userRepository.save(user);
+    }
+
+    public class UserNotFoundException extends RuntimeException {
+        public UserNotFoundException(Long userId) {
+            super("User with id " + userId + " not found");
+        }
+    }
 }

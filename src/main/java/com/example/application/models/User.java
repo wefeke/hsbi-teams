@@ -20,6 +20,7 @@ public class User {
     @JsonIgnore
     private String hashedPassword;
     private boolean isAdmin;
+    private boolean locked;
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Role> roles;
@@ -120,6 +121,13 @@ public class User {
         return super.hashCode();
     }
 
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
 
     @Override
     public boolean equals(Object obj) {
