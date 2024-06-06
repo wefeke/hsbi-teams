@@ -99,7 +99,7 @@ public class Veranstaltungstermin {
     }
 
     public List<Gruppenarbeit> getGruppenarbeiten() {
-        return gruppenarbeiten;
+        return new ArrayList<>(gruppenarbeiten);
     }
 
     public void addGruppenarbeit (Gruppenarbeit gruppenarbeit) {
@@ -117,5 +117,10 @@ public class Veranstaltungstermin {
     //Lilli
     public void removeGruppenarbeit(Gruppenarbeit gruppenarbeit) {
         this.gruppenarbeiten.remove(gruppenarbeit);
+    }
+
+    //Lilli
+    public void removeAllGruppenarbeiten(){
+        this.gruppenarbeiten = new ArrayList<Gruppenarbeit>();
     }
 }

@@ -7,9 +7,18 @@ import com.example.application.models.Veranstaltungstermin;
 import com.example.application.services.GruppeService;
 import com.example.application.services.GruppenarbeitService;
 import com.example.application.services.VeranstaltungsterminService;
+import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +34,11 @@ public class GruppenarbeitLoeschenDialog extends Dialog {
     private GruppeService gruppeService;
 
     //UI-Elemente
-    Button deleteBtn = new Button("Gruppenarbeit löschen");
+    H2 infoText = new H2("Empty");
+    Paragraph warningText = new Paragraph("Empty");
+    Paragraph noReturn = new Paragraph("Das kann nicht rückgängig gemacht werden!");
+    Button deleteBtn = new Button("Gruppenarbeit endgültig löschen");
+    Button cancelBtn = new Button("Abbrechen");
 
     public GruppenarbeitLoeschenDialog(GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungsterminService veranstaltungsterminService) {
         this.gruppenarbeitService = gruppenarbeitService;
@@ -33,6 +46,13 @@ public class GruppenarbeitLoeschenDialog extends Dialog {
         this.gruppeService = gruppeService;
         this.veranstaltungstermin = null;
         this.veranstaltungsterminService = veranstaltungsterminService;
+
+        warningText.addClassName("warning-text-delete");
+        warningText.getStyle().set("white-space", "pre-line");
+        noReturn.addClassName("no-return-text-delete");
+        noReturn.getStyle().set("white-space", "pre-line");
+
+        deleteBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         deleteBtn.addClickListener(event -> {
             List<Gruppe> gruppen = gruppenarbeit.getGruppen();
@@ -46,18 +66,40 @@ public class GruppenarbeitLoeschenDialog extends Dialog {
             veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
 
             gruppenarbeitService.deleteGruppenarbeit(gruppenarbeit);
+            close();
+            UI.getCurrent().getPage().reload();
         });
 
-        add(deleteBtn);
+        cancelBtn.addClickListener(event -> close());
+
+        add(createLayout());
 
     }
 
     public void setGruppenarbeit(Gruppenarbeit gruppenarbeit) {
         this.gruppenarbeit = gruppenarbeit;
+        infoText.setText("Gruppenarbeit " + this.gruppenarbeit.getTitel() + " löschen");
+        warningText.setText("Wenn du die Gruppenarbeit " + this.gruppenarbeit.getTitel() + " löscht,\n werden " +
+                "auch alle zugehörigen Gruppen (Anzahl: " + this.gruppenarbeit.getGruppen().size() + ") gelöscht.");
+
+        noReturn.setText("Bist du sicher, dass du die Gruppenarbeit " + this.gruppenarbeit.getTitel() + " löschen " +
+                "willst?\nDas kann nicht rückgängig gemacht werden!");
     }
 
     public void setVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin) {
         this.veranstaltungstermin = veranstaltungstermin;
+
+    }
+
+    public VerticalLayout createLayout(){
+        VerticalLayout mainLayout = new VerticalLayout();
+        mainLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        mainLayout.add(infoText);
+        mainLayout.add(warningText);
+        mainLayout.add(noReturn);
+        getFooter().add(cancelBtn);
+        getFooter().add(deleteBtn);
+        return mainLayout;
     }
 
 }
