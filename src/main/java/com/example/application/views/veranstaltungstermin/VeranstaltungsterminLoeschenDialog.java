@@ -76,6 +76,9 @@ public class VeranstaltungsterminLoeschenDialog extends Dialog {
 
             veranstaltungsterminService.deleteVeranstaltungstermin(veranstaltungstermin);
 
+            close();
+            UI.getCurrent().getPage().reload();
+
         });
         deleteBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
