@@ -29,6 +29,14 @@ public class Veranstaltung implements Serializable {
 
     }
 
+    public Veranstaltung(LocalDate semester, String titel, User user, List<Veranstaltungstermin> veranstaltungstermine, Set<Teilnehmer> teilnehmer) {
+        this.semester = semester;
+        this.titel = titel;
+        this.user = user;
+        this.veranstaltungstermine = veranstaltungstermine;
+        this.teilnehmer = teilnehmer;
+    }
+
     public Veranstaltung(Long id, LocalDate semester, String titel, User user) {
         this.id = id;
         this.semester = semester;

@@ -1,3 +1,4 @@
+/*
 INSERT INTO public.users (is_admin, id, hashed_password, "name", username, profile_picture) VALUES
                                                                                                 (true, 1, '$2a$10$jpLNVNeA7Ar/ZQ2DKbKCm.MuT2ESe.Qop96jipKMq7RaUgCoQedV.', 'Admin', 'admin', null),
                                                                                                 (false, 2, '$2a$10$jpLNVNeA7Ar/ZQ2DKbKCm.MuT2ESe.Qop96jipKMq7RaUgCoQedV.', 'Joris Strakeljahn', 'jstrakeljahn', null);
@@ -798,6 +799,7 @@ INSERT INTO public.veranstaltung_teilnehmer (teilnehmer_matrikel_nr, veranstaltu
                                                                                                           (1000109, 1004),
                                                                                                           (1000110, 1004),
                                                                                                           (1000111, 1004);
+
 
 INSERT INTO public.gruppenarbeit_teilnehmer (gruppenarbeit_id, teilnehmer_matrikel_nr) VALUES
     (1, 1000001),
@@ -2288,4 +2290,4 @@ INSERT INTO public.gruppenarbeit_teilnehmer (gruppenarbeit_id, teilnehmer_matrik
 (25, 1000044),
 (25, 1000045),
 (25, 1000046);
-
+*/

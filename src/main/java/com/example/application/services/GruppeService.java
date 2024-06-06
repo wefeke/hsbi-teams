@@ -22,4 +22,9 @@ public class GruppeService {
     public Gruppe findGruppeByIdWithTeilnehmer(Long id) {
         return gruppenRepository.findByIdWithTeilnehmer(id);
     }
+
+    //Lilli
+    public void deleteGruppe(Gruppe gruppe) {
+        gruppenRepository.delete(gruppe);
+    }
 }
