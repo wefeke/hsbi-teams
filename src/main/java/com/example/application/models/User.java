@@ -32,7 +32,7 @@ public class User {
     private List<Veranstaltung> veranstaltungen = new ArrayList<>();
 
     public User() {
-
+        //
     }
 
     public User(String username, String name, String hashedPassword, boolean isAdmin, Set<Role> roles, byte[] profilePicture, List<Veranstaltung> veranstaltungen) {
