@@ -48,7 +48,6 @@ public interface AuswertungRepository extends JpaRepository<Auswertung, Long> {
                     "INNER JOIN veranstaltungstermin v2 ON v2.id = g.veranstaltungstermin_id "+
                     "INNER JOIN veranstaltung v ON v2.veranstaltung_id = v.id "+
                     "WHERE v.id = :id"
-
             , nativeQuery = true)
     List<Auswertung> findAllAuswertungenWithID(@Param("id") Long id);
 }
