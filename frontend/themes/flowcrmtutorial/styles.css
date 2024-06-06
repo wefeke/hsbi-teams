@@ -119,11 +119,10 @@
 
 .kachel-gruppen {
     width: 200px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--lumo-contrast-20pct);
     padding: 10px;
     margin: 10px;
     border-radius: 10px;
-    background-color: #f9f9f9;
     box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2);
 }
 
@@ -172,16 +171,26 @@
 }
 
 .teilnehmer-liste {
-    position: fixed;
+    position: absolute;
     right: 25px;
     top: 8%;
     height: 87.5%;
     overflow-y: auto;
-    width: 300px; /* adjust as needed */
+    width: 300px;
     padding: 1em;
-    border: 1px solid #ccc;
-    background-color: #f9f9f9;
+    border: 1px solid var(--lumo-contrast-20pct);
     border-radius: 15px;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2);
+}
+
+.content-container {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: auto;
+    top: 150px;
+    height: 82vh;
 }
 
 .left-container {

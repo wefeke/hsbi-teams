@@ -1,6 +1,7 @@
 //Author: Joris
 package com.example.application.views;
 
+import com.example.application.login.UserSettings;
 import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.VeranstaltungenService;
@@ -96,7 +97,7 @@ public class MainLayout extends AppLayout {
         header.getStyle().set("background", "transparent");
 
         // (First Element) Logo-Button, das als Home-Button fungiert
-        Button logoButton = new Button("H.S.B.I TeamBuilder", e -> getUI().ifPresent(ui -> ui.navigate("")));
+        Button logoButton = new Button("HSBI TeamBuilder", e -> getUI().ifPresent(ui -> ui.navigate("")));
         logoButton.addClassName("logo-button");
         configureButton(logoButton, "24px", false);
         logoButton.getStyle().set("padding-left", "20px");
@@ -146,13 +147,23 @@ public class MainLayout extends AppLayout {
             div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
             div.getElement().getStyle().set("margin", "0 10px");
             userName.add(div);
+            UserSettings userSettings = new UserSettings(user);
+            userName.getSubMenu().addItem("Einstellungen", e ->
+                    userSettings.open()
+            );
+            settingItems.add(userMenu); //zur rechten Seite hinzufügen
             userName.getSubMenu().addItem("Sign out", e ->
                 authenticatedUser.logout()
             );
-            settingItems.add(userMenu); //zur rechten Seite hinzufügen
         } else {
+            Div div = new Div();
+            div.getElement().getStyle().set("display", "flex");
+            div.getElement().getStyle().set("align-items", "center");
+            div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
+            div.getElement().getStyle().set("margin", "0 10px");
             Anchor loginLink = new Anchor("login", "Sign in");
-            settingItems.add(loginLink); //zur rechten Seite hinzufügen
+            div.add(loginLink);
+            settingItems.add(div); //zur rechten Seite hinzufügen
         }
 
         //Theme Button
