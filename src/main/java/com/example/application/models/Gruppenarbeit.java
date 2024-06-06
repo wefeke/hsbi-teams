@@ -91,4 +91,12 @@ public class Gruppenarbeit {
     public void removeAllGruppen(){
         this.gruppen = new ArrayList<>();
     }
+
+    public void removeVeranstaltungstermin() {
+        this.veranstaltungstermin = null;
+    }
+
+    public Veranstaltungstermin getVeranstaltungstermin() {
+        return this.veranstaltungstermin;
+    }
 }

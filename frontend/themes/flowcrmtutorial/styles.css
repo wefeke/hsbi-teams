@@ -258,3 +258,17 @@
 .nav-list a[highlight] {
     background-color: var(--lumo-primary-color-10pct);
 }
+
+/*Added bi Lilli*/
+.warning-text-delete {
+    font-size: 13pt;
+    text-align: center;
+}
+
+/*Added by Lilli*/
+.no-return-text-delete {
+    font-size: 14pt;
+    font-weight: bold;
+    color: red;
+    text-align: center;
+}

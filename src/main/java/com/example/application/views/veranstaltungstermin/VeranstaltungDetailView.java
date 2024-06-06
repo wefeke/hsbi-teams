@@ -73,6 +73,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private GruppenarbeitLoeschenDialog gruppenarbeitLoeschenDialog;
     private GruppeAuswertungDialog gruppeAuswertungDialog;
     private TeilnehmerHinzufuegenDialog teilnehmerHinzufuegenDialog;
+    private VeranstaltungsterminLoeschenDialog veranstaltungsterminLoeschenDialog;
 
     //Layout
     private final VerticalLayout mainLayoutLeft;
@@ -210,6 +211,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         createGruppenarbeitHinzufuegenDialog();
         createGruppenarbeitBearbeitenDialog();
         createGruppenarbeitLoeschenDialog();
+        createVeranstaltungsterminLoeschenDialog();
         createTeilnehmerDialog();
 
         //init Methode ist wichtig, da erst hier die termine gesetzt werden, weil sonst im Konstruktor die termine noch nicht gesetzt sind,
@@ -269,25 +271,30 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         kachel.addClassName("kachel");
 
         //Initialize Dialogs
-        Dialog confirmationDialog = createDeleteConfirmationDialog(
-                "Möchten Sie den Veranstaltungstermin für " + veranstaltungstermin.getNotizen() + " am " + veranstaltungstermin.getDatum() + " wirklich löschen?",
-                () -> {
-                    veranstaltungsterminService.deleteVeranstaltungstermin(veranstaltungstermin);
-                    Notification.show("Veranstaltungstermin gelöscht");
-                    getUI().ifPresent(ui -> ui.getPage().reload());
-                }
-        );
+//        Dialog confirmationDialog = createDeleteConfirmationDialog(
+//                "Möchten Sie den Veranstaltungstermin für " + veranstaltungstermin.getNotizen() + " am " + veranstaltungstermin.getDatum() + " wirklich löschen?",
+//                () -> {
+//                    veranstaltungsterminService.deleteVeranstaltungstermin(veranstaltungstermin);
+//                    Notification.show("Veranstaltungstermin gelöscht");
+//                    getUI().ifPresent(ui -> ui.getPage().reload());
+//                }
+//        );
+
+
 
         VeranstaltungsterminBearbeiten editDialog = new VeranstaltungsterminBearbeiten(veranstaltungService, veranstaltungsterminService, this, veranstaltungIdString, veranstaltungstermin.getId(), authenticatedUser);
 
 
         //Delete Icon
-        Div deleteIcon = createDeleteIcon(confirmationDialog);
+        Div deleteIcon = createDeleteIcon(veranstaltungsterminLoeschenDialog);
         deleteIcon.addClassName("delete-icon");
 
         //Edit Icon
         Div editIcon = new Div(LineAwesomeIcon.EDIT.create());
         editIcon.addClassName("edit-icon");
+
+        editIconFunctionality(editIcon, deleteIcon, editDialog);
+        deleteIconFunctionality(deleteIcon, editIcon, veranstaltungsterminLoeschenDialog);
 
         editIcon.getElement().addEventListener("click", e-> {
             editDialog.open();
@@ -298,8 +305,16 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         kachel.add(editIcon);
 
         //Confirm Dialog Deselect Implementation
-        confirmationDialog.addOpenedChangeListener(e -> {
-            if (!e.isOpened()) {
+//        confirmationDialog.addOpenedChangeListener(e -> {
+//            if (!e.isOpened()) {
+//                kachel.getStyle().setBackgroundColor("");
+//                deleteIcon.getStyle().set("visibility", "hidden");
+//                editIcon.getStyle().set("visibility", "hidden");
+//            }
+//        });
+
+        veranstaltungsterminLoeschenDialog.addOpenedChangeListener(e -> {
+               if (!e.isOpened()) {
                 kachel.getStyle().setBackgroundColor("");
                 deleteIcon.getStyle().set("visibility", "hidden");
                 editIcon.getStyle().set("visibility", "hidden");
@@ -321,6 +336,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             }
             editIcon.getStyle().set("visibility", "visible");
             deleteIcon.getStyle().set("visibility", "visible");
+            veranstaltungsterminLoeschenDialog.setVeranstaltungstermin(veranstaltungstermin);
         });
 
         kachel.getElement().addEventListener("mouseout", e -> {
@@ -420,6 +436,11 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     //Lilli
     public void createGruppenarbeitLoeschenDialog() {
         gruppenarbeitLoeschenDialog = new GruppenarbeitLoeschenDialog(gruppenarbeitService, gruppeService, veranstaltungsterminService);
+    }
+
+    //Lilli
+    private void createVeranstaltungsterminLoeschenDialog() {
+        veranstaltungsterminLoeschenDialog = new VeranstaltungsterminLoeschenDialog(veranstaltung, gruppeService, gruppenarbeitService, veranstaltungsterminService, veranstaltungService);
     }
 
     public void createTeilnehmerDialog() {
