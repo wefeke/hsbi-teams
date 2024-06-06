@@ -49,7 +49,6 @@ public class StudierendeView extends VerticalLayout {
     private final Button importButton = new Button("Importieren");
     private final Button exportButton = new Button("Exportieren");
     private AuthenticatedUser authenticatedUser;
-    Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
 
     TextField vorname = new TextField("Vorname");
     TextField nachname = new TextField("Nachname");
@@ -121,6 +120,7 @@ public class StudierendeView extends VerticalLayout {
             }
         });
 */
+
     }
 
     public void updateStudierendeView() {
@@ -186,18 +186,29 @@ public class StudierendeView extends VerticalLayout {
     }
 
 
-    private void setTeilnehmer(Teilnehmer teilnehmer) {
-        vorname.setValue(teilnehmer.getVorname());
-        nachname.setValue(teilnehmer.getNachname());
-        matrikelNr.setValue(teilnehmer.getId().doubleValue());
-    }
+//    private void setTeilnehmer(Teilnehmer teilnehmer) {
+//
+//        vorname.setValue(teilnehmer.getVorname());
+//        nachname.setValue(teilnehmer.getNachname());
+//        matrikelNr.setValue(teilnehmer.getId().doubleValue());
+//    }
 
     private void aendernDiolog (Teilnehmer teilnehmer) {
         FormLayout form = new FormLayout();
         Dialog aendernDiolog = new Dialog(form);
 
-        //bindFields();
-        setTeilnehmer(teilnehmer);
+        Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
+
+        binder.forField(vorname)
+                .bind(Teilnehmer::getVorname, Teilnehmer::setVorname);
+        binder.forField(nachname)
+                .bind(Teilnehmer::getNachname, Teilnehmer::setNachname);
+        binder.forField(matrikelNr)
+                .withConverter(new DoubleToLongConverter())
+                .bind(Teilnehmer::getId, Teilnehmer::setId);
+        matrikelNr.setEnabled(false);
+
+        binder.setBean(teilnehmer);
 
         form.add(vorname, nachname, matrikelNr, save, cancel);
         aendernDiolog.add(form);
@@ -208,13 +219,9 @@ public class StudierendeView extends VerticalLayout {
 
         save.addClickListener(event -> {
             Teilnehmer selectedTeilnehmer = grid.asSingleSelect().getValue();
-            if (selectedTeilnehmer != null) {
-
-
-                selectedTeilnehmer.setVorname(vorname.getValue());
-                selectedTeilnehmer.setNachname(nachname.getValue());
-                selectedTeilnehmer.setId(matrikelNr.getValue().longValue());
-                teilnehmerService.saveTeilnehmer(selectedTeilnehmer);
+            if ((teilnehmer != null)) {
+                binder.writeBeanIfValid(teilnehmer);
+                teilnehmerService.saveTeilnehmer(teilnehmer);
                 Notification.show("Daten erfolgreich aktualisiert");
                 updateStudierendeView();
                 aendernDiolog.close();
@@ -223,7 +230,9 @@ public class StudierendeView extends VerticalLayout {
         cancel.addClickListener(event -> {
             aendernDiolog.close();
         });
+
     }
+
     private void makeButtonsSmall() {
 
 
@@ -246,15 +255,6 @@ public class StudierendeView extends VerticalLayout {
         aendern.setIcon(aendernIcon);
         aendern.setText("Studierende ändern");
     }
+
 }
-/*
-    private void bindFields(){
-        binder.forField(vorname)
-                .bind(Teilnehmer::getVorname, Teilnehmer::setVorname);
-        binder.forField(nachname)
-                .bind(Teilnehmer::getNachname, Teilnehmer::setNachname);
-        binder.forField(matrikelNr)
-                .withConverter(new DoubleToLongConverter())
-                .bind(Teilnehmer::getId, Teilnehmer::setId);
-    }
-*/
+
