@@ -40,7 +40,6 @@ public class VeranstaltungsterminLoeschenDialog extends Dialog {
     Button cancelBtn = new Button("Abbrechen");
     Paragraph warningText = new Paragraph("Empty");
     Paragraph noReturn = new Paragraph("Empty");
-    Text forTesting = new Text("Empty");
 
     public VeranstaltungsterminLoeschenDialog(Veranstaltung veranstaltung, GruppeService gruppeService, GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungenService veranstaltungenService) {
         this.veranstaltungstermin=null;

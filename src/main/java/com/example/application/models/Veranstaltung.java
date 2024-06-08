@@ -97,7 +97,7 @@ public class Veranstaltung implements Serializable {
     }
 
     public Set<Teilnehmer> getTeilnehmer() {
-        return teilnehmer;
+        return new HashSet<>(teilnehmer);
     }
 
     public void setTeilnehmer(Set<Teilnehmer> teilnehmer) {
@@ -109,7 +109,7 @@ public class Veranstaltung implements Serializable {
     }
 
     public List<Veranstaltungstermin> getVeranstaltungstermine() {
-        return veranstaltungstermine;
+        return new ArrayList<Veranstaltungstermin>(veranstaltungstermine);
     }
 
     public void setVeranstaltungstermine(List<Veranstaltungstermin> veranstaltungstermine) {

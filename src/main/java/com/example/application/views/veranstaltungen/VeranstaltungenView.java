@@ -42,6 +42,9 @@ public class VeranstaltungenView extends VerticalLayout {
 
     private final Div kachelContainer = new Div();
 
+    //Dialog Instances
+    private VeranstaltungLoeschenDialog veranstaltungLoeschenDialog;
+
     @Autowired
     public VeranstaltungenView(VeranstaltungenService veranstaltungenService, UserService userService, TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
         this.veranstaltungenService = veranstaltungenService;
@@ -83,6 +86,8 @@ public class VeranstaltungenView extends VerticalLayout {
         kachelContainer.addClassName("veranstaltungen-container");
         kachelContainer.getStyle().set("display", "flex");
         kachelContainer.getStyle().set("flexWrap", "wrap");
+
+        createVeranstaltungLoeschenDialog();
 
         updateKachelContainer();
         mainLayout.add(username, lineWithText, kachelContainer);
@@ -138,8 +143,6 @@ public class VeranstaltungenView extends VerticalLayout {
         Div editIcon = new Div(editIconSvg);
         editIcon.addClassName("edit-icon");
 
-        //Confirm-Dialog initialisieren
-        Dialog confirmationDialog = new Dialog();
         //Bearbeiten-Dialog initialisieren
         VeranstaltungBearbeiten editDialog = new VeranstaltungBearbeiten(veranstaltungenService, teilnehmerService, userService, veranstaltung, this, authenticatedUser);
 
@@ -148,24 +151,8 @@ public class VeranstaltungenView extends VerticalLayout {
             Notification.show("Veranstaltung gelöscht");
             this.updateKachelContainer();
             //getUI().ifPresent(ui -> ui.getPage().reload());
-            confirmationDialog.close();
+            veranstaltungLoeschenDialog.close();
         });
-
-            Button cancelButton = new Button("Nein", event -> {
-                confirmationDialog.close();
-                kachel.getStyle().set("background-color", "");
-            });
-            cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
-
-            VerticalLayout verticalLayout = new VerticalLayout(
-                    new Text("Möchten Sie die Veranstaltung (" + veranstaltung.getTitel() + ") wirklich löschen?"),
-                    new HorizontalLayout(
-                            confirmbutton,
-                            cancelButton
-                    )
-            );
-            verticalLayout.setAlignItems(Alignment.CENTER);
-            confirmationDialog.add( verticalLayout );
 
         //Bearbeiten-Dialog initialisieren
         editDialog.addOpenedChangeListener(e -> {
@@ -178,7 +165,7 @@ public class VeranstaltungenView extends VerticalLayout {
 
         //Icons
         deleteIcon.getElement().addEventListener("click", e ->
-            confirmationDialog.open()
+            veranstaltungLoeschenDialog.open()
         ).addEventData("event.stopPropagation()");
 
         editIcon.getElement().addEventListener("click", e-> {
@@ -193,6 +180,7 @@ public class VeranstaltungenView extends VerticalLayout {
             kachel.getStyle().set("background-color", "lightblue");
             deleteIcon.getStyle().set("visibility", "visible");
             editIcon.getStyle().set("visibility", "visible");
+            veranstaltungLoeschenDialog.setVeranstaltung(veranstaltung);
         });
 
         kachel.getElement().addEventListener("mouseout", e -> {
@@ -234,6 +222,11 @@ public class VeranstaltungenView extends VerticalLayout {
         );
 
         return neueVeranstaltungKachel;
+    }
+
+    //Lilli
+    private void createVeranstaltungLoeschenDialog() {
+        veranstaltungLoeschenDialog = new VeranstaltungLoeschenDialog();
     }
 
 }
