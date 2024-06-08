@@ -4,6 +4,7 @@ import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
 import com.example.application.models.Veranstaltung;
 import com.example.application.repositories.TeilnehmerRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -69,6 +70,9 @@ public List<Teilnehmer> findAllTeilnehmer2(){return teilnehmerRepository.findAll
     }
     public Veranstaltung findTeilnehmerById(Long id, User user) {
         return teilnehmerRepository.findByIdAndUser(id, user);
+    }
+    public List<Teilnehmer> findStudierendeOhneVeranstaltung() {
+        return teilnehmerRepository.findStudierendeOhneVeranstaltung();
     }
 
 }

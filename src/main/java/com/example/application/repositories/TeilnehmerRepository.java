@@ -41,4 +41,7 @@ public interface TeilnehmerRepository extends JpaRepository<Teilnehmer, Long> {
    List<Teilnehmer> findByUser(User user);
 
    Veranstaltung findByIdAndUser(Long Id, User user);
+
+    @Query("select t from Teilnehmer t where t.veranstaltungen is empty")
+    List<Teilnehmer> findStudierendeOhneVeranstaltung();
 }

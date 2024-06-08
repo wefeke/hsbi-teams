@@ -18,8 +18,9 @@ import java.util.List;
 @RolesAllowed({"ADMIN"})
 public class Aufraeumen extends Dialog {
     private final TeilnehmerService teilnehmerService;
-    private final Button deleteButton = new Button("löschen");
-    private final Button closeButton = new Button("schließen");
+    private final Button deleteOldButton = new Button("Löschen (älter als 4 Jahre)");
+    private final Button deleteNoEventButton = new Button("Löschen (keine Veranstaltung)");
+    private final Button closeButton = new Button("Schließen");
     private final Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class);
 
     public Aufraeumen(TeilnehmerService teilnehmerService) {
@@ -28,39 +29,38 @@ public class Aufraeumen extends Dialog {
         closeButton.addClickListener(event ->
                 close());
 
-        deleteButton.addClickListener(event -> {
+        deleteOldButton.addClickListener(event -> {
             grid.getSelectedItems().forEach(teilnehmerService::deleteTeilnehmer);
-            updateGrid();
+            updateGridOld();
         });
 
-        List<Teilnehmer> studierendeVorVierJahren = teilnehmerService.findStudierendeVorVierJahren();
-        if (studierendeVorVierJahren.isEmpty()) {
-            this.setWidth("30vw");
-            this.setHeight("30vh");
-            add(
-                    new Text("Es gibt keine Studierenden,die vor mehr als 4 Jahren erstellt wurden."),
-                    closeButton
-            );
-        } else {
-            this.setWidth("80vw");
-            this.setHeight("80vh");
-            grid.setSelectionMode(Grid.SelectionMode.MULTI);
-            grid.setItems(studierendeVorVierJahren);
-            grid.setColumns("vorname", "nachname", "id");
-            add(
-                    grid,
-                    closeButton,
-                    deleteButton
-            );
+        deleteNoEventButton.addClickListener(event -> {
+            grid.getSelectedItems().forEach(teilnehmerService::deleteTeilnehmer);
+            updateGridNoEvent();
+        });
 
-        }
-
+        this.setWidth("80vw");
+        this.setHeight("80vh");
+        grid.setSelectionMode(Grid.SelectionMode.MULTI);
+        grid.setColumns("vorname", "nachname", "id");
+        add(
+                grid,
+                closeButton,
+                deleteOldButton,
+                deleteNoEventButton
+        );
     }
 
-    private void updateGrid() {
+    private void updateGridOld() {
         List<Teilnehmer> studierendeVorVierJahren = teilnehmerService.findStudierendeVorVierJahren();
         grid.setItems(studierendeVorVierJahren);
     }
+
+    private void updateGridNoEvent() {
+        List<Teilnehmer> studierendeOhneVeranstaltung = teilnehmerService.findStudierendeOhneVeranstaltung();
+        grid.setItems(studierendeOhneVeranstaltung);
+    }
+}
 
 //    private void delete (){
 //        if (teilnehmerService.isTeilnehmerInVeranstaltung(teilnehmer)) {
@@ -118,4 +118,4 @@ public class Aufraeumen extends Dialog {
 //            add(yesButton, noButton);
 //        }
 //    }
-}
+
