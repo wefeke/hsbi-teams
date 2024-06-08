@@ -1,37 +1,47 @@
 package com.example.application.views.studierende;
 
-import com.example.application.models.Gruppe;
-import com.example.application.models.Gruppenarbeit;
-import com.example.application.models.Teilnehmer;
-import com.example.application.models.Veranstaltung;
+import com.example.application.models.*;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.textfield.NumberField;
 import jakarta.annotation.security.RolesAllowed;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
-@RolesAllowed({"ADMIN"})
+@RolesAllowed({"ADMIN", "USER"})
 public class Aufraeumen extends Dialog {
     private final TeilnehmerService teilnehmerService;
     private final Button deleteOldButton = new Button("Löschen (älter als 4 Jahre)");
     private final Button deleteNoEventButton = new Button("Löschen (keine Veranstaltung)");
     private final Button closeButton = new Button("Schließen");
     private final Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class);
+    private final NumberField yearsField = new NumberField("Jahre");
 
-    public Aufraeumen(TeilnehmerService teilnehmerService) {
+    private AuthenticatedUser authenticatedUser;
+
+
+    public Aufraeumen(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
         this.teilnehmerService = teilnehmerService;
+        this.authenticatedUser = authenticatedUser;
 
         closeButton.addClickListener(event ->
                 close());
 
         deleteOldButton.addClickListener(event -> {
-            grid.getSelectedItems().forEach(teilnehmerService::deleteTeilnehmer);
-            updateGridOld();
+            Double years = yearsField.getValue();
+            if (years != null) {
+                grid.getSelectedItems().forEach(teilnehmerService::deleteTeilnehmer);
+                updateGridOld(years.intValue());
+            } else {
+                Notification.show("Bitte geben Sie die Anzahl der Jahre ein.");
+            }
         });
 
         deleteNoEventButton.addClickListener(event -> {
@@ -47,16 +57,27 @@ public class Aufraeumen extends Dialog {
                 grid,
                 closeButton,
                 deleteOldButton,
-                deleteNoEventButton
+                deleteNoEventButton,
+                yearsField
         );
     }
 
-    private void updateGridOld() {
-        List<Teilnehmer> studierendeVorVierJahren = teilnehmerService.findStudierendeVorVierJahren();
-        grid.setItems(studierendeVorVierJahren);
+    private void updateGridOld(int years) {
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+            grid.setItems(teilnehmerService.findAllTeilnehmerByUser(user));
+        }
+        List<Teilnehmer> studierendeVorJahren = teilnehmerService.findStudierendeVorJahren(years);
+        grid.setItems(studierendeVorJahren);
     }
 
     private void updateGridNoEvent() {
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+            grid.setItems(teilnehmerService.findAllTeilnehmerByUser(user));
+        }
         List<Teilnehmer> studierendeOhneVeranstaltung = teilnehmerService.findStudierendeOhneVeranstaltung();
         grid.setItems(studierendeOhneVeranstaltung);
     }

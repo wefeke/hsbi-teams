@@ -57,9 +57,9 @@ public List<Teilnehmer> findAllTeilnehmer2(){return teilnehmerRepository.findAll
     public List<Teilnehmer> findTeilnehmerByVeranstaltungId(Long id) {
         return teilnehmerRepository.findByVeranstaltungId(id);
     }
-    public List<Teilnehmer> findStudierendeVorVierJahren() {
-        LocalDateTime vierJahreZurueck = LocalDateTime.now().minusYears(4);
-        return teilnehmerRepository.findStudierendeVorVierJahren(vierJahreZurueck);
+    public List<Teilnehmer> findStudierendeVorJahren(int years) {
+        LocalDateTime jahreZurueck = LocalDateTime.now().minusYears(years);
+        return teilnehmerRepository.findStudierendeVorJahren(jahreZurueck);
     }
     public List<Teilnehmer> findAllTeilnehmerByUserAndFilter(User user, String filterText) {
         if (filterText == null || filterText.isEmpty()) {
@@ -71,6 +71,11 @@ public List<Teilnehmer> findAllTeilnehmer2(){return teilnehmerRepository.findAll
     public Veranstaltung findTeilnehmerById(Long id, User user) {
         return teilnehmerRepository.findByIdAndUser(id, user);
     }
+
+    public List<Teilnehmer> findAllTeilnehmerByUser(User user) {
+        return teilnehmerRepository.findByUser(user);
+    }
+
     public List<Teilnehmer> findStudierendeOhneVeranstaltung() {
         return teilnehmerRepository.findStudierendeOhneVeranstaltung();
     }

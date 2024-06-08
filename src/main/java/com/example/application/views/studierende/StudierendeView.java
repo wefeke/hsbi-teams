@@ -64,7 +64,7 @@ public class StudierendeView extends VerticalLayout {
         this.authenticatedUser = authenticatedUser;
         this.teilnehmerService = teilnehmerService;
         DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService, authenticatedUser);
-        Aufraeumen aufraeumenDialog = new Aufraeumen(teilnehmerService);
+        Aufraeumen aufraeumenDialog = new Aufraeumen(teilnehmerService, authenticatedUser);
         addStudiernedenButtonIcon = addStudiernedenButton.getIcon();
         deleteIcon = delete.getIcon();
         aendernIcon = aendern.getIcon();
