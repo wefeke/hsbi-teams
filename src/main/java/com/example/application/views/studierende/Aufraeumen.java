@@ -76,10 +76,10 @@ public class Aufraeumen extends Dialog {
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
             User user = maybeUser.get();
-            grid.setItems(teilnehmerService.findAllTeilnehmerByUser(user));
+            List<Teilnehmer> studierendeOhneVeranstaltung = teilnehmerService.findStudierendeOhneVeranstaltung(user);
+            grid.setItems(studierendeOhneVeranstaltung);
         }
-        List<Teilnehmer> studierendeOhneVeranstaltung = teilnehmerService.findStudierendeOhneVeranstaltung();
-        grid.setItems(studierendeOhneVeranstaltung);
+
     }
 }
 

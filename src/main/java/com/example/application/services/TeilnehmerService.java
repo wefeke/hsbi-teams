@@ -76,8 +76,8 @@ public List<Teilnehmer> findAllTeilnehmer2(){return teilnehmerRepository.findAll
         return teilnehmerRepository.findByUser(user);
     }
 
-    public List<Teilnehmer> findStudierendeOhneVeranstaltung() {
-        return teilnehmerRepository.findStudierendeOhneVeranstaltung();
+    public List<Teilnehmer> findStudierendeOhneVeranstaltung(User user) {
+        return teilnehmerRepository.findStudierendeOhneVeranstaltung(user);
     }
 
 }

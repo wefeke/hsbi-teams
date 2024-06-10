@@ -1,6 +1,7 @@
 package com.example.application.views.studierende;
 
 import com.example.application.DoubleToLongConverter;
+import com.example.application.ExcelReader.ExcelExporter;
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
@@ -26,17 +27,21 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.example.application.ExcelReader.ExcelExporter;
 
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Route(value = "studierende", layout = MainLayout.class)
 @PageTitle(value = "Studierende")
 @RolesAllowed({"ADMIN", "USER"})
 public class StudierendeView extends VerticalLayout {
+
+    private final ExcelExporter excelExporter;
     private final TeilnehmerService teilnehmerService;
     private final Grid<Teilnehmer> grid = new Grid<>();
     private final TextField filterText = new TextField();
@@ -60,9 +65,10 @@ public class StudierendeView extends VerticalLayout {
     Button aufraeumenButton = new Button("Aufräumen");
 
     @Autowired
-    public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
+    public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser,ExcelExporter excelExporter) {
         this.authenticatedUser = authenticatedUser;
         this.teilnehmerService = teilnehmerService;
+        this.excelExporter = excelExporter;
         DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService, authenticatedUser);
         Aufraeumen aufraeumenDialog = new Aufraeumen(teilnehmerService, authenticatedUser);
         addStudiernedenButtonIcon = addStudiernedenButton.getIcon();
@@ -105,6 +111,17 @@ public class StudierendeView extends VerticalLayout {
                 aendernDiolog(selectedTeilnehmer);
             }
         });
+
+        exportButton.addClickListener(event -> {
+            Optional<User> maybeUser = authenticatedUser.get();
+            if (maybeUser.isPresent()) {
+                User user = maybeUser.get();
+                List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue());
+                String dateipfad = "C:\\Users\\tobia\\OneDrive\\Dokumente\\uni\\4. Semester"; // Ändern Sie dies zu dem tatsächlichen Pfad Ihrer Excel-Datei
+                excelExporter.exportTeilnehmerListe(teilnehmerList, dateipfad, user.getUsername());
+            }
+        });
+
         UI.getCurrent().getPage().addBrowserWindowResizeListener(event -> {
             if (event.getWidth() <= 1000) {
                 makeButtonsSmall();
@@ -114,15 +131,6 @@ public class StudierendeView extends VerticalLayout {
         });
 
         aufraeumenButton.addClickListener(event -> aufraeumenDialog.open());
-       /* UI.getCurrent().getPage().addBrowserWindowResizeListener(event -> {
-            if (event.getWidth() > 500) {
-                restoreButtons();
-            } else {
-                makeButtonsSmall();
-            }
-        });
-*/
-
     }
 
     public void updateStudierendeView() {
@@ -190,14 +198,6 @@ public class StudierendeView extends VerticalLayout {
 
     }
 
-
-//    private void setTeilnehmer(Teilnehmer teilnehmer) {
-//
-//        vorname.setValue(teilnehmer.getVorname());
-//        nachname.setValue(teilnehmer.getNachname());
-//        matrikelNr.setValue(teilnehmer.getId().doubleValue());
-//    }
-
     private void aendernDiolog (Teilnehmer teilnehmer) {
         FormLayout form = new FormLayout();
         Dialog aendernDiolog = new Dialog(form);
@@ -262,6 +262,4 @@ public class StudierendeView extends VerticalLayout {
         aendern.setIcon(aendernIcon);
         aendern.setText("Studierende ändern");
     }
-
 }
-
