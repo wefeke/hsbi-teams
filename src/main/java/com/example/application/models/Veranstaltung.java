@@ -124,4 +124,12 @@ public class Veranstaltung implements Serializable {
     public void removeVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin){
         this.veranstaltungstermine.remove(veranstaltungstermin);
     }
+
+    public void removeAllTermine() {
+        this.veranstaltungstermine = new ArrayList<Veranstaltungstermin>();
+    }
+
+    public void removeAllTeilnehmer() {
+        this.teilnehmer = new HashSet<Teilnehmer>();
+    }
 }

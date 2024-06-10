@@ -4,9 +4,7 @@ package com.example.application.views.veranstaltungen;
 import com.example.application.models.User;
 import com.example.application.models.Veranstaltung;
 import com.example.application.security.AuthenticatedUser;
-import com.example.application.services.TeilnehmerService;
-import com.example.application.services.UserService;
-import com.example.application.services.VeranstaltungenService;
+import com.example.application.services.*;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
@@ -38,6 +36,9 @@ public class VeranstaltungenView extends VerticalLayout {
     private final VeranstaltungenService veranstaltungenService;
     private final TeilnehmerService teilnehmerService;
     private final UserService userService;
+    private final VeranstaltungsterminService veranstaltungsterminService;
+    private final GruppenarbeitService gruppenarbeitService;
+    private final GruppeService gruppeService;
     private AuthenticatedUser authenticatedUser;
 
     private final Div kachelContainer = new Div();
@@ -46,11 +47,14 @@ public class VeranstaltungenView extends VerticalLayout {
     private VeranstaltungLoeschenDialog veranstaltungLoeschenDialog;
 
     @Autowired
-    public VeranstaltungenView(VeranstaltungenService veranstaltungenService, UserService userService, TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
+    public VeranstaltungenView(VeranstaltungenService veranstaltungenService, UserService userService, TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService) {
         this.veranstaltungenService = veranstaltungenService;
         this.teilnehmerService = teilnehmerService;
         this.userService = userService;
         this.authenticatedUser = authenticatedUser;
+        this.veranstaltungsterminService = veranstaltungsterminService;
+        this.gruppenarbeitService = gruppenarbeitService;
+        this.gruppeService = gruppeService;
 
         VerticalLayout mainLayout = new VerticalLayout();
         mainLayout.setSizeFull();
@@ -226,7 +230,7 @@ public class VeranstaltungenView extends VerticalLayout {
 
     //Lilli
     private void createVeranstaltungLoeschenDialog() {
-        veranstaltungLoeschenDialog = new VeranstaltungLoeschenDialog();
+        veranstaltungLoeschenDialog = new VeranstaltungLoeschenDialog(veranstaltungsterminService, gruppenarbeitService, gruppeService, veranstaltungenService, teilnehmerService);
     }
 
 }

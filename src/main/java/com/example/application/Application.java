@@ -77,6 +77,14 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
         teilnehmerRepository.save(testTeilnehmer3);
         veranstaltungRepository.save(testVeranstaltung);
 
+        testTeilnehmer.addVerastaltung(testVeranstaltung);
+        testTeilnehmer2.addVerastaltung(testVeranstaltung);
+        testTeilnehmer3.addVerastaltung(testVeranstaltung);
+
+        teilnehmerRepository.save(testTeilnehmer);
+        teilnehmerRepository.save(testTeilnehmer2);
+        teilnehmerRepository.save(testTeilnehmer3);
+
     }
 
 
