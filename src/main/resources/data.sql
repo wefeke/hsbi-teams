@@ -1,7 +1,7 @@
-/*
-INSERT INTO public.users (is_admin, id, hashed_password, "name", username, profile_picture) VALUES
-                                                                                                (true, 1, '$2a$10$jpLNVNeA7Ar/ZQ2DKbKCm.MuT2ESe.Qop96jipKMq7RaUgCoQedV.', 'Admin', 'admin', null),
-                                                                                                (false, 2, '$2a$10$jpLNVNeA7Ar/ZQ2DKbKCm.MuT2ESe.Qop96jipKMq7RaUgCoQedV.', 'Joris Strakeljahn', 'jstrakeljahn', null);
+
+INSERT INTO public.users (locked, is_admin, id, hashed_password, "name", username, profile_picture) VALUES
+                                                                                                (false, true, 1, '$2a$10$jpLNVNeA7Ar/ZQ2DKbKCm.MuT2ESe.Qop96jipKMq7RaUgCoQedV.', 'Admin', 'admin', null),
+                                                                                                (true, false, 2, '$2a$10$jpLNVNeA7Ar/ZQ2DKbKCm.MuT2ESe.Qop96jipKMq7RaUgCoQedV.', 'Joris Strakeljahn', 'jstrakeljahn', null);
 
 INSERT INTO public.user_roles (user_id, roles) VALUES
                                                    (1, 'ADMIN'),
@@ -2290,4 +2290,3 @@ INSERT INTO public.gruppenarbeit_teilnehmer (gruppenarbeit_id, teilnehmer_matrik
 (25, 1000044),
 (25, 1000045),
 (25, 1000046);
-*/

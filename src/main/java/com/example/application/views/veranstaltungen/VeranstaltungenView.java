@@ -20,6 +20,8 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
@@ -32,7 +34,7 @@ import java.util.Optional;
 @PageTitle("Veranstaltungen")
 @Route(value = "", layout = MainLayout.class)
 @RolesAllowed({"ADMIN", "USER"})
-public class VeranstaltungenView extends VerticalLayout {
+public class VeranstaltungenView extends VerticalLayout  {
 
     //Services
     private final VeranstaltungenService veranstaltungenService;

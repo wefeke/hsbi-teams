@@ -4,6 +4,7 @@ package com.example.application.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.apache.ibatis.annotations.One;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ public class User {
     private byte[] profilePicture;
 
     //Beziehungen
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<Veranstaltung> veranstaltungen = new ArrayList<>();
 
     public User() {
@@ -78,10 +79,12 @@ public class User {
         isAdmin = admin;
     }
 
+    @Transactional
     public Set<Role> getRoles() {
         return roles;
     }
 
+    @Transactional
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }

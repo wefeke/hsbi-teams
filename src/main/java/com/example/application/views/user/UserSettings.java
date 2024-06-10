@@ -1,6 +1,8 @@
-package com.example.application.login;
+package com.example.application.views.user;
 
 import com.example.application.models.User;
+import com.example.application.models.Veranstaltung;
+import com.example.application.services.UserService;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.notification.Notification;
@@ -12,46 +14,50 @@ import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.server.StreamResource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 
 public class UserSettings extends Dialog {
 
     private final TextField name = new TextField("Name");
     private final TextField username = new TextField("Username");
-    private final PasswordField hashedPassword = new PasswordField("Password");
+    private final Button passwordChange = new Button("Passwort ändern");
     private Avatar avatar = new Avatar();
     private final Button saveButton = new Button("Save");
     private final Button cancelButton = new Button("Cancel");
     private final Upload upload = new Upload();
 
+    private final PasswordEncoder passwordEncoder;
+
     private byte[] uploadedImage;
     MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
 
-    private final Button editButton = new Button("Edit");
-    private Boolean isEdited = false;
-
     private User user;
+    private final UserService userService;
 
-    private final Binder<User> binder = new Binder<>(User.class);
-
-    public UserSettings (User user) {
+    public UserSettings (User user, UserService userService, PasswordEncoder passwordEncoder) {
         this.user = user;
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
         createElements();
         configureElements();
         bindFields();
         readBean();
     }
 
+    private final Binder<User> binder = new Binder<>(User.class);
+
     private void createElements() {
         VerticalLayout verticalLayout= new VerticalLayout(
                 avatar,
                 name,
                 username,
-                hashedPassword,
+                passwordChange,
                 upload
 
         );
@@ -59,40 +65,84 @@ public class UserSettings extends Dialog {
         verticalLayout.setAlignItems(VerticalLayout.Alignment.CENTER);
         add(verticalLayout);
         setHeaderTitle("User Settings");
-        getFooter().add(cancelButton, editButton, saveButton);
+        getFooter().add(cancelButton, saveButton);
     }
 
     private void configureElements() {
         cancelButton.addClickListener(e -> close());
         saveButton.setThemeName("primary");
-        editButton.addClickListener(e -> {
-            if (isEdited == true) {
-                name.setReadOnly(false);
-                username.setReadOnly(false);
-                hashedPassword.setReadOnly(false);
-                isEdited = false;
+        saveButton.addClickListener(e -> {
+            if (binder.writeBeanIfValid(user)) {
+                this.userService.saveUser(user);
+                clearFields();
+                close();
+
+                Notification.show("Veranstaltung angelegt");
             }
             else {
-                name.setReadOnly(true);
-                username.setReadOnly(true);
-                hashedPassword.setReadOnly(true);
-                isEdited = true;
+                Notification.show("Fehler beim Speichern");
             }
+        });
+
+        passwordChange.addClickListener(e -> {
+            PasswordField old_password = new PasswordField("Altes Password");
+            PasswordField new_password = new PasswordField("Neues Password");
+            PasswordField password_check = new PasswordField("Password wiederholen");
+
+            Dialog passwordDialog = new Dialog();
+            passwordDialog.add(old_password, new_password, password_check);
+            passwordDialog.open();
+            old_password.setWidthFull();
+            new_password.setWidthFull();
+            password_check.setWidthFull();
+
+            password_check.addValueChangeListener(event -> {
+                if (new_password.getValue().equals(password_check.getValue())) {
+                    password_check.setInvalid(false);
+                }
+                else {
+                    password_check.setInvalid(true);
+                    password_check.setErrorMessage("Passwords do not match");
+                }
+            });
+            new_password.addValueChangeListener(event -> {
+                if (new_password.getValue().equals(password_check.getValue())) {
+                    password_check.setInvalid(false);
+                }
+                else {
+                    password_check.setInvalid(true);
+                    password_check.setErrorMessage("Passwords do not match");
+                }
+            });
+
+            passwordDialog.getFooter().add(new Button("Cancel", event -> {
+                passwordDialog.close();
+            }));
+
+            passwordDialog.getFooter().add(new Button("Save", event -> {
+                if (passwordEncoder.matches(old_password.getValue(), user.getPassword())) {
+                    old_password.setInvalid(false);
+                }
+                else {
+                    old_password.setInvalid(true);
+                    old_password.setErrorMessage("Password is incorrect");
+                }
+            }));
 
         });
 
         name.setWidthFull();
-        name.setReadOnly(true);
         username.setWidthFull();
-        username.setReadOnly(true);
-        hashedPassword.setWidthFull();
-        hashedPassword.setReadOnly(true);
+        passwordChange.setWidthFull();
     }
 
     private void bindFields() {
         binder.bind(name, User::getName, User::setName);
         binder.bind(username, User::getUsername, User::setUsername);
-        binder.bind(hashedPassword, User::getPassword, User::setPassword);
+    }
+
+    public void readBean () {
+        binder.readBean(user);
 
         avatar.setWidth("20vh");
         avatar.setHeight("20vh");
@@ -133,10 +183,12 @@ public class UserSettings extends Dialog {
         });
     }
 
-    private void readBean () {
-        binder.readBean(user);
-
+    private void clearFields () {
+        name.clear();
+        username.clear();
     }
+
+
 }
 
 

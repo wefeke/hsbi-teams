@@ -1,7 +1,9 @@
 //Author: Joris
 package com.example.application.views;
 
-import com.example.application.login.UserSettings;
+import com.example.application.services.UserService;
+import com.example.application.views.user.UserManagement;
+import com.example.application.views.user.UserSettings;
 import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.VeranstaltungenService;
@@ -23,6 +25,7 @@ import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 import java.io.ByteArrayInputStream;
@@ -34,14 +37,19 @@ import java.util.Optional;
 public class MainLayout extends AppLayout {
 
     private final VeranstaltungenService veranstaltungenService;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     private AuthenticatedUser authenticatedUser;
     private AccessAnnotationChecker accessChecker;
 
-    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker, VeranstaltungenService veranstaltungenService){
-        this.veranstaltungenService = veranstaltungenService;
+
+    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker, VeranstaltungenService veranstaltungenService, UserService userService, PasswordEncoder passwordEncoder){
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
+        this.veranstaltungenService = veranstaltungenService;
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
         createHeader();
     }
 
@@ -78,6 +86,7 @@ public class MainLayout extends AppLayout {
         return new MenuItemInfo[]{ //
                 new MenuItemInfo("Veranstaltungen", LineAwesomeIcon.UNIVERSITY_SOLID.create(), VeranstaltungenView.class), //
                 new MenuItemInfo("Studierende", LineAwesomeIcon.ID_BADGE.create(), StudierendeView.class),
+                new MenuItemInfo("User Management", LineAwesomeIcon.ID_CARD.create(), UserManagement.class),
         };
     }
 
@@ -147,7 +156,14 @@ public class MainLayout extends AppLayout {
             div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
             div.getElement().getStyle().set("margin", "0 10px");
             userName.add(div);
-            UserSettings userSettings = new UserSettings(user);
+
+            UserSettings userSettings = new UserSettings(user, userService, passwordEncoder);
+            userSettings.addOpenedChangeListener(e -> {
+                if (e.isOpened()) {
+                    userSettings.readBean();
+                }
+            });
+
             userName.getSubMenu().addItem("Einstellungen", e ->
                     userSettings.open()
             );

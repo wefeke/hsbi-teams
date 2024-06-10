@@ -1,5 +1,6 @@
 package com.example.application.login;
 
+import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.login.LoginI18n;
@@ -56,6 +57,18 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
             event.forwardTo("");
         }
 
-        setError(event.getLocation().getQueryParameters().getParameters().containsKey("error"));
+        if(event.getLocation()
+                .getQueryParameters()
+                .getParameters()
+                .containsKey("error")) {
+            setError(true);
+            setDescription("Your account is locked. Please contact an admin to unlock your account.");
+        }
+        else {
+            setError(false);
+            setDescription("Login using user/user or admin/admin");
+        }
+
+        //setError(event.getLocation().getQueryParameters().getParameters().containsKey("error"));
     }
 }

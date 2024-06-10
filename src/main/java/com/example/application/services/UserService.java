@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,6 +36,7 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
+    @Transactional
     public void saveUser(User user) {
         if (user != null) {
             userRepository.save(user);
@@ -42,6 +44,8 @@ public class UserService {
         else
             System.err.println("User is null. Are you sure you have connected your form to the application?");
     }
+
+
     public void lockUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         user.setLocked(true);

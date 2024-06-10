@@ -59,6 +59,7 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
 
     @Override
     public void run (String ... args) {
+        /*
         User testUser = new User("wefeke", "Kennet", passwordEncoder.encode("kennet"), true, Set.of(Role.ADMIN), null, new ArrayList<>());
         Veranstaltung testVeranstaltung = new Veranstaltung(LocalDate.now(), "Testveranstaltung", testUser, new ArrayList<>(), new HashSet<>());
         Teilnehmer testTeilnehmer = new Teilnehmer(1L, "Max", "Mustermann", testUser);
@@ -76,7 +77,7 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
         teilnehmerRepository.save(testTeilnehmer2);
         teilnehmerRepository.save(testTeilnehmer3);
         veranstaltungRepository.save(testVeranstaltung);
-
+*/
     }
 
 
