@@ -66,10 +66,10 @@ public class Aufraeumen extends Dialog {
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
             User user = maybeUser.get();
-            grid.setItems(teilnehmerService.findAllTeilnehmerByUser(user));
+            List<Teilnehmer> studierendeVorJahren = teilnehmerService.findStudierendeVorJahren(years,user);
+            grid.setItems(studierendeVorJahren);
         }
-        List<Teilnehmer> studierendeVorJahren = teilnehmerService.findStudierendeVorJahren(years);
-        grid.setItems(studierendeVorJahren);
+
     }
 
     private void updateGridNoEvent() {
