@@ -26,6 +26,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 import java.util.List;
@@ -118,6 +119,7 @@ public class VeranstaltungenView extends VerticalLayout  {
      * @param veranstaltung Die Veranstaltung, für die eine Kachel erstellt werden soll.
      * @return Die erstellte Kachel als {@link Div}-Element, fertig zum Hinzufügen zum Container.
      */
+
     private Div createVeranstaltungKachel(Veranstaltung veranstaltung) {
         Div veranstaltungInfo = new Div();
         veranstaltungInfo.setText(veranstaltung.getTitel());

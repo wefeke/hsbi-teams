@@ -15,6 +15,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.server.StreamResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -73,7 +74,9 @@ public class UserSettings extends Dialog {
         cancelButton.addClickListener(e -> close());
         saveButton.setThemeName("primary");
         saveButton.addClickListener(e -> {
+            User user = new User();
             if (binder.writeBeanIfValid(user)) {
+                user.setId(this.user.getId());
                 user.setProfilePicture(uploadedImage);
                 this.userService.saveUser(user);
                 clearFields();
