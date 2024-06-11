@@ -3,6 +3,7 @@ package com.example.application.services;
 import com.example.application.models.Test;
 import com.example.application.models.User;
 import com.example.application.repositories.UserRepository;
+import com.vaadin.flow.component.notification.Notification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -45,6 +46,28 @@ public class UserService {
             System.err.println("User is null. Are you sure you have connected your form to the application?");
     }
 
+    public Boolean isUsernameAvailable (String username) {
+       if (userRepository.findByUsername(username) == null)
+           return true;
+       else
+              return false;
+    }
+
+    public Boolean isUsernameAvailableExcept (String username, String exception) {
+
+        if (userRepository.findByUsername(username) == null) {
+            //Notification.show("Found no User with this Username");
+            return true;
+        }
+        else if (username.equals(exception)) {
+            //Notification.show("Found only this User with this Username");
+            return true;
+        }
+        else {
+            //Notification.show("User is already taken" +username + exception);
+            return false;
+        }
+    }
 
     public void lockUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));

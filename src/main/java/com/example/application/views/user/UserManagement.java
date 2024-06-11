@@ -1,25 +1,19 @@
 package com.example.application.views.user;
-
 import com.example.application.models.Role;
 import com.example.application.models.User;
-import com.example.application.models.Veranstaltung;
 import com.example.application.services.UserService;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 import jakarta.annotation.security.RolesAllowed;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.vaadin.lineawesome.LineAwesomeIcon;
 
 @PageTitle("User Management")
 @Route(value = "user-management", layout = MainLayout.class)
@@ -27,10 +21,22 @@ import java.util.Set;
 public class UserManagement extends VerticalLayout {
 
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserManagement(UserService userService) {
+    public UserManagement(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
 
+        setSizeFull();
+        add(new Button(LineAwesomeIcon.PLUS_SOLID.create(), e -> {
+            VaadinSession.getCurrent().setAttribute("previousLocation", "user-management");
+            getUI().get().navigate("registration");
+
+        }));
+        add(createGrid());
+    }
+
+    private Grid<User> createGrid(){
         Grid<User> grid = new Grid<>();
         grid.setItems(userService.findAllUser()); // Fetch all users
 
@@ -40,6 +46,8 @@ public class UserManagement extends VerticalLayout {
         grid.addColumn(new ComponentRenderer<>(user -> {
             Button button = new Button("Passwort ändern");
             button.addClickListener(event -> {
+                PasswordChange passwordChange = new PasswordChange(passwordEncoder, user);
+                passwordChange.open();
             });
             return button;
         })).setHeader("Passwort");
@@ -71,11 +79,9 @@ public class UserManagement extends VerticalLayout {
         })).setHeader("Zugriff");
 
         grid.setSizeFull();
-        add(grid); // Add the grid to the layout
+        grid.setThemeName("row-stripes");
 
-        setSizeFull();
+        return grid; // Add the grid to the layout
+
     }
-
-
-
 }
