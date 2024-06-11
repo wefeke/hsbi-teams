@@ -587,11 +587,11 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         VirtualList<Teilnehmer> teilnehmerList = new VirtualList<>();
         teilnehmerList.setItems(fullGruppe.getTeilnehmer());
         teilnehmerList.setRenderer(new ComponentRenderer<>(teilnehmer -> {
-            Div teilnehmerDiv = createTeilnehmerDivGruppe(teilnehmer);
+            Div teilnehmerDiv = createTeilnehmerDivGruppe(teilnehmer, fullGruppe.getGruppenarbeit());
 
             // Klick-Listener für Teilnehmer
             teilnehmerDiv.addClickListener(e -> {
-                gruppeAuswertungDialog = new GruppeAuswertungDialog(teilnehmer,fullGruppe.getGruppenarbeit(),teilnehmerGruppenarbeitService);
+                gruppeAuswertungDialog = new GruppeAuswertungDialog(teilnehmer,fullGruppe.getGruppenarbeit(),teilnehmerGruppenarbeitService, this);
                 gruppeAuswertungDialog.open();
             });
 
@@ -701,7 +701,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         return teilnehmerListe;
     }
 
-    private Div createTeilnehmerDivGruppe(Teilnehmer t) {
+    private Div createTeilnehmerDivGruppe(Teilnehmer t, Gruppenarbeit gruppenarbeit) {
         Div teilnehmerDiv = new Div();
         teilnehmerDiv.addClassName("teilnehmer-item-gruppe");
 
@@ -712,7 +712,28 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         Span name = new Span(t.getVorname() + " " + t.getNachname());
         name.addClassName("teilnehmer-name-gruppe");
 
-        teilnehmerDiv.add(profilbild, name);
+        Div punkteDiv = new Div();
+        punkteDiv.addClassName("punkte-div");
+
+        Float punkte = teilnehmerGruppenarbeitService.findPunkteByMatrikelNrAndGruppenarbeitId(t.getId(), gruppenarbeit.getId());
+
+        if(punkte != null) {
+            punkteDiv.setText(punkte.toString());
+        }
+
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setAlignItems(Alignment.CENTER);
+        layout.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        layout.setWidthFull();
+        layout.add(profilbild, name);
+
+        Div spacer = new Div();
+        layout.add(spacer);
+        layout.setFlexGrow(1, spacer);
+        layout.add(punkteDiv);
+
+        teilnehmerDiv.add(layout);
+
 
         return teilnehmerDiv;
     }

@@ -39,4 +39,8 @@ public class TeilnehmerGruppenarbeitService {
     public boolean exists(TeilnehmerGruppenarbeit teilnehmerGruppenarbeit) {
         return teilnehmerGruppenarbeitRepository.existsById(teilnehmerGruppenarbeit.getId());
     }
+
+    public Float findPunkteByMatrikelNrAndGruppenarbeitId(Long matrikelNr, Long gruppenarbeitId) {
+        return teilnehmerGruppenarbeitRepository.findPunkteByMatrikelNrAndGruppenarbeitId(matrikelNr, gruppenarbeitId);
+    }
 }

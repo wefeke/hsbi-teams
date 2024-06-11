@@ -118,7 +118,7 @@
 }
 
 .kachel-gruppen {
-    width: 200px;
+    width: 220px;
     border: 1px solid var(--lumo-contrast-20pct);
     padding: 10px;
     margin: 10px;
@@ -130,7 +130,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin: 5px 0;
+    margin-bottom: 5px;
     cursor: pointer;
     border-radius: 16px;
 }
@@ -158,6 +158,7 @@
 
 .teilnehmer-name-gruppe {
     font-size: 15px;
+    margin-left: -16px;
 }
 
 .teilnehmer-name-liste {
