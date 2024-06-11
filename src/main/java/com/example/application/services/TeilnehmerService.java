@@ -50,13 +50,19 @@ public List<Teilnehmer> findAllTeilnehmer2(){return teilnehmerRepository.findAll
     public boolean isTeilnehmerInVeranstaltung(Teilnehmer teilnehmer) {
         return !teilnehmer.getVeranstaltungen().isEmpty();
     }
+
     @Transactional
     public List<Teilnehmer> findTeilnehmerByVeranstaltungId(Long id) {
         return teilnehmerRepository.findByVeranstaltungId(id);
     }
+
     public List<Teilnehmer> findStudierendeVorVierJahren() {
         LocalDateTime vierJahreZurueck = LocalDateTime.now().minusYears(4);
         return teilnehmerRepository.findStudierendeVorVierJahren(vierJahreZurueck);
+    }
+
+    public boolean isTeilnehmerInGruppenarbeit(Teilnehmer teilnehmer, Long veranstaltungId) {
+        return teilnehmerRepository.isTeilnehmerInGruppenarbeit(teilnehmer.getId(), veranstaltungId);
     }
 
 }

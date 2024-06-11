@@ -34,4 +34,7 @@ public interface TeilnehmerRepository extends JpaRepository<Teilnehmer, Long> {
 
     @Query("SELECT t FROM Teilnehmer t WHERE t.hinzugefuegtAm<:vierJahreZurueck")
     List<Teilnehmer> findStudierendeVorVierJahren(@Param("vierJahreZurueck") LocalDateTime vierJahreZurueck);
+
+    @Query(value = "SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END FROM Teilnehmer t JOIN t.gruppenarbeiten g WHERE t.matrikelNr = :teilnehmerId AND g.veranstaltungstermin.veranstaltung.id = :veranstaltungId")
+    Boolean isTeilnehmerInGruppenarbeit(@Param("teilnehmerId") Long teilnehmerId, @Param("veranstaltungId") Long veranstaltungId);
 }

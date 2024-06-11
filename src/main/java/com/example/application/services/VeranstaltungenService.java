@@ -1,6 +1,7 @@
 
 package com.example.application.services;
 
+import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
 import com.example.application.models.Veranstaltung;
 import com.example.application.repositories.VeranstaltungenRepository;
@@ -42,6 +43,14 @@ public class VeranstaltungenService {
         }
         else
             System.err.println("Test is null. Are you sure you have connected your form to the application?");
+    }
+
+    @Transactional
+    public void removeTeilnehmerFromVeranstaltung(Teilnehmer teilnehmer, Long veranstaltungId, User user) {
+        Veranstaltung veranstaltung = veranstaltungenRepository.findByIdAndUser(veranstaltungId, user);
+
+        veranstaltung.getTeilnehmer().remove(teilnehmer);
+        veranstaltungenRepository.save(veranstaltung);
     }
 
 }
