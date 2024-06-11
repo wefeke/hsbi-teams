@@ -75,4 +75,8 @@ public class Gruppe {
     public void addTeilnehmer(Teilnehmer teilnehmer) {
         this.teilnehmer.add(teilnehmer);
     }
+
+    public void addGruppenarbeit(Gruppenarbeit gruppenarbeit) {
+        this.gruppenarbeit = gruppenarbeit;
+    }
 }

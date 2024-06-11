@@ -57,6 +57,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private int maxListHeight = 0;
     private final AuthenticatedUser authenticatedUser;
     private final Map<Div, Veranstaltungstermin> veranstaltungsterminMap = new HashMap<>();
+    private final Map<Div, Gruppenarbeit> gruppenarbeitMap = new HashMap<>();
 
     //UI Elements
     private final Div veranstaltungsterminContainer;
@@ -261,6 +262,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         }
 
         triggerVeranstaltungsterminKachelClick();
+        triggerGruppenarbeitKachelClick();
 
         applyVeranstaltungsterminFilter();
     }
@@ -451,6 +453,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         kachelContent.addClassName("kachel-content");
 
         Div kachel = new Div(kachelContent);
+        gruppenarbeitMap.put(kachel, gruppenarbeit);
         kachel.addClassName("kachel");
 
         //Tooltip
@@ -499,37 +502,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                     aktiveKachelGruppenarbeit.removeClassName("kachel-active");
                 }
 
-                gruppenContainer.removeAll();
-
-                if (gruppenLinie == null) {
-                    HorizontalLayout lineWithText = createLineWithText("Gruppen");
-
-                    Button editButton = createEditButton();
-
-                    Hr lineAfter = new Hr();
-                    lineAfter.addClassName("line-after-icon");
-
-                    gruppenLinie = new HorizontalLayout(lineWithText, editButton, lineAfter);
-                    gruppenLinie.setAlignItems(Alignment.CENTER);
-                    gruppenLinie.setJustifyContentMode(JustifyContentMode.BETWEEN);
-                    gruppenLinie.setWidthFull();
-
-                    contentLayout.add(gruppenLinie, gruppenContainer);
-                }
-
-                Gruppenarbeit fullGruppenarbeit = gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId());
-
-                if (fullGruppenarbeit.getGruppen() != null) {
-                    for (Gruppe gruppe : fullGruppenarbeit.getGruppen()) {
-                        gruppenContainer.add(gruppenKachel(gruppe));
-                    }
-                } else {
-                    System.out.println("Keine Gruppen gefunden.");
-                    //hier was einbauen, um Nutzer anzuzeigen, dass es keine Gruppen gibt
-                }
-
-                gruppenLinie.setVisible(true);
-                gruppenContainer.setVisible(true);
+                updateGruppen(gruppenarbeit);
 
                 kachel.addClassName("kachel-active");
                 aktiveKachelGruppenarbeit = kachel;
@@ -587,6 +560,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         VirtualList<Teilnehmer> teilnehmerList = new VirtualList<>();
         teilnehmerList.setItems(fullGruppe.getTeilnehmer());
         teilnehmerList.setRenderer(new ComponentRenderer<>(teilnehmer -> {
+
             Div teilnehmerDiv = createTeilnehmerDivGruppe(teilnehmer, fullGruppe.getGruppenarbeit());
 
             // Klick-Listener für Teilnehmer
@@ -598,7 +572,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             return teilnehmerDiv;
         }));
 
-        int itemHeight = 52;
+        int itemHeight = 48;
         int listHeight = fullGruppe.getTeilnehmer().size() * itemHeight;
 
         if (listHeight > maxListHeight) {
@@ -715,10 +689,12 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         Div punkteDiv = new Div();
         punkteDiv.addClassName("punkte-div");
 
-        Float punkte = teilnehmerGruppenarbeitService.findPunkteByMatrikelNrAndGruppenarbeitId(t.getId(), gruppenarbeit.getId());
+        if (gruppenarbeit != null) {
+            Float punkte = teilnehmerGruppenarbeitService.findPunkteByMatrikelNrAndGruppenarbeitId(t.getId(), gruppenarbeit.getId());
 
-        if(punkte != null) {
-            punkteDiv.setText(punkte.toString());
+            if (punkte != null) {
+                punkteDiv.setText(punkte.toString());
+            }
         }
 
         HorizontalLayout layout = new HorizontalLayout();
@@ -823,11 +799,19 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         gruppenarbeitContainer.removeAll();
 
+        Gruppenarbeit aktiveGruppenarbeit = gruppenarbeitMap.get(aktiveKachelGruppenarbeit);
+
         List<Gruppenarbeit> gruppenarbeiten = veranstaltungstermin.getGruppenarbeiten();
         gruppenarbeiten.sort(Comparator.comparing(Gruppenarbeit::getTitel));
 
         for (Gruppenarbeit gruppenarbeit : gruppenarbeiten) {
-            gruppenarbeitContainer.add(gruppenarbeitKachel(gruppenarbeit));
+            Div kachel = gruppenarbeitKachel(gruppenarbeit);
+            gruppenarbeitContainer.add(kachel);
+
+            if (gruppenarbeit.equals(aktiveGruppenarbeit)) {
+                aktiveKachelGruppenarbeit = kachel;
+                aktiveKachelGruppenarbeit.addClassName("kachel-active");
+            }
         }
 
         gruppenarbeitContainer.add(createGruppenarbeitKachel());
@@ -845,18 +829,70 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
     }
 
-    public void triggerVeranstaltungsterminKachelClick() {
+    public void updateGruppen (Gruppenarbeit gruppenarbeit) {
+
+        gruppenContainer.removeAll();
+
+        if (gruppenLinie == null) {
+            HorizontalLayout lineWithText = createLineWithText("Gruppen");
+
+            Button editButton = createEditButton();
+
+            Hr lineAfter = new Hr();
+            lineAfter.addClassName("line-after-icon");
+
+            gruppenLinie = new HorizontalLayout(lineWithText, editButton, lineAfter);
+            gruppenLinie.setAlignItems(Alignment.CENTER);
+            gruppenLinie.setJustifyContentMode(JustifyContentMode.BETWEEN);
+            gruppenLinie.setWidthFull();
+
+            contentLayout.add(gruppenLinie, gruppenContainer);
+        }
+
+        Gruppenarbeit fullGruppenarbeit = gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId());
+
+        if (fullGruppenarbeit.getGruppen() != null) {
+            for (Gruppe gruppe : fullGruppenarbeit.getGruppen()) {
+                gruppenContainer.add(gruppenKachel(gruppe));
+            }
+        } else {
+            Span noGruppen = new Span("Keine Gruppen vorhanden");
+            gruppenContainer.add(noGruppen);
+        }
+
+        gruppenLinie.setVisible(true);
+        gruppenContainer.setVisible(true);
+    }
+
+    public void triggerVeranstaltungsterminKachelClick () {
         if (aktiveKachelVeranstaltungstermin != null) {
             Veranstaltungstermin termin = veranstaltungsterminMap.get(aktiveKachelVeranstaltungstermin);
             updateGruppenarbeiten(termin);
         }
     }
 
-    public void setAktiveKachelVeranstaltungstermin(Veranstaltungstermin termin) {
+    public void triggerGruppenarbeitKachelClick () {
+        if (aktiveKachelGruppenarbeit != null) {
+            Gruppenarbeit gruppenarbeit = gruppenarbeitMap.get(aktiveKachelGruppenarbeit);
+            updateGruppen(gruppenarbeit);
+        }
+    }
+
+    public void setAktiveKachelVeranstaltungstermin (Veranstaltungstermin termin) {
         for (Map.Entry<Div, Veranstaltungstermin> entry : veranstaltungsterminMap.entrySet()) {
             if (entry.getValue().equals(termin)) {
                 aktiveKachelVeranstaltungstermin = entry.getKey();
                 aktiveKachelVeranstaltungstermin.addClassName("kachel-active");
+                break;
+            }
+        }
+    }
+
+    public void setAktiveKachelGruppenarbeit(Gruppenarbeit gruppenarbeit) {
+        for (Map.Entry<Div, Gruppenarbeit> entry : gruppenarbeitMap.entrySet()) {
+            if (entry.getValue().equals(gruppenarbeit)) {
+                aktiveKachelGruppenarbeit = entry.getKey();
+                aktiveKachelGruppenarbeit.addClassName("kachel-active");
                 break;
             }
         }

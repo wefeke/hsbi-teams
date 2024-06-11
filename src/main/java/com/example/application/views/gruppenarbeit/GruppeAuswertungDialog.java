@@ -119,7 +119,8 @@ public class GruppeAuswertungDialog extends Dialog {
             }
                 close();
                 clearFields();
-
+                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
+                veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
                 veranstaltungDetailView.update();
         });
 
