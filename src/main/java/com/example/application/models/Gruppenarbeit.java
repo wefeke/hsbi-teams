@@ -99,4 +99,6 @@ public class Gruppenarbeit {
     public Veranstaltungstermin getVeranstaltungstermin() {
         return this.veranstaltungstermin;
     }
+
 }
+

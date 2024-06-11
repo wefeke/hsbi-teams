@@ -3,8 +3,11 @@ package com.example.application.services;
 
 import com.example.application.models.Gruppe;
 import com.example.application.models.Gruppenarbeit;
+import com.example.application.models.User;
 import com.example.application.repositories.GruppenarbeitRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class GruppenarbeitService {
@@ -27,7 +30,6 @@ public class GruppenarbeitService {
     }
 
     public Gruppenarbeit findGruppenarbeitByIdWithGruppen(Long id) {
-        Gruppenarbeit gruppenarbeit = gruppenarbeitRepository.findByIdWithGruppen(id);
-        return gruppenarbeit;
+        return gruppenarbeitRepository.findByIdWithGruppen(id);
     }
 }

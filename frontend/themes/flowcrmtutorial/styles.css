@@ -16,7 +16,7 @@
     height: 150px;
 }
 
-.kachel:hover, .neue-veranstaltung-kachel:hover, .neue-veranstaltungstermin-kachel:hover, .neue-gruppenarbeit-kachel:hover {
+.kachel:hover, .neue-veranstaltung-kachel:hover, .neue-veranstaltungstermin-kachel:hover, .neue-gruppenarbeit-kachel:hover, .teilnehmer-item-liste:hover, .teilnehmer-item-gruppe:hover{
     background-color: lightblue;
 }
 
@@ -118,7 +118,7 @@
 }
 
 .kachel-gruppen {
-    width: 200px;
+    width: 220px;
     border: 1px solid var(--lumo-contrast-20pct);
     padding: 10px;
     margin: 10px;
@@ -126,12 +126,21 @@
     box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2);
 }
 
-.teilnehmer-item {
+.teilnehmer-item-gruppe {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 5px;
+    cursor: pointer;
+    border-radius: 16px;
+}
+
+.teilnehmer-item-liste {
     display: flex;
     flex-direction: row;
     align-items: center;
     margin: 5px 0;
-    cursor: pointer;
+    border-radius: 16px;
 }
 
 .profilbild {
@@ -147,8 +156,14 @@
     font-weight: bold;
 }
 
-.teilnehmer-name {
+.teilnehmer-name-gruppe {
+    font-size: 15px;
+    margin-left: -16px;
+}
+
+.teilnehmer-name-liste {
     font-size: 16px;
+    margin-left: -16px;;
 }
 
 .termin-datum {

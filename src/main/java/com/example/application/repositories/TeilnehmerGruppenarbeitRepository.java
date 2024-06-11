@@ -23,4 +23,7 @@ public interface TeilnehmerGruppenarbeitRepository extends JpaRepository<Teilneh
 
     @Override
     boolean existsById(TeilnehmerGruppenarbeitId teilnehmerGruppenarbeitId);
+
+    @Query(value = "SELECT punkte FROM teilnehmer_gruppenarbeit WHERE teilnehmer_matrikel_nr = :matrikelNr AND gruppenarbeit_id = :gruppenarbeitId", nativeQuery = true)
+    Float findPunkteByMatrikelNrAndGruppenarbeitId(@Param("matrikelNr") Long matrikelNr, @Param("gruppenarbeitId") Long gruppenarbeitId);
 }
