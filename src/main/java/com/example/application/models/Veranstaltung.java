@@ -24,7 +24,6 @@ public class Veranstaltung implements Serializable {
     private List<Veranstaltungstermin> veranstaltungstermine = new ArrayList<>();
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Teilnehmer> teilnehmer = new HashSet<>();
-
     public Veranstaltung() {
 
     }

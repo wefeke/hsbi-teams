@@ -31,7 +31,7 @@ import java.util.Optional;
 @PageTitle("Veranstaltungen")
 @Route(value = "", layout = MainLayout.class)
 @RolesAllowed({"ADMIN", "USER"})
-public class VeranstaltungenView extends VerticalLayout {
+public class VeranstaltungenView extends VerticalLayout  {
 
     //Services
     private final VeranstaltungenService veranstaltungenService;
