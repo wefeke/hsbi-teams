@@ -111,7 +111,7 @@ public class VeranstaltungenView extends VerticalLayout {
     private HorizontalLayout createHorizontalLayout(TextField searchField, Button newEventButton, Div spacer) {
         Select<String> sortSelect = new Select<>();
         sortSelect.setItems("Datum aufsteigend", "Datum absteigend", "A-Z", "Z-A");
-        sortSelect.setPlaceholder("Filter...");
+        sortSelect.setValue("Datum aufsteigend");
         sortSelect.addValueChangeListener(e -> {
             String selectedFilter = e.getValue();
             updateKachelContainerWithFilter(selectedFilter);

@@ -171,7 +171,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         filterButton = new Select<>();
         filterButton.setItems("Datum aufsteigend", "Datum absteigend", "Titel A-Z", "Titel Z-A");
-        filterButton.setPlaceholder("Filter...");
+        filterButton.setValue("Datum aufsteigend");
 
         filterButton.addValueChangeListener(event -> applyVeranstaltungsterminFilter());
 
@@ -644,7 +644,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         searchField.setClearButtonVisible(true);
         searchField.setValueChangeMode(ValueChangeMode.EAGER);
 
-        List<Teilnehmer> teilnehmer = teilnehmerService.findTeilnehmerByVeranstaltungId(veranstaltung.getId());
+        Set<Teilnehmer> teilnehmer = veranstaltung.getTeilnehmer();
 
         Div teilnehmerItems = new Div();
         for (Teilnehmer t : teilnehmer) {

@@ -136,6 +136,7 @@ public class VeranstaltungDialog extends Dialog {
                 .asRequired("Titel muss gefüllt sein")
                 .bind(Veranstaltung::getTitel, Veranstaltung::setTitel);
         binder.forField(datePicker)
+                .asRequired("Datum muss gefüllt sein")
                 .bind(Veranstaltung::getSemester, Veranstaltung::setSemester);
         binder.forField(comboBox)
                 .bind(Veranstaltung::getTeilnehmer, Veranstaltung::setTeilnehmer);
