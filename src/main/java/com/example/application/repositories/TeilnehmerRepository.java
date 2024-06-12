@@ -44,4 +44,7 @@ public interface TeilnehmerRepository extends JpaRepository<Teilnehmer, Long> {
 
     @Query("select t from Teilnehmer t where t.veranstaltungen is empty and t.user = :user")
     List<Teilnehmer> findStudierendeOhneVeranstaltung(@Param("user") User user);
+
+    @Query("SELECT t FROM Teilnehmer t WHERE t.matrikelNr NOT IN (SELECT teil.matrikelNr FROM Veranstaltung v JOIN v.teilnehmer teil WHERE v.id = :veranstaltungId)and t.user = :user")
+    List<Teilnehmer> findAllTeilnehmerNotInVeranstaltung(Long veranstaltungId , User user);
 }

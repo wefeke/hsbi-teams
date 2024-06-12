@@ -444,7 +444,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     }
 
     public void createTeilnehmerDialog() {
-        teilnehmerHinzufuegenDialog = new TeilnehmerHinzufuegenDialog(veranstaltungService, teilnehmerService, veranstaltung.getId());
+        teilnehmerHinzufuegenDialog = new TeilnehmerHinzufuegenDialog(veranstaltungService, teilnehmerService, veranstaltung.getId(), authenticatedUser);
     }
 
     private Div gruppenarbeitKachel(Gruppenarbeit gruppenarbeit) {

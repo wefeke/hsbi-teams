@@ -117,7 +117,7 @@ public class StudierendeView extends VerticalLayout {
             if (maybeUser.isPresent()) {
                 User user = maybeUser.get();
                 List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue());
-                String dateipfad = "C:\\Users\\tobia\\OneDrive\\Dokumente\\uni\\4. Semester"; // Ändern Sie dies zu dem tatsächlichen Pfad Ihrer Excel-Datei
+                String dateipfad = "C:\\Users\\tobia\\OneDrive\\Desktop"; // Ändern Sie dies zu dem tatsächlichen Pfad Ihrer Excel-Datei
                 excelExporter.exportTeilnehmerListe(teilnehmerList, dateipfad, user.getUsername());
             }
         });
@@ -242,13 +242,8 @@ public class StudierendeView extends VerticalLayout {
 
     private void makeButtonsSmall() {
 
-
         addStudiernedenButton.setText("+");
-
-
         delete.setText("-");
-
-
         aendern.setText("...");
     }
 
