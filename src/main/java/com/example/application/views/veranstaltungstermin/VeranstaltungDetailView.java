@@ -28,6 +28,7 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.virtuallist.VirtualList;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.*;
 import jakarta.annotation.security.RolesAllowed;
 import org.vaadin.lineawesome.LineAwesomeIcon;
@@ -169,7 +170,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         HorizontalLayout lineWithText = createLineWithText("Veranstaltungstermine");
 
         filterButton = new Select<>();
-        filterButton.setItems("Datum", "Titel A-Z", "Titel Z-A");
+        filterButton.setItems("Datum aufsteigend", "Datum absteigend", "Titel A-Z", "Titel Z-A");
         filterButton.setPlaceholder("Filter...");
 
         filterButton.addValueChangeListener(event -> applyVeranstaltungsterminFilter());
@@ -640,6 +641,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         searchField.setPlaceholder("Suche...");
         searchField.setWidthFull();
         searchField.getStyle().set("margin-top", "-10px");
+        searchField.setClearButtonVisible(true);
+        searchField.setValueChangeMode(ValueChangeMode.EAGER);
 
         List<Teilnehmer> teilnehmer = teilnehmerService.findTeilnehmerByVeranstaltungId(veranstaltung.getId());
 
@@ -774,7 +777,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         if (value != null) {
             // Sortieren Sie die Veranstaltungstermine basierend auf der ausgewählten Option
             switch (value) {
-                case "Datum" -> termine.sort(Comparator.comparing(Veranstaltungstermin::getDatum));
+                case "Datum aufsteigend" -> termine.sort(Comparator.comparing(Veranstaltungstermin::getDatum));
+                case "Datum absteigend" -> termine.sort(Comparator.comparing(Veranstaltungstermin::getDatum).reversed());
                 case "Titel A-Z" -> termine.sort(Comparator.comparing(Veranstaltungstermin::getNotizen));
                 case "Titel Z-A" -> termine.sort(Comparator.comparing(Veranstaltungstermin::getNotizen).reversed());
             }

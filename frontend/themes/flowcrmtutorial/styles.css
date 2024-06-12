@@ -16,7 +16,7 @@
     height: 150px;
 }
 
-.kachel:hover, .neue-veranstaltung-kachel:hover, .neue-veranstaltungstermin-kachel:hover, .neue-gruppenarbeit-kachel:hover, .teilnehmer-item-liste:hover, .teilnehmer-item-gruppe:hover{
+.kachel:hover, .neue-veranstaltung-kachel:hover, .neue-veranstaltungstermin-kachel:hover, .neue-gruppenarbeit-kachel:hover, .teilnehmer-item-liste:hover, .teilnehmer-item-gruppe:hover, .veranstaltung-row:hover{
     background-color: lightblue;
 }
 
@@ -286,4 +286,19 @@
     font-weight: bold;
     color: red;
     text-align: center;
+}
+
+.veranstaltung-row {
+    border-bottom: 1px solid #ccc;
+    padding: 10px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.veranstaltung-row .text-center {
+    flex-grow: 1;
+}
+
+.veranstaltung-row:first-child {
+    border-top: 1px solid #ccc;
 }

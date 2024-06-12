@@ -111,7 +111,7 @@ public class VeranstaltungDialog extends Dialog {
                     veranstaltung.setUser(user);
                 }
                 veranstaltungenService.saveVeranstaltung(veranstaltung);
-                veranstaltungenView.updateKachelContainer();
+                veranstaltungenView.updateKachelContainer("");
 
                 clearFields();
                 close();
