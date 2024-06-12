@@ -7,6 +7,7 @@ import com.example.application.services.GruppenarbeitService;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.VeranstaltungsterminService;
 import com.example.application.views.MainLayout;
+import com.example.application.views.veranstaltungstermin.VeranstaltungDetailView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -50,6 +51,8 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     //User
     private AuthenticatedUser authenticatedUser;
 
+    private VeranstaltungDetailView veranstaltungDetailView;
+
     //Data
     List<Teilnehmer> allParticipants = new ArrayList<>();
     Set<Teilnehmer> selectedParticipants;
@@ -74,7 +77,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
     //Konstruktor
     @Autowired
-    public GruppenarbeitHinzufuegenDialog(AuthenticatedUser authenticatedUser, Veranstaltung veranstaltung, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService) {
+    public GruppenarbeitHinzufuegenDialog(AuthenticatedUser authenticatedUser, Veranstaltung veranstaltung, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungDetailView veranstaltungDetailView) {
         this.veranstaltung = veranstaltung;
         this.gruppenarbeitService = gruppenarbeitService;
         this.teilnehmerService = teilnehmerService;
@@ -82,6 +85,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         this.gruppeService = gruppeService;
         this.veranstaltungstermin = null;
         this.authenticatedUser = authenticatedUser;
+        this.veranstaltungDetailView = veranstaltungDetailView;
 
         //gruppenGroesse.setReadOnly(true);
 
@@ -133,8 +137,9 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
                 Notification.show("Gruppenarbeit angelegt!");
                 close();
                 clearFields();
-                UI.getCurrent().getPage().reload();
-
+                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
+                veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+                veranstaltungDetailView.update();
 
             }
             else {

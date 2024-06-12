@@ -1,17 +1,17 @@
 
-INSERT INTO public.users (locked, is_admin, id, hashed_password, "name", username, profile_picture) VALUES
-                                                                                                (false, true, 1, '$2a$10$jpLNVNeA7Ar/ZQ2DKbKCm.MuT2ESe.Qop96jipKMq7RaUgCoQedV.', 'Admin', 'admin', null),
-                                                                                                (true, false, 2, '$2a$10$jpLNVNeA7Ar/ZQ2DKbKCm.MuT2ESe.Qop96jipKMq7RaUgCoQedV.', 'Joris Strakeljahn', 'jstrakeljahn', null);
+INSERT INTO public.users (is_admin, id, hashed_password, "name", username, profile_picture) VALUES
+                                                                                                (true, 1, '$2a$10$jpLNVNeA7Ar/ZQ2DKbKCm.MuT2ESe.Qop96jipKMq7RaUgCoQedV.', 'Admin', 'admin', null),
+                                                                                                (false, 2, '$2a$10$jpLNVNeA7Ar/ZQ2DKbKCm.MuT2ESe.Qop96jipKMq7RaUgCoQedV.', 'Joris Strakeljahn', 'jstrakeljahn', null);
 
 INSERT INTO public.user_roles (user_id, roles) VALUES
                                                    (1, 'ADMIN'),
                                                    (2, 'USER');
 
 INSERT INTO public.veranstaltung (id, semester, titel, user_id) VALUES
-(1001, '2024-05-01', 'Mathe', 1),
-(1002, '2024-05-01', 'Datenbanken', 1),
-(1003, '2024-05-26', 'Programmieren 1', 1),
-(1004, '2024-05-30', 'Webtechnologien', 2);
+(1001, '2024-05-01', 'Materialwirtschaft und Produktionsplanung/-steuerung (Sose 2024-5 WI(P) 23)', 1),
+(1002, '2024-05-01', 'Mathematik für Ökonomen (Sose 2024-5 M/S 01)', 1),
+(1003, '2024-05-26', 'Webtechnologien (Sose 2024-5 WI(P) 13)', 1),
+(1004, '2024-05-30', 'Softwareprojekt (Sose 2024-5 WI(P) 28)', 2);
 
 
 INSERT INTO public.veranstaltungstermin (id, datum, end_zeit, notizen, ort, start_zeit, veranstaltung_id, user_id) VALUES

@@ -140,7 +140,7 @@ public class VeranstaltungBearbeiten extends Dialog {
                 veranstaltungenService.saveVeranstaltung(veranstaltung);
                 clearFields();
                 close();
-                veranstaltungenView.updateKachelContainer();
+                veranstaltungenView.updateKachelContainer("");
 
                 Notification.show("Veranstaltung angelegt");
             }

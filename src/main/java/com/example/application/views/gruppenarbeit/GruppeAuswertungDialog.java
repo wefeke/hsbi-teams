@@ -3,6 +3,7 @@ package com.example.application.views.gruppenarbeit;
 import com.example.application.models.*;
 import com.example.application.repositories.TeilnehmerGruppenarbeitRepository;
 import com.example.application.services.TeilnehmerGruppenarbeitService;
+import com.example.application.views.veranstaltungstermin.VeranstaltungDetailView;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -39,12 +40,15 @@ public class GruppeAuswertungDialog extends Dialog {
 
     TeilnehmerGruppenarbeitService teilnehmerGruppenarbeitService;
 
+    private VeranstaltungDetailView veranstaltungDetailView;
 
-    public GruppeAuswertungDialog(Teilnehmer teilnehmer, Gruppenarbeit gruppenarbeit, TeilnehmerGruppenarbeitService teilnehmerGruppenarbeitService) {
+
+    public GruppeAuswertungDialog(Teilnehmer teilnehmer, Gruppenarbeit gruppenarbeit, TeilnehmerGruppenarbeitService teilnehmerGruppenarbeitService, VeranstaltungDetailView veranstaltungDetailView) {
         this.teilnehmer = teilnehmer;
         this.gruppenarbeit = gruppenarbeit;
         this.teilnehmerGruppenarbeitService = teilnehmerGruppenarbeitService;
         this.teilnehmerGruppenarbeit = new TeilnehmerGruppenarbeit();
+        this.veranstaltungDetailView = veranstaltungDetailView;
         teilnehmerGruppenarbeit.setId(new TeilnehmerGruppenarbeitId(teilnehmer.getId(),gruppenarbeit.getId()));
         teilnehmerGruppenarbeitResult = teilnehmerGruppenarbeitService.findByID(teilnehmerGruppenarbeit.getId()
         );
@@ -115,8 +119,9 @@ public class GruppeAuswertungDialog extends Dialog {
             }
                 close();
                 clearFields();
-
-                UI.getCurrent().getPage().reload();
+                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
+                veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+                veranstaltungDetailView.update();
         });
 
 

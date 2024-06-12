@@ -26,6 +26,7 @@ public class Teilnehmer {
     //Beziehungen
     @ManyToOne()
     private User user;
+    //@ManyToMany (mappedBy = "teilnehmer", fetch = FetchType.EAGER)
     @ManyToMany (fetch = FetchType.EAGER)
     private List<Veranstaltung> veranstaltungen = new ArrayList<>();
     @ManyToMany (fetch = FetchType.EAGER)
@@ -111,5 +112,9 @@ public class Teilnehmer {
 
     public String getFullName() {
         return this.vorname + " " + this.nachname;
+    }
+
+    public void removeVeranstaltung(Veranstaltung veranstaltung) {
+        this.veranstaltungen.remove(veranstaltung);
     }
 }
