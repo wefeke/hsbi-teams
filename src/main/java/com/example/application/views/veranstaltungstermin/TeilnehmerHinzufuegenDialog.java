@@ -5,6 +5,7 @@ import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.VeranstaltungenService;
+import com.example.application.views.studierende.StudierendeHinzufuegen;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
@@ -25,19 +26,23 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
     private final TeilnehmerService teilnehmerService;
     private final Long veranstaltungId;
     private final Button hinzufuegenButton = new Button("Hinzufügen");
+    private final Button anlegenButton = new Button("Teilnehmer anlegen");
+    private final Button importButton = new Button("importieren");
     private final TextField filterText = new TextField();
     private final Grid<Teilnehmer> grid = new Grid<>();
     private AuthenticatedUser authenticatedUser;
+    private final Dialog dialog = new Dialog();
 
     public TeilnehmerHinzufuegenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser) {
         this.veranstaltungService = veranstaltungService;
         this.teilnehmerService = teilnehmerService;
         this.veranstaltungId = veranstaltungId;
         this.authenticatedUser = authenticatedUser;
+
         this.setWidth("80vw");
         this.setHeight("80vh");
 
-        Text dialogTitle = new Text("Teilnehmer zur Veranstaltung " + veranstaltungId + " hinzufügen");
+
 
         hinzufuegenButton.setEnabled(false);
         hinzufuegenButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
@@ -58,11 +63,16 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
                 }
             }
         });
+
+        anlegenButton.addClickListener(event ->{openDialog();
+
+        });
         configureGrid();
+        configureDialog();
         // Erstellen Sie den Abbrechen-Button
         Button cancelButton = new Button("Abbrechen", e -> close());
         add(cancelButton,
-                dialogTitle,
+
                 getToolbar(),
                 getContent()
 
@@ -76,7 +86,7 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateGrid());
 
-        HorizontalLayout toolbar = new HorizontalLayout(filterText, hinzufuegenButton);
+        HorizontalLayout toolbar = new HorizontalLayout(filterText,anlegenButton,importButton, hinzufuegenButton);
 
         toolbar.addClassName("toolbar");
 
@@ -113,5 +123,16 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         content.addClassName("content");
         content.setSizeFull();
         return content;
+    }
+    private void openDialog() {
+        dialog.open();
+        updateGrid();
+    }
+
+    private void configureDialog() {
+        dialog.add(new StudierendeHinzufuegen(teilnehmerService, authenticatedUser));
+        dialog.setWidth("400px");
+        dialog.setHeight("300px");
+
     }
 }
