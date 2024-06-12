@@ -27,7 +27,7 @@ public class Teilnehmer {
     @ManyToOne()
     private User user;
     //@ManyToMany (mappedBy = "teilnehmer", fetch = FetchType.EAGER)
-    @ManyToMany (fetch = FetchType.EAGER)
+    @ManyToMany (mappedBy ="teilnehmer", fetch = FetchType.EAGER)
     private List<Veranstaltung> veranstaltungen = new ArrayList<>();
     @ManyToMany (fetch = FetchType.EAGER)
     private List<Gruppenarbeit> gruppenarbeiten = new ArrayList<>();
