@@ -35,10 +35,6 @@ public class UserSettings extends Dialog {
     private final PasswordEncoder passwordEncoder;
     private PasswordChange passwordChangeDialog;
 
-    private byte[] uploadedImage;
-    MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
-    private final Upload upload = new Upload(buffer);
-
     private User user;
     private final UserService userService;
 
@@ -60,8 +56,7 @@ public class UserSettings extends Dialog {
                 avatar,
                 name,
                 username,
-                passwordChange,
-                upload
+                passwordChange
 
         );
         verticalLayout.setAlignItems(VerticalLayout.Alignment.CENTER);
@@ -77,11 +72,9 @@ public class UserSettings extends Dialog {
             User user = new User();
             if (binder.writeBeanIfValid(user)) {
                 user.setId(this.user.getId());
-                user.setProfilePicture(uploadedImage);
                 this.userService.saveUser(user);
                 clearFields();
                 close();
-
                 Notification.show("User aktualisiert");
             }
             else {
@@ -93,30 +86,9 @@ public class UserSettings extends Dialog {
             passwordChangeDialog.open();
         });
 
-        //Image Handling
-        upload.addSucceededListener(event -> {
-            InputStream inputStream = buffer.getInputStream(event.getFileName());
-            ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
-
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            try {
-                while ((bytesRead = inputStream.read(buffer)) != -1) {
-                    byteOutputStream.write(buffer, 0, bytesRead);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            uploadedImage = byteOutputStream.toByteArray();
-            Notification.show("Datei \"" + event.getFileName() + "\" erfolgreich hochgeladen.");
-        });
-
-        upload.setAcceptedFileTypes("image/jpeg", "image/png", "image/gif");
-        upload.setMaxFiles(1);
-
         name.setWidthFull();
         username.setWidthFull();
+        username.setReadOnly(true);
         passwordChange.setWidthFull();
     }
 
@@ -124,7 +96,6 @@ public class UserSettings extends Dialog {
         binder.forField(name)
                 .bind(User::getName, User::setName);
         binder.forField(username)
-                .withValidator(username -> userService.isUsernameAvailableExcept(username, this.user.getUsername()), "Username bereits vergeben")
                 .bind(User::getUsername, User::setUsername);
     }
 

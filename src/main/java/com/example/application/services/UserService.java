@@ -53,22 +53,6 @@ public class UserService {
               return false;
     }
 
-    public Boolean isUsernameAvailableExcept (String username, String exception) {
-
-        if (userRepository.findByUsername(username) == null) {
-            //Notification.show("Found no User with this Username");
-            return true;
-        }
-        else if (username.equals(exception)) {
-            //Notification.show("Found only this User with this Username");
-            return true;
-        }
-        else {
-            //Notification.show("User is already taken" +username + exception);
-            return false;
-        }
-    }
-
     public void lockUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         user.setLocked(true);
