@@ -67,6 +67,8 @@ public class VeranstaltungenView extends VerticalLayout  {
         if (maybeUser.isPresent()) {
             User user = maybeUser.get();
             username.setText("Herzlich Willkommen, " + user.getName() + "!");
+        } else {
+            getUI().ifPresent(ui -> ui.navigate("login"));
         }
 
         HorizontalLayout lineWithText = createLineWithText();
@@ -205,7 +207,7 @@ public class VeranstaltungenView extends VerticalLayout  {
                 layout.setSizeFull();
 
                 // Layout zum KachelContainer hinzufügen
-                kachelContainer.add(noEventsText);
+                kachelContainer.add(layout);
             } else {
                 // Filtern der Veranstaltungen basierend auf dem Suchtext
                 List<Veranstaltung> filteredVeranstaltungen = veranstaltungen.stream()
