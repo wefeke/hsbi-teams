@@ -1,10 +1,8 @@
 package com.example.application.views.gruppenarbeit;
 
 import com.example.application.models.*;
-import com.example.application.repositories.TeilnehmerGruppenarbeitRepository;
-import com.example.application.services.TeilnehmerGruppenarbeitService;
+import com.example.application.services.GruppenarbeitTeilnehmerService;
 import com.example.application.views.veranstaltungstermin.VeranstaltungDetailView;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -13,7 +11,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Route;
-import org.springframework.context.annotation.Bean;
 
 import java.util.Optional;
 
@@ -23,9 +20,9 @@ public class GruppeAuswertungDialog extends Dialog {
     private final Teilnehmer teilnehmer;
     private final Gruppenarbeit gruppenarbeit;
 
-    private TeilnehmerGruppenarbeit teilnehmerGruppenarbeit;
-    private TeilnehmerGruppenarbeitId teilnehmerGruppenarbeitId;
-    private Optional<TeilnehmerGruppenarbeit> teilnehmerGruppenarbeitResult;
+    private GruppenarbeitTeilnehmer gruppenarbeitTeilnehmer;
+    private GruppenarbeitTeilnehmerId gruppenarbeitTeilnehmerId;
+    private Optional<GruppenarbeitTeilnehmer> gruppenarbeitTeilnehmerResult;
 
     // Dialog Elemente
     private final NumberField auswertungsWert = new NumberField();
@@ -38,19 +35,19 @@ public class GruppeAuswertungDialog extends Dialog {
 
     Binder<Auswertung> binder = new Binder<>(Auswertung.class);
 
-    TeilnehmerGruppenarbeitService teilnehmerGruppenarbeitService;
+    private final GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService;
 
     private VeranstaltungDetailView veranstaltungDetailView;
 
 
-    public GruppeAuswertungDialog(Teilnehmer teilnehmer, Gruppenarbeit gruppenarbeit, TeilnehmerGruppenarbeitService teilnehmerGruppenarbeitService, VeranstaltungDetailView veranstaltungDetailView) {
+    public GruppeAuswertungDialog(Teilnehmer teilnehmer, Gruppenarbeit gruppenarbeit, GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService, VeranstaltungDetailView veranstaltungDetailView) {
         this.teilnehmer = teilnehmer;
         this.gruppenarbeit = gruppenarbeit;
-        this.teilnehmerGruppenarbeitService = teilnehmerGruppenarbeitService;
-        this.teilnehmerGruppenarbeit = new TeilnehmerGruppenarbeit();
+        this.gruppenarbeitTeilnehmerService = gruppenarbeitTeilnehmerService;
+        this.gruppenarbeitTeilnehmer = new GruppenarbeitTeilnehmer();
         this.veranstaltungDetailView = veranstaltungDetailView;
-        teilnehmerGruppenarbeit.setId(new TeilnehmerGruppenarbeitId(teilnehmer.getId(),gruppenarbeit.getId()));
-        teilnehmerGruppenarbeitResult = teilnehmerGruppenarbeitService.findByID(teilnehmerGruppenarbeit.getId()
+        gruppenarbeitTeilnehmer.setId(new GruppenarbeitTeilnehmerId(teilnehmer.getId(),gruppenarbeit.getId()));
+        gruppenarbeitTeilnehmerResult = gruppenarbeitTeilnehmerService.findByID(gruppenarbeitTeilnehmer.getId()
         );
        /* teilnehmerGruppenarbeit = teilnehmerGruppenarbeitService.findTeilnehmerGruppenarbeitByWithTeilnehmerAndGruppe(teilnehmer.getId(),gruppenarbeit.getId());
         if (teilnehmerGruppenarbeit != null) {
@@ -86,7 +83,7 @@ public class GruppeAuswertungDialog extends Dialog {
             auswertungsWert.setValue(0.0);
         }
 
-        teilnehmerGruppenarbeit.getId().setPunkte(auswertungsWert.getValue().floatValue());
+        gruppenarbeitTeilnehmer.setPunkte(auswertungsWert.getValue().floatValue());
     }
 
     private void decrementValueByHalf() {
@@ -97,12 +94,12 @@ public class GruppeAuswertungDialog extends Dialog {
         } else {
             auswertungsWert.setValue(0.0);
         }
-        teilnehmerGruppenarbeit.getId().setPunkte(auswertungsWert.getValue().floatValue());
+        gruppenarbeitTeilnehmer.setPunkte(auswertungsWert.getValue().floatValue());
 
     }
 
     private void configureElements(){
-        if (teilnehmerGruppenarbeitResult.isPresent()) {
+        if (gruppenarbeitTeilnehmerResult.isPresent()) {
             auswertungsWert.setValue(1.0);
         } else {
             auswertungsWert.setValue(0.0);
@@ -112,11 +109,11 @@ public class GruppeAuswertungDialog extends Dialog {
         decrementButton.addClickListener(event -> decrementValueByHalf());
         //Footer Button Implementation
         saveButton.addClickListener( event -> {
-            if (teilnehmerGruppenarbeitService.exists(teilnehmerGruppenarbeit)) {
-                teilnehmerGruppenarbeitService.update(teilnehmerGruppenarbeit);
-            } else {
-                teilnehmerGruppenarbeitService.save(teilnehmerGruppenarbeit);
-            }
+
+                gruppenarbeitTeilnehmer.setPunkte(auswertungsWert.getValue().floatValue());
+                System.out.println(gruppenarbeitTeilnehmer.getPunkte().toString());
+                gruppenarbeitTeilnehmerService.save(gruppenarbeitTeilnehmer);
+
                 close();
                 clearFields();
                 veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());

@@ -20,12 +20,12 @@ public class Veranstaltung implements Serializable {
     //Beziehungen
     @ManyToOne()
     private User user;
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "veranstaltung", fetch = FetchType.EAGER)
     private List<Veranstaltungstermin> veranstaltungstermine = new ArrayList<>();
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Teilnehmer> teilnehmer = new HashSet<>();
-    public Veranstaltung() {
 
+    public Veranstaltung() {
     }
 
     public Veranstaltung(LocalDate semester, String titel, User user, List<Veranstaltungstermin> veranstaltungstermine, Set<Teilnehmer> teilnehmer) {

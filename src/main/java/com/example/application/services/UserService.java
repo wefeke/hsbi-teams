@@ -1,9 +1,7 @@
 package com.example.application.services;
 
-import com.example.application.models.Test;
 import com.example.application.models.User;
 import com.example.application.repositories.UserRepository;
-import com.vaadin.flow.component.notification.Notification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

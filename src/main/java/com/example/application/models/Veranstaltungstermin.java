@@ -25,7 +25,7 @@ public class Veranstaltungstermin {
     private User user;
     @ManyToOne
     private Veranstaltung veranstaltung;
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "veranstaltungstermin", fetch = FetchType.EAGER)
     private List<Gruppenarbeit> gruppenarbeiten = new ArrayList<>();
 
     public Veranstaltungstermin() {

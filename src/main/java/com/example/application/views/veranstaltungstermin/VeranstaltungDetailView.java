@@ -47,7 +47,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private final GruppenarbeitService gruppenarbeitService;
     private final TeilnehmerService teilnehmerService;
     private final GruppeService gruppeService;
-    private final TeilnehmerGruppenarbeitService teilnehmerGruppenarbeitService;
+    private final GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService;
 
     //Data
     private String veranstaltungIdString;
@@ -83,13 +83,13 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private HorizontalLayout gruppenarbeitLinie;
     private HorizontalLayout gruppenLinie;
 
-    public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, GruppeService gruppeService, TeilnehmerGruppenarbeitService teilnehmerGruppenarbeitService, AuthenticatedUser authenticatedUser) {
+    public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, GruppeService gruppeService, GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService, AuthenticatedUser authenticatedUser) {
         // Initialisierung der Services
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
         this.gruppenarbeitService = gruppenarbeitService;
         this.gruppeService = gruppeService;
-        this.teilnehmerGruppenarbeitService = teilnehmerGruppenarbeitService;
+        this.gruppenarbeitTeilnehmerService = gruppenarbeitTeilnehmerService;
         this.authenticatedUser = authenticatedUser;
         this.teilnehmerService = teilnehmerService;
 
@@ -566,7 +566,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
             // Klick-Listener für Teilnehmer
             teilnehmerDiv.addClickListener(e -> {
-                gruppeAuswertungDialog = new GruppeAuswertungDialog(teilnehmer,fullGruppe.getGruppenarbeit(),teilnehmerGruppenarbeitService, this);
+                gruppeAuswertungDialog = new GruppeAuswertungDialog(teilnehmer,fullGruppe.getGruppenarbeit(), gruppenarbeitTeilnehmerService, this);
                 gruppeAuswertungDialog.open();
             });
 
@@ -693,7 +693,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         punkteDiv.addClassName("punkte-div");
 
         if (gruppenarbeit != null) {
-            Float punkte = teilnehmerGruppenarbeitService.findPunkteByMatrikelNrAndGruppenarbeitId(t.getId(), gruppenarbeit.getId());
+            Float punkte = gruppenarbeitTeilnehmerService.findPunkteByMatrikelNrAndGruppenarbeitId(t.getId(), gruppenarbeit.getId());
 
             if (punkte != null) {
                 punkteDiv.setText(punkte.toString());

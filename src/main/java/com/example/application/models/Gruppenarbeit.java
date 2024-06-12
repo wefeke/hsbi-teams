@@ -19,11 +19,11 @@ public class Gruppenarbeit {
     //Beziehungen
     @ManyToOne()
     private User user;
-    @ManyToOne
+    @ManyToOne()
     private Veranstaltungstermin veranstaltungstermin = new Veranstaltungstermin();
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "gruppenarbeit",fetch = FetchType.EAGER)
     private List<Gruppe> gruppen = new ArrayList<>();
-    @ManyToMany
+    @ManyToMany()
     private List<Teilnehmer> teilnehmer = new ArrayList<>();
 
     public Gruppenarbeit(){
