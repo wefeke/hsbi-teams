@@ -81,4 +81,8 @@ public class Gruppe {
     public void addGruppenarbeit(Gruppenarbeit gruppenarbeit) {
         this.gruppenarbeit = gruppenarbeit;
     }
+
+    public void setUser(User user){
+        this.user = user;
+    }
 }

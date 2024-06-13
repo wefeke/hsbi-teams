@@ -124,24 +124,32 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
                     gruppenarbeit.setUser(user);
                 }
 
-                gruppenarbeit.setVeranstaltungstermin(this.veranstaltungstermin);
+                gruppenarbeit.setVeranstaltungstermin(veranstaltungstermin);
 
                 for (Gruppe gruppe : gruppen) {
+                    if (maybeUser.isPresent()) {
+                        User user = maybeUser.get();
+                        gruppe.setUser(user);
+                    }
                     gruppeService.save(gruppe);
                 }
 
-                gruppenarbeit.setTeilnehmer(selectedParticipantsList);
-
+                //der Gruppenarbeit die Teilnehmer übergeben
+                selectedParticipants = participants.getSelectedItems();
+                gruppenarbeit.setTeilnehmer(selectedParticipants.stream().toList());
                 gruppenarbeitService.save(gruppenarbeit);
 
+                //den Gruppen die Gruppenarbeit übergeben
                 for (Gruppe gruppe : gruppen) {
                     gruppe.setGruppenarbeit(gruppenarbeit);
                     gruppeService.save(gruppe);
                 }
 
                 //Gruppenarbeit zum Veranstaltungstermin hinzufügen
+                //TODO: ist das nötig?
                 veranstaltungstermin.addGruppenarbeit(gruppenarbeit);
                 veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
+
                 Notification.show("Gruppenarbeit angelegt!");
                 close();
                 clearFields();

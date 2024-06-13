@@ -116,4 +116,8 @@ public class Teilnehmer {
     public void removeVeranstaltung(Veranstaltung veranstaltung) {
         this.veranstaltungen.remove(veranstaltung);
     }
+
+    public void addGruppenarbeit(Gruppenarbeit gruppenarbeit){
+        this.gruppenarbeiten.add(gruppenarbeit);
+    }
 }
