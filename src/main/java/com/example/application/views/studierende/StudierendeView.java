@@ -131,6 +131,7 @@ public class StudierendeView extends VerticalLayout {
                 File tempFile = createTempFile();
                 if (tempFile != null) {
                     System.out.println("Temp file created at: " + tempFile.getAbsolutePath()); // Log the file path
+                    Notification.show("Temp file created at: " + tempFile.getAbsolutePath());
                     excelExporter.exportTeilnehmerListe(teilnehmerList, tempFile.getAbsolutePath(), user.getUsername());
                     if (tempFile.exists()) {
                         System.out.println("Temp file exists"); // Check if the file exists
@@ -282,20 +283,23 @@ public class StudierendeView extends VerticalLayout {
         aendern.setText("Studierende ändern");
     }
     private File createTempFile() {
-        try {
-            // Create a directory in the system's temporary directory
-            File dir = new File(System.getProperty("java.io.tmpdir"), "myapp");
-            if (!dir.exists()) {
-                dir.mkdir();
-            }
+    try {
+        // Pfad zum Download-Ordner
+        String downloadFolderPath = System.getProperty("user.home") + "/Downloads";
 
-            // Create the file in the new directory
-            File tempFile = File.createTempFile("export", ".xlsx", dir);
-            return tempFile;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+        // Erstellen Sie das Verzeichnis, wenn es noch nicht existiert
+        File dir = new File(downloadFolderPath);
+        if (!dir.exists()) {
+            dir.mkdir();
         }
+
+        // Erstellen Sie die Datei im Download-Ordner
+        File tempFile = File.createTempFile("export", ".xlsx", dir);
+        return tempFile;
+    } catch (IOException e) {
+        e.printStackTrace();
+        return null;
+    }
     }
 
     private StreamResource offerDownload(File file) {
