@@ -15,6 +15,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -62,12 +63,17 @@ public class StudierendeView extends VerticalLayout {
     private final Button exportButton = new Button("Exportieren");
     private AuthenticatedUser authenticatedUser;
 
+
+
     TextField vorname = new TextField("Vorname");
     TextField nachname = new TextField("Nachname");
     NumberField matrikelNr = new NumberField("Matrikelnummer");
     Button save = new Button("Save");
     Button cancel = new Button ("Cancel");
     Button aufraeumenButton = new Button("Aufräumen");
+
+    //Download Objects
+    Anchor exportButtonAnchor = new Anchor();
 
     @Autowired
     public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser,ExcelExporter excelExporter) {
@@ -116,18 +122,28 @@ public class StudierendeView extends VerticalLayout {
                 aendernDiolog(selectedTeilnehmer);
             }
         });
-exportButton.addClickListener(event -> {
-    Optional<User> maybeUser = authenticatedUser.get();
-    if (maybeUser.isPresent()) {
-        User user = maybeUser.get();
-        List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue());
-        File tempFile = createTempFile();
-        if (tempFile != null) {
-            excelExporter.exportTeilnehmerListe(teilnehmerList, tempFile.getAbsolutePath(), user.getUsername());
-            offerDownload(tempFile);
-        }
-    }
-});
+
+        exportButton.addClickListener(event -> {
+            Optional<User> maybeUser = authenticatedUser.get();
+            if (maybeUser.isPresent()) {
+                User user = maybeUser.get();
+                List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue());
+                File tempFile = createTempFile();
+                if (tempFile != null) {
+                    System.out.println("Temp file created at: " + tempFile.getAbsolutePath()); // Log the file path
+                    excelExporter.exportTeilnehmerListe(teilnehmerList, tempFile.getAbsolutePath(), user.getUsername());
+                    if (tempFile.exists()) {
+                        System.out.println("Temp file exists"); // Check if the file exists
+                    } else {
+                        System.out.println("Temp file does not exist");
+                    }
+                    StreamResource resource = offerDownload(tempFile);
+                    System.out.println("Resource: " + resource.toString()); // Log the resource object
+                    exportButtonAnchor.setHref(resource);
+
+                }
+            }
+        });
 
         UI.getCurrent().getPage().addBrowserWindowResizeListener(event -> {
             if (event.getWidth() <= 1000) {
@@ -185,7 +201,8 @@ exportButton.addClickListener(event -> {
     }
     private Component getToolbar2() {
 
-        HorizontalLayout toolbar2 = new HorizontalLayout(importButton, exportButton, aufraeumenButton);
+        exportButtonAnchor.add(exportButton);
+        HorizontalLayout toolbar2 = new HorizontalLayout(importButton, exportButtonAnchor, aufraeumenButton);
 
         toolbar2.addClassName("toolbar");
 
@@ -266,23 +283,33 @@ exportButton.addClickListener(event -> {
     }
     private File createTempFile() {
         try {
-            File tempFile = File.createTempFile("export", ".xlsx");
-            tempFile.deleteOnExit();
+            // Create a directory in the system's temporary directory
+            File dir = new File(System.getProperty("java.io.tmpdir"), "myapp");
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+
+            // Create the file in the new directory
+            File tempFile = File.createTempFile("export", ".xlsx", dir);
             return tempFile;
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
     }
-    private void offerDownload(File file) {
-    StreamResource resource = new StreamResource(file.getName(), () -> {
+
+    private StreamResource offerDownload(File file) {
+        System.out.println("File name: " + file.getName());
+    return new StreamResource(file.getName(), () -> {
         try {
+
             return new FileInputStream(file);
         } catch (FileNotFoundException e) {
+            System.out.println("File could not be offered: " + file.getName());
             e.printStackTrace();
+
             return null;
         }
     });
-
 }
 }
