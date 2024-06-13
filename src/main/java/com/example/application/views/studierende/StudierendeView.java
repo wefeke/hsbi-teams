@@ -124,6 +124,7 @@ public class StudierendeView extends VerticalLayout {
             if (maybeUser.isPresent()) {
                 User user = maybeUser.get();
                 List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue());
+                Notification.show(teilnehmerList.toString());
                 File tempFile = createTempFile();
                 if (tempFile != null) {
                     System.out.println("Temp file created at: " + tempFile.getAbsolutePath()); // Log the file path

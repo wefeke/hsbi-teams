@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,35 +16,35 @@ import java.util.List;
 public class ExcelExporter {
 
     public void exportTeilnehmerListe(List<Teilnehmer> teilnehmerList, String dateipfad, String currentUserId) {
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Teilnehmer");
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Teilnehmer");
 
-        Row headerRow = sheet.createRow(0);
-        headerRow.createCell(0).setCellValue("ID");
-        headerRow.createCell(1).setCellValue("Vorname");
-        headerRow.createCell(2).setCellValue("Nachname");
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("ID");
+            headerRow.createCell(1).setCellValue("Vorname");
+            headerRow.createCell(2).setCellValue("Nachname");
 
-        int rowIndex = 1;
-        for (Teilnehmer teilnehmer : teilnehmerList) {
-            if (teilnehmer.getUser().equals(currentUserId)) {
-                Row row = sheet.createRow(rowIndex++);
-                row.createCell(0).setCellValue(teilnehmer.getId());
-                row.createCell(1).setCellValue(teilnehmer.getVorname());
-                row.createCell(2).setCellValue(teilnehmer.getNachname());
+            int rowIndex = 1;
+            for (Teilnehmer teilnehmer : teilnehmerList) {
+                    Row row = sheet.createRow(rowIndex++);
+                    row.createCell(0).setCellValue(teilnehmer.getId());
+                    row.createCell(1).setCellValue(teilnehmer.getVorname());
+                    row.createCell(2).setCellValue(teilnehmer.getNachname());
             }
-        }
+            try {
+                Path path = Paths.get(dateipfad);
+                if (!Files.exists(path.getParent())) {
+                    Files.createDirectories(path.getParent());
+                }
+                FileOutputStream outputStream = new FileOutputStream(path.toFile());
+                workbook.write(outputStream);
 
-        try {
-            Path path = Paths.get(dateipfad);
-            if (!Files.exists(path.getParent())) {
-                Files.createDirectories(path.getParent());
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            FileOutputStream outputStream = new FileOutputStream(path.toFile());
-            workbook.write(outputStream);
-
-
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
     }
