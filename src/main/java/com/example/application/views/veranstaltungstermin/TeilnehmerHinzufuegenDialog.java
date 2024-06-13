@@ -30,14 +30,16 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
     private final Button importButton = new Button("importieren");
     private final TextField filterText = new TextField();
     private final Grid<Teilnehmer> grid = new Grid<>();
+    private final StudierendeHinzufuegen dialog;
     private final AuthenticatedUser authenticatedUser;
-    private final Dialog dialog = new Dialog();
+
 
     public TeilnehmerHinzufuegenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser) {
         this.veranstaltungService = veranstaltungService;
         this.teilnehmerService = teilnehmerService;
         this.veranstaltungId = veranstaltungId;
         this.authenticatedUser = authenticatedUser;
+        StudierendeHinzufuegen studierendeHinzufuegen = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser);
 
         this.setWidth("80vw");
         this.setHeight("80vh");
@@ -46,6 +48,11 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         hinzufuegenButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
         hinzufuegenButton.getStyle().set("margin-inline-start", "auto");
 
+        dialog = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser);
+        anlegenButton.addClickListener(event -> {
+            dialog.open();
+
+        });
 
         hinzufuegenButton.addClickListener(event -> {
             Set<Teilnehmer> selectedTeilnehmer = grid.getSelectedItems();
@@ -54,19 +61,19 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
                 if (maybeUser.isPresent()) {
                     User user = maybeUser.get();
                     for (Teilnehmer teilnehmer : selectedTeilnehmer) {
-                        teilnehmerService.addTeilnehmerToVeranstaltung(teilnehmer, veranstaltungId, user);
+                        veranstaltungService.addTeilnehmer(veranstaltungId, teilnehmer, user);
                     }
-                    Notification.show(selectedTeilnehmer.size() + " Studierende wurden zur Veranstaltung hinzugefügt");
+                    Notification.show(selectedTeilnehmer.size() + " Teilnehmer wurden hinzugefügt", 3000, Notification.Position.MIDDLE);
                     updateGrid();
                 }
+            } else {
+                Notification.show("Keine Teilnehmer ausgewählt", 3000, Notification.Position.MIDDLE);
             }
         });
 
-        anlegenButton.addClickListener(event ->{openDialog();
 
-        });
         configureGrid();
-        configureDialog();
+
 
         Button cancelButton = new Button("Abbrechen", e -> close());
         add(
@@ -76,6 +83,7 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
                 cancelButton
         );
         updateGrid();
+
     }
 
     private Component getToolbar() {
@@ -95,7 +103,7 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
             User user = maybeUser.get();
-            grid.setItems(teilnehmerService.findAllTeilnehmerNotInVeranstaltung(veranstaltungId,user));
+            grid.setItems(teilnehmerService.findAllTeilnehmerNotInVeranstaltung(veranstaltungId, user));
         }
     }
 
@@ -121,14 +129,4 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         return content;
     }
 
-    private void openDialog() {
-        dialog.open();
-        updateGrid();
-    }
-
-    private void configureDialog() {
-        dialog.add(new StudierendeHinzufuegen(teilnehmerService, authenticatedUser));
-        dialog.setWidth("400px");
-        dialog.setHeight("300px");
-    }
 }

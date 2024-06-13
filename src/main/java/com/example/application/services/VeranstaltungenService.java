@@ -31,8 +31,7 @@ public class VeranstaltungenService {
     public void saveVeranstaltung(Veranstaltung veranstaltung) {
         if (veranstaltung != null) {
             veranstaltungenRepository.save(veranstaltung);
-        }
-        else
+        } else
             System.err.println("Test is null. Are you sure you have connected your form to the application?");
     }
 
@@ -40,8 +39,7 @@ public class VeranstaltungenService {
     public void deleteVeranstaltung(Veranstaltung veranstaltung) {
         if (veranstaltung != null) {
             veranstaltungenRepository.delete(veranstaltung);
-        }
-        else
+        } else
             System.err.println("Test is null. Are you sure you have connected your form to the application?");
     }
 
@@ -52,5 +50,18 @@ public class VeranstaltungenService {
         veranstaltung.getTeilnehmer().remove(teilnehmer);
         veranstaltungenRepository.save(veranstaltung);
     }
+
+    @Transactional
+    public void addTeilnehmer(Long veranstaltungId, Teilnehmer teilnehmer, User user) {
+        Veranstaltung veranstaltung = veranstaltungenRepository.findByIdAndUser(veranstaltungId, user);
+        if (veranstaltung != null) {
+            veranstaltung.getTeilnehmer().add(teilnehmer);
+            teilnehmer.getVeranstaltungen().add(veranstaltung); // Update the participant's list of events
+            veranstaltungenRepository.save(veranstaltung);
+        } else {
+            System.err.println("Veranstaltung nicht gefunden. Sind Sie sicher, dass die Veranstaltung existiert und der Benutzer berechtigt ist?");
+        }
+    }
+
 
 }
