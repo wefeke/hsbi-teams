@@ -30,7 +30,7 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
     private final Button importButton = new Button("importieren");
     private final TextField filterText = new TextField();
     private final Grid<Teilnehmer> grid = new Grid<>();
-    private AuthenticatedUser authenticatedUser;
+    private final AuthenticatedUser authenticatedUser;
     private final Dialog dialog = new Dialog();
 
     public TeilnehmerHinzufuegenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser) {
@@ -42,12 +42,10 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         this.setWidth("80vw");
         this.setHeight("80vh");
 
-
-
         hinzufuegenButton.setEnabled(false);
         hinzufuegenButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
         hinzufuegenButton.getStyle().set("margin-inline-start", "auto");
-        updateGrid();
+
 
         hinzufuegenButton.addClickListener(event -> {
             Set<Teilnehmer> selectedTeilnehmer = grid.getSelectedItems();
@@ -69,15 +67,15 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         });
         configureGrid();
         configureDialog();
-        // Erstellen Sie den Abbrechen-Button
+
         Button cancelButton = new Button("Abbrechen", e -> close());
-        add(cancelButton,
+        add(
 
                 getToolbar(),
-                getContent()
-
+                getContent(),
+                cancelButton
         );
-
+        updateGrid();
     }
 
     private Component getToolbar() {
@@ -101,22 +99,20 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         }
     }
 
-        private void configureGrid() {
-            grid.setSizeFull();
-            grid.setSelectionMode(Grid.SelectionMode.MULTI);
-            grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname").setSortable(true);
-            ;
-            grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname").setSortable(true);
-            ;
-            grid.addColumn(Teilnehmer::getId).setHeader("MatrikelNr").setSortable(true);
-            ;
-            grid.addSelectionListener(selection -> {
-                int size = selection.getAllSelectedItems().size();
-                hinzufuegenButton.setEnabled(size != 0);
-            });
-            grid.setMultiSort(true, Grid.MultiSortPriority.APPEND);
-            updateGrid();
+    private void configureGrid() {
+        grid.setSizeFull();
+        grid.setSelectionMode(Grid.SelectionMode.MULTI);
+        grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname").setSortable(true);
+        grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname").setSortable(true);
+        grid.addColumn(Teilnehmer::getId).setHeader("MatrikelNr").setSortable(true);
+        grid.addSelectionListener(selection -> {
+            int size = selection.getAllSelectedItems().size();
+            hinzufuegenButton.setEnabled(size != 0);
+        });
+        grid.setMultiSort(true, Grid.MultiSortPriority.APPEND);
+        updateGrid();
         }
+
     private Component getContent() {
         HorizontalLayout content = new HorizontalLayout(grid);
         content.setFlexGrow(1, grid);
@@ -124,6 +120,7 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         content.setSizeFull();
         return content;
     }
+
     private void openDialog() {
         dialog.open();
         updateGrid();
@@ -133,6 +130,5 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         dialog.add(new StudierendeHinzufuegen(teilnehmerService, authenticatedUser));
         dialog.setWidth("400px");
         dialog.setHeight("300px");
-
     }
 }
