@@ -2,10 +2,7 @@ package com.example.application.views.gruppenarbeit;
 
 import com.example.application.models.*;
 import com.example.application.security.AuthenticatedUser;
-import com.example.application.services.GruppeService;
-import com.example.application.services.GruppenarbeitService;
-import com.example.application.services.TeilnehmerService;
-import com.example.application.services.VeranstaltungsterminService;
+import com.example.application.services.*;
 import com.example.application.views.MainLayout;
 import com.example.application.views.veranstaltungstermin.VeranstaltungDetailView;
 import com.vaadin.flow.component.Component;
@@ -38,6 +35,7 @@ import java.util.List;
 @Route(value = "gruppenarbeiten", layout = MainLayout.class)
 public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
+    private final VeranstaltungenService veranstaltungenService;
     //TestStuff
     Button saveBtn = new Button("Gruppenarbeit speichern");
     Button randomizeBtn = new Button("Neu mischen");
@@ -54,13 +52,13 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     private VeranstaltungDetailView veranstaltungDetailView;
 
     //Data
-    List<Teilnehmer> allParticipants = new ArrayList<>();
-    Set<Teilnehmer> selectedParticipants;
-    List<Teilnehmer> selectedParticipantsList;
-    Veranstaltungstermin veranstaltungstermin;
-    Veranstaltung veranstaltung;
-    Gruppenarbeit gruppenarbeit = new Gruppenarbeit();
-    List<Gruppe> gruppen = new ArrayList<Gruppe>();
+    private List<Teilnehmer> allParticipants = new ArrayList<>();
+    private Set<Teilnehmer> selectedParticipants;
+    private List<Teilnehmer> selectedParticipantsList;
+    private Veranstaltungstermin veranstaltungstermin;
+    private final String veranstaltungId;
+    private Gruppenarbeit gruppenarbeit = new Gruppenarbeit();
+    private List<Gruppe> gruppen = new ArrayList<Gruppe>();
 
     //Binder
     Binder<Gruppenarbeit> binderGruppenarbeit = new Binder<>(Gruppenarbeit.class);
@@ -77,8 +75,8 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
     //Konstruktor
     @Autowired
-    public GruppenarbeitHinzufuegenDialog(AuthenticatedUser authenticatedUser, Veranstaltung veranstaltung, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungDetailView veranstaltungDetailView) {
-        this.veranstaltung = veranstaltung;
+    public GruppenarbeitHinzufuegenDialog(AuthenticatedUser authenticatedUser, String veranstaltungId, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungDetailView veranstaltungDetailView, VeranstaltungenService veranstaltungenService, Veranstaltungstermin veranstaltungstermin) {
+        this.veranstaltungId = veranstaltungId;
         this.gruppenarbeitService = gruppenarbeitService;
         this.teilnehmerService = teilnehmerService;
         this.veranstaltungsterminService = veranstaltungsterminService;
@@ -86,12 +84,19 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         this.veranstaltungstermin = null;
         this.authenticatedUser = authenticatedUser;
         this.veranstaltungDetailView = veranstaltungDetailView;
+        this.veranstaltungstermin = veranstaltungstermin;
 
         //gruppenGroesse.setReadOnly(true);
 
-        if(this.veranstaltung!=null){
-            listBoxParticipants();
+
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+            if (veranstaltungenService.findVeranstaltungById(Long.parseLong(veranstaltungId), user) != null) {
+                listBoxParticipants();
+            }
         }
+
 
         configureGroupsArea();
 
@@ -114,7 +119,6 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
         saveBtn.addClickListener(event -> {
             if(binderGruppenarbeit.writeBeanIfValid(gruppenarbeit)){
-                Optional<User> maybeUser = authenticatedUser.get();
                 if (maybeUser.isPresent()) {
                     User user = maybeUser.get();
                     gruppenarbeit.setUser(user);
@@ -153,6 +157,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
         //Finales Zeugs
         add(createLayout());
+        this.veranstaltungenService = veranstaltungenService;
     }
 
     //Teilt ausgewählte Teilnehmer zufällig auf Gruppen zu und zeigt diese Zufallseinteilung dann mithilfe von Grids an
@@ -275,7 +280,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
     //Für die Felder der Teilnehmer in der ListBox
     private void listBoxParticipants() {
-        allParticipants.addAll(teilnehmerService.findTeilnehmerByVeranstaltungId(this.veranstaltung.getId()));
+        allParticipants.addAll(teilnehmerService.findTeilnehmerByVeranstaltungId(Long.parseLong(veranstaltungId)));
 
         participants.setItems(allParticipants);
         for(Teilnehmer p:allParticipants){
@@ -403,9 +408,9 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
                 .bind(Gruppenarbeit::getBeschreibung, Gruppenarbeit::setBeschreibung);
     }
 
-    public void setVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin){
-        this.veranstaltungstermin = veranstaltungstermin;
-    }
+//    public void setVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin){
+//        this.veranstaltungstermin = veranstaltungstermin;
+//    }
 
 //    private void changeLabelText(int groups, int participants) {
 //        int[] sizes = groupSizes(groups, participants);
