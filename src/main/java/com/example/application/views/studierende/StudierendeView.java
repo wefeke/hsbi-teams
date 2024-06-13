@@ -29,9 +29,14 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.example.application.ExcelReader.ExcelExporter;
 
+import com.vaadin.flow.server.StreamResource;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -111,16 +116,18 @@ public class StudierendeView extends VerticalLayout {
                 aendernDiolog(selectedTeilnehmer);
             }
         });
-
-        exportButton.addClickListener(event -> {
-            Optional<User> maybeUser = authenticatedUser.get();
-            if (maybeUser.isPresent()) {
-                User user = maybeUser.get();
-                List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue());
-                String dateipfad = "C:\\Users\\tobia\\OneDrive\\Desktop"; // Ändern Sie dies zu dem tatsächlichen Pfad Ihrer Excel-Datei
-                excelExporter.exportTeilnehmerListe(teilnehmerList, dateipfad, user.getUsername());
-            }
-        });
+exportButton.addClickListener(event -> {
+    Optional<User> maybeUser = authenticatedUser.get();
+    if (maybeUser.isPresent()) {
+        User user = maybeUser.get();
+        List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue());
+        File tempFile = createTempFile();
+        if (tempFile != null) {
+            excelExporter.exportTeilnehmerListe(teilnehmerList, tempFile.getAbsolutePath(), user.getUsername());
+            offerDownload(tempFile);
+        }
+    }
+});
 
         UI.getCurrent().getPage().addBrowserWindowResizeListener(event -> {
             if (event.getWidth() <= 1000) {
@@ -257,4 +264,25 @@ public class StudierendeView extends VerticalLayout {
         aendern.setIcon(aendernIcon);
         aendern.setText("Studierende ändern");
     }
+    private File createTempFile() {
+        try {
+            File tempFile = File.createTempFile("export", ".xlsx");
+            tempFile.deleteOnExit();
+            return tempFile;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    private void offerDownload(File file) {
+    StreamResource resource = new StreamResource(file.getName(), () -> {
+        try {
+            return new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    });
+
+}
 }
