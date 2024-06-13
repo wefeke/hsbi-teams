@@ -9,6 +9,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -36,9 +37,6 @@ import java.util.List;
 public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
     private final VeranstaltungenService veranstaltungenService;
-    //TestStuff
-    Button saveBtn = new Button("Gruppenarbeit speichern");
-    Button randomizeBtn = new Button("Neu mischen");
 
     //Services
     private final GruppenarbeitService gruppenarbeitService;
@@ -66,12 +64,14 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     //Dialog Items
     TextField titleField = new TextField("Titel");
     TextArea descriptionArea = new TextArea("Beschreibung");
-    H2 infoText = new H2("Gruppenarbeit anlegen");
     MultiSelectListBox<Teilnehmer> participants = new MultiSelectListBox<>();
     Select<String> groupSize = new Select<>();
     Grid<Gruppe> groupsGrid = new Grid<>(Gruppe.class, false);
     //TextField gruppenGroesse = new TextField("Teilnehmeranzahl");
     Div groupsArea = new Div();
+    Button saveBtn = new Button("Gruppenarbeit speichern");
+    Button randomizeBtn = new Button("Neu mischen");
+    Button cancelBtn = new Button("Abbrechen");
 
     //Konstruktor
     @Autowired
@@ -120,6 +120,11 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
         saveBtn.addClickListener(event -> {
             saveBtnFunctionality(gruppenarbeitService, veranstaltungsterminService, gruppeService, veranstaltungDetailView, veranstaltungstermin, maybeUser);
+        });
+
+        cancelBtn.addClickListener(event -> {
+            clearFields();
+            close();
         });
     }
 
@@ -400,6 +405,8 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         VerticalLayout gruppenarbeitText = new VerticalLayout();
         VerticalLayout buttonsLayout = new VerticalLayout();
 
+        setHeaderTitle("Gruppenarbeit hinzufügen");
+
         titleField.setWidth("400px");
         gruppenarbeitText.add(titleField);
         descriptionArea.setHeight("270px");
@@ -407,8 +414,11 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         gruppenarbeitText.add(descriptionArea);
 
         groupSize.setWidth("230px");
-        buttonsLayout.add(groupSize, saveBtn, randomizeBtn);
+        buttonsLayout.add(groupSize, randomizeBtn);
         buttonsLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        getFooter().add(cancelBtn);
+        getFooter().add(saveBtn);
+        saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         gruppenarbeitData.add(gruppenarbeitText);
         participants.setHeight("400px");
@@ -416,7 +426,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         gruppenarbeitData.add(buttonsLayout);
         gruppenarbeitData.setWidthFull();
 
-        mainPageLayout.add(infoText, gruppenarbeitData, new H3("Gruppen"), groupsArea);
+        mainPageLayout.add(gruppenarbeitData, new H3("Gruppen"), groupsArea);
 
         return mainPageLayout;
     }
