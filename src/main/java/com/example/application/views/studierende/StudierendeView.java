@@ -275,23 +275,24 @@ public class StudierendeView extends VerticalLayout {
         aendern.setText("Studierende ändern");
     }
     private File createTempFile() {
-    try {
-        // Pfad zum Download-Ordner
-        String downloadFolderPath = System.getProperty("user.home") + "/Downloads";
+        try {
+            // Pfad zum Download-Ordner
+            String downloadFolderPath = System.getProperty("user.home") + "/Downloads";
 
-        // Erstellen Sie das Verzeichnis, wenn es noch nicht existiert
-        File dir = new File(downloadFolderPath);
-        if (!dir.exists()) {
-            dir.mkdir();
+            // Erstellen Sie das Verzeichnis, wenn es noch nicht existiert
+            File dir = new File(downloadFolderPath);
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+
+            // Erstellen Sie die Datei im Download-Ordner
+            File tempFile = File.createTempFile("export", ".xlsx", dir);
+            return tempFile;
         }
-
-        // Erstellen Sie die Datei im Download-Ordner
-        File tempFile = File.createTempFile("export", ".xlsx", dir);
-        return tempFile;
-    } catch (IOException e) {
-        e.printStackTrace();
-        return null;
-    }
+        catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private StreamResource offerDownload(File file) {
