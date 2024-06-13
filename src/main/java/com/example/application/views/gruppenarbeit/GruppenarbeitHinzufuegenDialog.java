@@ -72,6 +72,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     Button saveBtn = new Button("Gruppenarbeit speichern");
     Button randomizeBtn = new Button("Neu mischen");
     Button cancelBtn = new Button("Abbrechen");
+    H4 groupsTitle = new H4("Gruppen");
 
     //Konstruktor
     @Autowired
@@ -190,6 +191,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     //Teilt ausgewählte Teilnehmer zufällig auf Gruppen zu und zeigt diese Zufallseinteilung dann mithilfe von Grids an
     private void randomize(List<Gruppe> gruppen) {
         if(groupSize.getOptionalValue().isEmpty()){
+            groupsTitle.setVisible(false);
             clearGroupsArea();
             clearGroupsList(gruppen);
         }
@@ -197,6 +199,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
             Notification.show("Kann keine Gruppen erstellen, da keine Teilnehmer ausgewählt sind.");
             clearGroupsArea();
             clearGroupsList(gruppen);
+            groupsTitle.setVisible(false);
         }
         else{
             clearGroupsList(gruppen);
@@ -208,6 +211,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
             //Notification.show(gruppenGroesse.getValue());
             randomizeParticipants(sizes, numberOfGroups, gruppen);
             groupGrids(numberOfGroups, gruppen);
+            groupsTitle.setVisible(true);
         }
     }
 
@@ -426,7 +430,8 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         gruppenarbeitData.add(buttonsLayout);
         gruppenarbeitData.setWidthFull();
 
-        mainPageLayout.add(gruppenarbeitData, new H3("Gruppen"), groupsArea);
+        mainPageLayout.add(gruppenarbeitData, groupsTitle, groupsArea);
+        groupsTitle.setVisible(false);
 
         return mainPageLayout;
     }
