@@ -5,8 +5,6 @@ import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.*;
 import com.example.application.views.MainLayout;
 import com.example.application.views.veranstaltungstermin.VeranstaltungDetailView;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -72,6 +70,10 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     Button saveBtn = new Button("Gruppenarbeit speichern");
     Button randomizeBtn = new Button("Neu mischen");
     Button cancelBtn = new Button("Abbrechen");
+    Button clearGroupsBtn = new Button("Nur Gruppen leeren");
+    Button clearAllFieldsBtn = new Button("Formular leeren");
+    Button deselectAllParticipantsBtn = new Button("Alle Teilnehmer entfernen");
+    Button selectAllParticipantsBtn = new Button("Alle Teilnehmer auswählen");
     H4 groupsTitle = new H4("Gruppen");
 
     //Konstruktor
@@ -125,8 +127,35 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
         cancelBtn.addClickListener(event -> {
             clearFields();
+            clearGroupsArea();
+            groupSize.clear();
+            groupsTitle.setVisible(false);
             close();
         });
+
+        clearGroupsBtn.addClickListener(event -> {
+            clearGroupsArea();
+            groupSize.clear();
+            groupsTitle.setVisible(false);
+        });
+
+        clearAllFieldsBtn.addClickListener(event -> {
+            clearFields();
+            groupSize.clear();
+            clearGroupsArea();
+            groupsTitle.setVisible(false);
+        });
+
+        deselectAllParticipantsBtn.addClickListener(event -> {
+            participants.deselectAll();
+        });
+
+        selectAllParticipantsBtn.addClickListener(event -> {
+            for(Teilnehmer p:allParticipants){
+                participants.select(p);
+            }
+        });
+
     }
 
     private void randomizeBtnFunctionality() {
@@ -418,7 +447,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         gruppenarbeitText.add(descriptionArea);
 
         groupSize.setWidth("230px");
-        buttonsLayout.add(groupSize, randomizeBtn);
+        buttonsLayout.add(groupSize, randomizeBtn, clearAllFieldsBtn, clearGroupsBtn, deselectAllParticipantsBtn, selectAllParticipantsBtn);
         buttonsLayout.setAlignItems(FlexComponent.Alignment.CENTER);
         getFooter().add(cancelBtn);
         getFooter().add(saveBtn);
