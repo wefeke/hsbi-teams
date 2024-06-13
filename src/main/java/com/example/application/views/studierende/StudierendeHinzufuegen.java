@@ -2,7 +2,9 @@ package com.example.application.views.studierende;
 
 import com.example.application.DoubleToLongConverter;
 import com.example.application.models.Teilnehmer;
+import com.example.application.models.User;
 import com.example.application.models.Veranstaltungstermin;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.Key;
@@ -28,6 +30,9 @@ public class StudierendeHinzufuegen extends FormLayout {
 
     private final TeilnehmerService teilnehmerService;
 
+    //User
+    private AuthenticatedUser authenticatedUser;
+
     TextField firstName = new TextField("Vorname");
     TextField lastName = new TextField("Nachname");
     NumberField matrikelNr = new NumberField("Matrikelnummer");
@@ -36,8 +41,9 @@ public class StudierendeHinzufuegen extends FormLayout {
     Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
 
     @Autowired
-    public StudierendeHinzufuegen(TeilnehmerService teilnehmerService) {
+    public StudierendeHinzufuegen(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
         this.teilnehmerService = teilnehmerService;
+        this.authenticatedUser = authenticatedUser;
         addClassName("contact-form");
 
         add(
@@ -74,8 +80,7 @@ public class StudierendeHinzufuegen extends FormLayout {
                     saveTeilnehmer();
                     Notification.show("Teilnehmer saved", 3000, Notification.Position.MIDDLE);
                 }
-            }
-            else {
+            } else {
                 Notification.show("Please fill out all fields", 3000, Notification.Position.MIDDLE);
             }
         });
@@ -98,16 +103,23 @@ public class StudierendeHinzufuegen extends FormLayout {
         teilnehmer.setVorname(firstName.getValue());
         teilnehmer.setNachname(lastName.getValue());
         teilnehmer.setId(matrikelNr.getValue().longValue());
-        teilnehmerService.saveTeilnehmer(teilnehmer);
+
+        Optional<User> maybeUser = authenticatedUser.get();
+        User user = maybeUser.get();
+        teilnehmerService.saveTeilnehmer(teilnehmer,user);
+
+
+        }
+
+//    private void bindFields(){
+//        binder.forField(firstName)
+//                .bind(Teilnehmer::getVorname, Teilnehmer::setVorname);
+//        binder.forField(lastName)
+//                .bind(Teilnehmer::getNachname, Teilnehmer::setNachname);
+//        binder.forField(matrikelNr)
+//                .withConverter(new DoubleToLongConverter())
+//                .bind(Teilnehmer::getId, Teilnehmer::setId);
+//    }
     }
 
-    private void bindFields(){
-        binder.forField(firstName)
-                .bind(Teilnehmer::getVorname, Teilnehmer::setVorname);
-        binder.forField(lastName)
-                .bind(Teilnehmer::getNachname, Teilnehmer::setNachname);
-        binder.forField(matrikelNr)
-                .withConverter(new DoubleToLongConverter())
-                .bind(Teilnehmer::getId, Teilnehmer::setId);
-    }
-}
+

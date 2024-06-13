@@ -120,4 +120,11 @@ public class Teilnehmer {
     public void addGruppenarbeit(Gruppenarbeit gruppenarbeit){
         this.gruppenarbeiten.add(gruppenarbeit);
     }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+    public User getUser () {
+        return user;
+    }
 }

@@ -72,7 +72,7 @@ public class VeranstaltungDialog extends Dialog {
     private void configureElements() {
 
         //Combobox
-        comboBox.setItems(teilnehmerService.findAllTeilnehmer(""));
+        comboBox.setItems(teilnehmerService.findAllTeilnehmerByUserAndFilter(authenticatedUser.get().get(),""));
         comboBox.setRenderer(new ComponentRenderer<>(teilnehmer -> {
             HorizontalLayout row = new HorizontalLayout();
             row.setAlignItems(FlexComponent.Alignment.CENTER);
