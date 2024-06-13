@@ -20,13 +20,12 @@ public class Veranstaltung implements Serializable {
     //Beziehungen
     @ManyToOne()
     private User user;
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "veranstaltung", fetch = FetchType.EAGER)
     private List<Veranstaltungstermin> veranstaltungstermine = new ArrayList<>();
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Teilnehmer> teilnehmer = new HashSet<>();
 
     public Veranstaltung() {
-
     }
 
     public Veranstaltung(LocalDate semester, String titel, User user, List<Veranstaltungstermin> veranstaltungstermine, Set<Teilnehmer> teilnehmer) {
@@ -123,5 +122,13 @@ public class Veranstaltung implements Serializable {
     //Lilli
     public void removeVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin){
         this.veranstaltungstermine.remove(veranstaltungstermin);
+    }
+
+    public void removeAllTermine() {
+        this.veranstaltungstermine = new ArrayList<Veranstaltungstermin>();
+    }
+
+    public void removeAllTeilnehmer() {
+        this.teilnehmer = new HashSet<Teilnehmer>();
     }
 }

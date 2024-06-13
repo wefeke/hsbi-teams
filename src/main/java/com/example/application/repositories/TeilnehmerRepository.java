@@ -47,4 +47,8 @@ public interface TeilnehmerRepository extends JpaRepository<Teilnehmer, Long> {
 
     @Query("SELECT t FROM Teilnehmer t WHERE t.matrikelNr NOT IN (SELECT teil.matrikelNr FROM Veranstaltung v JOIN v.teilnehmer teil WHERE v.id = :veranstaltungId)and t.user = :user")
     List<Teilnehmer> findAllTeilnehmerNotInVeranstaltung(Long veranstaltungId , User user);
+
+    @Query(value = "SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END FROM Teilnehmer t JOIN t.gruppenarbeiten g WHERE t.matrikelNr = :teilnehmerId AND g.veranstaltungstermin.veranstaltung.id = :veranstaltungId")
+    Boolean isTeilnehmerInGruppenarbeit(@Param("teilnehmerId") Long teilnehmerId, @Param("veranstaltungId") Long veranstaltungId);
+
 }

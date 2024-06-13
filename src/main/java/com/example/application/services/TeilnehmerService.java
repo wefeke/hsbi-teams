@@ -83,6 +83,10 @@ public class TeilnehmerService {
         return teilnehmerRepository.findStudierendeOhneVeranstaltung(user);
     }
 
+    public boolean isTeilnehmerInGruppenarbeit(Teilnehmer teilnehmer, Long veranstaltungId) {
+        return teilnehmerRepository.isTeilnehmerInGruppenarbeit(teilnehmer.getId(), veranstaltungId);
+    }
+
     public List<Teilnehmer> findStudierendeVorJahren(int years, User user) {
         return teilnehmerRepository.findStudierendeVorJahren(LocalDateTime.now().minusYears(years), user);
     }

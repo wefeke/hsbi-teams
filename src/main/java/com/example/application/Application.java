@@ -33,7 +33,7 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
     private AuswertungRepository auswertungRepository;
     private GruppenarbeitRepository gruppenarbeitRepository;
     private GruppenRepository gruppenRepository;
-    private TeilnehmerGruppenarbeitRepository teilnehmerGruppenarbeitRepository;
+    // private TeilnehmerGruppenarbeitRepository teilnehmerGruppenarbeitRepository;
     private TeilnehmerRepository teilnehmerRepository;
     private UserRepository userRepository;
     private VeranstaltungenRepository veranstaltungRepository;
@@ -41,11 +41,11 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
 
     private PasswordEncoder passwordEncoder;
 
-    public Application(AuswertungRepository auswertungRepository, GruppenarbeitRepository gruppenarbeitRepository, GruppenRepository gruppenRepository, TeilnehmerGruppenarbeitRepository teilnehmerGruppenarbeitRepository, TeilnehmerRepository teilnehmerRepository, UserRepository userRepository, VeranstaltungenRepository veranstaltungRepository, VeranstaltungsterminRepository veranstaltungsterminRepository, PasswordEncoder passwordEncoder){
+    public Application(AuswertungRepository auswertungRepository, GruppenarbeitRepository gruppenarbeitRepository, GruppenRepository gruppenRepository, TeilnehmerRepository teilnehmerRepository, UserRepository userRepository, VeranstaltungenRepository veranstaltungRepository, VeranstaltungsterminRepository veranstaltungsterminRepository, PasswordEncoder passwordEncoder){
         this.auswertungRepository = auswertungRepository;
         this.gruppenarbeitRepository = gruppenarbeitRepository;
         this.gruppenRepository = gruppenRepository;
-        this.teilnehmerGruppenarbeitRepository = teilnehmerGruppenarbeitRepository;
+        //this.teilnehmerGruppenarbeitRepository = teilnehmerGruppenarbeitRepository;
         this.teilnehmerRepository = teilnehmerRepository;
         this.userRepository = userRepository;
         this.veranstaltungRepository = veranstaltungRepository;
@@ -71,11 +71,20 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
 //        testVeranstaltung.addTeilnehmer(testTeilnehmer3);
 //        testUser.addVeranstaltungen(testVeranstaltung);
 //
+//
 //        userRepository.save(testUser);
 //        teilnehmerRepository.save(testTeilnehmer);
 //        teilnehmerRepository.save(testTeilnehmer2);
 //        teilnehmerRepository.save(testTeilnehmer3);
 //        veranstaltungRepository.save(testVeranstaltung);
+
+//        testTeilnehmer.addVerastaltung(testVeranstaltung);
+//        testTeilnehmer2.addVerastaltung(testVeranstaltung);
+//        testTeilnehmer3.addVerastaltung(testVeranstaltung);
+//
+//        teilnehmerRepository.save(testTeilnehmer);
+//        teilnehmerRepository.save(testTeilnehmer2);
+//        teilnehmerRepository.save(testTeilnehmer3);
 
     }
 

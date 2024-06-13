@@ -4,6 +4,7 @@ package com.example.application.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.apache.ibatis.annotations.One;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,13 +14,16 @@ import java.util.Set;
 @Table(name = "users") // Ändern Sie den Tabellennamen auf "users"
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(generator = "generator")
+    @SequenceGenerator(name="generator", sequenceName = "GENERATOR", allocationSize = 50, initialValue = 100)
+    @Column(name = "id", nullable = false)
     private Long id;
     private String username;
     private String name;
     @JsonIgnore
     private String hashedPassword;
     private boolean isAdmin;
+    private boolean locked;
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Role> roles;
@@ -28,7 +32,7 @@ public class User {
     private byte[] profilePicture;
 
     //Beziehungen
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<Veranstaltung> veranstaltungen = new ArrayList<>();
 
     public User() {
@@ -77,10 +81,12 @@ public class User {
         isAdmin = admin;
     }
 
+    @Transactional
     public Set<Role> getRoles() {
         return roles;
     }
 
+    @Transactional
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
@@ -120,6 +126,13 @@ public class User {
         return super.hashCode();
     }
 
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
 
     @Override
     public boolean equals(Object obj) {

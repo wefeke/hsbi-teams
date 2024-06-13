@@ -4,7 +4,9 @@ package com.example.application.models;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Gruppe {
@@ -18,10 +20,10 @@ public class Gruppe {
     //Beziehungen
     @ManyToOne()
     private User user;
-    @ManyToOne
+    @ManyToOne()
     private Gruppenarbeit gruppenarbeit = new Gruppenarbeit();
-    @ManyToMany
-    private List<Teilnehmer> teilnehmer = new ArrayList<>();
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Teilnehmer> teilnehmer = new HashSet<>();
 
     public Gruppe(){
     }
@@ -29,14 +31,14 @@ public class Gruppe {
     public Gruppe(Long nummer){
         this.nummer = nummer;
         this.gruppenarbeit = null;
-        this.teilnehmer = new ArrayList<Teilnehmer>();
+        this.teilnehmer = new HashSet<Teilnehmer>();
     }
 
     public Gruppe(Long nummer, User user){
         this.nummer = nummer;
         this.user = user;
         this.gruppenarbeit = null;
-        this.teilnehmer = new ArrayList<Teilnehmer>();
+        this.teilnehmer = new HashSet<Teilnehmer>();
     }
 
 
@@ -68,11 +70,19 @@ public class Gruppe {
         return "Gruppe " + this.nummer;
     }
 
-    public List<Teilnehmer> getTeilnehmer() {
+    public Set<Teilnehmer> getTeilnehmer() {
         return this.teilnehmer;
     }
 
     public void addTeilnehmer(Teilnehmer teilnehmer) {
         this.teilnehmer.add(teilnehmer);
+    }
+
+    public void addGruppenarbeit(Gruppenarbeit gruppenarbeit) {
+        this.gruppenarbeit = gruppenarbeit;
+    }
+
+    public void setUser(User user){
+        this.user = user;
     }
 }

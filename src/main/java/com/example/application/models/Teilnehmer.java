@@ -26,11 +26,11 @@ public class Teilnehmer {
     //Beziehungen
     @ManyToOne()
     private User user;
-    @ManyToMany (fetch = FetchType.EAGER)
+    @ManyToMany (mappedBy = "teilnehmer", fetch = FetchType.EAGER)
     private List<Veranstaltung> veranstaltungen = new ArrayList<>();
-    @ManyToMany (fetch = FetchType.EAGER)
+    @ManyToMany (mappedBy = "teilnehmer", fetch = FetchType.EAGER)
     private List<Gruppenarbeit> gruppenarbeiten = new ArrayList<>();
-    @ManyToMany (fetch = FetchType.EAGER)
+    @ManyToMany (mappedBy = "teilnehmer", fetch = FetchType.EAGER)
     private List<Gruppe> gruppen = new ArrayList<>();
 
     public Teilnehmer() {
@@ -111,6 +111,14 @@ public class Teilnehmer {
 
     public String getFullName() {
         return this.vorname + " " + this.nachname;
+    }
+
+    public void removeVeranstaltung(Veranstaltung veranstaltung) {
+        this.veranstaltungen.remove(veranstaltung);
+    }
+
+    public void addGruppenarbeit(Gruppenarbeit gruppenarbeit){
+        this.gruppenarbeiten.add(gruppenarbeit);
     }
 
     public void setUser(User user) {

@@ -3,26 +3,21 @@ package com.example.application.login;
 import com.example.application.models.Role;
 import com.example.application.models.User;
 import com.example.application.services.UserService;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Input;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import jakarta.persistence.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.ByteArrayOutputStream;
@@ -49,7 +44,7 @@ public class RegistrationView extends VerticalLayout {
 
     //Image
     MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
-    private Upload profilePicture = new Upload(buffer);
+    private Upload upload = new Upload(buffer);
     private byte[] uploadedImage;
 
     //Services
@@ -87,7 +82,7 @@ public class RegistrationView extends VerticalLayout {
                 username,
                 password,
                 password_check,
-                profilePicture,
+                upload,
                 verticalLayout
         );
     }
@@ -97,7 +92,7 @@ public class RegistrationView extends VerticalLayout {
         username.setWidthFull();
         password.setWidthFull();
         password_check.setWidthFull();
-        profilePicture.setWidthFull();
+        upload.setWidthFull();
         submitButton.setWidthFull();
         submitButton.setThemeName("primary");
 
@@ -107,6 +102,7 @@ public class RegistrationView extends VerticalLayout {
                 user.setRoles(Set.of(Role.USER));
                 user.setAdmin(false);
                 user.setProfilePicture(uploadedImage);
+                user.setLocked(true);
                 if (user.getPassword() != null) {
                     user.setPassword(passwordEncoder.encode(user.getPassword())); // encode the password
                     userService.saveUser(user); //Angemeldeten User holen
@@ -117,21 +113,33 @@ public class RegistrationView extends VerticalLayout {
 
                 Notification.show("User " + user.getName() + " angelegt!");
                 clearFields();
-                getUI().ifPresent(ui -> ui.navigate("login"));
+                String previousLocation = (String) VaadinSession.getCurrent().getAttribute("previousLocation");
+                if (previousLocation != null) {
+                    getUI().ifPresent(ui -> ui.navigate(previousLocation));
+                }
+                else {
+                    getUI().ifPresent(ui -> ui.navigate("login"));
+                }
             }
         });
 
         cancelButton.setWidthFull();
         cancelButton.setThemeName("error");
         cancelButton.addClickListener(event -> {
-            getUI().ifPresent(ui -> ui.navigate("login"));
+            String previousLocation = (String) VaadinSession.getCurrent().getAttribute("previousLocation");
+            if (previousLocation != null) {
+                getUI().ifPresent(ui -> ui.navigate(previousLocation));
+            }
+            else {
+                getUI().ifPresent(ui -> ui.navigate("login"));
+            }
         });
 
         password.addValueChangeListener(event -> checkPasswordsMatch());
         password_check.addValueChangeListener(event -> checkPasswordsMatch());
 
         //Image Handling
-        profilePicture.addSucceededListener(event -> {
+        upload.addSucceededListener(event -> {
             InputStream inputStream = buffer.getInputStream(event.getFileName());
             ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
 
@@ -144,13 +152,12 @@ public class RegistrationView extends VerticalLayout {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
             uploadedImage = byteOutputStream.toByteArray();
-            // Here you can handle the uploaded file
-            // For example, you can save it to a database
-            // user.setProfilePicture(bytes);
             Notification.show("File " + event.getFileName() + " successfully uploaded.");
         });
+
+        upload.setAcceptedFileTypes("image/jpeg", "image/png", "image/gif");
+        upload.setMaxFiles(1);
     }
 
     private void checkPasswordsMatch() {
@@ -170,7 +177,7 @@ public class RegistrationView extends VerticalLayout {
                 .bind(User::getName, User::setName);
         binder.forField(username)
                 .asRequired("Username muss gefüllt sein")
-                .withValidator(this::isUsernameAvailable, "Username bereits vergeben")
+                .withValidator(username -> userService.isUsernameAvailable(username), "Username bereits vergeben")
                 .withValidator(username -> username.equals(username.toLowerCase()), "Username muss klein geschrieben sein")
                 .bind(User::getUsername, User::setUsername);
         binder.forField(password)
@@ -187,8 +194,5 @@ public class RegistrationView extends VerticalLayout {
         password_check.clear();
     }
 
-    private boolean isUsernameAvailable(String username) {
-        User user = userService.findUserByUsername(username);
-        return user == null;
-    }
+
 }
