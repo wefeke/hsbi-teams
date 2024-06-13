@@ -81,14 +81,20 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         this.teilnehmerService = teilnehmerService;
         this.veranstaltungsterminService = veranstaltungsterminService;
         this.gruppeService = gruppeService;
-        this.veranstaltungstermin = null;
+        this.veranstaltungstermin = veranstaltungstermin;
         this.authenticatedUser = authenticatedUser;
         this.veranstaltungDetailView = veranstaltungDetailView;
-        this.veranstaltungstermin = veranstaltungstermin;
 
         //gruppenGroesse.setReadOnly(true);
 
+        configureDialog(authenticatedUser, veranstaltungId, gruppenarbeitService, veranstaltungsterminService, gruppeService, veranstaltungDetailView, veranstaltungenService, veranstaltungstermin);
 
+        //Finales Zeugs
+        add(createLayout());
+        this.veranstaltungenService = veranstaltungenService;
+    }
+
+    private void configureDialog(AuthenticatedUser authenticatedUser, String veranstaltungId, GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungDetailView veranstaltungDetailView, VeranstaltungenService veranstaltungenService, Veranstaltungstermin veranstaltungstermin) {
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
             User user = maybeUser.get();
@@ -97,75 +103,83 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
             }
         }
 
-
         configureGroupsArea();
-
         groupSizeSelect();
         bindFields();
-
-        //TODO: funktionierendes vernünftig in die Klasse in Methoden etc. integrieren
-        randomizeBtn.addClickListener(event -> {
-            if(gruppen.isEmpty()){
-                Notification.show("Es existieren keine Gruppen. Kann nicht neu mischen.");
-            }
-            else {
-                randomize(gruppen);
-            }
-        });
+        addBtnFunctionalities(gruppenarbeitService, veranstaltungsterminService, gruppeService, veranstaltungDetailView, veranstaltungstermin, maybeUser);
 
         groupSize.addValueChangeListener(event -> {
             randomize(gruppen);
         });
+    }
 
-        saveBtn.addClickListener(event -> {
-            if(binderGruppenarbeit.writeBeanIfValid(gruppenarbeit)){
-                if (maybeUser.isPresent()) {
-                    User user = maybeUser.get();
-                    gruppenarbeit.setUser(user);
-                }
-
-                gruppenarbeit.setVeranstaltungstermin(veranstaltungstermin);
-
-                for (Gruppe gruppe : gruppen) {
-                    if (maybeUser.isPresent()) {
-                        User user = maybeUser.get();
-                        gruppe.setUser(user);
-                    }
-                    gruppeService.save(gruppe);
-                }
-
-                //der Gruppenarbeit die Teilnehmer übergeben
-                selectedParticipants = participants.getSelectedItems();
-                gruppenarbeit.setTeilnehmer(selectedParticipants.stream().toList());
-                gruppenarbeitService.save(gruppenarbeit);
-
-                //den Gruppen die Gruppenarbeit übergeben
-                for (Gruppe gruppe : gruppen) {
-                    gruppe.setGruppenarbeit(gruppenarbeit);
-                    gruppeService.save(gruppe);
-                }
-
-                //Gruppenarbeit zum Veranstaltungstermin hinzufügen
-                //TODO: ist das nötig?
-                veranstaltungstermin.addGruppenarbeit(gruppenarbeit);
-                veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
-
-                Notification.show("Gruppenarbeit angelegt!");
-                close();
-                clearFields();
-                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
-                veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
-                veranstaltungDetailView.update();
-
-            }
-            else {
-                Notification.show("Fehler");
-            }
+    private void addBtnFunctionalities(GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungDetailView veranstaltungDetailView, Veranstaltungstermin veranstaltungstermin, Optional<User> maybeUser) {
+        randomizeBtn.addClickListener(event -> {
+            randomizeBtnFunctionality();
         });
 
-        //Finales Zeugs
-        add(createLayout());
-        this.veranstaltungenService = veranstaltungenService;
+        saveBtn.addClickListener(event -> {
+            saveBtnFunctionality(gruppenarbeitService, veranstaltungsterminService, gruppeService, veranstaltungDetailView, veranstaltungstermin, maybeUser);
+        });
+    }
+
+    private void randomizeBtnFunctionality() {
+        if(gruppen.isEmpty()){
+            Notification.show("Es existieren keine Gruppen. Kann nicht neu mischen.");
+        }
+        else {
+            randomize(gruppen);
+        }
+    }
+
+    private void saveBtnFunctionality(GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungDetailView veranstaltungDetailView, Veranstaltungstermin veranstaltungstermin, Optional<User> maybeUser) {
+        if(binderGruppenarbeit.writeBeanIfValid(gruppenarbeit)){
+            saveGruppenarbeitWithGruppen(gruppenarbeitService, veranstaltungsterminService, gruppeService, veranstaltungstermin, maybeUser);
+
+            Notification.show("Gruppenarbeit angelegt!");
+            close();
+            clearFields();
+            veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
+            veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+            veranstaltungDetailView.update();
+
+        }
+        else {
+            Notification.show("Fehler");
+        }
+    }
+
+    private void saveGruppenarbeitWithGruppen(GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, Veranstaltungstermin veranstaltungstermin, Optional<User> maybeUser) {
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+            gruppenarbeit.setUser(user);
+        }
+
+        gruppenarbeit.setVeranstaltungstermin(veranstaltungstermin);
+
+        for (Gruppe gruppe : gruppen) {
+            if (maybeUser.isPresent()) {
+                User user = maybeUser.get();
+                gruppe.setUser(user);
+            }
+            gruppeService.save(gruppe);
+        }
+
+        //der Gruppenarbeit die Teilnehmer übergeben
+        selectedParticipants = participants.getSelectedItems();
+        gruppenarbeit.setTeilnehmer(selectedParticipants.stream().toList());
+        gruppenarbeitService.save(gruppenarbeit);
+
+        //den Gruppen die Gruppenarbeit übergeben
+        for (Gruppe gruppe : gruppen) {
+            gruppe.setGruppenarbeit(gruppenarbeit);
+            gruppeService.save(gruppe);
+        }
+
+        //Gruppenarbeit zum Veranstaltungstermin hinzufügen
+        //TODO: ist das nötig?
+        veranstaltungstermin.addGruppenarbeit(gruppenarbeit);
+        veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
     }
 
     //Teilt ausgewählte Teilnehmer zufällig auf Gruppen zu und zeigt diese Zufallseinteilung dann mithilfe von Grids an
