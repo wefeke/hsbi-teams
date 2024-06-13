@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
 
 @RolesAllowed({"ADMIN", "USER"})
-public class StudierendeHinzufuegen extends FormLayout{
+public class StudierendeHinzufuegen extends Dialog{
 
     private final TeilnehmerService teilnehmerService;
     private AuthenticatedUser authenticatedUser;
@@ -36,6 +36,7 @@ public class StudierendeHinzufuegen extends FormLayout{
     public StudierendeHinzufuegen(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
         this.teilnehmerService = teilnehmerService;
         this.authenticatedUser = authenticatedUser;
+
 
         // Layout erstellen und Komponenten hinzufügen
         FormLayout formLayout = createLayout();
