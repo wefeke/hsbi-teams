@@ -229,7 +229,6 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         }
 
         createVeranstaltungsterminDialog();
-        createGruppenarbeitHinzufuegenDialog();
         createGruppenarbeitBearbeitenDialog();
         createGruppenarbeitLoeschenDialog();
         createVeranstaltungsterminLoeschenDialog();
@@ -417,9 +416,10 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     }
 
     //Lilli
-    public void createGruppenarbeitHinzufuegenDialog() {
-        gruppenarbeitHinzufuegenDialog = new GruppenarbeitHinzufuegenDialog(authenticatedUser, veranstaltung, gruppenarbeitService, teilnehmerService, veranstaltungsterminService, gruppeService, this);
-        gruppenarbeitHinzufuegenDialog.setWidth("1500px");
+    public GruppenarbeitHinzufuegenDialog createGruppenarbeitHinzufuegenDialog(Veranstaltungstermin veranstaltungstermin) {
+        GruppenarbeitHinzufuegenDialog dialog = new GruppenarbeitHinzufuegenDialog(authenticatedUser, veranstaltungIdString, gruppenarbeitService, teilnehmerService, veranstaltungsterminService, gruppeService, this, veranstaltungService, veranstaltungstermin);
+        dialog.setWidth("1500px");
+        return dialog;
     }
 
     //Lilli
@@ -823,7 +823,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         gruppenarbeitLinie.setVisible(true);
         gruppenarbeitContainer.setVisible(true);
 
-        gruppenarbeitHinzufuegenDialog.setVeranstaltungstermin(veranstaltungstermin);
+        gruppenarbeitHinzufuegenDialog = createGruppenarbeitHinzufuegenDialog(veranstaltungstermin);
 
         if (gruppenLinie != null) {
             gruppenLinie.setVisible(false);
