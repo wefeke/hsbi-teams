@@ -32,6 +32,7 @@ import com.example.application.ExcelReader.ExcelExporter;
 
 import com.vaadin.flow.server.StreamResource;
 import jakarta.annotation.security.RolesAllowed;
+import org.hibernate.bytecode.enhance.internal.tracker.NoopCollectionTracker;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
@@ -63,17 +64,12 @@ public class StudierendeView extends VerticalLayout {
     private final Button exportButton = new Button("Exportieren");
     private AuthenticatedUser authenticatedUser;
 
-
-
     TextField vorname = new TextField("Vorname");
     TextField nachname = new TextField("Nachname");
     NumberField matrikelNr = new NumberField("Matrikelnummer");
     Button save = new Button("Save");
     Button cancel = new Button ("Cancel");
     Button aufraeumenButton = new Button("Aufräumen");
-
-    //Download Objects
-    Anchor exportButtonAnchor = new Anchor();
 
     @Autowired
     public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser,ExcelExporter excelExporter) {
@@ -131,7 +127,7 @@ public class StudierendeView extends VerticalLayout {
                 File tempFile = createTempFile();
                 if (tempFile != null) {
                     System.out.println("Temp file created at: " + tempFile.getAbsolutePath()); // Log the file path
-                    Notification.show("Temp file created at: " + tempFile.getAbsolutePath());
+                    Notification.show("File created at: " + tempFile.getAbsolutePath());
                     excelExporter.exportTeilnehmerListe(teilnehmerList, tempFile.getAbsolutePath(), user.getUsername());
                     if (tempFile.exists()) {
                         System.out.println("Temp file exists"); // Check if the file exists
@@ -140,8 +136,6 @@ public class StudierendeView extends VerticalLayout {
                     }
                     StreamResource resource = offerDownload(tempFile);
                     System.out.println("Resource: " + resource.toString()); // Log the resource object
-                    exportButtonAnchor.setHref(resource);
-
                 }
             }
         });
@@ -201,9 +195,7 @@ public class StudierendeView extends VerticalLayout {
         return toolbar;
     }
     private Component getToolbar2() {
-
-        exportButtonAnchor.add(exportButton);
-        HorizontalLayout toolbar2 = new HorizontalLayout(importButton, exportButtonAnchor, aufraeumenButton);
+        HorizontalLayout toolbar2 = new HorizontalLayout(importButton, exportButton, aufraeumenButton);
 
         toolbar2.addClassName("toolbar");
 
