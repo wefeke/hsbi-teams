@@ -30,7 +30,6 @@ public class VeranstaltungsterminDialog extends Dialog {
     private final VeranstaltungsterminService veranstaltungsterminService;
     private final String veranstaltungId;
 
-
     //Dialog Items
     private final DatePicker startDatePicker = new DatePicker("Termin Datum");
     private final DatePicker endDatePicker = new DatePicker("Ende Terminserie");
