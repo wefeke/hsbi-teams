@@ -1,7 +1,7 @@
 package com.example.application.repositories;
 
 import com.example.application.models.Teilnehmer;
-import com.example.application.models.Test;
+
 import com.example.application.models.User;
 import com.example.application.models.Veranstaltung;
 import org.springframework.data.jpa.repository.JpaRepository;

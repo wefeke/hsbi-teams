@@ -45,6 +45,12 @@ public class TeilnehmerService {
         } else
             System.err.println("Teilnehmer is null. Are you sure you have connected your form to the application?");
     }
+    public void updateTeilnehmer(Teilnehmer teilnehmer) {
+        if (teilnehmer != null) {
+            teilnehmerRepository.save(teilnehmer);
+        } else
+            System.err.println("Teilnehmer is null. Are you sure you have connected your form to the application?");
+    }
 
     @Transactional
     public void deleteTeilnehmer(Teilnehmer teilnehmer) {
