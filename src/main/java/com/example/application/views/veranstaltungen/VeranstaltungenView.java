@@ -237,6 +237,11 @@ public class VeranstaltungenView extends VerticalLayout  {
     }
 
     private HorizontalLayout createVeranstaltungKachel(Veranstaltung veranstaltung) {
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        Div veranstaltungsDatum = new Div();
+        veranstaltungsDatum.setText(veranstaltung.getSemester().format(dateFormatter));
+        veranstaltungsDatum.getStyle().set("font-size", "18px");
+
         Div veranstaltungInfo = new Div();
         veranstaltungInfo.setText(veranstaltung.getTitel());
         veranstaltungInfo.setId("veranstaltung-info");
@@ -245,11 +250,6 @@ public class VeranstaltungenView extends VerticalLayout  {
 
         Div spacer = new Div();
         spacer.getStyle().set("flex-grow", "1");
-
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        Div veranstaltungsDatum = new Div();
-        veranstaltungsDatum.setText(veranstaltung.getSemester().format(dateFormatter));
-        veranstaltungsDatum.getStyle().set("font-size", "18px");
 
         Button deleteButton = new Button(new Icon(VaadinIcon.TRASH));
         deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
