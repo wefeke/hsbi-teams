@@ -437,7 +437,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         veranstaltungsterminLoeschenDialog = new VeranstaltungsterminLoeschenDialog(veranstaltung, gruppeService, gruppenarbeitService, veranstaltungsterminService, veranstaltungService);
     }
 
-    public void createTeilnehmerDialog() {
+    public void createTeilnehmerHinzufuegenDialog() {
         teilnehmerHinzufuegenDialog = new TeilnehmerHinzufuegenDialog(veranstaltungService, teilnehmerService, veranstaltung.getId(), authenticatedUser);
     }
 
