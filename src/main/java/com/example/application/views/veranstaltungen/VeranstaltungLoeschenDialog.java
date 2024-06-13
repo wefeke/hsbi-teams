@@ -85,7 +85,7 @@ public class VeranstaltungLoeschenDialog extends Dialog {
                 str += teil.toString();
                 Notification.show(str);
                 teil.removeVeranstaltung(veranstaltung);
-                teilnehmerService.saveTeilnehmer(teil);
+                teilnehmerService.updateTeilnehmer(teil);
             }
 
             veranstaltungenService.deleteVeranstaltung(veranstaltung);

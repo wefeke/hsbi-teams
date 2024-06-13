@@ -1,7 +1,10 @@
 package com.example.application.views.studierende;
 
 import com.example.application.DoubleToLongConverter;
+import com.example.application.ExcelReader.ExcelExporter;
 import com.example.application.models.Teilnehmer;
+import com.example.application.models.User;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.UI;
@@ -24,16 +27,21 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.example.application.ExcelReader.ExcelExporter;
 
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 @Route(value = "studierende", layout = MainLayout.class)
 @PageTitle(value = "Studierende")
 @RolesAllowed({"ADMIN", "USER"})
 public class StudierendeView extends VerticalLayout {
+
+    private final ExcelExporter excelExporter;
     private final TeilnehmerService teilnehmerService;
     private final Grid<Teilnehmer> grid = new Grid<>();
     private final TextField filterText = new TextField();
@@ -47,8 +55,7 @@ public class StudierendeView extends VerticalLayout {
     private final Component aendernIcon;
     private final Button importButton = new Button("Importieren");
     private final Button exportButton = new Button("Exportieren");
-
-    Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
+    private AuthenticatedUser authenticatedUser;
 
     TextField vorname = new TextField("Vorname");
     TextField nachname = new TextField("Nachname");
@@ -58,10 +65,12 @@ public class StudierendeView extends VerticalLayout {
     Button aufraeumenButton = new Button("Aufräumen");
 
     @Autowired
-    public StudierendeView(TeilnehmerService teilnehmerService) {
+    public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser,ExcelExporter excelExporter) {
+        this.authenticatedUser = authenticatedUser;
         this.teilnehmerService = teilnehmerService;
-        DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService);
-        Aufraeumen aufraeumenDialog = new Aufraeumen(teilnehmerService);
+        this.excelExporter = excelExporter;
+        DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService, authenticatedUser);
+        Aufraeumen aufraeumenDialog = new Aufraeumen(teilnehmerService, authenticatedUser);
         addStudiernedenButtonIcon = addStudiernedenButton.getIcon();
         deleteIcon = delete.getIcon();
         aendernIcon = aendern.getIcon();
@@ -102,6 +111,17 @@ public class StudierendeView extends VerticalLayout {
                 aendernDiolog(selectedTeilnehmer);
             }
         });
+
+        exportButton.addClickListener(event -> {
+            Optional<User> maybeUser = authenticatedUser.get();
+            if (maybeUser.isPresent()) {
+                User user = maybeUser.get();
+                List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue());
+                String dateipfad = "C:\\Users\\tobia\\OneDrive\\Desktop"; // Ändern Sie dies zu dem tatsächlichen Pfad Ihrer Excel-Datei
+                excelExporter.exportTeilnehmerListe(teilnehmerList, dateipfad, user.getUsername());
+            }
+        });
+
         UI.getCurrent().getPage().addBrowserWindowResizeListener(event -> {
             if (event.getWidth() <= 1000) {
                 makeButtonsSmall();
@@ -111,20 +131,15 @@ public class StudierendeView extends VerticalLayout {
         });
 
         aufraeumenButton.addClickListener(event -> aufraeumenDialog.open());
-       /* UI.getCurrent().getPage().addBrowserWindowResizeListener(event -> {
-            if (event.getWidth() > 500) {
-                restoreButtons();
-            } else {
-                makeButtonsSmall();
-            }
-        });
-*/
     }
 
     public void updateStudierendeView() {
-        grid.setItems(teilnehmerService.findAllTeilnehmer(filterText.getValue()));
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+            grid.setItems(teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue()));
+        }
     }
-
     private Component getContent() {
         HorizontalLayout content = new HorizontalLayout(grid);
         content.setFlexGrow(1, grid);
@@ -177,25 +192,28 @@ public class StudierendeView extends VerticalLayout {
     }
 
     private void configureDialog() {
-        dialog.add(new StudierendeHinzufuegen(teilnehmerService));
+        dialog.add(new StudierendeHinzufuegen(teilnehmerService, authenticatedUser));
         dialog.setWidth("400px");
         dialog.setHeight("300px");
 
-    }
-
-
-    private void setTeilnehmer(Teilnehmer teilnehmer) {
-        vorname.setValue(teilnehmer.getVorname());
-        nachname.setValue(teilnehmer.getNachname());
-        matrikelNr.setValue(teilnehmer.getId().doubleValue());
     }
 
     private void aendernDiolog (Teilnehmer teilnehmer) {
         FormLayout form = new FormLayout();
         Dialog aendernDiolog = new Dialog(form);
 
-        //bindFields();
-        setTeilnehmer(teilnehmer);
+        Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
+
+        binder.forField(vorname)
+                .bind(Teilnehmer::getVorname, Teilnehmer::setVorname);
+        binder.forField(nachname)
+                .bind(Teilnehmer::getNachname, Teilnehmer::setNachname);
+        binder.forField(matrikelNr)
+                .withConverter(new DoubleToLongConverter())
+                .bind(Teilnehmer::getId, Teilnehmer::setId);
+        matrikelNr.setEnabled(false);
+
+        binder.setBean(teilnehmer);
 
         form.add(vorname, nachname, matrikelNr, save, cancel);
         aendernDiolog.add(form);
@@ -206,11 +224,11 @@ public class StudierendeView extends VerticalLayout {
 
         save.addClickListener(event -> {
             Teilnehmer selectedTeilnehmer = grid.asSingleSelect().getValue();
-            if (selectedTeilnehmer != null) {
-                selectedTeilnehmer.setVorname(vorname.getValue());
-                selectedTeilnehmer.setNachname(nachname.getValue());
-                selectedTeilnehmer.setId(matrikelNr.getValue().longValue());
-                teilnehmerService.saveTeilnehmer(selectedTeilnehmer);
+            if ((teilnehmer != null)) {
+                Optional<User> maybeUser = authenticatedUser.get();
+                User user = maybeUser.get();
+                binder.writeBeanIfValid(teilnehmer);
+                teilnehmerService.saveTeilnehmer(teilnehmer, user);
                 Notification.show("Daten erfolgreich aktualisiert");
                 updateStudierendeView();
                 aendernDiolog.close();
@@ -219,16 +237,13 @@ public class StudierendeView extends VerticalLayout {
         cancel.addClickListener(event -> {
             aendernDiolog.close();
         });
+
     }
+
     private void makeButtonsSmall() {
 
-
         addStudiernedenButton.setText("+");
-
-
         delete.setText("-");
-
-
         aendern.setText("...");
     }
 
@@ -243,14 +258,3 @@ public class StudierendeView extends VerticalLayout {
         aendern.setText("Studierende ändern");
     }
 }
-/*
-    private void bindFields(){
-        binder.forField(vorname)
-                .bind(Teilnehmer::getVorname, Teilnehmer::setVorname);
-        binder.forField(nachname)
-                .bind(Teilnehmer::getNachname, Teilnehmer::setNachname);
-        binder.forField(matrikelNr)
-                .withConverter(new DoubleToLongConverter())
-                .bind(Teilnehmer::getId, Teilnehmer::setId);
-    }
-*/

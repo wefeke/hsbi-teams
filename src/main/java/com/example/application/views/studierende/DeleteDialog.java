@@ -1,25 +1,26 @@
 package com.example.application.views.studierende;
 
-import com.example.application.models.Gruppe;
-import com.example.application.models.Teilnehmer;
-import com.example.application.models.Gruppenarbeit;
+import com.example.application.models.*;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.notification.Notification;
-import com.example.application.models.Veranstaltung;
 import jakarta.annotation.security.RolesAllowed;
 
 import java.util.HashSet;
+import java.util.Optional;
 
 @RolesAllowed({"ADMIN", "USER"})
 public class DeleteDialog extends Dialog {
     private final TeilnehmerService teilnehmerService;
+    private AuthenticatedUser authenticatedUser;
 
-    public DeleteDialog(TeilnehmerService teilnehmerService) {
+    public DeleteDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
         this.teilnehmerService = teilnehmerService;
+        this.authenticatedUser = authenticatedUser;
     }
 
     public void openDeleteDialog(Teilnehmer teilnehmer) {
@@ -52,9 +53,10 @@ public class DeleteDialog extends Dialog {
                     teilnehmer.getVeranstaltungen().remove(veranstaltung);
                 }
 
-
                 // Speichern Sie die Änderungen
-                teilnehmerService.saveTeilnehmer(teilnehmer);
+                Optional<User> maybeUser = authenticatedUser.get();
+                User user = maybeUser.get();
+                teilnehmerService.saveTeilnehmer(teilnehmer, user);
 
                 // Löschen Sie den Teilnehmer
                 //teilnehmerService.deleteTeilnehmer(teilnehmer);
