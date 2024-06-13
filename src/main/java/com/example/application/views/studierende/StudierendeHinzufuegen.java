@@ -11,17 +11,15 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import jakarta.annotation.security.RolesAllowed;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 
 @RolesAllowed({"ADMIN", "USER"})
-public class StudierendeHinzufuegen extends FormLayout{
+public class StudierendeHinzufuegen extends Dialog {
 
     private final TeilnehmerService teilnehmerService;
     private AuthenticatedUser authenticatedUser;
@@ -30,6 +28,7 @@ public class StudierendeHinzufuegen extends FormLayout{
     TextField lastName = new TextField("Nachname");
     NumberField matrikelNr = new NumberField("Matrikelnummer");
     Button save = new Button("Speichern");
+    Button cancel = new Button("Abbrechen");
     private Teilnehmer teilnehmer;
     Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
 
@@ -38,11 +37,12 @@ public class StudierendeHinzufuegen extends FormLayout{
         this.authenticatedUser = authenticatedUser;
 
         // Layout erstellen und Komponenten hinzufügen
-        FormLayout formLayout = createLayout();
-        add(formLayout); // Sicherstellen, dass das Layout hinzugefügt wird
-        add(new HorizontalLayout(save)); // Button hinzufügen
+        setHeaderTitle("Studierenden hinzufügen");
+        add(createLayout()); // Sicherstellen, dass das Layout hinzugefügt wird
+        getFooter().add(cancel, save); // Button hinzufügen
 
-        configureSaveButton();
+
+        configureButtons();
         bindFields();
     }
 
@@ -54,7 +54,7 @@ public class StudierendeHinzufuegen extends FormLayout{
         return formLayout;
     }
 
-    private void configureSaveButton() {
+    private void configureButtons() {
         save.addClickListener(event -> {
             if (isValidInput()) {
                 if (isDuplicateMatrikelNr()) {
@@ -67,6 +67,9 @@ public class StudierendeHinzufuegen extends FormLayout{
             } else {
                 Notification.show("Bitte füllen Sie alle Felder aus", 3000, Notification.Position.MIDDLE);
             }
+        });
+        cancel.addClickListener(event -> {
+            close();
         });
     }
 

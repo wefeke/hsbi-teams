@@ -58,7 +58,7 @@ public class StudierendeView extends VerticalLayout {
     private final Editor<Teilnehmer> editor =grid.getEditor();
     private final TextField filterText = new TextField();
     private final Button addStudiernedenButton = new Button("Studierenden hinzufügen");
-    private final Dialog dialog = new Dialog();
+    private final StudierendeHinzufuegen dialog;
     private H2 users = new H2("Studierende");
     private final Button delete = new Button("Studierenden löschen");
     private final Button aendern = new Button ("Studierende ändern");
@@ -97,8 +97,12 @@ public class StudierendeView extends VerticalLayout {
                 getToolbar2()
         );
         updateStudierendeView();
-        addStudiernedenButton.addClickListener(event -> openDialog());
-        configureDialog();
+
+        dialog = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser);
+        addStudiernedenButton.addClickListener(event -> {
+            dialog.open();
+            updateStudierendeView();
+        });
 
         // CSS Befehle
         delete.setEnabled(false);
@@ -248,18 +252,6 @@ public class StudierendeView extends VerticalLayout {
         return toolbar2;
     }
 
-
-    private void openDialog() {
-        dialog.open();
-        updateStudierendeView();
-    }
-
-    private void configureDialog() {
-        dialog.add(new StudierendeHinzufuegen(teilnehmerService, authenticatedUser));
-        dialog.setWidth("400px");
-        dialog.setHeight("300px");
-
-    }
 
 //    private void aendernDiolog (Teilnehmer teilnehmer) {
 //        FormLayout form = new FormLayout();
