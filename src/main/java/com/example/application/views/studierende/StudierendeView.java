@@ -7,6 +7,7 @@ import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.views.MainLayout;
+import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.Component;
@@ -30,15 +31,18 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.example.application.ExcelReader.ExcelExporter;
 
+
 import com.vaadin.flow.server.StreamResource;
 import jakarta.annotation.security.RolesAllowed;
 import org.hibernate.bytecode.enhance.internal.tracker.NoopCollectionTracker;
 import org.springframework.beans.factory.annotation.Autowired;
 
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -51,6 +55,7 @@ public class StudierendeView extends VerticalLayout {
     private final ExcelExporter excelExporter;
     private final TeilnehmerService teilnehmerService;
     private final Grid<Teilnehmer> grid = new Grid<>();
+    private final Editor<Teilnehmer> editor =grid.getEditor();
     private final TextField filterText = new TextField();
     private final Button addStudiernedenButton = new Button("Studierenden hinzufügen");
     private final Dialog dialog = new Dialog();
@@ -76,8 +81,8 @@ public class StudierendeView extends VerticalLayout {
         this.authenticatedUser = authenticatedUser;
         this.teilnehmerService = teilnehmerService;
         this.excelExporter = excelExporter;
-        DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService, authenticatedUser);
-        Aufraeumen aufraeumenDialog = new Aufraeumen(teilnehmerService, authenticatedUser);
+        Aufraeumen aufraeumenDialog = new Aufraeumen(teilnehmerService, authenticatedUser, this);
+        DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService, authenticatedUser, aufraeumenDialog, this);
         addStudiernedenButtonIcon = addStudiernedenButton.getIcon();
         deleteIcon = delete.getIcon();
         aendernIcon = aendern.getIcon();
@@ -106,18 +111,18 @@ public class StudierendeView extends VerticalLayout {
 
         // Click-Listener für den Lösch-Button
         delete.addClickListener(event -> {
-            Teilnehmer selectedTeilnehmer = grid.asSingleSelect().getValue();
-            if (selectedTeilnehmer != null) {
+            List<Teilnehmer> selectedTeilnehmer = new ArrayList<>(grid.getSelectedItems());
+            if (!selectedTeilnehmer.isEmpty()) {
                 deleteDialog.openDeleteDialog(selectedTeilnehmer);
             }
         });
         // Click-Listener für den Ändern-Button
-        aendern.addClickListener(event -> {
-            Teilnehmer selectedTeilnehmer = grid.asSingleSelect().getValue();
-            if (selectedTeilnehmer != null) {
-                aendernDiolog(selectedTeilnehmer);
-            }
-        });
+//        aendern.addClickListener(event -> {
+//            Teilnehmer selectedTeilnehmer = grid.asSingleSelect().getValue();
+//            if (selectedTeilnehmer != null) {
+//                aendernDiolog(selectedTeilnehmer);
+//            }
+//        });
 
         exportButton.addClickListener(event -> {
             Optional<User> maybeUser = authenticatedUser.get();
@@ -172,15 +177,55 @@ public class StudierendeView extends VerticalLayout {
     private void configureGrid() {
         grid.setSizeFull();
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
-        grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname").setSortable(true);;
-        grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname").setSortable(true);;
-        grid.addColumn(Teilnehmer::getId).setHeader("MatrikelNr").setSortable(true);;
+        Grid.Column<Teilnehmer> vornameColumn = grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname").setSortable(true);;
+        Grid.Column<Teilnehmer> nachnameColumn = grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname").setSortable(true);;
+        Grid.Column<Teilnehmer> matrikelNrColumn = grid.addColumn(Teilnehmer::getId).setHeader("MatrikelNr").setSortable(true);;
         grid.addSelectionListener(selection -> {
             int size = selection.getAllSelectedItems().size();
             delete.setEnabled(size != 0);
             aendern.setEnabled(size != 0);
         });
+        Grid.Column<Teilnehmer> editColumn = grid.addComponentColumn(teilnehmer -> {
+            Button editButton = new Button("Edit");
+            editButton.addClickListener(click -> {
+                if (editor.isOpen())
+                    editor.cancel();
+                grid.getEditor().editItem(teilnehmer);
+            });
+            return editButton;
+        });
         grid.setMultiSort(true, Grid.MultiSortPriority.APPEND);
+
+        Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
+        editor.setBinder(binder);
+        editor.setBuffered(true);
+
+        binder.forField(vorname)
+                .asRequired("Vorname muss gefüllt sein")
+                .bind(Teilnehmer::getVorname, Teilnehmer::setVorname);
+        vornameColumn.setEditorComponent(vorname);
+
+        binder.forField(nachname)
+                .asRequired("Nachname muss gefüllt sein")
+                .bind(Teilnehmer::getNachname, Teilnehmer::setNachname);
+        nachnameColumn.setEditorComponent(nachname);
+
+        binder.forField(matrikelNr)
+                .asRequired("Matrikelnummer muss gefüllt sein")
+                .withConverter(new DoubleToLongConverter())
+                .bind(Teilnehmer::getId, Teilnehmer::setId);
+        matrikelNrColumn.setEditorComponent(matrikelNr);
+        matrikelNr.setEnabled(false);
+
+        Button saveButton = new Button("Save", e -> editor.save());
+        Button cancelButton = new Button(VaadinIcon.CLOSE.create(),
+                e -> editor.cancel());
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_ICON,
+                ButtonVariant.LUMO_ERROR);
+        HorizontalLayout actions = new HorizontalLayout(saveButton,
+                cancelButton);
+        actions.setPadding(false);
+        editColumn.setEditorComponent(actions);
     }
 
     private Component getToolbar() {
@@ -216,47 +261,47 @@ public class StudierendeView extends VerticalLayout {
 
     }
 
-    private void aendernDiolog (Teilnehmer teilnehmer) {
-        FormLayout form = new FormLayout();
-        Dialog aendernDiolog = new Dialog(form);
-
-        Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
-
-        binder.forField(vorname)
-                .bind(Teilnehmer::getVorname, Teilnehmer::setVorname);
-        binder.forField(nachname)
-                .bind(Teilnehmer::getNachname, Teilnehmer::setNachname);
-        binder.forField(matrikelNr)
-                .withConverter(new DoubleToLongConverter())
-                .bind(Teilnehmer::getId, Teilnehmer::setId);
-        matrikelNr.setEnabled(false);
-
-        binder.setBean(teilnehmer);
-
-        form.add(vorname, nachname, matrikelNr, save, cancel);
-        aendernDiolog.add(form);
-
-        aendernDiolog.open();
-        aendernDiolog.setWidth("450px");
-        aendernDiolog.setHeight("350px");
-
-        save.addClickListener(event -> {
-            Teilnehmer selectedTeilnehmer = grid.asSingleSelect().getValue();
-            if ((teilnehmer != null)) {
-                Optional<User> maybeUser = authenticatedUser.get();
-                User user = maybeUser.get();
-                binder.writeBeanIfValid(teilnehmer);
-                teilnehmerService.saveTeilnehmer(teilnehmer, user);
-                Notification.show("Daten erfolgreich aktualisiert");
-                updateStudierendeView();
-                aendernDiolog.close();
-            }
-        });
-        cancel.addClickListener(event -> {
-            aendernDiolog.close();
-        });
-
-    }
+//    private void aendernDiolog (Teilnehmer teilnehmer) {
+//        FormLayout form = new FormLayout();
+//        Dialog aendernDiolog = new Dialog(form);
+//
+//        Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
+//
+//        binder.forField(vorname)
+//                .bind(Teilnehmer::getVorname, Teilnehmer::setVorname).isAsRequiredEnabled();
+//        binder.forField(nachname)
+//                .bind(Teilnehmer::getNachname, Teilnehmer::setNachname).isAsRequiredEnabled();
+//        binder.forField(matrikelNr)
+//                .withConverter(new DoubleToLongConverter())
+//                .bind(Teilnehmer::getId, Teilnehmer::setId).isAsRequiredEnabled();
+//        matrikelNr.setEnabled(false);
+//
+//        binder.setBean(teilnehmer);
+//
+//        form.add(vorname, nachname, matrikelNr, save, cancel);
+//        aendernDiolog.add(form);
+//
+//        aendernDiolog.open();
+//        aendernDiolog.setWidth("450px");
+//        aendernDiolog.setHeight("350px");
+//
+//        save.addClickListener(event -> {
+//            Teilnehmer selectedTeilnehmer = grid.asSingleSelect().getValue();
+//            if ((teilnehmer != null)) {
+//                Optional<User> maybeUser = authenticatedUser.get();
+//                User user = maybeUser.get();
+//                binder.writeBeanIfValid(teilnehmer);
+//                teilnehmerService.saveTeilnehmer(teilnehmer, user);
+//                Notification.show("Daten erfolgreich aktualisiert");
+//                updateStudierendeView();
+//                aendernDiolog.close();
+//            }
+//        });
+//        cancel.addClickListener(event -> {
+//            aendernDiolog.close();
+//        });
+//
+//    }
 
     private void makeButtonsSmall() {
 

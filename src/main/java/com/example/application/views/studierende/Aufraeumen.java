@@ -3,33 +3,38 @@ package com.example.application.views.studierende;
 import com.example.application.models.*;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
+import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
 
 @RolesAllowed({"ADMIN", "USER"})
 public class Aufraeumen extends Dialog {
     private final TeilnehmerService teilnehmerService;
-    private final Button deleteOldButton = new Button("Löschen (älter als 4 Jahre)");
-    private final Button deleteNoEventButton = new Button("Löschen (keine Veranstaltung)");
+    private final Button deleteOldButton = new Button("Älter als ... Jahre)");
+    private final Button deleteNoEventButton = new Button("Ohne Veranstaltung)");
+    private final Button deleteButton = new Button("Löschen");
     private final Button closeButton = new Button("Schließen");
     private final Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class);
-    private final NumberField yearsField = new NumberField("Jahre");
+    private final NumberField yearsField = new NumberField();
 
-    private AuthenticatedUser authenticatedUser;
+   private AuthenticatedUser authenticatedUser;
 
 
-    public Aufraeumen(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
+    public Aufraeumen(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, StudierendeView studierendeView) {
         this.teilnehmerService = teilnehmerService;
         this.authenticatedUser = authenticatedUser;
+        DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService, authenticatedUser, this, studierendeView);
+
 
         closeButton.addClickListener(event ->
                 close());
@@ -39,6 +44,7 @@ public class Aufraeumen extends Dialog {
             if (years != null) {
                 grid.getSelectedItems().forEach(teilnehmerService::deleteTeilnehmer);
                 updateGridOld(years.intValue());
+                setHeaderTitle("Studierende seit " + years.intValue() + " Jahren");
             } else {
                 Notification.show("Bitte geben Sie die Anzahl der Jahre ein.");
             }
@@ -47,22 +53,37 @@ public class Aufraeumen extends Dialog {
         deleteNoEventButton.addClickListener(event -> {
             grid.getSelectedItems().forEach(teilnehmerService::deleteTeilnehmer);
             updateGridNoEvent();
+            setHeaderTitle("Studierende ohne Veranstaltung");
+        });
+        deleteButton.addClickListener(event -> {
+            Set<Teilnehmer> selectedTeilnehmer = grid.getSelectedItems();
+            if (!selectedTeilnehmer.isEmpty()) {
+                List<Teilnehmer> teilnehmerList = new ArrayList<>(selectedTeilnehmer);
+                deleteDialog.openDeleteDialog(teilnehmerList);
+            }
         });
 
         this.setWidth("80vw");
         this.setHeight("80vh");
         grid.setSelectionMode(Grid.SelectionMode.MULTI);
         grid.setColumns("vorname", "nachname", "id");
+        updateGridNoEvent();
         add(
-                grid,
-                closeButton,
-                deleteOldButton,
-                deleteNoEventButton,
-                yearsField
+                createLayout()
         );
     }
+    private VerticalLayout createLayout() {
+        setHeaderTitle("Studierende ohne Veranstaltung");
+        getHeader().add(deleteNoEventButton);
+        getHeader().add(deleteOldButton);
+        getHeader().add(yearsField);
+        getFooter().add(closeButton);
+        getFooter().add(deleteButton);
 
-    private void updateGridOld(int years) {
+        return (
+                new VerticalLayout(grid));
+    }
+    public void updateGridOld(int years) {
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
             User user = maybeUser.get();
@@ -72,7 +93,7 @@ public class Aufraeumen extends Dialog {
 
     }
 
-    private void updateGridNoEvent() {
+    public void updateGridNoEvent() {
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
             User user = maybeUser.get();
