@@ -295,7 +295,7 @@
     cursor: pointer;
 }
 
-.veranstaltung-row .text-center {
+.text-center {
     flex-grow: 1;
 }
 

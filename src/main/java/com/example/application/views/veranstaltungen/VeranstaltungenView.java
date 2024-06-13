@@ -77,6 +77,7 @@ public class VeranstaltungenView extends VerticalLayout  {
         kachelContainer.addClassName("veranstaltungen-container");
         kachelContainer.getStyle().set("display", "flex");
         kachelContainer.getStyle().set("flexWrap", "wrap");
+        kachelContainer.setSizeFull();
 
         kachelContainer.add(new Div());
 
@@ -193,21 +194,7 @@ public class VeranstaltungenView extends VerticalLayout  {
             List<Veranstaltung> veranstaltungen = veranstaltungenService.findAllVeranstaltungenByUser(user);
             // Überprüfen, ob die Liste der Veranstaltungen leer ist
             if (veranstaltungen.isEmpty()) {
-                // Text und Button erstellen
-                VeranstaltungDialog createDialog = new VeranstaltungDialog(veranstaltungenService, teilnehmerService, userService, this, authenticatedUser);
-
-                Text noEventsText = new Text("Noch keine Veranstaltungen vorhanden, bitte legen Sie hier eine an:");
-                Button createEventButton = new Button("Veranstaltung anlegen");
-                createEventButton.addClickListener(e -> createDialog.open());
-
-                // Layout erstellen und Komponenten hinzufügen
-                VerticalLayout layout = new VerticalLayout(noEventsText, createEventButton);
-                layout.setAlignItems(Alignment.CENTER);
-                layout.setJustifyContentMode(JustifyContentMode.CENTER);
-                layout.setSizeFull();
-
-                // Layout zum KachelContainer hinzufügen
-                kachelContainer.add(layout);
+                createDefaultLayout();
             } else {
                 // Filtern der Veranstaltungen basierend auf dem Suchtext
                 List<Veranstaltung> filteredVeranstaltungen = veranstaltungen.stream()
@@ -231,6 +218,23 @@ public class VeranstaltungenView extends VerticalLayout  {
         }
     }
 
+    private void createDefaultLayout() {
+        VeranstaltungDialog createDialog = new VeranstaltungDialog(veranstaltungenService, teilnehmerService, userService, this, authenticatedUser);
+
+        Text noEventsText = new Text("Noch keine Veranstaltungen vorhanden, bitte legen Sie hier eine an:");
+        Button createEventButton = new Button("Veranstaltung anlegen");
+        createEventButton.addClickListener(e -> createDialog.open());
+
+        // Layout erstellen und Komponenten hinzufügen
+        VerticalLayout layout = new VerticalLayout(noEventsText, createEventButton);
+        layout.setAlignItems(Alignment.CENTER);
+        layout.setJustifyContentMode(JustifyContentMode.CENTER);
+        layout.setSizeFull();
+
+        // Layout zum KachelContainer hinzufügen
+        kachelContainer.add(layout);
+    }
+
     private HorizontalLayout createVeranstaltungKachel(Veranstaltung veranstaltung) {
         Div veranstaltungInfo = new Div();
         veranstaltungInfo.setText(veranstaltung.getTitel());
@@ -242,8 +246,7 @@ public class VeranstaltungenView extends VerticalLayout  {
 
         Div veranstaltungsDatum = new Div();
         veranstaltungsDatum.setText(veranstaltung.getSemester().toString());
-        veranstaltungsDatum.getStyle().set("left", "5px");
-        veranstaltungsDatum.getStyle().set("margin-top", "-18px");
+        veranstaltungsDatum.getStyle().set("font-size", "18px");
 
         Button deleteButton = new Button(new Icon(VaadinIcon.TRASH));
         deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
@@ -264,7 +267,7 @@ public class VeranstaltungenView extends VerticalLayout  {
             editDialog.readBean();
         }).addEventData("event.stopPropagation()");
 
-        HorizontalLayout row = new HorizontalLayout(veranstaltungInfo, spacer, veranstaltungsDatum, editButton, deleteButton);
+        HorizontalLayout row = new HorizontalLayout(veranstaltungsDatum, veranstaltungInfo, spacer, editButton, deleteButton);
         row.addClassName("veranstaltung-row");
         row.setAlignItems(Alignment.CENTER);
         row.setJustifyContentMode(JustifyContentMode.BETWEEN);
