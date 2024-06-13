@@ -31,7 +31,6 @@ public class UserManagement extends VerticalLayout {
         add(new Button(LineAwesomeIcon.PLUS_SOLID.create(), e -> {
             VaadinSession.getCurrent().setAttribute("previousLocation", "user-management");
             getUI().get().navigate("registration");
-
         }));
         add(createGrid());
     }

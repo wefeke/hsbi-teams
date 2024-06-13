@@ -68,4 +68,20 @@ public class UserService {
             super("User with id " + userId + " not found");
         }
     }
+
+    public Boolean isUsernameAvailableExcept (String username, String exception) {
+
+        if (userRepository.findByUsername(username) == null) {
+            //Notification.show("Found no User with this Username");
+            return true;
+        }
+        else if (username.equals(exception)) {
+            //Notification.show("Found only this User with this Username");
+            return true;
+        }
+        else {
+            //Notification.show("User is already taken" +username + exception);
+            return false;
+        }
+    }
 }

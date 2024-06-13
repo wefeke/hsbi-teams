@@ -19,10 +19,14 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.data.binder.Binder;
 import jakarta.annotation.security.RolesAllowed;
+import org.vaadin.lineawesome.LineAwesomeIcon;
+
 
 import java.util.Optional;
 
@@ -42,6 +46,10 @@ public class VeranstaltungDialog extends Dialog {
     private final MultiSelectComboBox<Teilnehmer> comboBox = new MultiSelectComboBox<>("Teilnehmer");
     private final Button cancelButton= new Button("Cancel");
     private final Button saveButton= new Button("Save");
+
+    //Upload Components
+    MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
+    private final Upload upload = new Upload(buffer);
 
     //Security
     private AuthenticatedUser authenticatedUser;
@@ -66,7 +74,7 @@ public class VeranstaltungDialog extends Dialog {
         getFooter().add(saveButton);
 
         return (
-                new VerticalLayout(titelField, datePicker, comboBox));
+                new VerticalLayout(titelField, datePicker, comboBox, upload));
         }
 
     private void configureElements() {
@@ -128,6 +136,11 @@ public class VeranstaltungDialog extends Dialog {
             clearFields();
             close();
         });
+
+
+        upload.setUploadButton(new Button(LineAwesomeIcon.UPLOAD_SOLID.create()));
+        upload.setDropLabelIcon(LineAwesomeIcon.ID_CARD.create());
+        upload.setDropLabel(new Span("Teilnehmer Excel-Datei"));
 
     }
 
