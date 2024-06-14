@@ -18,6 +18,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -34,6 +35,7 @@ public class GruppeBearbeitenDialog extends Dialog {
     //UI Elements
     private final Button cancelBtn = new Button("Abbrechen");
     private final Button saveBtn = new Button("Speichern");
+    private final Button addNewGroupBtn = new Button("Eine neue Gruppe hinzufügen");
     private final Div groupsArea = new Div();
     private Grid<Teilnehmer> uebrigeTeilnehmer;
 
@@ -47,21 +49,17 @@ public class GruppeBearbeitenDialog extends Dialog {
     public GruppeBearbeitenDialog(Gruppenarbeit gruppenarbeit, GruppenarbeitService gruppenarbeitService) {
         this.gruppenarbeit = gruppenarbeit;
         this.gruppenarbeitService = gruppenarbeitService;
-        this.gruppen = gruppenarbeit.getGruppen();
+        this.gruppen = gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId()).getGruppen();
         this.allTeilnehmer = gruppenarbeit.getVeranstaltungstermin().getVeranstaltung().getTeilnehmer();
         this.gruppenarbeitTeilnehmer = gruppenarbeit.getTeilnehmer();
         this.otherTeilnehmer = new ArrayList<Teilnehmer>(allTeilnehmer);
         otherTeilnehmer.removeAll(gruppenarbeitTeilnehmer);
-
-
 
         uebrigeTeilnehmer = new Grid<>(Teilnehmer.class, false);
         uebrigeTeilnehmer.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");
         uebrigeTeilnehmer.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
         uebrigeTeilnehmer.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
         uebrigeTeilnehmer.setItems(otherTeilnehmer);
-
-
 
         configureGroupsArea();
         groupGrids(gruppen.size(), gruppen);
@@ -79,6 +77,17 @@ public class GruppeBearbeitenDialog extends Dialog {
         cancelBtn.addClickListener(event -> {
             close();
         });
+
+        addNewGroupBtn.addClickListener(event -> {
+            dataViews.clear();
+            gruppenGrids.clear();
+            int newGroupNumber = gruppen.size() + 1;
+            groupsArea.removeAll();
+            gruppen.add(new Gruppe((long) newGroupNumber));
+            groupGrids(gruppen.size(), gruppen);
+            Notification.show(String.valueOf(dataViews.size()));
+
+        });
     }
 
     private void groupGrids(int numberOfGroups, List<Gruppe> gruppen) {
@@ -91,6 +100,7 @@ public class GruppeBearbeitenDialog extends Dialog {
             grid.addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS);
             grid.setRowsDraggable(true);
             gruppenGrids.add(grid);
+
             GridListDataView<Teilnehmer> dataView = grid.setItems(gruppen.get(i).getTeilnehmer());
             dataViews.add(dataView);
 
@@ -133,6 +143,8 @@ public class GruppeBearbeitenDialog extends Dialog {
     private VerticalLayout createLayout() {
         VerticalLayout mainLayout = new VerticalLayout();
         setHeaderTitle("Gruppen bearbeiten");
+
+        getFooter().add(addNewGroupBtn);
         getFooter().add(cancelBtn);
         getFooter().add(saveBtn);
 
