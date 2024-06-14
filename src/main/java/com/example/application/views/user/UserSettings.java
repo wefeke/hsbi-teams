@@ -4,6 +4,7 @@ import com.example.application.models.User;
 import com.example.application.models.Veranstaltung;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.UserService;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.notification.Notification;
@@ -45,7 +46,13 @@ public class UserSettings extends Dialog {
     private final PasswordEncoder passwordEncoder;
     private PasswordChange passwordChangeDialog;
 
+    //Image Objects
+    MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
+    private final Upload upload = new Upload(buffer);
+    private byte[] uploadedImage;
+
     private AuthenticatedUser authenticatedUser;
+
     private User user;
     private final UserService userService;
 
@@ -68,7 +75,8 @@ public class UserSettings extends Dialog {
                 avatar,
                 name,
                 username,
-                passwordChange
+                passwordChange,
+                upload
 
         );
         verticalLayout.setAlignItems(VerticalLayout.Alignment.CENTER);
@@ -79,10 +87,12 @@ public class UserSettings extends Dialog {
 
     private void configureElements() {
         cancelButton.addClickListener(e -> close());
+        saveButton.setTooltipText("!Achtung! Beim speichern werden Sie ausgeloggt");
         saveButton.setThemeName("primary");
 
         saveButton.addClickListener(e -> {
             if (binder.writeBeanIfValid(user)) {
+                user.setProfilePicture(uploadedImage);
                 userService.saveUser(user);
                 authenticatedUser.logout();
                 Notification.show("User aktualisiert");
@@ -97,6 +107,28 @@ public class UserSettings extends Dialog {
         passwordChange.addClickListener(e -> {
             passwordChangeDialog.open();
         });
+
+        //Image Handling
+        upload.addSucceededListener(event -> {
+            InputStream inputStream = buffer.getInputStream(event.getFileName());
+            ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
+
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            try {
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    byteOutputStream.write(buffer, 0, bytesRead);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            uploadedImage = byteOutputStream.toByteArray();
+            Notification.show("Datei \"" + event.getFileName() + "\" erfolgreich hochgeladen.");
+        });
+
+        upload.setAcceptedFileTypes("image/jpeg", "image/png", "image/gif");
+        upload.setMaxFiles(1);
 
         name.setWidthFull();
         username.setWidthFull();

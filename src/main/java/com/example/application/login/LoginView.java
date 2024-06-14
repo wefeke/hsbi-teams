@@ -42,8 +42,6 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
 
         getFooter().add(registerButton);
 
-
-
         setForgotPasswordButtonVisible(false);
         setOpened(true);
     }

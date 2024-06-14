@@ -6,6 +6,7 @@ import com.example.application.services.UserService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
@@ -19,6 +20,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.vaadin.lineawesome.LineAwesomeIcon;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -43,8 +45,8 @@ public class RegistrationView extends VerticalLayout {
     private Button cancelButton = new Button("Abbrechen");
 
     //Image
-    MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
-    private Upload upload = new Upload(buffer);
+    MultiFileMemoryBuffer buffer;
+    private Upload upload;
     private byte[] uploadedImage;
 
     //Services
@@ -59,6 +61,9 @@ public class RegistrationView extends VerticalLayout {
     public RegistrationView(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+
+        buffer = new MultiFileMemoryBuffer();
+        upload  = new Upload(buffer);
 
         mainLayout = new Div(createElements());
         mainLayout.getStyle()
@@ -100,7 +105,6 @@ public class RegistrationView extends VerticalLayout {
             User user = new User();
             if (binder.writeBeanIfValid(user)) {
                 user.setRoles(Set.of(Role.USER));
-                user.setAdmin(false);
                 user.setProfilePicture(uploadedImage);
                 user.setLocked(true);
                 if (user.getPassword() != null) {
@@ -138,6 +142,7 @@ public class RegistrationView extends VerticalLayout {
         password.addValueChangeListener(event -> checkPasswordsMatch());
         password_check.addValueChangeListener(event -> checkPasswordsMatch());
 
+
         //Image Handling
         upload.addSucceededListener(event -> {
             InputStream inputStream = buffer.getInputStream(event.getFileName());
@@ -153,10 +158,12 @@ public class RegistrationView extends VerticalLayout {
                 e.printStackTrace();
             }
             uploadedImage = byteOutputStream.toByteArray();
-            Notification.show("File " + event.getFileName() + " successfully uploaded.");
+            Notification.show("Datei \"" + event.getFileName() + "\" erfolgreich hochgeladen.");
         });
 
-        upload.setAcceptedFileTypes("image/jpeg", "image/png", "image/gif");
+        upload.setAcceptedFileTypes("image/jpeg", "image/png");
+        upload.setDropLabel(new Span("Profilbild"));
+        upload.setDropLabelIcon(LineAwesomeIcon.IMAGE.create());
         upload.setMaxFiles(1);
     }
 

@@ -125,6 +125,22 @@ public class MainLayout extends AppLayout {
             }
         }
 
+        //Theme Button
+        Button themeToggleButton = new Button("Toggle Theme");
+
+        themeToggleButton.addClickListener( event -> {
+            UI ui = UI.getCurrent();
+            if (ui.getElement().getThemeList().contains("dark")) {
+                ui.getElement().getThemeList().remove("dark");
+                themeToggleButton.setText("Dark Theme");
+            } else {
+                ui.getElement().getThemeList().add("dark");
+                themeToggleButton.setText("Light Theme");
+            }
+        });
+        themeToggleButton.getStyle().setMarginRight("10px");
+        settingItems.add(themeToggleButton); //zur rechten Seite hinzufügen
+
         // (Fifth Element) Login-Button
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
@@ -164,11 +180,12 @@ public class MainLayout extends AppLayout {
                 }
             });
 
-            userName.getSubMenu().addItem("Einstellungen", e ->
+            userName.getSubMenu().addItem(LineAwesomeIcon.COG_SOLID.create(), e ->
                     userSettings.open()
             );
+
             settingItems.add(userMenu); //zur rechten Seite hinzufügen
-            userName.getSubMenu().addItem("Sign out", e ->
+            userName.getSubMenu().addItem(LineAwesomeIcon.SIGN_OUT_ALT_SOLID.create(), e ->
                 authenticatedUser.logout()
             );
         } else {
@@ -181,22 +198,6 @@ public class MainLayout extends AppLayout {
             div.add(loginLink);
             settingItems.add(div); //zur rechten Seite hinzufügen
         }
-
-        //Theme Button
-        Button themeToggleButton = new Button("Toggle Theme");
-
-        themeToggleButton.addClickListener( event -> {
-            UI ui = UI.getCurrent();
-            if (ui.getElement().getThemeList().contains("dark")) {
-                ui.getElement().getThemeList().remove("dark");
-                themeToggleButton.setText("Dark Theme");
-            } else {
-                ui.getElement().getThemeList().add("dark");
-                themeToggleButton.setText("Light Theme");
-            }
-        });
-        themeToggleButton.getStyle().setMarginRight("10px");
-        settingItems.add(themeToggleButton); //zur rechten Seite hinzufügen
 
         header.add(navItems, settingItems);  //Linke und rechte Seite in die Navigationsbar
         addToNavbar(header);
