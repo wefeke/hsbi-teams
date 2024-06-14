@@ -9,6 +9,8 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.grid.dnd.GridDropMode;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.notification.Notification;
@@ -26,6 +28,8 @@ public class GruppeBearbeitenDialog extends Dialog {
     private final Set<Teilnehmer> allTeilnehmer;
     private final List<Teilnehmer> gruppenarbeitTeilnehmer;
     private List<Teilnehmer> otherTeilnehmer;
+    private List<Grid<Teilnehmer>> gruppenGrids = new ArrayList<>();
+    ArrayList<GridListDataView<Teilnehmer>> dataViews = new ArrayList<>();
 
     //UI Elements
     private final Button cancelBtn = new Button("Abbrechen");
@@ -36,6 +40,9 @@ public class GruppeBearbeitenDialog extends Dialog {
     //Services
     private final GruppenarbeitService gruppenarbeitService;
 
+    //Test
+    private Teilnehmer draggedItem;
+
 
     public GruppeBearbeitenDialog(Gruppenarbeit gruppenarbeit, GruppenarbeitService gruppenarbeitService) {
         this.gruppenarbeit = gruppenarbeit;
@@ -45,6 +52,8 @@ public class GruppeBearbeitenDialog extends Dialog {
         this.gruppenarbeitTeilnehmer = gruppenarbeit.getTeilnehmer();
         this.otherTeilnehmer = new ArrayList<Teilnehmer>(allTeilnehmer);
         otherTeilnehmer.removeAll(gruppenarbeitTeilnehmer);
+
+
 
         uebrigeTeilnehmer = new Grid<>(Teilnehmer.class, false);
         uebrigeTeilnehmer.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");
@@ -78,9 +87,12 @@ public class GruppeBearbeitenDialog extends Dialog {
             grid.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");
             grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
             grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
-            grid.setItems(gruppen.get(i).getTeilnehmer());
             grid.setWidth("400px");
             grid.addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS);
+            grid.setRowsDraggable(true);
+            gruppenGrids.add(grid);
+            GridListDataView<Teilnehmer> dataView = grid.setItems(gruppen.get(i).getTeilnehmer());
+            dataViews.add(dataView);
 
             H5 title = new H5("Gruppe " + (i+1) + ": " + gruppen.get(i).getTeilnehmer().size() + " Teilnehmer");
             title.addClassName("gruppen-gruppenarbeit-title");
@@ -91,6 +103,30 @@ public class GruppeBearbeitenDialog extends Dialog {
             Div titleAndGroups = new Div(title, buttonLayout, grid);
             titleAndGroups.addClassName("gruppen-gruppenarbeit");
             groupsArea.add(titleAndGroups);
+        }
+        for(Grid<Teilnehmer> grid:gruppenGrids){
+            grid.addDragStartListener(e -> {
+                draggedItem = e.getDraggedItems().getFirst();
+                grid.setDropMode(GridDropMode.ON_GRID);
+                ArrayList<Grid<Teilnehmer>> otherGrids = new ArrayList<>(gruppenGrids);
+                otherGrids.remove(grid);
+                for(Grid<Teilnehmer> otherGrid:otherGrids){
+                    otherGrid.setDropMode(GridDropMode.ON_GRID);
+                }
+            });
+            grid.addDropListener(e -> {
+                int num = gruppenGrids.indexOf(grid);
+                for(GridListDataView<Teilnehmer> dataView: dataViews){
+                    if(dataView.contains(draggedItem)){
+                        dataView.removeItem(draggedItem);
+                    }
+                }
+                dataViews.get(num).addItem(draggedItem);
+            });
+            grid.addDragEndListener(e -> {
+                draggedItem = null;
+                grid.setDropMode(null);
+            });
         }
     }
 
