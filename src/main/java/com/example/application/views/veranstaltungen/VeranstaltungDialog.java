@@ -7,6 +7,7 @@ import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
+import com.example.application.views.veranstaltungstermin.TeilnehmerEntfernenDialog;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -79,7 +80,6 @@ public class VeranstaltungDialog extends Dialog {
         }
 
     private void configureElements() {
-
         //Combobox
         comboBox.setItems(teilnehmerService.findAllTeilnehmerByUserAndFilter(authenticatedUser.get().get(),""));
         comboBox.setRenderer(new ComponentRenderer<>(teilnehmer -> {
@@ -164,3 +164,4 @@ public class VeranstaltungDialog extends Dialog {
     }
 
 }
+
