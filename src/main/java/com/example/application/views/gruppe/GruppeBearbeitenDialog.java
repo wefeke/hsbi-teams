@@ -33,6 +33,7 @@ public class GruppeBearbeitenDialog extends Dialog {
     private List<Grid<Teilnehmer>> gruppenGrids = new ArrayList<>();
     ArrayList<GridListDataView<Teilnehmer>> dataViews = new ArrayList<>();
     private final AuthenticatedUser authenticatedUser;
+    private List<H5> titles = new ArrayList<>();
 
     //UI Elements
     private final Button cancelBtn = new Button("Abbrechen");
@@ -82,6 +83,7 @@ public class GruppeBearbeitenDialog extends Dialog {
         addNewGroupBtn.addClickListener(event -> {
             dataViews.clear();
             gruppenGrids.clear();
+            titles.clear();
             int newGroupNumber = gruppen.size() + 1;
             groupsArea.removeAll();
             Optional<User> maybeUser = authenticatedUser.get();
@@ -91,7 +93,6 @@ public class GruppeBearbeitenDialog extends Dialog {
                 gruppeService.save(neueGruppe);
                 gruppen.add(neueGruppe);
                 groupGrids(gruppen.size(), gruppen);
-                Notification.show(String.valueOf(gruppen.size()));
             }
             else {
                 Notification.show("Fehler");
@@ -105,7 +106,6 @@ public class GruppeBearbeitenDialog extends Dialog {
         for(Teilnehmer teilnehmer:allTeilnehmer){
             teilnehmer.removeGruppenarbeit(gruppenarbeit);
         }
-        System.out.println(""+gruppen.size());
         for(Gruppe gruppe:gruppen){
             gruppe.removeAllTeilnehmer();
             gruppe.addAllTeilnehmer(dataViews.get(gruppen.indexOf(gruppe)+1).getItems().toList());
@@ -122,9 +122,7 @@ public class GruppeBearbeitenDialog extends Dialog {
 
         gruppenarbeit.removeAllGruppen();
         gruppenarbeit.addAllGruppen(gruppen);
-        System.out.println("Gruppen in der Gruppenarbeit: "+gruppenarbeit.getGruppen().size());
         gruppenarbeitService.save(gruppenarbeit);
-        System.out.println("Gruppen in der Gruppenarbeit: "+gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId()).getGruppen().size());
     }
 
     private void groupGrids(int numberOfGroups, List<Gruppe> gruppen) {
@@ -150,6 +148,7 @@ public class GruppeBearbeitenDialog extends Dialog {
             dataViews.add(dataView);
 
             H5 title = new H5("Gruppe " + (i+1) + ": " + gruppen.get(i).getTeilnehmer().size() + " Teilnehmer");
+            titles.add(title);
             title.addClassName("gruppen-gruppenarbeit-title");
 
             Button deleteBtn = new Button("Entfernen");
@@ -161,6 +160,7 @@ public class GruppeBearbeitenDialog extends Dialog {
         }
         for(Grid<Teilnehmer> grid:gruppenGrids){
             grid.addDragStartListener(e -> {
+                int num = gruppenGrids.indexOf(grid);
                 draggedItem = e.getDraggedItems().getFirst();
                 grid.setDropMode(GridDropMode.ON_GRID);
                 ArrayList<Grid<Teilnehmer>> otherGrids = new ArrayList<>(gruppenGrids);
@@ -168,6 +168,12 @@ public class GruppeBearbeitenDialog extends Dialog {
                 for(Grid<Teilnehmer> otherGrid:otherGrids){
                     otherGrid.setDropMode(GridDropMode.ON_GRID);
                 }
+                gruppenGrids.set(num, grid);
+                System.out.println(num);
+//                if(num!=0) {
+//                    titles.get(num - 1).setText("Gruppe " + (num) + ": " + dataViews.get(num).getItems().toList().size() + " Teilnehmer");
+//                }
+
             });
             grid.addDropListener(e -> {
                 int num = gruppenGrids.indexOf(grid);
@@ -177,10 +183,19 @@ public class GruppeBearbeitenDialog extends Dialog {
                     }
                 }
                 dataViews.get(num).addItem(draggedItem);
+                gruppenGrids.set(num, grid);
+                System.out.println(num);
+                if(num!=0) {
+                    titles.get(num - 1).setText("Gruppe " + (num) + ": " + dataViews.get(num).getItems().toList().size() + " Teilnehmer");
+                }
             });
             grid.addDragEndListener(e -> {
                 draggedItem = null;
                 grid.setDropMode(null);
+                int num = gruppenGrids.indexOf(grid);
+                if(num!=0) {
+                    titles.get(num - 1).setText("Gruppe " + (num) + ": " + dataViews.get(num).getItems().toList().size() + " Teilnehmer");
+                }
             });
         }
     }
