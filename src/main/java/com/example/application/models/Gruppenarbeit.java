@@ -23,7 +23,7 @@ public class Gruppenarbeit {
     private Veranstaltungstermin veranstaltungstermin = new Veranstaltungstermin();
     @OneToMany(mappedBy = "gruppenarbeit",fetch = FetchType.EAGER)
     private List<Gruppe> gruppen = new ArrayList<>();
-    @ManyToMany()
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Teilnehmer> teilnehmer = new ArrayList<>();
 
     public Gruppenarbeit(){
@@ -77,7 +77,7 @@ public class Gruppenarbeit {
     }
 
     public List<Teilnehmer> getTeilnehmer() {
-        return teilnehmer;
+        return new ArrayList<Teilnehmer>(teilnehmer);
     }
 
     public void setUser(User user) {
