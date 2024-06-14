@@ -15,6 +15,9 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @PageTitle("User Management")
 @Route(value = "user-management", layout = MainLayout.class)
 @RolesAllowed({"ADMIN"})
@@ -37,16 +40,16 @@ public class UserManagement extends VerticalLayout {
 
     private Grid<User> createGrid(){
         Grid<User> grid = new Grid<>();
-        grid.setItems(userService.findAllUser()); // Fetch all users
 
+        grid.setItems(userService.findAllUserByRole(Role.USER));
         grid.addColumn(User::getName).setHeader("Name"); // Add a column for the user name
         grid.addColumn(User::getUsername).setHeader("Username");
 
         grid.addColumn(new ComponentRenderer<>(user -> {
             Button button = new Button("Passwort ändern");
             button.addClickListener(event -> {
-                PasswordChange passwordChange = new PasswordChange(passwordEncoder, user);
-                passwordChange.open();
+                AdminPasswordChange adminPasswordChange = new AdminPasswordChange(passwordEncoder, userService, user);
+                adminPasswordChange.open();
             });
             return button;
         })).setHeader("Passwort");

@@ -39,8 +39,8 @@ public class RegistrationView extends VerticalLayout {
     private TextField username = new TextField("Username");
     private PasswordField password = new PasswordField("Password");
     private PasswordField password_check = new PasswordField("Password bestätigen");
-    private Button submitButton = new Button("Submit");
-    private Button cancelButton = new Button("Cancel");
+    private Button submitButton = new Button("Bestätigen");
+    private Button cancelButton = new Button("Abbrechen");
 
     //Image
     MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();

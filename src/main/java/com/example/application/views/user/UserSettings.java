@@ -14,6 +14,7 @@ import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.server.StreamResource;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,8 +30,8 @@ public class UserSettings extends Dialog {
     private final TextField username = new TextField("Username");
     private final Button passwordChange = new Button("Passwort ändern");
     private Avatar avatar = new Avatar();
-    private final Button saveButton = new Button("Save");
-    private final Button cancelButton = new Button("Cancel");
+    private final Button saveButton = new Button("Änderungen speichern");
+    private final Button cancelButton = new Button("Abbrechen");
 
     private final PasswordEncoder passwordEncoder;
     private PasswordChange passwordChangeDialog;
@@ -44,7 +45,7 @@ public class UserSettings extends Dialog {
         this.user = user;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
-        passwordChangeDialog = new PasswordChange(passwordEncoder, user);
+        passwordChangeDialog = new PasswordChange(passwordEncoder, userService, user);
         createElements();
         configureElements();
         bindFields();
@@ -68,14 +69,13 @@ public class UserSettings extends Dialog {
     private void configureElements() {
         cancelButton.addClickListener(e -> close());
         saveButton.setThemeName("primary");
+
         saveButton.addClickListener(e -> {
-            User user = new User();
             if (binder.writeBeanIfValid(user)) {
-                user.setId(this.user.getId());
-                this.userService.saveUser(user);
+                userService.saveUser(user);
+                Notification.show("User aktualisiert");
                 clearFields();
                 close();
-                Notification.show("User aktualisiert");
             }
             else {
                 Notification.show("Fehler beim Speichern");

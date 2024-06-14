@@ -28,6 +28,7 @@ import jakarta.annotation.security.RolesAllowed;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Route(value = "addDialog")
@@ -44,8 +45,8 @@ public class VeranstaltungDialog extends Dialog {
     private final TextField titelField = new TextField("Titel");
     private final DatePicker datePicker = new DatePicker("Datum");
     private final MultiSelectComboBox<Teilnehmer> comboBox = new MultiSelectComboBox<>("Teilnehmer");
-    private final Button cancelButton= new Button("Cancel");
-    private final Button saveButton= new Button("Save");
+    private final Button cancelButton= new Button("Abbrechen");
+    private final Button saveButton= new Button("Speichern");
 
     //Upload Components
     MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
@@ -137,7 +138,8 @@ public class VeranstaltungDialog extends Dialog {
             close();
         });
 
-
+        datePicker.setValue(LocalDate.now());
+        //Upload
         upload.setUploadButton(new Button(LineAwesomeIcon.UPLOAD_SOLID.create()));
         upload.setDropLabelIcon(LineAwesomeIcon.ID_CARD.create());
         upload.setDropLabel(new Span("Teilnehmer Excel-Datei"));
