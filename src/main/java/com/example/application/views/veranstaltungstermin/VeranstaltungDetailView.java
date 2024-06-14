@@ -7,6 +7,7 @@ import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.*;
 import com.example.application.models.*;
 import com.example.application.views.MainLayout;
+import com.example.application.views.gruppe.GruppeBearbeitenDialog;
 import com.example.application.views.gruppenarbeit.GruppeAuswertungDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitBearbeitenDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitHinzufuegenDialog;
@@ -78,6 +79,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private TeilnehmerHinzufuegenDialog teilnehmerHinzufuegenDialog;
     private TeilnehmerEntfernenDialog teilnehmerEntfernenDialog;
     private VeranstaltungsterminLoeschenDialog veranstaltungsterminLoeschenDialog;
+    private GruppeBearbeitenDialog gruppeBearbeitenDialog;
 
     private final VerticalLayout contentLayout;
     private HorizontalLayout gruppenarbeitLinie;
@@ -509,6 +511,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 aktiveKachelGruppenarbeit = kachel;
 
             }
+            gruppeBearbeitenDialog = new GruppeBearbeitenDialog(gruppenarbeit);
+            gruppeBearbeitenDialog.setWidth("1500px");
         });
 
         return kachel;
@@ -841,6 +845,10 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             HorizontalLayout lineWithText = createLineWithText("Gruppen");
 
             Button editButton = createEditButton();
+            //Lilli
+            editButton.addClickListener(event -> {
+                gruppeBearbeitenDialog.open();
+            });
 
             Hr lineAfter = new Hr();
             lineAfter.addClassName("line-after-icon");
