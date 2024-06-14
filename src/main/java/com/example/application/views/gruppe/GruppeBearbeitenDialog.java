@@ -60,17 +60,12 @@ public class GruppeBearbeitenDialog extends Dialog {
         this.otherTeilnehmer = new ArrayList<Teilnehmer>(allTeilnehmer);
         otherTeilnehmer.removeAll(gruppenarbeitTeilnehmer);
 
-        uebrigeTeilnehmer = new Grid<>(Teilnehmer.class, false);
-        uebrigeTeilnehmer.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");
-        uebrigeTeilnehmer.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
-        uebrigeTeilnehmer.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
-        uebrigeTeilnehmer.setItems(otherTeilnehmer);
-
         configureGroupsArea();
         groupGrids(gruppen.size(), gruppen);
 
         saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         addButtonFunctionalities();
+
         add(createLayout());
     }
 
@@ -107,13 +102,24 @@ public class GruppeBearbeitenDialog extends Dialog {
 
     @Transactional
     protected void saveUpdatesToGruppenarbeit() {
+        for(Teilnehmer teilnehmer:allTeilnehmer){
+            teilnehmer.removeGruppenarbeit(gruppenarbeit);
+        }
         System.out.println(""+gruppen.size());
         for(Gruppe gruppe:gruppen){
             gruppe.removeAllTeilnehmer();
-            gruppe.addAllTeilnehmer(dataViews.get(gruppen.indexOf(gruppe)).getItems().toList());
+            gruppe.addAllTeilnehmer(dataViews.get(gruppen.indexOf(gruppe)+1).getItems().toList());
             gruppe.setGruppenarbeit(gruppenarbeit);
             gruppeService.save(gruppe);
         }
+        gruppenarbeit.removeAllTeilnehmer();
+        for(Gruppe gruppe:gruppen){
+            for(Teilnehmer teilnehmer:gruppe.getTeilnehmer()){
+                gruppenarbeit.addTeilnehmer(teilnehmer);
+                teilnehmer.addGruppenarbeit(gruppenarbeit);
+            }
+        }
+
         gruppenarbeit.removeAllGruppen();
         gruppenarbeit.addAllGruppen(gruppen);
         System.out.println("Gruppen in der Gruppenarbeit: "+gruppenarbeit.getGruppen().size());
@@ -122,6 +128,14 @@ public class GruppeBearbeitenDialog extends Dialog {
     }
 
     private void groupGrids(int numberOfGroups, List<Gruppe> gruppen) {
+        uebrigeTeilnehmer = new Grid<>(Teilnehmer.class, false);
+        uebrigeTeilnehmer.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");
+        uebrigeTeilnehmer.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
+        uebrigeTeilnehmer.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
+        uebrigeTeilnehmer.setRowsDraggable(true);
+        dataViews.add(uebrigeTeilnehmer.setItems(otherTeilnehmer));
+        gruppenGrids.add(uebrigeTeilnehmer);
+
         for(int i = 0; i< numberOfGroups; i++){
             Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class, false);
             grid.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");

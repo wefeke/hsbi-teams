@@ -104,5 +104,13 @@ public class Gruppenarbeit {
     public void addAllGruppen(Collection<Gruppe> gruppenCollection) {
         this.gruppen.addAll(gruppenCollection);
     }
+
+    public void removeAllTeilnehmer() {
+        this.teilnehmer = new ArrayList<Teilnehmer>();
+    }
+
+    public void addTeilnehmer(Teilnehmer teilnehmer) {
+        this.teilnehmer.add(teilnehmer);
+    }
 }
 

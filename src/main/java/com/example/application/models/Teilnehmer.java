@@ -127,4 +127,8 @@ public class Teilnehmer {
     public User getUser () {
         return user;
     }
+
+    public void removeGruppenarbeit(Gruppenarbeit gruppenarbeit) {
+        this.gruppenarbeiten.remove(gruppenarbeit);
+    }
 }
