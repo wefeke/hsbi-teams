@@ -4,6 +4,7 @@ package com.example.application.models;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -100,5 +101,8 @@ public class Gruppenarbeit {
         return this.veranstaltungstermin;
     }
 
+    public void addAllGruppen(Collection<Gruppe> gruppenCollection) {
+        this.gruppen.addAll(gruppenCollection);
+    }
 }
 

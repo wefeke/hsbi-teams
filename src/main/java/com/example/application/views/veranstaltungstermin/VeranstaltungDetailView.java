@@ -511,7 +511,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 aktiveKachelGruppenarbeit = kachel;
 
             }
-            gruppeBearbeitenDialog = new GruppeBearbeitenDialog(gruppenarbeit, gruppenarbeitService);
+            gruppeBearbeitenDialog = new GruppeBearbeitenDialog(gruppenarbeit, gruppenarbeitService, gruppeService, authenticatedUser);
             gruppeBearbeitenDialog.setWidth("1500px");
         });
 

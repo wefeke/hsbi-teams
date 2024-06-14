@@ -3,6 +3,9 @@ package com.example.application.views.gruppe;
 import com.example.application.models.Gruppe;
 import com.example.application.models.Gruppenarbeit;
 import com.example.application.models.Teilnehmer;
+import com.example.application.models.User;
+import com.example.application.security.AuthenticatedUser;
+import com.example.application.services.GruppeService;
 import com.example.application.services.GruppenarbeitService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -16,11 +19,9 @@ import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class GruppeBearbeitenDialog extends Dialog {
     //Data
@@ -31,6 +32,7 @@ public class GruppeBearbeitenDialog extends Dialog {
     private List<Teilnehmer> otherTeilnehmer;
     private List<Grid<Teilnehmer>> gruppenGrids = new ArrayList<>();
     ArrayList<GridListDataView<Teilnehmer>> dataViews = new ArrayList<>();
+    private final AuthenticatedUser authenticatedUser;
 
     //UI Elements
     private final Button cancelBtn = new Button("Abbrechen");
@@ -41,14 +43,17 @@ public class GruppeBearbeitenDialog extends Dialog {
 
     //Services
     private final GruppenarbeitService gruppenarbeitService;
+    private final GruppeService gruppeService;
 
     //Test
     private Teilnehmer draggedItem;
 
 
-    public GruppeBearbeitenDialog(Gruppenarbeit gruppenarbeit, GruppenarbeitService gruppenarbeitService) {
+    public GruppeBearbeitenDialog(Gruppenarbeit gruppenarbeit, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, AuthenticatedUser authenticatedUser) {
         this.gruppenarbeit = gruppenarbeit;
         this.gruppenarbeitService = gruppenarbeitService;
+        this.gruppeService = gruppeService;
+        this.authenticatedUser = authenticatedUser;
         this.gruppen = gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId()).getGruppen();
         this.allTeilnehmer = gruppenarbeit.getVeranstaltungstermin().getVeranstaltung().getTeilnehmer();
         this.gruppenarbeitTeilnehmer = gruppenarbeit.getTeilnehmer();
@@ -71,7 +76,8 @@ public class GruppeBearbeitenDialog extends Dialog {
 
     private void addButtonFunctionalities(){
         saveBtn.addClickListener(event ->{
-            Notification.show(String.valueOf(otherTeilnehmer.size()));
+            saveUpdatesToGruppenarbeit();
+            close();
         });
 
         cancelBtn.addClickListener(event -> {
@@ -83,11 +89,36 @@ public class GruppeBearbeitenDialog extends Dialog {
             gruppenGrids.clear();
             int newGroupNumber = gruppen.size() + 1;
             groupsArea.removeAll();
-            gruppen.add(new Gruppe((long) newGroupNumber));
-            groupGrids(gruppen.size(), gruppen);
-            Notification.show(String.valueOf(dataViews.size()));
+            Optional<User> maybeUser = authenticatedUser.get();
+            if (maybeUser.isPresent()) {
+                User user = maybeUser.get();
+                Gruppe neueGruppe = new Gruppe((long) newGroupNumber, user);
+                gruppeService.save(neueGruppe);
+                gruppen.add(neueGruppe);
+                groupGrids(gruppen.size(), gruppen);
+                Notification.show(String.valueOf(gruppen.size()));
+            }
+            else {
+                Notification.show("Fehler");
+            }
 
         });
+    }
+
+    @Transactional
+    protected void saveUpdatesToGruppenarbeit() {
+        System.out.println(""+gruppen.size());
+        for(Gruppe gruppe:gruppen){
+            gruppe.removeAllTeilnehmer();
+            gruppe.addAllTeilnehmer(dataViews.get(gruppen.indexOf(gruppe)).getItems().toList());
+            gruppe.setGruppenarbeit(gruppenarbeit);
+            gruppeService.save(gruppe);
+        }
+        gruppenarbeit.removeAllGruppen();
+        gruppenarbeit.addAllGruppen(gruppen);
+        System.out.println("Gruppen in der Gruppenarbeit: "+gruppenarbeit.getGruppen().size());
+        gruppenarbeitService.save(gruppenarbeit);
+        System.out.println("Gruppen in der Gruppenarbeit: "+gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId()).getGruppen().size());
     }
 
     private void groupGrids(int numberOfGroups, List<Gruppe> gruppen) {
