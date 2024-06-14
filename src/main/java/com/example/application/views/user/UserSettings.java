@@ -2,6 +2,7 @@ package com.example.application.views.user;
 
 import com.example.application.models.User;
 import com.example.application.models.Veranstaltung;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.UserService;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -15,6 +16,11 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.server.StreamResource;
 import org.aspectj.weaver.ast.Not;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +28,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class UserSettings extends Dialog {
 
@@ -36,13 +45,15 @@ public class UserSettings extends Dialog {
     private final PasswordEncoder passwordEncoder;
     private PasswordChange passwordChangeDialog;
 
+    private AuthenticatedUser authenticatedUser;
     private User user;
     private final UserService userService;
 
     private final Binder<User> binder = new Binder<>(User.class);
 
-    public UserSettings (User user, UserService userService, PasswordEncoder passwordEncoder) {
+    public UserSettings (AuthenticatedUser authenticatedUser, User user, UserService userService, PasswordEncoder passwordEncoder) {
         this.user = user;
+        this.authenticatedUser = authenticatedUser;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         passwordChangeDialog = new PasswordChange(passwordEncoder, userService, user);
@@ -73,6 +84,7 @@ public class UserSettings extends Dialog {
         saveButton.addClickListener(e -> {
             if (binder.writeBeanIfValid(user)) {
                 userService.saveUser(user);
+                authenticatedUser.logout();
                 Notification.show("User aktualisiert");
                 clearFields();
                 close();
@@ -88,7 +100,7 @@ public class UserSettings extends Dialog {
 
         name.setWidthFull();
         username.setWidthFull();
-        username.setReadOnly(true);
+        //username.setReadOnly(true);
         passwordChange.setWidthFull();
     }
 
@@ -96,6 +108,8 @@ public class UserSettings extends Dialog {
         binder.forField(name)
                 .bind(User::getName, User::setName);
         binder.forField(username)
+                .withValidator(username -> userService.isUsernameAvailableExcept(username, this.user.getUsername()), "Username bereits vergeben")
+                .withValidator(username -> username.equals(username.toLowerCase()), "Username muss klein geschrieben sein")
                 .bind(User::getUsername, User::setUsername);
     }
 
