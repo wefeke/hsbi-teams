@@ -96,6 +96,8 @@ public class UserSettings extends Dialog {
         saveButton.setThemeName("primary");
 
         saveButton.addClickListener(e -> {
+            System.out.println(username);
+            System.out.println(user.getUsername());
             if (binder.writeBeanIfValid(user)) {
                 user.setProfilePicture(uploadedImage);
                 userService.saveUser(user);

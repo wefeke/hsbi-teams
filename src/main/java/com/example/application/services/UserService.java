@@ -75,6 +75,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public Boolean isUsernameAvailableExcept (String username, String exception) {
 
         if (userRepository.findByUsername(username) == null) {
