@@ -33,6 +33,7 @@ public class UserService {
         return userRepository.findAll(filter, pageable);
     }
 
+    @Transactional
     public User findUserById(Long id) {
         return userRepository.findUserById(id);
     }
@@ -50,6 +51,7 @@ public class UserService {
             System.err.println("User is null. Are you sure you have connected your form to the application?");
     }
 
+    @Transactional
     public Boolean isUsernameAvailable (String username) {
        if (userRepository.findByUsername(username) == null)
            return true;
@@ -57,12 +59,14 @@ public class UserService {
               return false;
     }
 
+    @Transactional
     public void lockUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         user.setLocked(true);
         userRepository.save(user);
     }
 
+    @Transactional
     public void unlockUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         user.setLocked(false);
