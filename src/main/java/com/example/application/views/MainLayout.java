@@ -10,6 +10,7 @@ import com.example.application.services.VeranstaltungenService;
 import com.example.application.views.studierende.StudierendeView;
 import com.example.application.views.veranstaltungen.VeranstaltungenView;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -18,6 +19,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.SvgIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -126,19 +128,22 @@ public class MainLayout extends AppLayout {
         }
 
         //Theme Button
-        Button themeToggleButton = new Button("Toggle Theme");
+        Button themeToggleButton = new Button(LineAwesomeIcon.MOON.create());
+        themeToggleButton.setText("Dunkel");
 
         themeToggleButton.addClickListener( event -> {
             UI ui = UI.getCurrent();
             if (ui.getElement().getThemeList().contains("dark")) {
                 ui.getElement().getThemeList().remove("dark");
-                themeToggleButton.setText("Dark Theme");
+                themeToggleButton.setIcon(LineAwesomeIcon.MOON_SOLID.create());
+                themeToggleButton.setText("Dunkel");
             } else {
                 ui.getElement().getThemeList().add("dark");
-                themeToggleButton.setText("Light Theme");
+                themeToggleButton.setText("Hell");
+                themeToggleButton.setIcon(LineAwesomeIcon.SUN_SOLID.create());
             }
         });
-        themeToggleButton.getStyle().setMarginRight("10px");
+        //themeToggleButton.getStyle().setMarginRight("10px");
         settingItems.add(themeToggleButton); //zur rechten Seite hinzufügen
 
         // (Fifth Element) Login-Button
@@ -170,7 +175,6 @@ public class MainLayout extends AppLayout {
             div.getElement().getStyle().set("display", "flex");
             div.getElement().getStyle().set("align-items", "center");
             div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
-            div.getElement().getStyle().set("margin", "0 10px");
             userName.add(div);
 
             UserSettings userSettings = new UserSettings(authenticatedUser, userService, passwordEncoder);
@@ -180,20 +184,23 @@ public class MainLayout extends AppLayout {
                 }
             });
 
-            userName.getSubMenu().addItem(LineAwesomeIcon.COG_SOLID.create(), e ->
+            // Create a HorizontalLayout and add the icon and text to it
+            HorizontalLayout settingsItemLayout = new HorizontalLayout(LineAwesomeIcon.COG_SOLID.create(), new Text("Einstellungen"));
+            userName.getSubMenu().addItem(settingsItemLayout, e ->
                     userSettings.open()
             );
 
-            settingItems.add(userMenu); //zur rechten Seite hinzufügen
-            userName.getSubMenu().addItem(LineAwesomeIcon.SIGN_OUT_ALT_SOLID.create(), e ->
+            HorizontalLayout signOutItemLayout = new HorizontalLayout(LineAwesomeIcon.SIGN_OUT_ALT_SOLID.create(), new Text("Abmelden"));
+            userName.getSubMenu().addItem(signOutItemLayout, e ->
                 authenticatedUser.logout()
             );
+            userMenu.getStyle().setMarginRight("10px");
+            settingItems.add(userMenu); //zur rechten Seite hinzufügen
         } else {
             Div div = new Div();
             div.getElement().getStyle().set("display", "flex");
             div.getElement().getStyle().set("align-items", "center");
             div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
-            div.getElement().getStyle().set("margin", "0 10px");
             Anchor loginLink = new Anchor("login", "Sign in");
             div.add(loginLink);
             settingItems.add(div); //zur rechten Seite hinzufügen
