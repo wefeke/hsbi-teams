@@ -1,5 +1,6 @@
 package com.example.application.services;
 
+import com.example.application.models.Role;
 import com.example.application.models.User;
 import com.example.application.repositories.UserRepository;
 import org.springframework.data.domain.Page;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserService {
@@ -31,6 +33,11 @@ public class UserService {
         return userRepository.findAll(filter, pageable);
     }
 
+    @Transactional
+    public User findUserById(Long id) {
+        return userRepository.findUserById(id);
+    }
+
     public User findUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
@@ -44,6 +51,7 @@ public class UserService {
             System.err.println("User is null. Are you sure you have connected your form to the application?");
     }
 
+    @Transactional
     public Boolean isUsernameAvailable (String username) {
        if (userRepository.findByUsername(username) == null)
            return true;
@@ -51,12 +59,14 @@ public class UserService {
               return false;
     }
 
+    @Transactional
     public void lockUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         user.setLocked(true);
         userRepository.save(user);
     }
 
+    @Transactional
     public void unlockUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         user.setLocked(false);
@@ -68,4 +78,27 @@ public class UserService {
             super("User with id " + userId + " not found");
         }
     }
+
+    @Transactional
+    public Boolean isUsernameAvailableExcept (String username, String exception) {
+
+        if (userRepository.findByUsername(username) == null) {
+            //Notification.show("Found no User with this Username");
+            return true;
+        }
+        else if (username.equals(exception)) {
+            //Notification.show("Found only this User with this Username");
+            return true;
+        }
+        else {
+            //Notification.show("User is already taken" +username + exception);
+            return false;
+        }
+    }
+
+    @Transactional
+    public List<User> findAllUserByRole (Role role) {
+        return userRepository.findAllByRolesContains(role);
+    }
+
 }

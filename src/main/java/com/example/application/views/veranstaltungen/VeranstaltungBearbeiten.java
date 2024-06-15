@@ -120,6 +120,7 @@ public class VeranstaltungBearbeiten extends Dialog {
             row.getStyle().set("line-height", "var(--lumo-line-height-m)");
             return row;
         }));
+        comboBox.setReadOnly(true);
         comboBox.setSizeFull();
         datePicker.setSizeFull();
         titelField.setSizeFull();
@@ -161,6 +162,7 @@ public class VeranstaltungBearbeiten extends Dialog {
                 .asRequired("Titel muss gefüllt sein")
                 .bind(Veranstaltung::getTitel, Veranstaltung::setTitel);
         binder.forField(datePicker)
+                .asRequired("Datum darf nicht leer sein")
                 .bind(Veranstaltung::getSemester, Veranstaltung::setSemester);
         binder.forField(comboBox)
                 .bind(Veranstaltung::getTeilnehmer, Veranstaltung::setTeilnehmer);
