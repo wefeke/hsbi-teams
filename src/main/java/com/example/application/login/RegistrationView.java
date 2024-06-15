@@ -45,8 +45,8 @@ public class RegistrationView extends VerticalLayout {
     private Button cancelButton = new Button("Abbrechen");
 
     //Image
-    MultiFileMemoryBuffer buffer;
-    private Upload upload;
+    MultiFileMemoryBuffer buffer =  new MultiFileMemoryBuffer();
+    private Upload upload = new Upload(buffer);
     private byte[] uploadedImage;
 
     //Services
@@ -61,9 +61,6 @@ public class RegistrationView extends VerticalLayout {
     public RegistrationView(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
-
-        buffer = new MultiFileMemoryBuffer();
-        upload  = new Upload(buffer);
 
         mainLayout = new Div(createElements());
         mainLayout.getStyle()
@@ -142,7 +139,6 @@ public class RegistrationView extends VerticalLayout {
         password.addValueChangeListener(event -> checkPasswordsMatch());
         password_check.addValueChangeListener(event -> checkPasswordsMatch());
 
-
         //Image Handling
         upload.addSucceededListener(event -> {
             InputStream inputStream = buffer.getInputStream(event.getFileName());
@@ -160,7 +156,6 @@ public class RegistrationView extends VerticalLayout {
             uploadedImage = byteOutputStream.toByteArray();
             Notification.show("Datei \"" + event.getFileName() + "\" erfolgreich hochgeladen.");
         });
-
         upload.setAcceptedFileTypes("image/jpeg", "image/png");
         upload.setDropLabel(new Span("Profilbild"));
         upload.setDropLabelIcon(LineAwesomeIcon.IMAGE.create());

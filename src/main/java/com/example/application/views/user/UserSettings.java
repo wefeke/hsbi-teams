@@ -56,11 +56,16 @@ public class UserSettings extends Dialog {
     private User user;
     private final UserService userService;
 
+    private Long userId;
+
     private final Binder<User> binder = new Binder<>(User.class);
 
-    public UserSettings (AuthenticatedUser authenticatedUser, User user, UserService userService, PasswordEncoder passwordEncoder) {
-        this.user = user;
+    public UserSettings (AuthenticatedUser authenticatedUser, UserService userService, PasswordEncoder passwordEncoder) {
         this.authenticatedUser = authenticatedUser;
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            this.user = maybeUser.get();
+        }
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         passwordChangeDialog = new PasswordChange(passwordEncoder, userService, user);

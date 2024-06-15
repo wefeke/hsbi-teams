@@ -33,6 +33,10 @@ public class UserService {
         return userRepository.findAll(filter, pageable);
     }
 
+    public User findUserById(Long id) {
+        return userRepository.findUserById(id);
+    }
+
     public User findUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
@@ -87,6 +91,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public List<User> findAllUserByRole (Role role) {
         return userRepository.findAllByRolesContains(role);
     }

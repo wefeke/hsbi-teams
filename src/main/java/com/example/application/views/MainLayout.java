@@ -173,7 +173,7 @@ public class MainLayout extends AppLayout {
             div.getElement().getStyle().set("margin", "0 10px");
             userName.add(div);
 
-            UserSettings userSettings = new UserSettings(authenticatedUser, user, userService, passwordEncoder);
+            UserSettings userSettings = new UserSettings(authenticatedUser, userService, passwordEncoder);
             userSettings.addOpenedChangeListener(e -> {
                 if (e.isOpened()) {
                     userSettings.readBean();
