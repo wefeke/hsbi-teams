@@ -130,6 +130,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         Button auswertungButton = new Button("Auswertung");
         auswertungButton.addClassName("auswertung-button");
+        // Navigation zur Auswertung
         auswertungButton.addClickListener(e -> {
             String route = "auswertung/" + veranstaltung.getId();
             UI.getCurrent().navigate(route);

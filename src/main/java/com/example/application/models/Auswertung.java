@@ -1,14 +1,13 @@
 package com.example.application.models;
 
-import jakarta.persistence.*;
-
-@Entity
 public class Auswertung {
-    @Id
-    private Long id;
+
+
+    private Long matrikelnummer;
     private String name;
-    private String titelVeranstaltung;
-    private String titelGruppenarbeit;
+    private String veranstaltung;
+    private String gruppenarbeit;
+    private Float punkte;
 
     public Float getPunkte() {
         return punkte;
@@ -18,21 +17,20 @@ public class Auswertung {
         this.punkte = punkte;
     }
 
-    private Float punkte;
 
 
     public Auswertung() {
 
     }
-
-
-    public Long getId() {
-        return id;
+    public Long getMatrikelnummer() {
+        return matrikelnummer;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setMatrikelnummer(Long matrikelnummer) {
+        this.matrikelnummer = matrikelnummer;
     }
+
+
 
     public String getName() {
         return name;
@@ -42,20 +40,20 @@ public class Auswertung {
         this.name = name;
     }
 
-    public String getTitelVeranstaltung() {
-        return titelVeranstaltung;
+    public String getVeranstaltung() {
+        return veranstaltung;
     }
 
-    public void setTitelVeranstaltung(String titelVeranstaltung) {
-        this.titelVeranstaltung = titelVeranstaltung;
+    public void setVeranstaltung(String veranstaltung) {
+        this.veranstaltung = veranstaltung;
     }
 
-    public String getTitelGruppenarbeit() {
-        return titelGruppenarbeit;
+    public String getGruppenarbeit() {
+        return gruppenarbeit;
     }
 
-    public void setTitelGruppenarbeit(String titelGruppenarbeit) {
-        this.titelGruppenarbeit = titelGruppenarbeit;
+    public void setGruppenarbeit(String gruppenarbeit) {
+        this.gruppenarbeit = gruppenarbeit;
     }
 
 

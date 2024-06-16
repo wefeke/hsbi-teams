@@ -13,6 +13,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,7 +32,6 @@ import java.util.Set;
 @Theme(value = "flowcrmtutorial")
 public class Application implements AppShellConfigurator, CommandLineRunner {
 
-    private AuswertungRepository auswertungRepository;
     private GruppenarbeitRepository gruppenarbeitRepository;
     private GruppenRepository gruppenRepository;
     // private TeilnehmerGruppenarbeitRepository teilnehmerGruppenarbeitRepository;
@@ -41,8 +42,7 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
 
     private PasswordEncoder passwordEncoder;
 
-    public Application(AuswertungRepository auswertungRepository, GruppenarbeitRepository gruppenarbeitRepository, GruppenRepository gruppenRepository, TeilnehmerRepository teilnehmerRepository, UserRepository userRepository, VeranstaltungenRepository veranstaltungRepository, VeranstaltungsterminRepository veranstaltungsterminRepository, PasswordEncoder passwordEncoder){
-        this.auswertungRepository = auswertungRepository;
+    public Application(GruppenarbeitRepository gruppenarbeitRepository, GruppenRepository gruppenRepository, TeilnehmerRepository teilnehmerRepository, UserRepository userRepository, VeranstaltungenRepository veranstaltungRepository, VeranstaltungsterminRepository veranstaltungsterminRepository, PasswordEncoder passwordEncoder){
         this.gruppenarbeitRepository = gruppenarbeitRepository;
         this.gruppenRepository = gruppenRepository;
         //this.teilnehmerGruppenarbeitRepository = teilnehmerGruppenarbeitRepository;
@@ -54,7 +54,9 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
     }
 
     public static void main(String[] args) {
+
         SpringApplication.run(Application.class, args);
+
     }
 
     @Override
