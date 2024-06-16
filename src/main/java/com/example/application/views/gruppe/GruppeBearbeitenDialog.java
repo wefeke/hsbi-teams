@@ -49,7 +49,6 @@ public class GruppeBearbeitenDialog extends Dialog {
     //Test
     private Teilnehmer draggedItem;
 
-
     public GruppeBearbeitenDialog(Gruppenarbeit gruppenarbeit, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, AuthenticatedUser authenticatedUser) {
         this.gruppenarbeit = gruppenarbeit;
         this.gruppenarbeitService = gruppenarbeitService;
