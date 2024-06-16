@@ -36,6 +36,7 @@ import com.vaadin.flow.server.StreamResource;
 import jakarta.annotation.security.RolesAllowed;
 import org.hibernate.bytecode.enhance.internal.tracker.NoopCollectionTracker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.vaadin.lineawesome.LineAwesomeIcon;
 
 
 import java.io.File;
@@ -191,10 +192,11 @@ public class StudierendeView extends VerticalLayout {
             aendern.setEnabled(size != 0);
         });
         Grid.Column<Teilnehmer> editColumn = grid.addComponentColumn(teilnehmer -> {
-            Button editButton = new Button("Edit");
+            Button editButton = new Button(LineAwesomeIcon.EDIT.create());
             editButton.addClickListener(click -> {
                 if (editor.isOpen())
                     editor.cancel();
+                grid.select(teilnehmer); // Zeile auswählen
                 grid.getEditor().editItem(teilnehmer);
             });
             return editButton;
@@ -222,7 +224,18 @@ public class StudierendeView extends VerticalLayout {
         matrikelNrColumn.setEditorComponent(matrikelNr);
         matrikelNr.setEnabled(false);
 
-        Button saveButton = new Button("Save", e -> editor.save());
+        Button saveButton = new Button("Save", e -> {
+            editor.save();
+            Teilnehmer updatedTeilnehmer = grid.asSingleSelect().getValue();
+            Optional<User> maybeUser = authenticatedUser.get();
+            if (maybeUser.isPresent()) {
+                User user = maybeUser.get();
+                teilnehmerService.saveTeilnehmer(updatedTeilnehmer, user);
+                Notification.show("Teilnehmer wurde aktualisiert");
+            } else {
+                Notification.show("Fehler beim Speichern");
+            }
+        });
         Button cancelButton = new Button(VaadinIcon.CLOSE.create(),
                 e -> editor.cancel());
         cancelButton.addThemeVariants(ButtonVariant.LUMO_ICON,
@@ -252,6 +265,7 @@ public class StudierendeView extends VerticalLayout {
 
         return toolbar2;
     }
+
 
 
 //    private void aendernDiolog (Teilnehmer teilnehmer) {
@@ -347,5 +361,7 @@ public class StudierendeView extends VerticalLayout {
             return null;
         }
     });
-}
+    }
+
+
 }

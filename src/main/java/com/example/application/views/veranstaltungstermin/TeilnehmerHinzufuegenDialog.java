@@ -6,9 +6,9 @@ import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.VeranstaltungenService;
 import com.example.application.views.studierende.StudierendeHinzufuegen;
+import com.example.application.views.veranstaltungstermin.TeilnehmerErstellenDialog;
 import com.example.application.views.studierende.StudierendeView;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -18,6 +18,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -31,18 +32,18 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
     private final Button importButton = new Button("importieren");
     private final TextField filterText = new TextField();
     private final Grid<Teilnehmer> grid = new Grid<>();
-    private final StudierendeHinzufuegen dialog;
+    private final TeilnehmerErstellenDialog dialog;
     private final AuthenticatedUser authenticatedUser;
-    private final StudierendeView studierendeView;
+    //private final TeilnehmerErstellenDialog teilnehmerErstellenDialog;
 
 
-    public TeilnehmerHinzufuegenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser, StudierendeView studierendeView) {
+    public TeilnehmerHinzufuegenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser) {
         this.veranstaltungService = veranstaltungService;
         this.teilnehmerService = teilnehmerService;
         this.veranstaltungId = veranstaltungId;
         this.authenticatedUser = authenticatedUser;
-        this.studierendeView = studierendeView;
-        StudierendeHinzufuegen studierendeHinzufuegen = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser, studierendeView);
+        //this.teilnehmerErstellenDialog = teilnehmerErstellenDialog;
+       // StudierendeHinzufuegen studierendeHinzufuegen = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser, studierendeView);
 
         this.setWidth("80vw");
         this.setHeight("80vh");
@@ -51,21 +52,20 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         hinzufuegenButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
         hinzufuegenButton.getStyle().set("margin-inline-start", "auto");
 
-        dialog = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser ,studierendeView);
+        dialog = new TeilnehmerErstellenDialog(teilnehmerService, authenticatedUser,this);
         anlegenButton.addClickListener(event -> {
             dialog.open();
 
         });
 
         hinzufuegenButton.addClickListener(event -> {
-            Set<Teilnehmer> selectedTeilnehmer = grid.getSelectedItems();
+            Set<Teilnehmer> selectedTeilnehmer = new HashSet<>(grid.getSelectedItems());
             if (!selectedTeilnehmer.isEmpty()) {
                 Optional<User> maybeUser = authenticatedUser.get();
                 if (maybeUser.isPresent()) {
                     User user = maybeUser.get();
-                    for (Teilnehmer teilnehmer : selectedTeilnehmer) {
-                        veranstaltungService.addTeilnehmer(veranstaltungId, teilnehmer, user);
-                    }
+                    veranstaltungService.addTeilnehmer(veranstaltungId, selectedTeilnehmer, user);
+
                     Notification.show(selectedTeilnehmer.size() + " Teilnehmer wurden hinzugefügt", 3000, Notification.Position.MIDDLE);
                     updateGrid();
                 }
@@ -102,11 +102,11 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         return toolbar;
     }
 
-    private void updateGrid() {
-        Optional<User> maybeUser = authenticatedUser.get();
-        if (maybeUser.isPresent()) {
-            User user = maybeUser.get();
-            grid.setItems(teilnehmerService.findAllTeilnehmerNotInVeranstaltung(veranstaltungId, user));
+    public void updateGrid() {
+            Optional<User> maybeUser = authenticatedUser.get();
+            if (maybeUser.isPresent()) {
+                User user = maybeUser.get();
+                grid.setItems(teilnehmerService.findAllTeilnehmerNotInVeranstaltung(veranstaltungId, user));
         }
     }
 

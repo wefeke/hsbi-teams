@@ -1,16 +1,16 @@
-package com.example.application.views.studierende;
+package com.example.application.views.veranstaltungstermin;
 
 import com.example.application.DoubleToLongConverter;
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
-import com.example.application.views.veranstaltungen.VeranstaltungenView;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.formlayout.FormLayout;
+import com.example.application.views.studierende.StudierendeView;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -20,7 +20,7 @@ import jakarta.annotation.security.RolesAllowed;
 import java.util.Optional;
 
 @RolesAllowed({"ADMIN", "USER"})
-public class StudierendeHinzufuegen extends Dialog {
+public class TeilnehmerErstellenDialog extends Dialog {
 
     private final TeilnehmerService teilnehmerService;
     private AuthenticatedUser authenticatedUser;
@@ -33,12 +33,13 @@ public class StudierendeHinzufuegen extends Dialog {
     Button cancel = new Button("Abbrechen");
     private Teilnehmer teilnehmer;
     Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
-    private StudierendeView studierendeView;
 
-    public StudierendeHinzufuegen(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser,StudierendeView studierendeView){
+    private final TeilnehmerHinzufuegenDialog teilnehmerHinzufuegenDialog;
+
+    public TeilnehmerErstellenDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser,TeilnehmerHinzufuegenDialog teilnehmerHinzufuegenDialog){
         this.teilnehmerService = teilnehmerService;
         this.authenticatedUser = authenticatedUser;
-        this.studierendeView = studierendeView;
+        this.teilnehmerHinzufuegenDialog = teilnehmerHinzufuegenDialog;
 
         // Layout erstellen und Komponenten hinzufügen
         setHeaderTitle("Studierenden hinzufügen");
@@ -95,7 +96,7 @@ public class StudierendeHinzufuegen extends Dialog {
             if (maybeUser.isPresent()) {
                 User user = maybeUser.get();
                 teilnehmerService.saveTeilnehmer(teilnehmer, user);
-                studierendeView.updateStudierendeView(); // Grid aktualisieren
+                teilnehmerHinzufuegenDialog.updateGrid();// Grid aktualisieren
                 clearFields();
                 close();
                 Notification.show("Teilnehmer wurde angelegt");
@@ -127,50 +128,3 @@ public class StudierendeHinzufuegen extends Dialog {
         matrikelNr.clear();
     }
 }
-
-//        if (teilnehmer == null) {
-//            teilnehmer = new Teilnehmer();
-//        }
-//        teilnehmer.setVorname(firstName.getValue());
-//        teilnehmer.setNachname(lastName.getValue());
-//        teilnehmer.setId(matrikelNr.getValue().longValue());
-//
-//        Optional<User> maybeUser = authenticatedUser.get();
-//        User user = maybeUser.get();
-//        teilnehmerService.saveTeilnehmer(teilnehmer,user);
-//public class StudierendeHinzufuegen extends FormLayout {
-//
-//    private final TeilnehmerService teilnehmerService;
-//
-//    //User
-//    private AuthenticatedUser authenticatedUser;
-//
-//    TextField firstName = new TextField("Vorname");
-//    TextField lastName = new TextField("Nachname");
-//    NumberField matrikelNr = new NumberField("Matrikelnummer");
-//    Button save = new Button("Save");
-//    private Teilnehmer teilnehmer;
-//    Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
-//
-//    public StudierendeHinzufuegen(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
-//        this.teilnehmerService = teilnehmerService;
-//        this.authenticatedUser = authenticatedUser;
-//
-//
-//        add(
-//                createLayout(),
-//                new HorizontalLayout(save)
-//        );
-//
-//        configureSaveButton();
-//        bindFields();
-//    }
-
-//    public void setTeilnehmer(Teilnehmer teilnehmer) {
-//        this.teilnehmer = teilnehmer;
-//        if (teilnehmer != null) {
-//            firstName.setValue(teilnehmer.getVorname());
-//            lastName.setValue(teilnehmer.getNachname());
-//            matrikelNr.setValue(teilnehmer.getId().doubleValue());
-//        }
-//    }

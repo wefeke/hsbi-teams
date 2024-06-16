@@ -86,9 +86,9 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private HorizontalLayout gruppenarbeitLinie;
     private HorizontalLayout gruppenLinie;
 
-    private final StudierendeView studierendeView;
+   // private final TeilnehmerErstellenDialog teilnehmerErstellenDialog;
 
-    public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, GruppeService gruppeService, GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService, AuthenticatedUser authenticatedUser, StudierendeView studierendeView) {
+    public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, GruppeService gruppeService, GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService, AuthenticatedUser authenticatedUser) {
         // Initialisierung der Services
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
@@ -97,7 +97,9 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         this.gruppenarbeitTeilnehmerService = gruppenarbeitTeilnehmerService;
         this.authenticatedUser = authenticatedUser;
         this.teilnehmerService = teilnehmerService;
-        this.studierendeView = studierendeView;
+
+        //this.teilnehmerErstellenDialog= teilnehmerErstellenDialog;
+
 
         // Initialisierung der UI-Elemente
         this.teilnehmerListe = new Div();
@@ -444,7 +446,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     }
 
     public void createTeilnehmerHinzufuegenDialog() {
-        teilnehmerHinzufuegenDialog = new TeilnehmerHinzufuegenDialog(veranstaltungService, teilnehmerService, veranstaltung.getId(), authenticatedUser, studierendeView);
+        teilnehmerHinzufuegenDialog = new TeilnehmerHinzufuegenDialog(veranstaltungService, teilnehmerService, veranstaltung.getId(), authenticatedUser);
     }
 
     public void createTeilnehmerEntfernenDialog() {

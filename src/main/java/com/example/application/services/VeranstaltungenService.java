@@ -8,7 +8,9 @@ import com.example.application.repositories.VeranstaltungenRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class VeranstaltungenService {
@@ -52,11 +54,12 @@ public class VeranstaltungenService {
     }
 
     @Transactional
-    public void addTeilnehmer(Long veranstaltungId, Teilnehmer teilnehmer, User user) {
+    public void addTeilnehmer(Long veranstaltungId, Set<Teilnehmer> teilnehmer, User user) {
         Veranstaltung veranstaltung = veranstaltungenRepository.findByIdAndUser(veranstaltungId, user);
         if (veranstaltung != null) {
-            veranstaltung.getTeilnehmer().add(teilnehmer);
-            teilnehmer.getVeranstaltungen().add(veranstaltung); // Update the participant's list of events
+            Set<Teilnehmer> t= new HashSet<>(veranstaltung.getTeilnehmer());
+            t.addAll(teilnehmer);
+            veranstaltung.setTeilnehmer(t);
             veranstaltungenRepository.save(veranstaltung);
         } else {
             System.err.println("Veranstaltung nicht gefunden. Sind Sie sicher, dass die Veranstaltung existiert und der Benutzer berechtigt ist?");
