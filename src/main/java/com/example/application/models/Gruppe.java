@@ -3,10 +3,7 @@ package com.example.application.models;
 
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 public class Gruppe {
@@ -78,11 +75,15 @@ public class Gruppe {
         this.teilnehmer.add(teilnehmer);
     }
 
-    public void addGruppenarbeit(Gruppenarbeit gruppenarbeit) {
-        this.gruppenarbeit = gruppenarbeit;
-    }
-
     public void setUser(User user){
         this.user = user;
+    }
+
+    public void removeAllTeilnehmer(){
+        this.teilnehmer = new HashSet<Teilnehmer>();
+    }
+
+    public void addAllTeilnehmer(Collection<Teilnehmer> teilnehmerCollection){
+        this.teilnehmer.addAll(teilnehmerCollection);
     }
 }
