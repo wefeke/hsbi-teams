@@ -7,6 +7,7 @@ import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
+import com.example.application.views.veranstaltungstermin.TeilnehmerEntfernenDialog;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -19,11 +20,16 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.data.binder.Binder;
 import jakarta.annotation.security.RolesAllowed;
+import org.vaadin.lineawesome.LineAwesomeIcon;
 
+
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Route(value = "addDialog")
@@ -40,8 +46,12 @@ public class VeranstaltungDialog extends Dialog {
     private final TextField titelField = new TextField("Titel");
     private final DatePicker datePicker = new DatePicker("Datum");
     private final MultiSelectComboBox<Teilnehmer> comboBox = new MultiSelectComboBox<>("Teilnehmer");
-    private final Button cancelButton= new Button("Cancel");
-    private final Button saveButton= new Button("Save");
+    private final Button cancelButton= new Button("Abbrechen");
+    private final Button saveButton= new Button("Speichern");
+
+    //Upload Components
+    MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
+    private final Upload upload = new Upload(buffer);
 
     //Security
     private AuthenticatedUser authenticatedUser;
@@ -66,11 +76,10 @@ public class VeranstaltungDialog extends Dialog {
         getFooter().add(saveButton);
 
         return (
-                new VerticalLayout(titelField, datePicker, comboBox));
+                new VerticalLayout(titelField, datePicker, comboBox, upload));
         }
 
     private void configureElements() {
-
         //Combobox
         comboBox.setItems(teilnehmerService.findAllTeilnehmerByUserAndFilter(authenticatedUser.get().get(),""));
         comboBox.setRenderer(new ComponentRenderer<>(teilnehmer -> {
@@ -129,6 +138,12 @@ public class VeranstaltungDialog extends Dialog {
             close();
         });
 
+        datePicker.setValue(LocalDate.now());
+        //Upload
+        upload.setUploadButton(new Button(LineAwesomeIcon.UPLOAD_SOLID.create()));
+        upload.setDropLabelIcon(LineAwesomeIcon.ID_CARD.create());
+        upload.setDropLabel(new Span("Teilnehmer Excel-Datei"));
+
     }
 
     private void bindFields() {
@@ -149,3 +164,4 @@ public class VeranstaltungDialog extends Dialog {
     }
 
 }
+

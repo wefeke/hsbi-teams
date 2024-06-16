@@ -8,15 +8,12 @@ import com.example.application.services.GruppeService;
 import com.example.application.services.GruppenarbeitService;
 import com.example.application.services.VeranstaltungenService;
 import com.example.application.services.VeranstaltungsterminService;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
@@ -89,19 +86,19 @@ public class VeranstaltungsterminLoeschenDialog extends Dialog {
     public void setVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin) {
         this.veranstaltungstermin = veranstaltungstermin;
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        infoText.setText("Veranstaltungstermin " + this.veranstaltungstermin.getNotizen() + " am " +
+        infoText.setText("Veranstaltungstermin " + this.veranstaltungstermin.getTitel() + " am " +
                 this.veranstaltungstermin.getDatum().format(dateFormatter) + " löschen");
         int anzGruppen = 0;
         for(Gruppenarbeit gruppenarbeit: this.veranstaltungstermin.getGruppenarbeiten()){
             anzGruppen+=gruppenarbeit.getGruppen().size();
         }
         warningText.setText("Wenn du den Veranstaltungstermin " +
-                this.veranstaltungstermin.getNotizen() + " am " +
+                this.veranstaltungstermin.getTitel() + " am " +
                 this.veranstaltungstermin.getDatum().format(dateFormatter) +
                 " löscht,\n werden " + "auch alle zugehörigen Gruppenarbeiten (Anzahl: " +
                 this.veranstaltungstermin.getGruppenarbeiten().size() + ") \nund die zu den Gruppenarbeiten" +
                 " gehörenden Gruppen (Gesamtzahl: " + anzGruppen + ") gelöscht.");
-        noReturn.setText("Bist du sicher, dass du den Veranstaltungstermin " + this.veranstaltungstermin.getNotizen() +
+        noReturn.setText("Bist du sicher, dass du den Veranstaltungstermin " + this.veranstaltungstermin.getTitel() +
                 " am " + this.veranstaltungstermin.getDatum().format(dateFormatter) + " löschen willst?\n" +
                 "Das kann nicht rückgängig gemacht werden!");
     }

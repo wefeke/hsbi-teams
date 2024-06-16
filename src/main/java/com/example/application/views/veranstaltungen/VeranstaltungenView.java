@@ -70,6 +70,7 @@ public class VeranstaltungenView extends VerticalLayout  {
             username.setText("Herzlich Willkommen, " + user.getName() + "!");
         } else {
             getUI().ifPresent(ui -> ui.navigate("login"));
+            throw new IllegalStateException("User is not authenticated");
         }
 
         HorizontalLayout lineWithText = createLineWithText();

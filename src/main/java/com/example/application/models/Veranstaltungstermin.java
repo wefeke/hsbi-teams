@@ -18,7 +18,7 @@ public class Veranstaltungstermin {
     private LocalTime startZeit;
     private LocalTime endZeit;
     private String ort;
-    private String notizen;
+    private String titel;
 
     //Beziehungen
     @ManyToOne()
@@ -32,12 +32,12 @@ public class Veranstaltungstermin {
 
     }
 
-    public Veranstaltungstermin(LocalDate datum, LocalTime startZeit, LocalTime endZeit, String ort, String notizen, User user, Veranstaltung veranstaltung) {
+    public Veranstaltungstermin(LocalDate datum, LocalTime startZeit, LocalTime endZeit, String ort, String titel, User user, Veranstaltung veranstaltung) {
         this.datum = datum;
         this.startZeit = startZeit;
         this.endZeit = endZeit;
         this.ort = ort;
-        this.notizen = notizen;
+        this.titel = titel;
         this.user = user;
         this.veranstaltung = veranstaltung;
     }
@@ -66,12 +66,12 @@ public class Veranstaltungstermin {
         this.veranstaltung = veranstaltung;
     }
 
-    public String getNotizen() {
-        return notizen;
+    public String getTitel() {
+        return titel;
     }
 
-    public void setNotizen(String notizen) {
-        this.notizen = notizen;
+    public void setTitel(String titel) {
+        this.titel = titel;
     }
 
     public String getOrt() {

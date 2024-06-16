@@ -284,7 +284,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         terminZeit.addClassName("termin-zeit");
 
         Div terminNotiz = new Div();
-        terminNotiz.setText(veranstaltungstermin.getNotizen());
+        terminNotiz.setText(veranstaltungstermin.getTitel());
         terminNotiz.addClassName("termin-notiz");
 
         Div kachelContent = new Div(terminDatum, terminZeit, terminNotiz);
@@ -783,8 +783,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             switch (value) {
                 case "Datum aufsteigend" -> termine.sort(Comparator.comparing(Veranstaltungstermin::getDatum));
                 case "Datum absteigend" -> termine.sort(Comparator.comparing(Veranstaltungstermin::getDatum).reversed());
-                case "Titel A-Z" -> termine.sort(Comparator.comparing(Veranstaltungstermin::getNotizen));
-                case "Titel Z-A" -> termine.sort(Comparator.comparing(Veranstaltungstermin::getNotizen).reversed());
+                case "Titel A-Z" -> termine.sort(Comparator.comparing(Veranstaltungstermin::getTitel));
+                case "Titel Z-A" -> termine.sort(Comparator.comparing(Veranstaltungstermin::getTitel).reversed());
             }
 
             Veranstaltungstermin aktiverTermin = veranstaltungsterminMap.get(aktiveKachelVeranstaltungstermin);
