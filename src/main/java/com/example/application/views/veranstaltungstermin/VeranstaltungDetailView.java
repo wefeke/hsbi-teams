@@ -11,6 +11,7 @@ import com.example.application.views.gruppenarbeit.GruppeAuswertungDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitBearbeitenDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitHinzufuegenDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitLoeschenDialog;
+import com.example.application.views.studierende.StudierendeView;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -83,7 +84,9 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private HorizontalLayout gruppenarbeitLinie;
     private HorizontalLayout gruppenLinie;
 
-    public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, GruppeService gruppeService, GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService, AuthenticatedUser authenticatedUser) {
+    private final StudierendeView studierendeView;
+
+    public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, GruppeService gruppeService, GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService, AuthenticatedUser authenticatedUser, StudierendeView studierendeView) {
         // Initialisierung der Services
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
@@ -92,6 +95,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         this.gruppenarbeitTeilnehmerService = gruppenarbeitTeilnehmerService;
         this.authenticatedUser = authenticatedUser;
         this.teilnehmerService = teilnehmerService;
+        this.studierendeView = studierendeView;
 
         // Initialisierung der UI-Elemente
         this.teilnehmerListe = new Div();
@@ -438,7 +442,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     }
 
     public void createTeilnehmerHinzufuegenDialog() {
-        teilnehmerHinzufuegenDialog = new TeilnehmerHinzufuegenDialog(veranstaltungService, teilnehmerService, veranstaltung.getId(), authenticatedUser);
+        teilnehmerHinzufuegenDialog = new TeilnehmerHinzufuegenDialog(veranstaltungService, teilnehmerService, veranstaltung.getId(), authenticatedUser,studierendeView);
     }
 
     public void createTeilnehmerEntfernenDialog() {

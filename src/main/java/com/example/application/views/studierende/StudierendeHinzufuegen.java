@@ -5,6 +5,7 @@ import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
+import com.example.application.views.veranstaltungen.VeranstaltungenView;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.Key;
@@ -24,6 +25,7 @@ public class StudierendeHinzufuegen extends Dialog {
     private final TeilnehmerService teilnehmerService;
     private AuthenticatedUser authenticatedUser;
 
+
     TextField firstName = new TextField("Vorname");
     TextField lastName = new TextField("Nachname");
     NumberField matrikelNr = new NumberField("Matrikelnummer");
@@ -31,10 +33,12 @@ public class StudierendeHinzufuegen extends Dialog {
     Button cancel = new Button("Abbrechen");
     private Teilnehmer teilnehmer;
     Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
+    private StudierendeView studierendeView;
 
-    public StudierendeHinzufuegen(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
+    public StudierendeHinzufuegen(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, StudierendeView studierendeView) {
         this.teilnehmerService = teilnehmerService;
         this.authenticatedUser = authenticatedUser;
+        this.studierendeView = studierendeView;
 
         // Layout erstellen und Komponenten hinzufügen
         setHeaderTitle("Studierenden hinzufügen");
@@ -91,10 +95,13 @@ public class StudierendeHinzufuegen extends Dialog {
             if (maybeUser.isPresent()) {
                 User user = maybeUser.get();
                 teilnehmerService.saveTeilnehmer(teilnehmer, user);
+                studierendeView.updateStudierendeView(); // Grid aktualisieren
+                clearFields();
+                close();
+                Notification.show("Teilnehmer wurde angelegt");
+            } else {
+                Notification.show("Fehler beim Speichern");
             }
-            Notification.show("Teilnehmer wurde angelegt");
-        } else {
-            Notification.show("Fehler beim Speichern");
         }
     }
 
@@ -109,8 +116,15 @@ public class StudierendeHinzufuegen extends Dialog {
 
         binder.forField(matrikelNr)
                 .asRequired("Matrikelnummer muss gefüllt sein")
+                .withValidator(matrikelNr -> String.valueOf(matrikelNr.longValue()).matches("\\d{7}"), "Matrikelnummer muss genau 7 Zahlen enthalten")
                 .withConverter(new DoubleToLongConverter())
                 .bind(Teilnehmer::getId, Teilnehmer::setId);
+    }
+
+    private void clearFields() {
+        firstName.clear();
+        lastName.clear();
+        matrikelNr.clear();
     }
 }
 

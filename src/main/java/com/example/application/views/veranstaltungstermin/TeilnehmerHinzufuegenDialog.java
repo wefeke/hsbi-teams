@@ -6,6 +6,7 @@ import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.VeranstaltungenService;
 import com.example.application.views.studierende.StudierendeHinzufuegen;
+import com.example.application.views.studierende.StudierendeView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
@@ -32,14 +33,16 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
     private final Grid<Teilnehmer> grid = new Grid<>();
     private final StudierendeHinzufuegen dialog;
     private final AuthenticatedUser authenticatedUser;
+    private final StudierendeView studierendeView;
 
 
-    public TeilnehmerHinzufuegenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser) {
+    public TeilnehmerHinzufuegenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser, StudierendeView studierendeView) {
         this.veranstaltungService = veranstaltungService;
         this.teilnehmerService = teilnehmerService;
         this.veranstaltungId = veranstaltungId;
         this.authenticatedUser = authenticatedUser;
-        StudierendeHinzufuegen studierendeHinzufuegen = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser);
+        this.studierendeView = studierendeView;
+        StudierendeHinzufuegen studierendeHinzufuegen = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser, studierendeView);
 
         this.setWidth("80vw");
         this.setHeight("80vh");
@@ -48,7 +51,7 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         hinzufuegenButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
         hinzufuegenButton.getStyle().set("margin-inline-start", "auto");
 
-        dialog = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser);
+        dialog = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser ,studierendeView);
         anlegenButton.addClickListener(event -> {
             dialog.open();
 

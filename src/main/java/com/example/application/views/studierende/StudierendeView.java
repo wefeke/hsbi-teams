@@ -83,7 +83,7 @@ public class StudierendeView extends VerticalLayout {
         this.excelExporter = excelExporter;
         Aufraeumen aufraeumenDialog = new Aufraeumen(teilnehmerService, authenticatedUser, this);
         DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService, authenticatedUser, aufraeumenDialog, this);
-        StudierendeHinzufuegen studierendeHinzufuegen = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser);
+        StudierendeHinzufuegen studierendeHinzufuegen = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser, this);
         addStudiernedenButtonIcon = addStudiernedenButton.getIcon();
         deleteIcon = delete.getIcon();
         aendernIcon = aendern.getIcon();
@@ -99,7 +99,7 @@ public class StudierendeView extends VerticalLayout {
         );
         updateStudierendeView();
 
-        dialog = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser);
+        dialog = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser, this);
         addStudiernedenButton.addClickListener(event -> {
             dialog.open();
             updateStudierendeView();
