@@ -26,10 +26,19 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.data.binder.Binder;
 import jakarta.annotation.security.RolesAllowed;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 
+import java.io.InputStream;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 @Route(value = "addDialog")
@@ -139,10 +148,23 @@ public class VeranstaltungDialog extends Dialog {
         });
 
         datePicker.setValue(LocalDate.now());
+
         //Upload
+        upload.addSucceededListener(event -> {
+            try {
+                InputStream inputStream = buffer.getInputStream(event.getFileName());
+                List<Teilnehmer> teilnehmerList = readTeilnehmerFromExcel(inputStream);
+                comboBox.setItems(teilnehmerList);
+                comboBox.setValue(teilnehmerList);
+            } catch (Exception e) {
+                Notification.show("Error reading Excel file: " + e.getMessage());
+                System.out.println(e.getMessage());
+            }
+        });
         upload.setUploadButton(new Button(LineAwesomeIcon.UPLOAD_SOLID.create()));
         upload.setDropLabelIcon(LineAwesomeIcon.ID_CARD.create());
         upload.setDropLabel(new Span("Teilnehmer Excel-Datei"));
+        upload.setAcceptedFileTypes(".xlsx");
 
     }
 
@@ -159,8 +181,39 @@ public class VeranstaltungDialog extends Dialog {
 
     public void clearFields(){
         titelField.clear();
-        datePicker.clear();
+        datePicker.setValue(LocalDate.now());
         comboBox.clear();
+    }
+
+    public List<Teilnehmer> readTeilnehmerFromExcel(InputStream inputStream) throws Exception {
+        List<Teilnehmer> teilnehmerList = new ArrayList<>();
+
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        Sheet sheet = workbook.getSheetAt(0);
+        Iterator<Row> rows = sheet.iterator();
+
+        if (rows.hasNext()) { // skip the header row
+            rows.next();
+        }
+
+        while (rows.hasNext()) {
+            Row currentRow = rows.next();
+            // Assuming the first cell is vorname and the second cell is nachname
+            Cell idCell = currentRow.getCell(0);
+            Cell vornameCell = currentRow.getCell(1);
+            Cell nachnameCell = currentRow.getCell(2);
+
+            Teilnehmer teilnehmer = new Teilnehmer();
+            teilnehmer.setId((long) idCell.getNumericCellValue());
+            teilnehmer.setVorname(vornameCell.getStringCellValue());
+            teilnehmer.setNachname(nachnameCell.getStringCellValue());
+
+            teilnehmerList.add(teilnehmer);
+        }
+
+        workbook.close();
+
+        return teilnehmerList;
     }
 
 }
