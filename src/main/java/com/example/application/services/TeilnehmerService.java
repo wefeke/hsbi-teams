@@ -38,6 +38,7 @@ public class TeilnehmerService {
         return teilnehmerRepository.findTeilnehmerByMatrikelNrAndUser(matrikelNr, user);
     }
 
+    @Transactional
     public void saveTeilnehmer(Teilnehmer teilnehmer, User user) {
         if (teilnehmer != null) {
             teilnehmer.setUser(user);
