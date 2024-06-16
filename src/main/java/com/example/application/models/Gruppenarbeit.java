@@ -4,6 +4,7 @@ package com.example.application.models;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -23,7 +24,7 @@ public class Gruppenarbeit {
     private Veranstaltungstermin veranstaltungstermin = new Veranstaltungstermin();
     @OneToMany(mappedBy = "gruppenarbeit",fetch = FetchType.EAGER)
     private List<Gruppe> gruppen = new ArrayList<>();
-    @ManyToMany()
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Teilnehmer> teilnehmer = new ArrayList<>();
 
     public Gruppenarbeit(){
@@ -77,7 +78,7 @@ public class Gruppenarbeit {
     }
 
     public List<Teilnehmer> getTeilnehmer() {
-        return teilnehmer;
+        return new ArrayList<Teilnehmer>(teilnehmer);
     }
 
     public void setUser(User user) {
@@ -100,5 +101,16 @@ public class Gruppenarbeit {
         return this.veranstaltungstermin;
     }
 
+    public void addAllGruppen(Collection<Gruppe> gruppenCollection) {
+        this.gruppen.addAll(gruppenCollection);
+    }
+
+    public void removeAllTeilnehmer() {
+        this.teilnehmer = new ArrayList<Teilnehmer>();
+    }
+
+    public void addTeilnehmer(Teilnehmer teilnehmer) {
+        this.teilnehmer.add(teilnehmer);
+    }
 }
 

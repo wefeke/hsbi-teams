@@ -36,7 +36,7 @@ public class VeranstaltungenViewTest {
     static void setup() {
         playwright = Playwright.create();
         //Headless Modus kann auf true gesetzt werden, um den Browser nicht zu öffnen, wenn false wird der Browser geöffnet
-        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true));
+        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
     }
 
     @AfterAll

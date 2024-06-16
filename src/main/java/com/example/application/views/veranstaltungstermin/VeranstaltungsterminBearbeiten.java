@@ -1,13 +1,10 @@
 package com.example.application.views.veranstaltungstermin;
 
 import com.example.application.models.User;
-import com.example.application.models.Veranstaltung;
 import com.example.application.models.Veranstaltungstermin;
 import com.example.application.security.AuthenticatedUser;
-import com.example.application.services.TeilnehmerService;
 import com.example.application.services.VeranstaltungenService;
 import com.example.application.services.VeranstaltungsterminService;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -15,8 +12,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
-import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.data.binder.*;
@@ -36,8 +31,8 @@ public class VeranstaltungsterminBearbeiten extends Dialog {
     private final TimePicker endTimePicker = new TimePicker("Endzeit");
     private final TextField ort = new TextField("Ort");
     private final TextField notizen = new TextField("Notizen");
-    private final Button cancelButton= new Button("Cancel");
-    private final Button saveButton= new Button("Save");
+    private final Button cancelButton= new Button("Abbrechen");
+    private final Button saveButton= new Button("Änderungen speichern");
     private final VeranstaltungDetailView veranstaltungDetailView;
     private final Long veranstaltungsterminId;
 
@@ -106,7 +101,7 @@ public class VeranstaltungsterminBearbeiten extends Dialog {
 
     private void bindFields(){
         binder.forField(notizen)
-                .bind(Veranstaltungstermin::getNotizen, Veranstaltungstermin::setNotizen);
+                .bind(Veranstaltungstermin::getTitel, Veranstaltungstermin::setTitel);
         binder.forField(ort)
                 .bind(Veranstaltungstermin::getOrt, Veranstaltungstermin::setOrt);
         binder.forField(startTimePicker)
@@ -138,7 +133,7 @@ public class VeranstaltungsterminBearbeiten extends Dialog {
                 veranstaltungstermin.setVeranstaltung(veranstaltungService.findVeranstaltungById(Long.parseLong(veranstaltungId), user));
             }
             veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
-            Notification.show("Veranstaltungstermin " + veranstaltungstermin.getNotizen() + " bearbeitet!");
+            Notification.show("Veranstaltungstermin " + veranstaltungstermin.getTitel() + " bearbeitet!");
         }
     }
 

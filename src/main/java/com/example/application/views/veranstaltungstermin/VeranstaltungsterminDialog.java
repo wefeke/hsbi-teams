@@ -6,7 +6,6 @@ import com.example.application.models.Veranstaltungstermin;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.VeranstaltungenService;
 import com.example.application.services.VeranstaltungsterminService;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -36,14 +35,16 @@ public class VeranstaltungsterminDialog extends Dialog {
     private final TimePicker startTimePicker = new TimePicker("Startzeit");
     private final TimePicker endTimePicker = new TimePicker("Endzeit");
     private final TextField ort = new TextField("Ort");
-    private final TextField notizen = new TextField("Notizen");
+    private final TextField titel = new TextField("Titel");
     private final RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
-    private final Button cancelButton= new Button("Cancel");
-    private final Button saveButton= new Button("Save");
+    private final Button cancelButton= new Button("Abbrechen");
+    private final Button saveButton= new Button("Speichern");
 
     private AuthenticatedUser authenticatedUser;
 
     private VeranstaltungDetailView veranstaltungDetailView;
+
+    private Veranstaltung veranstaltung;
 
     //Data Binder
     Binder<Veranstaltungstermin> binder = new Binder<>(Veranstaltungstermin.class);
@@ -69,7 +70,7 @@ public class VeranstaltungsterminDialog extends Dialog {
         return(
                 new HorizontalLayout(
                         new VerticalLayout(
-                                notizen,
+                                titel,
                                 startTimePicker,
                                 startDatePicker,
                                 radioGroup
@@ -99,6 +100,7 @@ public class VeranstaltungsterminDialog extends Dialog {
             }
         });
 
+        startDatePicker.setValue(LocalDate.now());
         endDatePicker.setVisible(false); //Initial is to hide the field
 
         //Footer Button Implementation
@@ -135,8 +137,9 @@ public class VeranstaltungsterminDialog extends Dialog {
     }
 
     private void bindFields(){
-        binder.forField(notizen)
-                .bind(Veranstaltungstermin::getNotizen, Veranstaltungstermin::setNotizen);
+        binder.forField(titel)
+                .asRequired("Titel muss gefüllt sein")
+                .bind(Veranstaltungstermin::getTitel, Veranstaltungstermin::setTitel);
         binder.forField(ort)
                 .bind(Veranstaltungstermin::getOrt, Veranstaltungstermin::setOrt);
         binder.forField(startTimePicker)
@@ -211,7 +214,7 @@ public class VeranstaltungsterminDialog extends Dialog {
         startTimePicker.clear();
         endTimePicker.clear();
         ort.clear();
-        notizen.clear();
+        titel.clear();
         radioGroup.setValue("Einmalig");
     }
 

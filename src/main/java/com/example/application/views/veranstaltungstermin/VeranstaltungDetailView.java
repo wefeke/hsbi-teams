@@ -7,6 +7,7 @@ import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.*;
 import com.example.application.models.*;
 import com.example.application.views.MainLayout;
+import com.example.application.views.gruppe.GruppeBearbeitenDialog;
 import com.example.application.views.gruppenarbeit.GruppeAuswertungDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitBearbeitenDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitHinzufuegenDialog;
@@ -79,6 +80,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private TeilnehmerHinzufuegenDialog teilnehmerHinzufuegenDialog;
     private TeilnehmerEntfernenDialog teilnehmerEntfernenDialog;
     private VeranstaltungsterminLoeschenDialog veranstaltungsterminLoeschenDialog;
+    private GruppeBearbeitenDialog gruppeBearbeitenDialog;
 
     private final VerticalLayout contentLayout;
     private HorizontalLayout gruppenarbeitLinie;
@@ -286,7 +288,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         terminZeit.addClassName("termin-zeit");
 
         Div terminNotiz = new Div();
-        terminNotiz.setText(veranstaltungstermin.getNotizen());
+        terminNotiz.setText(veranstaltungstermin.getTitel());
         terminNotiz.addClassName("termin-notiz");
 
         Div kachelContent = new Div(terminDatum, terminZeit, terminNotiz);
@@ -513,6 +515,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 aktiveKachelGruppenarbeit = kachel;
 
             }
+            gruppeBearbeitenDialog = new GruppeBearbeitenDialog(gruppenarbeit, gruppenarbeitService, gruppeService, authenticatedUser);
+            gruppeBearbeitenDialog.setWidth("1500px");
         });
 
         return kachel;
@@ -783,8 +787,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             switch (value) {
                 case "Datum aufsteigend" -> termine.sort(Comparator.comparing(Veranstaltungstermin::getDatum));
                 case "Datum absteigend" -> termine.sort(Comparator.comparing(Veranstaltungstermin::getDatum).reversed());
-                case "Titel A-Z" -> termine.sort(Comparator.comparing(Veranstaltungstermin::getNotizen));
-                case "Titel Z-A" -> termine.sort(Comparator.comparing(Veranstaltungstermin::getNotizen).reversed());
+                case "Titel A-Z" -> termine.sort(Comparator.comparing(Veranstaltungstermin::getTitel));
+                case "Titel Z-A" -> termine.sort(Comparator.comparing(Veranstaltungstermin::getTitel).reversed());
             }
 
             Veranstaltungstermin aktiverTermin = veranstaltungsterminMap.get(aktiveKachelVeranstaltungstermin);
@@ -845,6 +849,10 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             HorizontalLayout lineWithText = createLineWithText("Gruppen");
 
             Button editButton = createEditButton();
+            //Lilli
+            editButton.addClickListener(event -> {
+                gruppeBearbeitenDialog.open();
+            });
 
             Hr lineAfter = new Hr();
             lineAfter.addClassName("line-after-icon");

@@ -31,7 +31,7 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
         LoginI18n i18n = LoginI18n.createDefault();
         i18n.setHeader(new LoginI18n.Header());
         i18n.getHeader().setTitle("HSBI Teams");
-        i18n.getHeader().setDescription("Login using user/user or admin/admin");
+        i18n.getHeader().setDescription("Einfaches Einteilen IHRER Studenten");
         i18n.setAdditionalInformation(null);
         setI18n(i18n);
 
@@ -41,8 +41,6 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
         registerButton.setWidthFull();
 
         getFooter().add(registerButton);
-
-
 
         setForgotPasswordButtonVisible(false);
         setOpened(true);
