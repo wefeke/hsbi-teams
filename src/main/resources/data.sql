@@ -1,4 +1,4 @@
-
+/*
 INSERT INTO public.users (locked, is_admin, id, hashed_password, "name", username, profile_picture) VALUES
                                                                                                 (false, true, 1, '$2a$10$jpLNVNeA7Ar/ZQ2DKbKCm.MuT2ESe.Qop96jipKMq7RaUgCoQedV.', 'Admin', 'admin', null),
                                                                                                 (true, false, 2, '$2a$10$jpLNVNeA7Ar/ZQ2DKbKCm.MuT2ESe.Qop96jipKMq7RaUgCoQedV.', 'Joris Strakeljahn', 'jstrakeljahn', null);
@@ -6,6 +6,7 @@ INSERT INTO public.users (locked, is_admin, id, hashed_password, "name", usernam
 INSERT INTO public.user_roles (user_id, roles) VALUES
                                                    (1, 'ADMIN'),
                                                    (2, 'USER');
+*/
 
 /*
 INSERT INTO public.veranstaltung (id, semester, titel, user_id) VALUES

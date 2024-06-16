@@ -22,7 +22,6 @@ public class User {
     private String name;
     @JsonIgnore
     private String hashedPassword;
-    private boolean isAdmin;
     private boolean locked;
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
@@ -39,11 +38,11 @@ public class User {
 
     }
 
-    public User(String username, String name, String hashedPassword, boolean isAdmin, Set<Role> roles, byte[] profilePicture, List<Veranstaltung> veranstaltungen) {
+    public User(String username, String name, String hashedPassword, boolean locked, Set<Role> roles, byte[] profilePicture, List<Veranstaltung> veranstaltungen) {
         this.username = username;
         this.name = name;
         this.hashedPassword = hashedPassword;
-        this.isAdmin = isAdmin;
+        this.locked = locked;
         this.roles = roles;
         this.profilePicture = profilePicture;
         this.veranstaltungen = veranstaltungen;
@@ -71,14 +70,6 @@ public class User {
 
     public void setPassword(String hashedPassword) {
         this.hashedPassword = hashedPassword;
-    }
-
-    public boolean isAdmin() {
-        return isAdmin;
-    }
-
-    public void setAdmin(boolean admin) {
-        isAdmin = admin;
     }
 
     @Transactional

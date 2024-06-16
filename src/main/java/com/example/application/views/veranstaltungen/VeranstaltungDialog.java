@@ -1,5 +1,6 @@
 package com.example.application.views.veranstaltungen;
 
+import com.example.application.ExcelReader.ExcelImporter;
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
 import com.example.application.models.Veranstaltung;
@@ -61,9 +62,11 @@ public class VeranstaltungDialog extends Dialog {
     //Upload Components
     MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
     private final Upload upload = new Upload(buffer);
+    ExcelImporter excelImporter;
 
     //Security
     private AuthenticatedUser authenticatedUser;
+    private User user;
 
     //Data Binder
     Binder<Veranstaltung> binder = new Binder<>(Veranstaltung.class);
@@ -74,6 +77,13 @@ public class VeranstaltungDialog extends Dialog {
         this.userService = userService;
         this.veranstaltungenView = veranstaltungenView;
         this.authenticatedUser = authenticatedUser;
+        this.excelImporter = new ExcelImporter(teilnehmerService, authenticatedUser);
+
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            this.user = maybeUser.get();
+        }
+
         add(createLayout());
         configureElements();
         bindFields();
@@ -90,7 +100,7 @@ public class VeranstaltungDialog extends Dialog {
 
     private void configureElements() {
         //Combobox
-        comboBox.setItems(teilnehmerService.findAllTeilnehmerByUserAndFilter(authenticatedUser.get().get(),""));
+        comboBox.setItems(teilnehmerService.findAllTeilnehmerByUserAndFilter(user,""));
         comboBox.setRenderer(new ComponentRenderer<>(teilnehmer -> {
             HorizontalLayout row = new HorizontalLayout();
             row.setAlignItems(FlexComponent.Alignment.CENTER);
@@ -123,11 +133,7 @@ public class VeranstaltungDialog extends Dialog {
             Veranstaltung veranstaltung = new Veranstaltung();
 
             if (binder.writeBeanIfValid(veranstaltung)) {
-                Optional<User> maybeUser = authenticatedUser.get();
-                if (maybeUser.isPresent()) {
-                    User user = maybeUser.get();
-                    veranstaltung.setUser(user);
-                }
+                veranstaltung.setUser(user);
                 veranstaltungenService.saveVeranstaltung(veranstaltung);
                 veranstaltungenView.updateKachelContainer("");
 
@@ -153,7 +159,8 @@ public class VeranstaltungDialog extends Dialog {
         upload.addSucceededListener(event -> {
             try {
                 InputStream inputStream = buffer.getInputStream(event.getFileName());
-                List<Teilnehmer> teilnehmerList = readTeilnehmerFromExcel(inputStream);
+                List<Teilnehmer> teilnehmerList = excelImporter.readTeilnehmerFromExcel(inputStream);
+
                 comboBox.setItems(teilnehmerList);
                 comboBox.setValue(teilnehmerList);
             } catch (Exception e) {
@@ -185,36 +192,7 @@ public class VeranstaltungDialog extends Dialog {
         comboBox.clear();
     }
 
-    public List<Teilnehmer> readTeilnehmerFromExcel(InputStream inputStream) throws Exception {
-        List<Teilnehmer> teilnehmerList = new ArrayList<>();
 
-        Workbook workbook = new XSSFWorkbook(inputStream);
-        Sheet sheet = workbook.getSheetAt(0);
-        Iterator<Row> rows = sheet.iterator();
-
-        if (rows.hasNext()) { // skip the header row
-            rows.next();
-        }
-
-        while (rows.hasNext()) {
-            Row currentRow = rows.next();
-            // Assuming the first cell is vorname and the second cell is nachname
-            Cell idCell = currentRow.getCell(0);
-            Cell vornameCell = currentRow.getCell(1);
-            Cell nachnameCell = currentRow.getCell(2);
-
-            Teilnehmer teilnehmer = new Teilnehmer();
-            teilnehmer.setId((long) idCell.getNumericCellValue());
-            teilnehmer.setVorname(vornameCell.getStringCellValue());
-            teilnehmer.setNachname(nachnameCell.getStringCellValue());
-
-            teilnehmerList.add(teilnehmer);
-        }
-
-        workbook.close();
-
-        return teilnehmerList;
-    }
 
 }
 

@@ -84,8 +84,9 @@ public class Teilnehmer {
         this.veranstaltungen.add(veranstaltung);
     }
 
+    @Override
     public String toString(){
-        return this.vorname + " " + this.nachname;
+        return this.matrikelNr + " " + this.vorname + " " + this.nachname;
     }
 
     @Override
