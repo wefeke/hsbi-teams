@@ -2,6 +2,7 @@ package com.example.application.views.gruppenarbeit;
 
 import com.example.application.models.*;
 import com.example.application.services.GruppenarbeitTeilnehmerService;
+import com.example.application.views.auswertung.Auswertung;
 import com.example.application.views.veranstaltungstermin.VeranstaltungDetailView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;

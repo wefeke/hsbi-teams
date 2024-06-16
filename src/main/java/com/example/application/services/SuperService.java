@@ -2,19 +2,10 @@ package com.example.application.services;
 
 import com.example.application.models.*;
 import com.example.application.security.AuthenticatedUser;
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.data.provider.ListDataProvider;
-import org.aspectj.weaver.loadtime.Aj;
+import com.example.application.views.auswertung.Auswertung;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 

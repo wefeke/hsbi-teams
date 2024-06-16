@@ -1,9 +1,8 @@
-package com.example.application.views.test;
+package com.example.application.views.auswertung;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import com.example.application.models.Auswertung;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -12,13 +11,15 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
+
+// LEON
 @Service
-public class StudierendeExcelExporter {
+public class AuswertungExcelExporter {
     private XSSFWorkbook workbook;
     private XSSFSheet sheet;
     private List<Auswertung> auswertungen;
 
-    public StudierendeExcelExporter() {
+    public AuswertungExcelExporter() {
         workbook = new XSSFWorkbook();
     }
 

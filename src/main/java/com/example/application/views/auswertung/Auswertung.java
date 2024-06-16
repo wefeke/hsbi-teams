@@ -1,7 +1,7 @@
-package com.example.application.models;
+package com.example.application.views.auswertung;
 
+// Auswertung
 public class Auswertung {
-
 
     private Long matrikelnummer;
     private String name;
@@ -16,7 +16,6 @@ public class Auswertung {
     public void setPunkte(Float punkte) {
         this.punkte = punkte;
     }
-
 
 
     public Auswertung() {

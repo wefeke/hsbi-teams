@@ -3,7 +3,6 @@ import com.example.application.models.*;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.*;
 import com.example.application.views.MainLayout;
-import com.example.application.views.test.StudierendeExcelExporter;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -38,7 +37,7 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
     Optional<User> maybeUser;
     User user;
     Long veranstaltungsID;
-    StudierendeExcelExporter studierendeExcelExporter;
+    AuswertungExcelExporter auswertungExcelExporter;
 
     public AuswertungView(
            VeranstaltungenService veranstaltungenService,
@@ -48,7 +47,7 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
            UserService userService,
            AuthenticatedUser authenticatedUser,
            SuperService superService,
-           StudierendeExcelExporter studierendeExcelExporter) {
+           AuswertungExcelExporter studierendeExcelExporter) {
         this.veranstaltungenService = veranstaltungenService;
         this.teilnehmerService = teilnehmerService;
         this.gruppenarbeitService = gruppenarbeitService;
@@ -56,7 +55,7 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
         this.userService = userService;
         this.authenticatedUser = authenticatedUser;
         this.superService = superService;
-        this.studierendeExcelExporter = studierendeExcelExporter;
+        this.auswertungExcelExporter = studierendeExcelExporter;
 
         addClassName("auswertung-view");
         maybeUser = authenticatedUser.get();
@@ -117,7 +116,7 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
         StreamResource resource = new StreamResource("auswertung_"+veranstaltungenService.findVeranstaltungById(veranstaltungsID,user).getTitel()+"_"+timeStamp+".xlsx", () -> {
             byte[] data = null; // Your method to fetch data
             try {
-                data = studierendeExcelExporter.export(superService.findAllAuswertungenByVeranstaltung(veranstaltungsID));
+                data = auswertungExcelExporter.export(superService.findAllAuswertungenByVeranstaltung(veranstaltungsID));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
