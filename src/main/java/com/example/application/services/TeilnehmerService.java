@@ -34,10 +34,11 @@ public class TeilnehmerService {
 //            return teilnehmerRepository.search(filterText);
 //        }
 //    }
-    public Optional<Teilnehmer> findByMatrikelNr(Long matrikelNr) {
-        return teilnehmerRepository.findByMatrikelNr(matrikelNr);
+    public Optional<Teilnehmer> findByMatrikelNr(Long matrikelNr, User user) {
+        return teilnehmerRepository.findTeilnehmerByMatrikelNrAndUser(matrikelNr, user);
     }
 
+    @Transactional
     public void saveTeilnehmer(Teilnehmer teilnehmer, User user) {
         if (teilnehmer != null) {
             teilnehmer.setUser(user);
@@ -98,9 +99,8 @@ public class TeilnehmerService {
     }
 
     public List<Teilnehmer> findAllTeilnehmerNotInVeranstaltung(Long veranstaltungId, User user) {
-   return teilnehmerRepository.findAllTeilnehmerNotInVeranstaltung(veranstaltungId, user);
-}
-
+        return teilnehmerRepository.findAllTeilnehmerNotInVeranstaltung(veranstaltungId, user);
+    }
 
     @Transactional
     public void addTeilnehmerToVeranstaltung(Teilnehmer teilnehmer, Long veranstaltungId, User user) {
@@ -114,6 +114,23 @@ public class TeilnehmerService {
             throw new IllegalArgumentException("Invalid Veranstaltung Id:" + veranstaltungId);
         }
     }
+
+    public Optional<Teilnehmer> findTeilnehmerByIdAndVornameAndNachname(Long id, String vorname, String nachname, User user) {
+        return teilnehmerRepository.findTeilnehmerByIdAndVornameAndNachnameAndUser(id, vorname, nachname, user);
     }
+
+    public Optional<Teilnehmer> findTeilnehmerByVornameAndNachname(String vorname, String nachname, User user) {
+        return teilnehmerRepository.findTeilnehmerByVornameAndNachnameAndUser(vorname, nachname, user);
+    }
+
+    public List<Teilnehmer> findAllTeilnehmerByVornameAndNachname(String vorname, String nachname, User user) {
+        return teilnehmerRepository.findAllByVornameAndNachnameAndUser(vorname, nachname, user);
+    }
+
+    public Optional<Teilnehmer> findTeilnehmerByNachname(String nachname, User user) {
+        return teilnehmerRepository.findTeilnehmerByNachnameAndUser(nachname, user);
+    }
+
+}
 
 

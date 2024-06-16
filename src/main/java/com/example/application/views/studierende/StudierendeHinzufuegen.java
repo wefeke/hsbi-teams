@@ -32,6 +32,7 @@ public class StudierendeHinzufuegen extends FormLayout {
 
     //User
     private AuthenticatedUser authenticatedUser;
+    private User user;
 
     TextField firstName = new TextField("Vorname");
     TextField lastName = new TextField("Nachname");
@@ -44,6 +45,10 @@ public class StudierendeHinzufuegen extends FormLayout {
     public StudierendeHinzufuegen(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
         this.teilnehmerService = teilnehmerService;
         this.authenticatedUser = authenticatedUser;
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            this.user = maybeUser.get();
+        }
         addClassName("contact-form");
 
         add(
@@ -92,7 +97,7 @@ public class StudierendeHinzufuegen extends FormLayout {
 
     private boolean isDuplicateMatrikelNr() {
         Long matrikelNrValue = matrikelNr.getValue().longValue();
-        Optional<Teilnehmer> existingTeilnehmer = teilnehmerService.findByMatrikelNr(matrikelNrValue);
+        Optional<Teilnehmer> existingTeilnehmer = teilnehmerService.findByMatrikelNr(matrikelNrValue, user);
         return existingTeilnehmer.isPresent() && (teilnehmer == null || !existingTeilnehmer.get().getId().equals(teilnehmer.getId()));
     }
 
@@ -104,8 +109,6 @@ public class StudierendeHinzufuegen extends FormLayout {
         teilnehmer.setNachname(lastName.getValue());
         teilnehmer.setId(matrikelNr.getValue().longValue());
 
-        Optional<User> maybeUser = authenticatedUser.get();
-        User user = maybeUser.get();
         teilnehmerService.saveTeilnehmer(teilnehmer,user);
 
 

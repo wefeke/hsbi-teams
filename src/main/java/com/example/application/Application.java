@@ -61,33 +61,30 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
 
     @Override
     public void run (String ... args) {
-//        User testUser = new User("wefeke", "Kennet", passwordEncoder.encode("kennet"), true, Set.of(Role.ADMIN), null, new ArrayList<>());
-//        Veranstaltung testVeranstaltung = new Veranstaltung(LocalDate.now(), "Testveranstaltung", testUser, new ArrayList<>(), new HashSet<>());
-//        Teilnehmer testTeilnehmer = new Teilnehmer(1L, "Max", "Mustermann", testUser);
-//        Teilnehmer testTeilnehmer2 = new Teilnehmer(2L, "Marcel", "Weithöner", testUser);
-//        Teilnehmer testTeilnehmer3 = new Teilnehmer(3L, "Joris", "Strakeljahn", testUser);
-//
-//
-//        testVeranstaltung.addTeilnehmer(testTeilnehmer);
-//        testVeranstaltung.addTeilnehmer(testTeilnehmer2);
-//        testVeranstaltung.addTeilnehmer(testTeilnehmer3);
-//        testUser.addVeranstaltungen(testVeranstaltung);
-//
-//
-//        userRepository.save(testUser);
-//        teilnehmerRepository.save(testTeilnehmer);
-//        teilnehmerRepository.save(testTeilnehmer2);
-//        teilnehmerRepository.save(testTeilnehmer3);
-//        veranstaltungRepository.save(testVeranstaltung);
 
-//        testTeilnehmer.addVerastaltung(testVeranstaltung);
-//        testTeilnehmer2.addVerastaltung(testVeranstaltung);
-//        testTeilnehmer3.addVerastaltung(testVeranstaltung);
-//
-//        teilnehmerRepository.save(testTeilnehmer);
-//        teilnehmerRepository.save(testTeilnehmer2);
-//        teilnehmerRepository.save(testTeilnehmer3);
+        // Initialize two users: Admin and User
+        User admin = new User("admin", "Admin", passwordEncoder.encode("admin"), false, Set.of(Role.ADMIN), null, new ArrayList<>());
+        User user = new User("user", "User", passwordEncoder.encode("user"), false, Set.of(Role.USER), null, new ArrayList<>());
+        userRepository.save(admin);
+        userRepository.save(user);
 
+        // Initialize a Veranstaltung for the Admin
+        Veranstaltung veranstaltung = new Veranstaltung(1000001L, LocalDate.now(), "Test Veranstaltung", admin);
+        veranstaltungRepository.save(veranstaltung);
+
+        // Initialize 3 Teilnehmer for the Veranstaltung
+        Teilnehmer teilnehmer1 = new Teilnehmer(1000001L, "Max", "Müller", admin);
+        Teilnehmer teilnehmer2 = new Teilnehmer(1000002L, "Anna", "Schmidt", admin);
+        Teilnehmer teilnehmer3 = new Teilnehmer(1000003L, "Paul", "Schneider", admin);
+        teilnehmerRepository.save(teilnehmer1);
+        teilnehmerRepository.save(teilnehmer2);
+        teilnehmerRepository.save(teilnehmer3);
+
+        // Add the Teilnehmer to the Veranstaltung
+        veranstaltung.addTeilnehmer(teilnehmer1);
+        veranstaltung.addTeilnehmer(teilnehmer2);
+        veranstaltung.addTeilnehmer(teilnehmer3);
+        veranstaltungRepository.save(veranstaltung);
     }
 
 

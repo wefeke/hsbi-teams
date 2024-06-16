@@ -1,5 +1,6 @@
 package com.example.application.views.veranstaltungen;
 
+import com.example.application.ExcelReader.ExcelImporter;
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
 import com.example.application.models.Veranstaltung;
@@ -8,13 +9,17 @@ import com.example.application.services.TeilnehmerService;
 import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
 import com.example.application.views.veranstaltungstermin.TeilnehmerEntfernenDialog;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.listbox.ListBox;
+import com.vaadin.flow.component.listbox.MultiSelectListBox;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -26,11 +31,17 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.data.binder.Binder;
 import jakarta.annotation.security.RolesAllowed;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 
+import java.io.InputStream;
 import java.time.LocalDate;
-import java.util.Optional;
+import java.util.*;
 
 @Route(value = "addDialog")
 @RolesAllowed({"ADMIN", "USER"})
@@ -52,9 +63,12 @@ public class VeranstaltungDialog extends Dialog {
     //Upload Components
     MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
     private final Upload upload = new Upload(buffer);
+    ExcelImporter excelImporter;
+    Set<Teilnehmer> newTeilnehmerListe = new HashSet<>();
 
     //Security
     private AuthenticatedUser authenticatedUser;
+    private User user;
 
     //Data Binder
     Binder<Veranstaltung> binder = new Binder<>(Veranstaltung.class);
@@ -65,6 +79,13 @@ public class VeranstaltungDialog extends Dialog {
         this.userService = userService;
         this.veranstaltungenView = veranstaltungenView;
         this.authenticatedUser = authenticatedUser;
+        this.excelImporter = new ExcelImporter(teilnehmerService, authenticatedUser);
+
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            this.user = maybeUser.get();
+        }
+
         add(createLayout());
         configureElements();
         bindFields();
@@ -81,7 +102,7 @@ public class VeranstaltungDialog extends Dialog {
 
     private void configureElements() {
         //Combobox
-        comboBox.setItems(teilnehmerService.findAllTeilnehmerByUserAndFilter(authenticatedUser.get().get(),""));
+        comboBox.setItems(teilnehmerService.findAllTeilnehmerByUserAndFilter(user,""));
         comboBox.setRenderer(new ComponentRenderer<>(teilnehmer -> {
             HorizontalLayout row = new HorizontalLayout();
             row.setAlignItems(FlexComponent.Alignment.CENTER);
@@ -108,24 +129,33 @@ public class VeranstaltungDialog extends Dialog {
         comboBox.setSizeFull();
         datePicker.setSizeFull();
         titelField.setSizeFull();
+
         //Buttons
         saveButton.addClickListener(event -> {
-
             Veranstaltung veranstaltung = new Veranstaltung();
-
             if (binder.writeBeanIfValid(veranstaltung)) {
-                Optional<User> maybeUser = authenticatedUser.get();
-                if (maybeUser.isPresent()) {
-                    User user = maybeUser.get();
-                    veranstaltung.setUser(user);
+                veranstaltung.setUser(user);
+
+                Set<Teilnehmer> tempNewTeilnehmerSet = new HashSet<>(newTeilnehmerListe);
+                tempNewTeilnehmerSet.removeAll(comboBox.getValue()); // Teilnehmer die ich aus der Teilnehmerliste löschen muss
+                newTeilnehmerListe.removeAll(tempNewTeilnehmerSet);
+
+                Dialog dialog = new Dialog();
+                dialog.setMaxHeight(getHeight());
+                dialog.setHeaderTitle("Neue Teilnehmer");
+                dialog.getFooter().add(new Button("OK", e -> dialog.close()));
+                VerticalLayout dialogLayout = new VerticalLayout();
+                dialog.add(dialogLayout);
+
+                for (Teilnehmer teilnehmer : newTeilnehmerListe) {
+                    teilnehmerService.saveTeilnehmer(teilnehmer, user);
+                    dialogLayout.add(new Span("Teilnehmer :" + teilnehmer.toString() + " angelegt"));
                 }
                 veranstaltungenService.saveVeranstaltung(veranstaltung);
                 veranstaltungenView.updateKachelContainer("");
-
                 clearFields();
                 close();
-
-                Notification.show("Veranstaltung angelegt");
+                dialog.open();
             }
             else {
                 Notification.show("Fehler beim Speichern");
@@ -139,10 +169,33 @@ public class VeranstaltungDialog extends Dialog {
         });
 
         datePicker.setValue(LocalDate.now());
+
         //Upload
+        upload.addSucceededListener(event -> {
+            try {
+                InputStream inputStream = buffer.getInputStream(event.getFileName());
+                newTeilnehmerListe.addAll(excelImporter.readTeilnehmerFromExcel(inputStream));
+
+                List<Teilnehmer> combinedItems= new ArrayList<>();
+                combinedItems.addAll(teilnehmerService.findAllTeilnehmerByUserAndFilter(user, ""));
+                combinedItems.addAll(newTeilnehmerListe);
+
+                List<Teilnehmer> combinedValue = new ArrayList<>();
+                combinedValue.addAll(comboBox.getValue());
+                combinedValue.addAll(newTeilnehmerListe);
+
+                comboBox.setItems(combinedItems);
+                comboBox.setValue(combinedValue);
+
+            } catch (Exception e) {
+                Notification.show("Error reading Excel file: " + e.getMessage());
+                System.out.println(e.getMessage());
+            }
+        });
         upload.setUploadButton(new Button(LineAwesomeIcon.UPLOAD_SOLID.create()));
         upload.setDropLabelIcon(LineAwesomeIcon.ID_CARD.create());
         upload.setDropLabel(new Span("Teilnehmer Excel-Datei"));
+        upload.setAcceptedFileTypes(".xlsx");
 
     }
 
@@ -159,9 +212,12 @@ public class VeranstaltungDialog extends Dialog {
 
     public void clearFields(){
         titelField.clear();
-        datePicker.clear();
+        datePicker.setValue(LocalDate.now());
         comboBox.clear();
     }
+
+
+
 
 }
 
