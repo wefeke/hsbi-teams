@@ -151,6 +151,7 @@ public class VeranstaltungDialog extends Dialog {
                     teilnehmerService.saveTeilnehmer(teilnehmer, user);
                     dialogLayout.add(new Span("Teilnehmer :" + teilnehmer.toString() + " angelegt"));
                 }
+
                 veranstaltungenService.saveVeranstaltung(veranstaltung);
                 veranstaltungenView.updateKachelContainer("");
                 clearFields();
