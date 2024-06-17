@@ -8,7 +8,9 @@ import com.example.application.repositories.VeranstaltungenRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class VeranstaltungenService {
@@ -31,8 +33,7 @@ public class VeranstaltungenService {
     public void saveVeranstaltung(Veranstaltung veranstaltung) {
         if (veranstaltung != null) {
             veranstaltungenRepository.save(veranstaltung);
-        }
-        else
+        } else
             System.err.println("Test is null. Are you sure you have connected your form to the application?");
     }
 
@@ -40,8 +41,7 @@ public class VeranstaltungenService {
     public void deleteVeranstaltung(Veranstaltung veranstaltung) {
         if (veranstaltung != null) {
             veranstaltungenRepository.delete(veranstaltung);
-        }
-        else
+        } else
             System.err.println("Test is null. Are you sure you have connected your form to the application?");
     }
 
@@ -52,5 +52,19 @@ public class VeranstaltungenService {
         veranstaltung.getTeilnehmer().remove(teilnehmer);
         veranstaltungenRepository.save(veranstaltung);
     }
+
+    @Transactional
+    public void addTeilnehmer(Long veranstaltungId, Set<Teilnehmer> teilnehmer, User user) {
+        Veranstaltung veranstaltung = veranstaltungenRepository.findByIdAndUser(veranstaltungId, user);
+        if (veranstaltung != null) {
+            Set<Teilnehmer> t= new HashSet<>(veranstaltung.getTeilnehmer());
+            t.addAll(teilnehmer);
+            veranstaltung.setTeilnehmer(t);
+            veranstaltungenRepository.save(veranstaltung);
+        } else {
+            System.err.println("Veranstaltung nicht gefunden. Sind Sie sicher, dass die Veranstaltung existiert und der Benutzer berechtigt ist?");
+        }
+    }
+
 
 }

@@ -7,7 +7,21 @@ INSERT INTO public.user_roles (user_id, roles) VALUES
                                                    (1, 'ADMIN'),
                                                    (2, 'USER');
 */
-
+/*
+INSERT INTO public.teilnehmer (matrikel_nr, nachname, vorname, "hinzugefügt am", user_id) VALUES
+                                                                   (1000001, 'Müller', 'Max', now(), 1),
+                                                                   (1000002, 'Schmidt', 'Anna', now(), 1),
+                                                                   (1000003, 'Schneider', 'Paul', now(), 1),
+                                                                   (1000004, 'Fischer', 'Marie', now(), 1),
+                                                                   (1000005, 'Weber', 'Lukas', now(), 1),
+                                                                   (1000006, 'Meyer', 'Laura', now(), 1),
+                                                                    (100007, 'Blank','Tobi', now(), 2),
+                                                                    (100008, 'Müller','Max', now(), 2),
+                                                                    (100009, 'Schmidt','Anna', now(), 2),
+                                                                    (100010, 'Schneider','Paul', now(), 2),
+                                                                    (100011, 'Fischer','Marie', now(), 2),
+                                                                    (100012, 'Weber','Lukas', now(), 2);
+*/
 /*
 INSERT INTO public.veranstaltung (id, semester, titel, user_id) VALUES
 (1001, '2024-05-01', 'Materialwirtschaft und Produktionsplanung/-steuerung (Sose 2024-5 WI(P) 23)', 1),
