@@ -51,4 +51,7 @@ public interface TeilnehmerRepository extends JpaRepository<Teilnehmer, Long> {
     @Query(value = "SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END FROM Teilnehmer t JOIN t.gruppenarbeiten g WHERE t.matrikelNr = :teilnehmerId AND g.veranstaltungstermin.veranstaltung.id = :veranstaltungId")
     Boolean isTeilnehmerInGruppenarbeit(@Param("teilnehmerId") Long teilnehmerId, @Param("veranstaltungId") Long veranstaltungId);
 
+
+    Optional<Teilnehmer> findByMatrikelNrAndUserId(Long matrikelNr, Long userId);
 }
+

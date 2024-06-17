@@ -114,6 +114,12 @@ public class TeilnehmerService {
             throw new IllegalArgumentException("Invalid Veranstaltung Id:" + veranstaltungId);
         }
     }
+
+
+    public Optional<Teilnehmer> findByMatrikelNrAndUserId(Long matrikelNr, Long userId) {
+        return teilnehmerRepository.findByMatrikelNrAndUserId(matrikelNr, userId);
     }
+}
+
 
 
