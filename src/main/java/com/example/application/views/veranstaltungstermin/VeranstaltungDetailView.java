@@ -265,15 +265,19 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         triggerVeranstaltungsterminKachelClick();
         triggerGruppenarbeitKachelClick();
+        applyVeranstaltungsterminFilter();
 
+        updateTeilnehmerListe();
+    }
+
+
+    private void updateTeilnehmerListe() {
         rightContainer.remove(teilnehmerListe);
 
         teilnehmerListe.removeAll();
         teilnehmerListe.add(createTeilnehmerListe());
 
         rightContainer.add(teilnehmerListe);
-
-        applyVeranstaltungsterminFilter();
     }
 
     public void addTerminToTermine (Veranstaltungstermin veranstaltungstermin){
@@ -290,7 +294,6 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             termine.add(veranstaltungstermin);
         }
     }
-
 
     private Div veranstaltungsterminKachel(Veranstaltungstermin veranstaltungstermin) {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
@@ -586,9 +589,15 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
     private Div gruppenKachel(Gruppe gruppe) {
         // Laden der Gruppe mit den Teilnehmern
-        Gruppe fullGruppe = gruppeService.findGruppeByIdWithTeilnehmer(gruppe.getId());
+        Gruppe fullGruppe;
+        if (gruppeService.findGruppeByIdWithTeilnehmer(gruppe.getId()) != null) {
+            fullGruppe = gruppeService.findGruppeByIdWithTeilnehmer(gruppe.getId());
+        } else {
+            fullGruppe = null;
+        }
 
         Div gruppenInfo = new Div();
+        assert fullGruppe != null;
         gruppenInfo.setText("Gruppe " + fullGruppe.getNummer());
         gruppenInfo.addClassName("text-center");
 
@@ -601,7 +610,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
             // Klick-Listener für Teilnehmer
             teilnehmerDiv.addClickListener(e -> {
-                gruppeAuswertungDialog = new GruppeAuswertungDialog(teilnehmer,fullGruppe.getGruppenarbeit(), gruppenarbeitTeilnehmerService, this);
+                gruppeAuswertungDialog = new GruppeAuswertungDialog(teilnehmer, gruppe.getGruppenarbeit(), gruppenarbeitTeilnehmerService, this);
                 gruppeAuswertungDialog.open();
             });
 
@@ -896,7 +905,6 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             HorizontalLayout lineWithText = createLineWithText("Gruppen");
 
             Button editButton = createEditButton();
-            //Lilli
             editButton.addClickListener(event -> gruppeBearbeitenDialog.open());
 
             Hr lineAfter = new Hr();
@@ -909,9 +917,15 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
             contentLayout.add(gruppenLinie, gruppenContainer);
         }
+        Gruppenarbeit fullGruppenarbeit;
 
-        Gruppenarbeit fullGruppenarbeit = gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId());
+        if (gruppenarbeit.getId() != null) {
+            fullGruppenarbeit = gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId());
+        } else {
+            fullGruppenarbeit = null;
+        }
 
+        assert fullGruppenarbeit != null;
         if (fullGruppenarbeit.getGruppen() != null) {
             for (Gruppe gruppe : fullGruppenarbeit.getGruppen()) {
                 gruppenContainer.add(gruppenKachel(gruppe));
@@ -928,14 +942,18 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     public void triggerVeranstaltungsterminKachelClick () {
         if (aktiveKachelVeranstaltungstermin != null) {
             Veranstaltungstermin termin = veranstaltungsterminMap.get(aktiveKachelVeranstaltungstermin);
-            updateGruppenarbeiten(termin);
+
+            Veranstaltungstermin updatedTermin = veranstaltungsterminService.findVeranstaltungsterminById(termin.getId());
+            updateGruppenarbeiten(updatedTermin);
         }
     }
 
     public void triggerGruppenarbeitKachelClick () {
         if (aktiveKachelGruppenarbeit != null) {
             Gruppenarbeit gruppenarbeit = gruppenarbeitMap.get(aktiveKachelGruppenarbeit);
-            updateGruppen(gruppenarbeit);
+
+            Gruppenarbeit updatedGruppenarbeit = gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId());
+            updateGruppen(updatedGruppenarbeit);
         }
     }
 
@@ -948,16 +966,27 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 break;
             }
         }
-        System.out.println(termin.toString() + "setAkiveKachelveranstaltungstermin");
     }
 
     public void setAktiveKachelGruppenarbeit(Gruppenarbeit gruppenarbeit) {
-        for (Map.Entry<Div, Gruppenarbeit> entry : gruppenarbeitMap.entrySet()) {
-            if (entry.getValue().equals(gruppenarbeit)) {
-                aktiveKachelGruppenarbeit = entry.getKey();
-                aktiveKachelGruppenarbeit.addClassName("kachel-active");
-                aktiveGruppenarbeit = gruppenarbeit;
-                break;
+
+        Veranstaltungstermin neuerVeranstaltungstermin = veranstaltungsterminService.findVeranstaltungsterminById(gruppenarbeit.getVeranstaltungstermin().getId());
+
+        if (neuerVeranstaltungstermin != null) {
+            List<Gruppenarbeit> aktuelleGruppenarbeiten = neuerVeranstaltungstermin.getGruppenarbeiten();
+
+            for (Gruppenarbeit aktuelleGruppenarbeit : aktuelleGruppenarbeiten) {
+                if (aktuelleGruppenarbeit.getId().equals(gruppenarbeit.getId())) {
+                    for (Map.Entry<Div, Gruppenarbeit> entry : gruppenarbeitMap.entrySet()) {
+                        if (entry.getValue().equals(aktuelleGruppenarbeit)) {
+                            aktiveKachelGruppenarbeit = entry.getKey();
+                            aktiveKachelGruppenarbeit.addClassName("kachel-active");
+                            aktiveGruppenarbeit = aktuelleGruppenarbeit;
+                            break;
+                        }
+                    }
+                    break;
+                }
             }
         }
     }
