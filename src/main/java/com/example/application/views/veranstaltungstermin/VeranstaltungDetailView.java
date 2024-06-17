@@ -88,8 +88,6 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private HorizontalLayout gruppenarbeitLinie;
     private HorizontalLayout gruppenLinie;
 
-   // private final TeilnehmerErstellenDialog teilnehmerErstellenDialog;
-
     public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, GruppeService gruppeService, GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService, AuthenticatedUser authenticatedUser) {
         // Initialisierung der Services
         this.veranstaltungService = veranstaltungService;
@@ -99,9 +97,6 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         this.gruppenarbeitTeilnehmerService = gruppenarbeitTeilnehmerService;
         this.authenticatedUser = authenticatedUser;
         this.teilnehmerService = teilnehmerService;
-
-        //this.teilnehmerErstellenDialog= teilnehmerErstellenDialog;
-
 
         // Initialisierung der UI-Elemente
         this.teilnehmerListe = new Div();
@@ -127,11 +122,13 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         HorizontalLayout mainLayout = new HorizontalLayout(leftContainer, rightContainer);
         mainLayout.setSizeFull();
-        mainLayout.getStyle().set("overflow", "hidden"); // Hide the overflow content
+        mainLayout.getStyle().set("overflow", "hidden");
 
         VerticalLayout titleContainer = new VerticalLayout();
         Div contentContainer = new Div();
         contentContainer.getStyle().set("width", "calc(100% - 400px)");
+        contentContainer.getStyle().set("height", "80vh");
+        contentContainer.getStyle().set("border-top", "1px solid #ccc");
 
         // Konfiguration des Titels und des Umschaltbuttons
         veranstaltungTitle.addClassName("veranstaltung-title");
@@ -433,7 +430,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
 
     public void createVeranstaltungsterminDialog () {
-        veranstaltungsterminDialog = new VeranstaltungsterminDialog(veranstaltungService, veranstaltungsterminService, this, veranstaltungIdString, authenticatedUser);
+        veranstaltungsterminDialog = new VeranstaltungsterminDialog(veranstaltungService, veranstaltungsterminService, this, veranstaltungIdString, authenticatedUser, aktiverVeranstaltungstermin, aktiveGruppenarbeit);
     }
 
     //Lilli
@@ -445,17 +442,17 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
     //Lilli
     public void createGruppenarbeitBearbeitenDialog() {
-        gruppenarbeitBearbeitenDialog = new GruppenarbeitBearbeitenDialog(gruppenarbeitService);
+        gruppenarbeitBearbeitenDialog = new GruppenarbeitBearbeitenDialog(gruppenarbeitService, this);
     }
 
     //Lilli
     public void createGruppenarbeitLoeschenDialog() {
-        gruppenarbeitLoeschenDialog = new GruppenarbeitLoeschenDialog(gruppenarbeitService, gruppeService, veranstaltungsterminService);
+        gruppenarbeitLoeschenDialog = new GruppenarbeitLoeschenDialog(gruppenarbeitService, gruppeService, veranstaltungsterminService,this);
     }
 
     //Lilli
     private void createVeranstaltungsterminLoeschenDialog() {
-        veranstaltungsterminLoeschenDialog = new VeranstaltungsterminLoeschenDialog(veranstaltung, gruppeService, gruppenarbeitService, veranstaltungsterminService, veranstaltungService);
+        veranstaltungsterminLoeschenDialog = new VeranstaltungsterminLoeschenDialog(veranstaltung, gruppeService, gruppenarbeitService, this, aktiverVeranstaltungstermin, aktiveGruppenarbeit, veranstaltungsterminService, veranstaltungService);
     }
 
     public void createTeilnehmerHinzufuegenDialog() {
@@ -535,7 +532,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 aktiveGruppenarbeit = gruppenarbeit;
 
             }
-            gruppeBearbeitenDialog = new GruppeBearbeitenDialog(gruppenarbeit, gruppenarbeitService, gruppeService, authenticatedUser);
+            gruppeBearbeitenDialog = new GruppeBearbeitenDialog(gruppenarbeit, gruppenarbeitService, gruppeService, authenticatedUser, this);
             gruppeBearbeitenDialog.setWidth("1500px");
         });
 

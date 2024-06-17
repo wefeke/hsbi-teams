@@ -10,7 +10,6 @@ import com.example.application.services.VeranstaltungenService;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -19,33 +18,23 @@ import java.util.Optional;
 
 public class TeilnehmerEntfernenDialog extends Dialog {
 
-    private final VeranstaltungenService veranstaltungService;
     private final TeilnehmerService teilnehmerService;
     private final Long veranstaltungId;
     private Teilnehmer teilnehmer;
-    private AuthenticatedUser authenticatedUser;
-    private final VeranstaltungDetailView veranstaltungDetailView;
-    private Veranstaltungstermin veranstaltungstermin;
-    private Gruppenarbeit gruppenarbeit;
 
-    private Text infoText = new Text("");
-    private Button deleteBtn = new Button("Teilnehmer endgültig entfernen");
-    private Button cancelBtn = new Button("Abbrechen");
+    private final Text infoText = new Text("");
+    private final Button deleteBtn = new Button("Teilnehmer endgültig entfernen");
 
     public TeilnehmerEntfernenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser, VeranstaltungDetailView veranstaltungDetailView, Veranstaltungstermin veranstaltungstermin, Gruppenarbeit gruppenarbeit) {
-        this.veranstaltungService = veranstaltungService;
         this.teilnehmerService = teilnehmerService;
         this.veranstaltungId = veranstaltungId;
-        this.authenticatedUser = authenticatedUser;
-        this.veranstaltungDetailView = veranstaltungDetailView;
-        this.veranstaltungstermin = veranstaltungstermin;
-        this.gruppenarbeit = gruppenarbeit;
 
 
         VerticalLayout layout = new VerticalLayout();
         layout.add(infoText);
 
         HorizontalLayout buttonLayout = new HorizontalLayout();
+        Button cancelBtn = new Button("Abbrechen");
         buttonLayout.add(deleteBtn, cancelBtn);
         buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
 
