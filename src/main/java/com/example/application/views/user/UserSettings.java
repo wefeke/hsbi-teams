@@ -38,13 +38,9 @@ public class UserSettings extends Dialog {
 
     private final TextField name = new TextField("Name");
     private final TextField username = new TextField("Username");
-    private final Button passwordChange = new Button("Passwort ändern");
     private Avatar avatar = new Avatar();
     private final Button saveButton = new Button("Änderungen speichern");
     private final Button cancelButton = new Button("Abbrechen");
-
-    private final PasswordEncoder passwordEncoder;
-    private PasswordChange passwordChangeDialog;
 
     //Image Objects
     MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
@@ -60,15 +56,13 @@ public class UserSettings extends Dialog {
 
     private final Binder<User> binder = new Binder<>(User.class);
 
-    public UserSettings (AuthenticatedUser authenticatedUser, UserService userService, PasswordEncoder passwordEncoder) {
+    public UserSettings (AuthenticatedUser authenticatedUser, UserService userService) {
         this.authenticatedUser = authenticatedUser;
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
             this.user = maybeUser.get();
         }
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-        passwordChangeDialog = new PasswordChange(passwordEncoder, userService, user);
         createElements();
         configureElements();
         bindFields();
@@ -80,7 +74,6 @@ public class UserSettings extends Dialog {
                 avatar,
                 name,
                 username,
-                passwordChange,
                 upload
 
         );
@@ -96,23 +89,17 @@ public class UserSettings extends Dialog {
         saveButton.setThemeName("primary");
 
         saveButton.addClickListener(e -> {
-            System.out.println(username);
-            System.out.println(user.getUsername());
             if (binder.writeBeanIfValid(user)) {
                 user.setProfilePicture(uploadedImage);
                 userService.saveUser(user);
-                authenticatedUser.logout();
                 Notification.show("User aktualisiert");
                 clearFields();
                 close();
+                authenticatedUser.logout();
             }
             else {
                 Notification.show("Fehler beim Speichern");
             }
-        });
-
-        passwordChange.addClickListener(e -> {
-            passwordChangeDialog.open();
         });
 
         //Image Handling
@@ -139,8 +126,6 @@ public class UserSettings extends Dialog {
 
         name.setWidthFull();
         username.setWidthFull();
-        //username.setReadOnly(true);
-        passwordChange.setWidthFull();
     }
 
     private void bindFields() {

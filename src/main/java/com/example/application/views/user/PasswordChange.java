@@ -1,12 +1,15 @@
 package com.example.application.views.user;
 
 import com.example.application.models.User;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.UserService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.PasswordField;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
 
 public class PasswordChange extends Dialog {
 
@@ -16,12 +19,16 @@ public class PasswordChange extends Dialog {
 
     private PasswordEncoder passwordEncoder;
     private final UserService userService;
+    private AuthenticatedUser authenticatedUser;
     private User user;
 
-    public PasswordChange (PasswordEncoder passwordEncoder, UserService userService, User user) {
+    public PasswordChange (AuthenticatedUser authenticatedUser, UserService userService, PasswordEncoder passwordEncoder) {
+        this.authenticatedUser = authenticatedUser;
+        Optional<User> maybeUser = authenticatedUser.get();
+        maybeUser.ifPresent(value -> this.user = value);
+
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
-        this.user = user;
         createElements();
         configureElements();
 

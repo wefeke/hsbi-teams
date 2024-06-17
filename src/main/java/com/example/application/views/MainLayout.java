@@ -2,6 +2,7 @@
 package com.example.application.views;
 
 import com.example.application.services.UserService;
+import com.example.application.views.user.PasswordChange;
 import com.example.application.views.user.UserManagement;
 import com.example.application.views.user.UserSettings;
 import com.example.application.models.User;
@@ -177,12 +178,14 @@ public class MainLayout extends AppLayout {
             div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
             userName.add(div);
 
-            UserSettings userSettings = new UserSettings(authenticatedUser, userService, passwordEncoder);
+            UserSettings userSettings = new UserSettings(authenticatedUser, userService);
             userSettings.addOpenedChangeListener(e -> {
                 if (e.isOpened()) {
                     userSettings.readBean();
                 }
             });
+
+            PasswordChange passwordChange = new PasswordChange(authenticatedUser, userService, passwordEncoder);
 
             // Create a HorizontalLayout and add the icon and text to it
             HorizontalLayout settingsItemLayout = new HorizontalLayout(LineAwesomeIcon.COG_SOLID.create(), new Text("Einstellungen"));
@@ -190,10 +193,17 @@ public class MainLayout extends AppLayout {
                     userSettings.open()
             );
 
+            // Create a HorizontalLayout and add the icon and text to it
+            HorizontalLayout passwordItemLayout = new HorizontalLayout(LineAwesomeIcon.KEY_SOLID.create(), new Text("Passwort"));
+            userName.getSubMenu().addItem(passwordItemLayout, e ->
+                    passwordChange.open()
+            );
+
             HorizontalLayout signOutItemLayout = new HorizontalLayout(LineAwesomeIcon.SIGN_OUT_ALT_SOLID.create(), new Text("Abmelden"));
             userName.getSubMenu().addItem(signOutItemLayout, e ->
                 authenticatedUser.logout()
             );
+
             userMenu.getStyle().setMarginRight("10px");
             settingItems.add(userMenu); //zur rechten Seite hinzufügen
         } else {

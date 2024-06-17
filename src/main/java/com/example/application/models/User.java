@@ -90,9 +90,11 @@ public class User {
         this.id = id;
     }
 
+
     public byte[] getProfilePicture() {
         return profilePicture;
     }
+
     public void setProfilePicture(byte[] profilePicture) {
         this.profilePicture = profilePicture;
     }
