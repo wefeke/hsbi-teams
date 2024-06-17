@@ -84,8 +84,13 @@ public class TeilnehmerErstellenDialog extends Dialog {
 
     private boolean isDuplicateMatrikelNr() {
         Long matrikelNrValue = matrikelNr.getValue().longValue();
-        Optional<Teilnehmer> existingTeilnehmer = teilnehmerService.findByMatrikelNr(matrikelNrValue);
-        return existingTeilnehmer.isPresent() && (teilnehmer == null || !existingTeilnehmer.get().getId().equals(teilnehmer.getId()));
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            Long userId = maybeUser.get().getId();
+            Optional<Teilnehmer> existingTeilnehmer = teilnehmerService.findByMatrikelNrAndUserId(matrikelNrValue, userId);
+            return existingTeilnehmer.isPresent() && (teilnehmer == null || !existingTeilnehmer.get().getId().equals(teilnehmer.getId()));
+        }
+        return false;
     }
 
     private void saveTeilnehmer() {
