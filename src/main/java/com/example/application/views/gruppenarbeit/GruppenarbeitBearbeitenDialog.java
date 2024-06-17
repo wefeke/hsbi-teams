@@ -77,8 +77,13 @@ public class GruppenarbeitBearbeitenDialog extends Dialog {
         saveBtn.addClickListener(event -> {
             saveChanges();
 
-            veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
-            veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+            if (gruppenarbeit.getVeranstaltungstermin() != null) {
+                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
+
+                if (gruppenarbeit != null) {
+                    veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+                }
+            }
             veranstaltungDetailView.update();
 
             close();

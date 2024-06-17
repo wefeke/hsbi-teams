@@ -174,8 +174,14 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
             Notification.show("Gruppenarbeit angelegt!");
             close();
             clearFields();
-            veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
-            veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+
+            if (gruppenarbeit.getVeranstaltungstermin() != null) {
+                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
+
+                if (gruppenarbeit != null) {
+                    veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+                }
+            }
             veranstaltungDetailView.update();
 
         }

@@ -59,8 +59,13 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
 
                     Notification.show(selectedTeilnehmer.size() + " Teilnehmer wurden hinzugefügt");
 
-                    veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(veranstaltungstermin);
-                    veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+                    if (veranstaltungstermin != null) {
+                        veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(veranstaltungstermin);
+
+                        if (gruppenarbeit != null) {
+                            veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+                        }
+                    }
                     veranstaltungDetailView.update();
 
                     updateGrid();

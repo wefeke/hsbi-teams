@@ -75,8 +75,11 @@ public class GruppeBearbeitenDialog extends Dialog {
     private void addButtonFunctionalities(){
         saveBtn.addClickListener(event ->{
             saveUpdatesToGruppenarbeit();
-            veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
-            veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+
+            if (gruppenarbeit.getVeranstaltungstermin() != null) {
+                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
+                veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+            }
             veranstaltungDetailView.update();
             close();
         });

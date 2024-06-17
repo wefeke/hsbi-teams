@@ -66,8 +66,13 @@ public class GruppenarbeitLoeschenDialog extends Dialog {
 
             close();
 
-            veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
-            veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+            if (veranstaltungstermin != null) {
+                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(veranstaltungstermin);
+
+                if (gruppenarbeit != null) {
+                    veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+                }
+            }
             veranstaltungDetailView.update();
         });
 

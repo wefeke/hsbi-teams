@@ -78,8 +78,13 @@ public class VeranstaltungsterminLoeschenDialog extends Dialog {
 
             veranstaltungsterminService.deleteVeranstaltungstermin(veranstaltungstermin);
 
-            veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(aktiverVeranstaltungstermin);
-            veranstaltungDetailView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
+            if (aktiverVeranstaltungstermin != null) {
+                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(aktiverVeranstaltungstermin);
+
+                if (aktiveGruppenarbeit != null) {
+                    veranstaltungDetailView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
+                }
+            }
             veranstaltungDetailView.update();
 
             close();

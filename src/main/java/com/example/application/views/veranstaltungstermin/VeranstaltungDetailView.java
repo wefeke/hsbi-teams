@@ -263,12 +263,6 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
     public void update() {
 
-        Optional<User> maybeUser = authenticatedUser.get();
-        if (maybeUser.isPresent()) {
-            User user = maybeUser.get();
-            termine = veranstaltungsterminService.findVeranstaltungstermineByVeranstaltungId(veranstaltung.getId(), user);
-        }
-
         triggerVeranstaltungsterminKachelClick();
         triggerGruppenarbeitKachelClick();
 
@@ -281,6 +275,22 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         applyVeranstaltungsterminFilter();
     }
+
+    public void addTerminToTermine (Veranstaltungstermin veranstaltungstermin){
+        if (veranstaltungstermin != null){
+            termine.add(veranstaltungstermin);
+        }
+    }
+
+    public void removeAndAddTerminToTermine (Veranstaltungstermin veranstaltungstermin, Long veranstaltungsterminId) {
+        if (veranstaltungstermin != null && veranstaltungsterminId != null){
+            Veranstaltungstermin v = veranstaltungsterminService.findVeranstaltungsterminById(veranstaltungsterminId);
+            termine.remove(v);
+
+            termine.add(veranstaltungstermin);
+        }
+    }
+
 
     private Div veranstaltungsterminKachel(Veranstaltungstermin veranstaltungstermin) {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
@@ -307,7 +317,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         veranstaltungsterminMap.put(kachel, veranstaltungstermin);
         kachel.addClassName("kachel");
 
-        VeranstaltungsterminBearbeiten editDialog = new VeranstaltungsterminBearbeiten(veranstaltungService, veranstaltungsterminService, this, veranstaltungIdString, veranstaltungstermin.getId(), authenticatedUser);
+        VeranstaltungsterminBearbeiten editDialog = new VeranstaltungsterminBearbeiten(veranstaltungService, veranstaltungsterminService, this, veranstaltungIdString, veranstaltungstermin.getId(), authenticatedUser, aktiverVeranstaltungstermin, aktiveGruppenarbeit);
 
         //Delete Icon
         Div deleteIcon = createDeleteIcon();
@@ -938,6 +948,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 break;
             }
         }
+        System.out.println(termin.toString() + "setAkiveKachelveranstaltungstermin");
     }
 
     public void setAktiveKachelGruppenarbeit(Gruppenarbeit gruppenarbeit) {

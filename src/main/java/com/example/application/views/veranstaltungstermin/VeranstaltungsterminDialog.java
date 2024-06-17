@@ -118,8 +118,16 @@ public class VeranstaltungsterminDialog extends Dialog {
 
                 close();
                 clearFields();
-                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(aktiverVeranstaltungstermin);
-                veranstaltungDetailView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
+
+                veranstaltungDetailView.addTerminToTermine(veranstaltungstermin);
+
+                if (aktiverVeranstaltungstermin != null) {
+                    veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(aktiverVeranstaltungstermin);
+
+                    if (aktiveGruppenarbeit != null) {
+                        veranstaltungDetailView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
+                    }
+                }
                 veranstaltungDetailView.update();
 
             }

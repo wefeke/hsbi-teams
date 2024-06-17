@@ -111,8 +111,11 @@ public class GruppeAuswertungDialog extends Dialog {
                 gruppenarbeitTeilnehmerService.save(gruppenarbeitTeilnehmer);
                 close();
                 clearFields();
+
+            if (gruppenarbeit.getVeranstaltungstermin() != null) {
                 veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
                 veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+            }
                 veranstaltungDetailView.update();
         });
 

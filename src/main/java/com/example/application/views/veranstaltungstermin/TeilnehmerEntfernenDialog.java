@@ -48,8 +48,13 @@ public class TeilnehmerEntfernenDialog extends Dialog {
                 veranstaltungService.removeTeilnehmerFromVeranstaltung(teilnehmer, veranstaltungId, user);
             }
 
-            veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(veranstaltungstermin);
-            veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+            if (veranstaltungstermin != null) {
+                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(veranstaltungstermin);
+
+                if (gruppenarbeit != null) {
+                    veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+                }
+            }
             veranstaltungDetailView.update();
 
             close();
