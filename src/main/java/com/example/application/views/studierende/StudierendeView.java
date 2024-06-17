@@ -62,10 +62,10 @@ public class StudierendeView extends VerticalLayout {
     private final StudierendeHinzufuegen dialog;
     private H2 users = new H2("Studierende");
     private final Button delete = new Button("Studierenden löschen");
-    private final Button aendern = new Button ("Studierende ändern");
+    //private final Button aendern = new Button ("Studierende ändern");
     private final Component addStudiernedenButtonIcon;
     private final Component deleteIcon;
-    private final Component aendernIcon;
+    //private final Component aendernIcon;
     private final Button importButton = new Button("Importieren");
     private final Button exportButton = new Button("Exportieren");
     private AuthenticatedUser authenticatedUser;
@@ -87,7 +87,7 @@ public class StudierendeView extends VerticalLayout {
         StudierendeHinzufuegen studierendeHinzufuegen = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser, this);
         addStudiernedenButtonIcon = addStudiernedenButton.getIcon();
         deleteIcon = delete.getIcon();
-        aendernIcon = aendern.getIcon();
+        //aendernIcon = aendern.getIcon();
 
         addClassName("Studierenden-view");
 
@@ -111,9 +111,9 @@ public class StudierendeView extends VerticalLayout {
         delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
         delete.getStyle().set("margin-inline-start", "auto");
 
-        aendern.setEnabled(false);
-        aendern.addThemeVariants(ButtonVariant.LUMO_ERROR);
-        aendern.getStyle().set("margin-inline-start", "auto");
+//        aendern.setEnabled(false);
+//        aendern.addThemeVariants(ButtonVariant.LUMO_ERROR);
+//        aendern.getStyle().set("margin-inline-start", "auto");
 
         // Click-Listener für den Lösch-Button
         delete.addClickListener(event -> {
@@ -189,7 +189,7 @@ public class StudierendeView extends VerticalLayout {
         grid.addSelectionListener(selection -> {
             int size = selection.getAllSelectedItems().size();
             delete.setEnabled(size != 0);
-            aendern.setEnabled(size != 0);
+            //aendern.setEnabled(size != 0);
         });
         Grid.Column<Teilnehmer> editColumn = grid.addComponentColumn(teilnehmer -> {
             Button editButton = new Button(LineAwesomeIcon.EDIT.create());
@@ -252,7 +252,7 @@ public class StudierendeView extends VerticalLayout {
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateStudierendeView());
 
-        HorizontalLayout toolbar = new HorizontalLayout(filterText, addStudiernedenButton, delete, aendern);
+        HorizontalLayout toolbar = new HorizontalLayout(filterText, addStudiernedenButton, delete);
 
         toolbar.addClassName("toolbar");
 
@@ -314,7 +314,6 @@ public class StudierendeView extends VerticalLayout {
 
         addStudiernedenButton.setText("+");
         delete.setText("-");
-        aendern.setText("...");
     }
 
     private void restoreButtons() {
@@ -324,8 +323,6 @@ public class StudierendeView extends VerticalLayout {
         delete.setIcon(deleteIcon);
         delete.setText("Studierenden löschen");
 
-        aendern.setIcon(aendernIcon);
-        aendern.setText("Studierende ändern");
     }
     private File createTempFile() {
         try {
