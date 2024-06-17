@@ -62,4 +62,7 @@ public interface TeilnehmerRepository extends JpaRepository<Teilnehmer, Long> {
     Boolean isTeilnehmerInGruppenarbeit(@Param("teilnehmerId") Long teilnehmerId, @Param("veranstaltungId") Long veranstaltungId);
 
 
+
+    Optional<Teilnehmer> findByMatrikelNrAndUserId(Long matrikelNr, Long userId);
 }
+

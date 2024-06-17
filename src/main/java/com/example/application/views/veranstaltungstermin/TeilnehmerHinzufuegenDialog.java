@@ -6,8 +6,9 @@ import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.VeranstaltungenService;
 import com.example.application.views.studierende.StudierendeHinzufuegen;
+import com.example.application.views.veranstaltungstermin.TeilnehmerErstellenDialog;
+import com.example.application.views.studierende.StudierendeView;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -17,6 +18,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -30,14 +32,18 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
     private final Button importButton = new Button("importieren");
     private final TextField filterText = new TextField();
     private final Grid<Teilnehmer> grid = new Grid<>();
+    private final TeilnehmerErstellenDialog dialog;
     private final AuthenticatedUser authenticatedUser;
-    private final Dialog dialog = new Dialog();
+    //private final TeilnehmerErstellenDialog teilnehmerErstellenDialog;
+
 
     public TeilnehmerHinzufuegenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser) {
         this.veranstaltungService = veranstaltungService;
         this.teilnehmerService = teilnehmerService;
         this.veranstaltungId = veranstaltungId;
         this.authenticatedUser = authenticatedUser;
+        //this.teilnehmerErstellenDialog = teilnehmerErstellenDialog;
+       // StudierendeHinzufuegen studierendeHinzufuegen = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser, studierendeView);
 
         this.setWidth("80vw");
         this.setHeight("80vh");
@@ -46,27 +52,31 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         hinzufuegenButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
         hinzufuegenButton.getStyle().set("margin-inline-start", "auto");
 
+        dialog = new TeilnehmerErstellenDialog(teilnehmerService, authenticatedUser,this);
+        anlegenButton.addClickListener(event -> {
+            dialog.open();
+
+        });
 
         hinzufuegenButton.addClickListener(event -> {
-            Set<Teilnehmer> selectedTeilnehmer = grid.getSelectedItems();
+            Set<Teilnehmer> selectedTeilnehmer = new HashSet<>(grid.getSelectedItems());
             if (!selectedTeilnehmer.isEmpty()) {
                 Optional<User> maybeUser = authenticatedUser.get();
                 if (maybeUser.isPresent()) {
                     User user = maybeUser.get();
-                    for (Teilnehmer teilnehmer : selectedTeilnehmer) {
-                        teilnehmerService.addTeilnehmerToVeranstaltung(teilnehmer, veranstaltungId, user);
-                    }
-                    Notification.show(selectedTeilnehmer.size() + " Studierende wurden zur Veranstaltung hinzugefügt");
+                    veranstaltungService.addTeilnehmer(veranstaltungId, selectedTeilnehmer, user);
+
+                    Notification.show(selectedTeilnehmer.size() + " Teilnehmer wurden hinzugefügt", 3000, Notification.Position.MIDDLE);
                     updateGrid();
                 }
+            } else {
+                Notification.show("Keine Teilnehmer ausgewählt", 3000, Notification.Position.MIDDLE);
             }
         });
 
-        anlegenButton.addClickListener(event ->{openDialog();
 
-        });
         configureGrid();
-        configureDialog();
+
 
         Button cancelButton = new Button("Abbrechen", e -> close());
         add(
@@ -76,6 +86,7 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
                 cancelButton
         );
         updateGrid();
+
     }
 
     private Component getToolbar() {
@@ -91,11 +102,11 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         return toolbar;
     }
 
-    private void updateGrid() {
-        Optional<User> maybeUser = authenticatedUser.get();
-        if (maybeUser.isPresent()) {
-            User user = maybeUser.get();
-            grid.setItems(teilnehmerService.findAllTeilnehmerNotInVeranstaltung(veranstaltungId,user));
+    public void updateGrid() {
+            Optional<User> maybeUser = authenticatedUser.get();
+            if (maybeUser.isPresent()) {
+                User user = maybeUser.get();
+                grid.setItems(teilnehmerService.findAllTeilnehmerNotInVeranstaltung(veranstaltungId, user));
         }
     }
 
@@ -121,14 +132,4 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         return content;
     }
 
-    private void openDialog() {
-        dialog.open();
-        updateGrid();
-    }
-
-    private void configureDialog() {
-        dialog.add(new StudierendeHinzufuegen(teilnehmerService, authenticatedUser));
-        dialog.setWidth("400px");
-        dialog.setHeight("300px");
-    }
 }

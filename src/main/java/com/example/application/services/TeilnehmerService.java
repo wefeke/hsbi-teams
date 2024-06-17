@@ -117,6 +117,10 @@ public class TeilnehmerService {
 
     public Optional<Teilnehmer> findTeilnehmerByIdAndVornameAndNachname(Long id, String vorname, String nachname, User user) {
         return teilnehmerRepository.findTeilnehmerByIdAndVornameAndNachnameAndUser(id, vorname, nachname, user);
+}
+
+    public Optional<Teilnehmer> findByMatrikelNrAndUserId(Long matrikelNr, Long userId) {
+        return teilnehmerRepository.findByMatrikelNrAndUserId(matrikelNr, userId);
     }
 
     public Optional<Teilnehmer> findTeilnehmerByVornameAndNachname(String vorname, String nachname, User user) {
@@ -132,5 +136,6 @@ public class TeilnehmerService {
     }
 
 }
+
 
 
