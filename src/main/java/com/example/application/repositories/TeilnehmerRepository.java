@@ -23,6 +23,17 @@ public interface TeilnehmerRepository extends JpaRepository<Teilnehmer, Long> {
     Optional<Teilnehmer> findByMatrikelNr(Long matrikelNr);
 */
 
+    Optional<Teilnehmer> findTeilnehmerByIdAndVornameAndNachnameAndUser(Long id, String vorname, String nachname, User user);
+
+    Optional<Teilnehmer> findTeilnehmerByVornameAndNachnameAndUser (String vorname, String nachname, User user);
+
+    List<Teilnehmer> findAllByVornameAndNachnameAndUser (String vorname, String nachname, User user);
+
+    Optional<Teilnehmer> findTeilnehmerByNachnameAndUser (String nachname, User user);
+
+    Optional<Teilnehmer> findTeilnehmerByMatrikelNrAndUser (Long matrikelNr, User user);
+
+
     @Query("select c from Teilnehmer c " +
             "where c.user = :user " +
             "and (lower(c.vorname) like lower(concat('%', :searchTerm, '%')) " +
@@ -30,10 +41,9 @@ public interface TeilnehmerRepository extends JpaRepository<Teilnehmer, Long> {
             "or cast(c.matrikelNr as string) like lower(concat('%', :searchTerm, '%'))")
     List<Teilnehmer> searchByUser(@Param("user") User user, @Param("searchTerm") String searchTerm);
 
-    Optional<Teilnehmer> findByMatrikelNr(Long matrikelNr);
-
     @Query("SELECT t FROM Teilnehmer t JOIN t.veranstaltungen v WHERE v.id = :id")
     List<Teilnehmer> findByVeranstaltungId(@Param("id") Long id);
+
 
     @Query("select t from Teilnehmer t where t.hinzugefuegtAm <= :datum and t.user = :user")
     List<Teilnehmer> findStudierendeVorJahren(@Param("datum") LocalDateTime datum, @Param("user") User user);
@@ -50,6 +60,7 @@ public interface TeilnehmerRepository extends JpaRepository<Teilnehmer, Long> {
 
     @Query(value = "SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END FROM Teilnehmer t JOIN t.gruppenarbeiten g WHERE t.matrikelNr = :teilnehmerId AND g.veranstaltungstermin.veranstaltung.id = :veranstaltungId")
     Boolean isTeilnehmerInGruppenarbeit(@Param("teilnehmerId") Long teilnehmerId, @Param("veranstaltungId") Long veranstaltungId);
+
 
 
     Optional<Teilnehmer> findByMatrikelNrAndUserId(Long matrikelNr, Long userId);

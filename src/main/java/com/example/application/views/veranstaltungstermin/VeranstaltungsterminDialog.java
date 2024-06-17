@@ -209,7 +209,7 @@ public class VeranstaltungsterminDialog extends Dialog {
 
     public void clearFields(){
         //Clear all Fields after saving
-        startDatePicker.clear();
+        startDatePicker.setValue(LocalDate.now());
         endDatePicker.clear();
         startTimePicker.clear();
         endTimePicker.clear();
