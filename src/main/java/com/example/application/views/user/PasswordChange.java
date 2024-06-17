@@ -32,7 +32,7 @@ public class PasswordChange extends Dialog {
         createElements();
         configureElements();
 
-        setHeaderTitle("Change Password");
+        setHeaderTitle("Passwort ändern");
     }
 
     private void createElements() {
@@ -53,7 +53,7 @@ public class PasswordChange extends Dialog {
             }
             else {
                 password_check.setInvalid(true);
-                password_check.setErrorMessage("Passwords do not match");
+                password_check.setErrorMessage("Passwörter sind nicht gleich");
             }
         });
 
@@ -63,7 +63,7 @@ public class PasswordChange extends Dialog {
             }
             else {
                 password_check.setInvalid(true);
-                password_check.setErrorMessage("Passwords do not match");
+                password_check.setErrorMessage("Passwörter sind nicht gleich");
             }
         });
 
@@ -78,7 +78,7 @@ public class PasswordChange extends Dialog {
             }
             else {
                 old_password.setInvalid(true);
-                old_password.setErrorMessage("Password is incorrect");
+                old_password.setErrorMessage("Password ist nicht korrekt");
             }
 
             if (!password_check.isInvalid() && !old_password.isInvalid() && !new_password.isInvalid()) {

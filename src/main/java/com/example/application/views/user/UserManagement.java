@@ -60,9 +60,20 @@ public class UserManagement extends VerticalLayout {
             comboBox.setValue(user.getRoles());
 
             comboBox.addValueChangeListener(event -> {
-                user.setRoles(event.getValue());
-                userService.saveUser(user); // Aktualisieren Sie den Benutzer in der Datenbank
+                if (comboBox.isEmpty())
+                    comboBox.setInvalid(true);
+                else
+                    comboBox.setInvalid(false);
+
+                if (!comboBox.isInvalid()){
+                    user.setRoles(event.getValue());
+                    userService.saveUser(user); // Aktualisieren Sie den Benutzer in der Datenbank
+                }
+                else {
+                    comboBox.setErrorMessage("Bitte wählen Sie mindestens eine Rolle aus");
+                }
             });
+
             return comboBox;
         })).setHeader("Rollen");
 
