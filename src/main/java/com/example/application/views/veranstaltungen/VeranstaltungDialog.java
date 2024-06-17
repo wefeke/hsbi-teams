@@ -65,7 +65,6 @@ public class VeranstaltungDialog extends Dialog {
     private final Upload upload = new Upload(buffer);
     ExcelImporter excelImporter;
     Set<Teilnehmer> newTeilnehmerListe = new HashSet<>();
-    VerticalLayout dialogLayout;
 
     //Security
     private AuthenticatedUser authenticatedUser;
