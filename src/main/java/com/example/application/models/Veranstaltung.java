@@ -1,9 +1,7 @@
 //Autor: Joris
 package com.example.application.models;
 
-import com.vaadin.flow.component.html.Div;
 import jakarta.persistence.*;
-
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
@@ -43,7 +41,6 @@ public class Veranstaltung implements Serializable {
         this.user = user;
     }
 
-    // Getter und Setter
     public Long getId() {
         return id;
     }
@@ -71,7 +68,6 @@ public class Veranstaltung implements Serializable {
         this.user = user;
     }
 
-    // equals und hashCode Methoden
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -85,7 +81,6 @@ public class Veranstaltung implements Serializable {
         return Objects.hash(id);
     }
 
-    // toString Methode, um das Objekt als String darzustellen, nützlich für Logging
     @Override
     public String toString() {
         return "Semester{" +

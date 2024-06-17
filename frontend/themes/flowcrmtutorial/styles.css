@@ -1,4 +1,4 @@
-/* General Styles */
+
 .text-center {
     text-align: center;
     margin: auto;
@@ -230,6 +230,21 @@
     cursor: pointer;
 }
 
+.veranstaltung-row {
+    border-bottom: 1px solid #ccc;
+    padding: 10px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.text-center {
+    flex-grow: 1;
+}
+
+.veranstaltung-row:first-child {
+    border-top: 1px solid #ccc;
+}
+
 /* Added by Lilli */
 .gruppen-gruppenarbeit {
     display: flex;
@@ -240,6 +255,20 @@
 /*Addes by Lilli*/
 .gruppen-gruppenarbeit-title {
     padding-bottom: 10px;
+}
+
+/*Added bi Lilli*/
+.warning-text-delete {
+    font-size: 13pt;
+    text-align: center;
+}
+
+/*Added by Lilli*/
+.no-return-text-delete {
+    font-size: 14pt;
+    font-weight: bold;
+    color: red;
+    text-align: center;
 }
 
 .logo-button :hover {
@@ -272,33 +301,4 @@
 
 .nav-list a[highlight] {
     background-color: var(--lumo-primary-color-10pct);
-}
-
-/*Added bi Lilli*/
-.warning-text-delete {
-    font-size: 13pt;
-    text-align: center;
-}
-
-/*Added by Lilli*/
-.no-return-text-delete {
-    font-size: 14pt;
-    font-weight: bold;
-    color: red;
-    text-align: center;
-}
-
-.veranstaltung-row {
-    border-bottom: 1px solid #ccc;
-    padding: 10px;
-    transition: background-color 0.3s ease;
-    cursor: pointer;
-}
-
-.text-center {
-    flex-grow: 1;
-}
-
-.veranstaltung-row:first-child {
-    border-top: 1px solid #ccc;
 }

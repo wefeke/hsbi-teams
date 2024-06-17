@@ -1,5 +1,7 @@
 package com.example.application.views.veranstaltungstermin;
 
+import com.example.application.models.Gruppenarbeit;
+import com.example.application.models.Veranstaltungstermin;
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
@@ -16,26 +18,23 @@ import java.util.Optional;
 
 public class TeilnehmerEntfernenDialog extends Dialog {
 
-    private final VeranstaltungenService veranstaltungService;
     private final TeilnehmerService teilnehmerService;
     private final Long veranstaltungId;
     private Teilnehmer teilnehmer;
-    private AuthenticatedUser authenticatedUser;
 
-    private Text infoText = new Text("");
-    private Button deleteBtn = new Button("Teilnehmer endgültig entfernen");
-    private Button cancelBtn = new Button("Abbrechen");
+    private final Text infoText = new Text("");
+    private final Button deleteBtn = new Button("Teilnehmer endgültig entfernen");
 
-    public TeilnehmerEntfernenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser) {
-        this.veranstaltungService = veranstaltungService;
+    public TeilnehmerEntfernenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser, VeranstaltungDetailView veranstaltungDetailView, Veranstaltungstermin veranstaltungstermin, Gruppenarbeit gruppenarbeit) {
         this.teilnehmerService = teilnehmerService;
         this.veranstaltungId = veranstaltungId;
-        this.authenticatedUser = authenticatedUser;
+
 
         VerticalLayout layout = new VerticalLayout();
         layout.add(infoText);
 
         HorizontalLayout buttonLayout = new HorizontalLayout();
+        Button cancelBtn = new Button("Abbrechen");
         buttonLayout.add(deleteBtn, cancelBtn);
         buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
 
@@ -48,6 +47,15 @@ public class TeilnehmerEntfernenDialog extends Dialog {
                 User user = maybeUser.get();
                 veranstaltungService.removeTeilnehmerFromVeranstaltung(teilnehmer, veranstaltungId, user);
             }
+
+            if (veranstaltungstermin != null) {
+                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(veranstaltungstermin);
+
+                if (gruppenarbeit != null) {
+                    veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+                }
+            }
+            veranstaltungDetailView.update();
 
             close();
         });

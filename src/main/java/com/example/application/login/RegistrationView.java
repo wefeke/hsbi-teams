@@ -25,7 +25,7 @@ import org.vaadin.lineawesome.LineAwesomeIcon;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Set;
+import java.util.*;
 
 @AnonymousAllowed
 @PageTitle("Registration")

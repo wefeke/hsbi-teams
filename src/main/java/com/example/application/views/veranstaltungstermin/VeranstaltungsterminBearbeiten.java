@@ -1,5 +1,6 @@
 package com.example.application.views.veranstaltungstermin;
 
+import com.example.application.models.Gruppenarbeit;
 import com.example.application.models.User;
 import com.example.application.models.Veranstaltungstermin;
 import com.example.application.security.AuthenticatedUser;
@@ -36,18 +37,23 @@ public class VeranstaltungsterminBearbeiten extends Dialog {
     private final VeranstaltungDetailView veranstaltungDetailView;
     private final Long veranstaltungsterminId;
 
-    private AuthenticatedUser authenticatedUser;
+    private final AuthenticatedUser authenticatedUser;
+
+    private final Veranstaltungstermin aktiverVeranstaltungstermin;
+    private final Gruppenarbeit aktiveGruppenarbeit;
 
     //Data Binder
     Binder<Veranstaltungstermin> binder = new Binder<>(Veranstaltungstermin.class);
 
-    public VeranstaltungsterminBearbeiten(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungDetailView veranstaltungDetailView, String veranstaltungId, Long veranstaltungsterminId, AuthenticatedUser authenticatedUser) {
+    public VeranstaltungsterminBearbeiten(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungDetailView veranstaltungDetailView, String veranstaltungId, Long veranstaltungsterminId, AuthenticatedUser authenticatedUser, Veranstaltungstermin aktiverVeranstaltungstermin, Gruppenarbeit aktiveGruppenarbeit) {
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
         this.veranstaltungId = veranstaltungId;
         this.veranstaltungDetailView = veranstaltungDetailView;
         this.veranstaltungsterminId = veranstaltungsterminId;
         this.authenticatedUser = authenticatedUser;
+        this.aktiverVeranstaltungstermin = aktiverVeranstaltungstermin;
+        this.aktiveGruppenarbeit = aktiveGruppenarbeit;
 
         add(createLayout());
         configureElements();
@@ -87,6 +93,15 @@ public class VeranstaltungsterminBearbeiten extends Dialog {
 
                 close();
                 clearFields();
+
+                veranstaltungDetailView.removeAndAddTerminToTermine(veranstaltungstermin, veranstaltungsterminId);
+
+                if (aktiverVeranstaltungstermin != null) {
+                    veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(aktiverVeranstaltungstermin);
+                    if (aktiveGruppenarbeit != null) {
+                        veranstaltungDetailView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
+                    }
+                }
                 veranstaltungDetailView.update();
 
             }

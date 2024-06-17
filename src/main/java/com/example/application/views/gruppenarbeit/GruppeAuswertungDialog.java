@@ -12,6 +12,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Route;
+import jakarta.validation.constraints.NotNull;
+
+import java.lang.annotation.Native;
 import java.util.Optional;
 
 // LEON
@@ -19,6 +22,7 @@ import java.util.Optional;
 public class GruppeAuswertungDialog extends Dialog {
     // Entity-Felder
     private final Teilnehmer teilnehmer;
+    @NotNull
     private final Gruppenarbeit gruppenarbeit;
     private GruppenarbeitTeilnehmer gruppenarbeitTeilnehmer;
     private GruppenarbeitTeilnehmerId gruppenarbeitTeilnehmerId;
@@ -111,9 +115,14 @@ public class GruppeAuswertungDialog extends Dialog {
                 gruppenarbeitTeilnehmerService.save(gruppenarbeitTeilnehmer);
                 close();
                 clearFields();
+
+            if (gruppenarbeit.getVeranstaltungstermin() != null) {
                 veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
-                veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
-                veranstaltungDetailView.update();
+            }
+
+            veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+
+            veranstaltungDetailView.update();
         });
 
 

@@ -24,6 +24,9 @@ public class VeranstaltungsterminLoeschenDialog extends Dialog {
     //Data
     private final Veranstaltung veranstaltung;
     private Veranstaltungstermin veranstaltungstermin;
+    private VeranstaltungDetailView veranstaltungDetailView;
+    private Veranstaltungstermin aktiverVeranstaltungstermin;
+    private Gruppenarbeit aktiveGruppenarbeit;
 
     //Services
     private GruppeService gruppeService;
@@ -38,7 +41,10 @@ public class VeranstaltungsterminLoeschenDialog extends Dialog {
     Paragraph warningText = new Paragraph("Empty");
     Paragraph noReturn = new Paragraph("Empty");
 
-    public VeranstaltungsterminLoeschenDialog(Veranstaltung veranstaltung, GruppeService gruppeService, GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungenService veranstaltungenService) {
+    public VeranstaltungsterminLoeschenDialog(Veranstaltung veranstaltung, GruppeService gruppeService, GruppenarbeitService gruppenarbeitService, VeranstaltungDetailView veranstaltungDetailView, Veranstaltungstermin aktiverVeranstaltungstermin, Gruppenarbeit aktiveGruppenarbeit, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungenService veranstaltungenService) {
+        this.veranstaltungDetailView = veranstaltungDetailView;
+        this.aktiverVeranstaltungstermin = aktiverVeranstaltungstermin;
+        this.aktiveGruppenarbeit = aktiveGruppenarbeit;
         this.veranstaltungstermin=null;
         this.veranstaltung = veranstaltung;
         this.gruppeService = gruppeService;
@@ -72,9 +78,16 @@ public class VeranstaltungsterminLoeschenDialog extends Dialog {
 
             veranstaltungsterminService.deleteVeranstaltungstermin(veranstaltungstermin);
 
-            close();
-            UI.getCurrent().getPage().reload();
+            if (aktiverVeranstaltungstermin != null) {
+                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(aktiverVeranstaltungstermin);
 
+                if (aktiveGruppenarbeit != null) {
+                    veranstaltungDetailView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
+                }
+            }
+            veranstaltungDetailView.update();
+
+            close();
         });
         deleteBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
