@@ -154,11 +154,12 @@ public class VeranstaltungDialog extends Dialog {
 
                 veranstaltungenService.saveVeranstaltung(veranstaltung);
                 veranstaltungenView.updateKachelContainer("");
-                clearFields();
-                close();
 
                 if (!newTeilnehmerListe.isEmpty())
                     dialog.open();
+
+                clearFields();
+                close();
             }
             else {
                 Notification.show("Fehler beim Speichern");
