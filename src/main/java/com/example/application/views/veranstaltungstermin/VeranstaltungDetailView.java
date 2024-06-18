@@ -387,7 +387,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         terminZeit.addClassName("termin-zeit");
 
         Div terminNotiz = new Div();
-        String splitTitle = splitLongWords(veranstaltungstermin.getTitel(), 21);
+        String splitTitle = splitLongWords(veranstaltungstermin.getTitel());
         terminNotiz.setText(splitTitle);
         terminNotiz.addClassName("termin-notiz");
 
@@ -503,14 +503,15 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
      * Der modifizierte Text wird dann zurückgegeben.
      *
      * @param text der Eingabetext, der möglicherweise lange Wörter enthält, die geteilt werden sollen
-     * @param maxLength die maximale Länge eines Wortes, bevor es geteilt wird
      * @return der modifizierte Text mit langen Wörtern, die in kleinere Teile geteilt wurden
      *
      * @autor Joris
      */
-    private String splitLongWords(String text, int maxLength) {
+    private String splitLongWords(String text) {
         String[] words = text.split(" ");
         StringBuilder newText = new StringBuilder();
+
+        int maxLength = 21;
 
         for (String word : words) {
             if (word.length() > maxLength) {
@@ -656,7 +657,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
      */
     private Div gruppenarbeitKachel(Gruppenarbeit gruppenarbeit) {
         Div gruppenarbeitInfo = new Div();
-        String splitTitle = splitLongWords(gruppenarbeit.getTitel(), 21);
+        String splitTitle = splitLongWords(gruppenarbeit.getTitel());
         gruppenarbeitInfo.setText(splitTitle);
         gruppenarbeitInfo.addClassName("text-center");
 
@@ -984,6 +985,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         Button teilnehmerHinzufuegenButton = new Button();
         teilnehmerHinzufuegenButton.setText("Teilnehmer hinzufügen");
+        teilnehmerHinzufuegenButton.setId("teilnehmer-hinzufuegen-button");
         teilnehmerHinzufuegenButton.setWidthFull();
 
         teilnehmerHinzufuegenButton.addClickListener(e -> {

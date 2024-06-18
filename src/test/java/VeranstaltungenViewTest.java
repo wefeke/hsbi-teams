@@ -71,18 +71,14 @@ public class VeranstaltungenViewTest {
         String url = "http://localhost:" + port + "/";
 
         page.navigate(url);
-        page.waitForLoadState(); // Sicherstellen, dass die Seite geladen ist
+        page.waitForLoadState();
 
-        // Login durchführen
         performLogin(page);
 
-        // Öffnen Sie den Dialog für neue Veranstaltung
-        page.locator("vaadin-button[role='button']:has-text('Veranstaltung anlegen')").click();
+        page.locator("vaadin-button[theme='icon'][role='button'][id='veranstaltung-erstellen-button']").click();
 
-        // Warten, bis der Dialog sichtbar ist
         assertThat(page.locator("h2:has-text('Veranstaltung hinzufügen')")).isVisible();
 
-        // Formular ausfüllen
         page.fill("input[id='input-vaadin-text-field-18']", "Test Veranstaltung");
         page.fill("input[id='input-vaadin-date-picker-19']", "26.6.2024");
 
@@ -90,11 +86,37 @@ public class VeranstaltungenViewTest {
         page.locator("input[id='input-vaadin-date-picker-19']").press("Enter");
         page.waitForTimeout(500);
 
-        // Klicken Sie auf den Speichern-Button
-        page.locator("vaadin-button[theme='primary'][role='button']:has-text('Save')").click();
+        page.locator("vaadin-button[theme='primary'][role='button']:has-text('Speichern')").click();
 
-        // Überprüfen Sie, ob die Veranstaltung in der Liste angezeigt wird
         assertThat(page.locator("div[id='veranstaltung-info']:has-text('Test Veranstaltung')")).isVisible();
+
+        page.close();
+    }
+
+    @Test
+    public void testAddTeilnehmerToVeranstaltung() {
+        System.out.println("Aktive Profile: " + String.join(", ", env.getActiveProfiles()));
+        Page page = browser.newPage();
+
+        // Verwenden Sie den dynamischen Port
+        String url = "http://localhost:" + port + "/";
+
+        page.navigate(url);
+        page.waitForLoadState();
+
+        performLogin(page);
+
+        page.locator("div[id='veranstaltung-info']:has-text('Test Veranstaltung')").click();
+
+        page.locator("vaadin-button[id='teilnehmer-hinzufuegen-button']:has-text('Teilnehmer hinzufügen')").click();
+
+        assertThat(page.locator("h2:has-text('Teilnehmer hinzufügen')")).isVisible();
+
+        page.locator("vaadin-checkbox[id='selectAllCheckbox']").click();
+
+        page.locator("vaadin-button[theme='error'][role='button']:has-text('Hinzufügen')").click();
+
+        assertThat(page.locator("span[class='teilnehmer-name-liste']:has-text('Laura Meyer')")).isVisible();
 
         page.close();
     }

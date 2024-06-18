@@ -135,6 +135,7 @@ public class VeranstaltungenView extends VerticalLayout  {
 
         // Button zum Erstellen neuer Veranstaltungen erstellen
         Button newEventButton = new Button(new Icon(VaadinIcon.PLUS));
+        newEventButton.setId("veranstaltung-erstellen-button");
         newEventButton.addClickListener(e -> createDialog.open());
 
         Div spacer = new Div();
