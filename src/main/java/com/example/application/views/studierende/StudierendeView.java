@@ -43,10 +43,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Route(value = "studierende", layout = MainLayout.class)
 @PageTitle(value = "Studierende")
@@ -110,9 +107,13 @@ public class StudierendeView extends VerticalLayout {
 
         // Click-Listener für den Lösch-Button
         delete.addClickListener(event -> {
-            List<Teilnehmer> selectedTeilnehmer = new ArrayList<>(grid.getSelectedItems());
+            Set<Teilnehmer> selectedTeilnehmer = grid.getSelectedItems();
             if (!selectedTeilnehmer.isEmpty()) {
-                deleteDialog.openDeleteDialog(selectedTeilnehmer);
+                for (Teilnehmer teilnehmer : selectedTeilnehmer) {
+                    DeleteDialog deleteDialogForSelectedTeilnehmer = new DeleteDialog(teilnehmerService, authenticatedUser, aufraeumenDialog, this);
+                    deleteDialogForSelectedTeilnehmer.setTeilnehmer(teilnehmer);
+                    deleteDialogForSelectedTeilnehmer.open();
+                }
             }
         });
 
