@@ -16,19 +16,21 @@ import java.util.Set;
 public class UserService {
     private final UserRepository userRepository;
 
-
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public List<User> findAllUser() {
         return userRepository.findAll();
     }
 
+    @Transactional
     public User findAdmin(){
         return userRepository.findByUsername("Admin");
     }
 
+    @Transactional
     public Page<User> list(Pageable pageable, Specification<User> filter) {
         return userRepository.findAll(filter, pageable);
     }
@@ -74,6 +76,7 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
     public class UserNotFoundException extends RuntimeException {
         public UserNotFoundException(Long userId) {
             super("User with id " + userId + " not found");

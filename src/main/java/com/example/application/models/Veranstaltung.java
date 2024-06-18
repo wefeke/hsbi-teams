@@ -2,6 +2,8 @@
 package com.example.application.models;
 
 import jakarta.persistence.*;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
@@ -64,6 +66,7 @@ public class Veranstaltung implements Serializable {
         this.titel = titel;
     }
 
+    @Transactional
     public void setUser(User user){
         this.user = user;
     }

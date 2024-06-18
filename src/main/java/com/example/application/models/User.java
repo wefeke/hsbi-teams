@@ -6,9 +6,7 @@ import jakarta.persistence.*;
 import org.apache.ibatis.annotations.One;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "users") // Ändern Sie den Tabellennamen auf "users"
@@ -45,7 +43,7 @@ public class User {
         this.locked = locked;
         this.roles = roles;
         this.profilePicture = profilePicture;
-        this.veranstaltungen = veranstaltungen;
+        this.veranstaltungen = veranstaltungen;;
     }
 
     public String getUsername() {
@@ -68,23 +66,26 @@ public class User {
         return hashedPassword;
     }
 
+
     public void setPassword(String hashedPassword) {
         this.hashedPassword = hashedPassword;
     }
 
-    @Transactional
+
     public Set<Role> getRoles() {
         return roles;
     }
 
-    @Transactional
+
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 
+
     public Long getId() {
         return id;
     }
+
 
     public void setId(Long id) {
         this.id = id;
