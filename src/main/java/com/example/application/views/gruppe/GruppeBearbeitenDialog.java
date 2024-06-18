@@ -63,6 +63,14 @@ public class GruppeBearbeitenDialog extends Dialog {
         this.otherTeilnehmer = new ArrayList<Teilnehmer>(allTeilnehmer);
         otherTeilnehmer.removeAll(gruppenarbeitTeilnehmer);
 
+        uebrigeTeilnehmer = new Grid<>(Teilnehmer.class, false);
+        uebrigeTeilnehmer.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");
+        uebrigeTeilnehmer.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
+        uebrigeTeilnehmer.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
+        uebrigeTeilnehmer.setRowsDraggable(true);
+        dataViews.add(uebrigeTeilnehmer.setItems(otherTeilnehmer));
+        gruppenGrids.add(uebrigeTeilnehmer);
+
         configureGroupsArea();
         groupGrids(gruppen.size(), gruppen);
 
@@ -89,8 +97,10 @@ public class GruppeBearbeitenDialog extends Dialog {
         });
 
         addNewGroupBtn.addClickListener(event -> {
-            dataViews.clear();
-            gruppenGrids.clear();
+            dataViews.subList(1, dataViews.size()).clear();
+//            dataViews.clear();
+//            gruppenGrids.clear();
+            gruppenGrids.subList(1, gruppenGrids.size()).clear();
             titles.clear();
             int newGroupNumber = gruppen.size() + 1;
             groupsArea.removeAll();
@@ -134,13 +144,13 @@ public class GruppeBearbeitenDialog extends Dialog {
     }
 
     private void groupGrids(int numberOfGroups, List<Gruppe> gruppen) {
-        uebrigeTeilnehmer = new Grid<>(Teilnehmer.class, false);
-        uebrigeTeilnehmer.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");
-        uebrigeTeilnehmer.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
-        uebrigeTeilnehmer.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
-        uebrigeTeilnehmer.setRowsDraggable(true);
-        dataViews.add(uebrigeTeilnehmer.setItems(otherTeilnehmer));
-        gruppenGrids.add(uebrigeTeilnehmer);
+//        uebrigeTeilnehmer = new Grid<>(Teilnehmer.class, false);
+//        uebrigeTeilnehmer.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");
+//        uebrigeTeilnehmer.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
+//        uebrigeTeilnehmer.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
+//        uebrigeTeilnehmer.setRowsDraggable(true);
+//        dataViews.add(uebrigeTeilnehmer.setItems(otherTeilnehmer));
+//        gruppenGrids.add(uebrigeTeilnehmer);
 
         for(int i = 0; i< numberOfGroups; i++){
             Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class, false);
@@ -193,7 +203,7 @@ public class GruppeBearbeitenDialog extends Dialog {
                 dataViews.get(num).addItem(draggedItem);
                 gruppenGrids.set(num, grid);
                 System.out.println(num);
-                if(num!=0) {
+                if(num!=0&&num!=-1) {
                     titles.get(num - 1).setText("Gruppe " + (num) + ": " + dataViews.get(num).getItems().toList().size() + " Teilnehmer");
                 }
             });
@@ -201,7 +211,7 @@ public class GruppeBearbeitenDialog extends Dialog {
                 draggedItem = null;
                 grid.setDropMode(null);
                 int num = gruppenGrids.indexOf(grid);
-                if(num!=0) {
+                if(num!=0&&num!=-1) {
                     titles.get(num - 1).setText("Gruppe " + (num) + ": " + dataViews.get(num).getItems().toList().size() + " Teilnehmer");
                 }
             });
