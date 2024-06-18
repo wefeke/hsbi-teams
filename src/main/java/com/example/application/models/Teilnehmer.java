@@ -51,6 +51,14 @@ public class Teilnehmer {
         this.matrikelNr = matrikelNummer;
     }
 
+    public Long getMatrikelNr() {
+        return matrikelNr;
+    }
+
+    public void setMatrikelNr(Long matrikelNr) {
+        this.matrikelNr = matrikelNr;
+    }
+
     public String getVorname() {
         return vorname;
     }
