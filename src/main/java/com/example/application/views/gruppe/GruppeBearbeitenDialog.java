@@ -17,7 +17,10 @@ import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.grid.dnd.GridDropMode;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H5;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +39,7 @@ public class GruppeBearbeitenDialog extends Dialog {
     private final AuthenticatedUser authenticatedUser;
     private List<H5> titles = new ArrayList<>();
     private VeranstaltungDetailView veranstaltungDetailView;
+    private List<Button> deleteButtons = new ArrayList<>();
 
     //UI Elements
     private final Button cancelBtn = new Button("Abbrechen");
@@ -74,10 +78,30 @@ public class GruppeBearbeitenDialog extends Dialog {
         configureGroupsArea();
         groupGrids(gruppen.size(), gruppen);
 
+//        deleteBtnsFunctionality();
+
         saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         addButtonFunctionalities();
 
         add(createLayout());
+    }
+
+    private void deleteBtnsFunctionality() {
+        for(Button btn: deleteButtons) {
+            btn.addClickListener(event -> {
+                int gruppenNr = deleteButtons.indexOf(btn);
+                deleteButtons.clear();
+                gruppen.remove(gruppenNr);
+                Notification.show("I want to delete group " + gruppenNr);
+                dataViews.subList(1, dataViews.size()).clear();
+                gruppenGrids.subList(1, gruppenGrids.size()).clear();
+                titles.clear();
+                groupsArea.removeAll();
+                groupGrids(gruppen.size(), gruppen);
+                deleteBtnsFunctionality();
+                System.out.println("test");
+            });
+        }
     }
 
     private void addButtonFunctionalities(){
@@ -100,6 +124,7 @@ public class GruppeBearbeitenDialog extends Dialog {
             dataViews.subList(1, dataViews.size()).clear();
             gruppenGrids.subList(1, gruppenGrids.size()).clear();
             titles.clear();
+            deleteButtons.clear();
             int newGroupNumber = gruppen.size() + 1;
             groupsArea.removeAll();
             Optional<User> maybeUser = authenticatedUser.get();
@@ -109,6 +134,7 @@ public class GruppeBearbeitenDialog extends Dialog {
                 gruppeService.save(neueGruppe);
                 gruppen.add(neueGruppe);
                 groupGrids(gruppen.size(), gruppen);
+                deleteBtnsFunctionality();
             }
             else {
                 Notification.show("Fehler");
@@ -167,10 +193,15 @@ public class GruppeBearbeitenDialog extends Dialog {
             titles.add(title);
             title.addClassName("gruppen-gruppenarbeit-title");
 
-            Button deleteBtn = new Button("Entfernen");
-            Button addBtn = new Button("Hinzufügen");
-            HorizontalLayout buttonLayout = new HorizontalLayout(deleteBtn, addBtn);
-            Div titleAndGroups = new Div(title, buttonLayout, grid);
+            Button deleteBtn = new Button(new Icon(VaadinIcon.TRASH));
+            deleteButtons.add(deleteBtn);
+
+            HorizontalLayout topLayout = new HorizontalLayout(title, deleteBtn);
+            topLayout.setWidthFull();
+            topLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+            topLayout.setFlexGrow(1, title);
+
+            Div titleAndGroups = new Div(topLayout, grid);
             titleAndGroups.addClassName("gruppen-gruppenarbeit");
             groupsArea.add(titleAndGroups);
         }
