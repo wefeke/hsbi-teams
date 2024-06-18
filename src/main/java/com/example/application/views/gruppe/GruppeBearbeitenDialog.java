@@ -78,7 +78,7 @@ public class GruppeBearbeitenDialog extends Dialog {
         configureGroupsArea();
         groupGrids(gruppen.size(), gruppen);
 
-//        deleteBtnsFunctionality();
+        deleteBtnsFunctionality();
 
         saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         addButtonFunctionalities();
@@ -91,15 +91,19 @@ public class GruppeBearbeitenDialog extends Dialog {
             btn.addClickListener(event -> {
                 int gruppenNr = deleteButtons.indexOf(btn);
                 deleteButtons.clear();
+                if(dataViews.get(gruppenNr+1) != null) {
+                    otherTeilnehmer.addAll(dataViews.get(gruppenNr + 1).getItems().toList());
+                    dataViews.getFirst().addItems(dataViews.get(gruppenNr + 1).getItems().toList());
+                }
+                gruppeService.deleteGruppe(gruppen.get(gruppenNr));
+
                 gruppen.remove(gruppenNr);
-                Notification.show("I want to delete group " + gruppenNr);
                 dataViews.subList(1, dataViews.size()).clear();
                 gruppenGrids.subList(1, gruppenGrids.size()).clear();
                 titles.clear();
                 groupsArea.removeAll();
                 groupGrids(gruppen.size(), gruppen);
                 deleteBtnsFunctionality();
-                System.out.println("test");
             });
         }
     }
@@ -152,6 +156,7 @@ public class GruppeBearbeitenDialog extends Dialog {
             gruppe.removeAllTeilnehmer();
             gruppe.addAllTeilnehmer(dataViews.get(gruppen.indexOf(gruppe)+1).getItems().toList());
             gruppe.setGruppenarbeit(gruppenarbeit);
+            gruppe.setNummer((long) gruppen.indexOf(gruppe)+1);
             gruppeService.save(gruppe);
         }
         gruppenarbeit.removeAllTeilnehmer();
