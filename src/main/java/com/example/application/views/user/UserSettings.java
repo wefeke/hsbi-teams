@@ -118,7 +118,7 @@ public class UserSettings extends Dialog {
             }
 
             uploadedImage = byteOutputStream.toByteArray();
-            Notification.show("Datei \"" + event.getFileName() + "\" erfolgreich hochgeladen.");
+
         });
 
         upload.setAcceptedFileTypes("image/jpeg", "image/png", "image/gif");
