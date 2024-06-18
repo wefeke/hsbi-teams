@@ -245,6 +245,10 @@
     border-top: 1px solid #ccc;
 }
 
+.highlight {
+    color: red;
+}
+
 /* Added by Lilli */
 .gruppen-gruppenarbeit {
     display: flex;

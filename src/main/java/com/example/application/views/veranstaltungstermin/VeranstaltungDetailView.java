@@ -387,7 +387,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         terminZeit.addClassName("termin-zeit");
 
         Div terminNotiz = new Div();
-        terminNotiz.setText(veranstaltungstermin.getTitel());
+        String splitTitle = splitLongWords(veranstaltungstermin.getTitel(), 21);
+        terminNotiz.setText(splitTitle);
         terminNotiz.addClassName("termin-notiz");
 
         Div kachelContent = new Div(terminDatum, terminZeit, terminNotiz);
@@ -493,6 +494,34 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         });
 
         return kachel;
+    }
+
+    /**
+     * Teilt Wörter, die länger als eine bestimmte Länge sind, in kleinere Teile auf.
+     * Diese Methode nimmt einen Text und eine maximale Länge als Eingabe. Sie teilt den Text in Wörter auf und überprüft jedes Wort.
+     * Wenn ein Wort länger als die maximale Länge ist, teilt es das Wort an der Position der maximalen Länge in zwei Teile und fügt einen Bindestrich zwischen den Teilen ein.
+     * Der modifizierte Text wird dann zurückgegeben.
+     *
+     * @param text der Eingabetext, der möglicherweise lange Wörter enthält, die geteilt werden sollen
+     * @param maxLength die maximale Länge eines Wortes, bevor es geteilt wird
+     * @return der modifizierte Text mit langen Wörtern, die in kleinere Teile geteilt wurden
+     *
+     * @autor Joris
+     */
+    private String splitLongWords(String text, int maxLength) {
+        String[] words = text.split(" ");
+        StringBuilder newText = new StringBuilder();
+
+        for (String word : words) {
+            if (word.length() > maxLength) {
+                String splitWord = word.substring(0, maxLength - 1) + "-" + word.substring(maxLength - 1);
+                newText.append(splitWord).append(" ");
+            } else {
+                newText.append(word).append(" ");
+            }
+        }
+
+        return newText.toString().trim();
     }
 
     /**
@@ -627,7 +656,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
      */
     private Div gruppenarbeitKachel(Gruppenarbeit gruppenarbeit) {
         Div gruppenarbeitInfo = new Div();
-        gruppenarbeitInfo.setText(gruppenarbeit.getTitel());
+        String splitTitle = splitLongWords(gruppenarbeit.getTitel(), 21);
+        gruppenarbeitInfo.setText(splitTitle);
         gruppenarbeitInfo.addClassName("text-center");
 
         Div kachelContent = new Div(gruppenarbeitInfo);
@@ -928,11 +958,15 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         Div teilnehmerItems = new Div();
         assert teilnehmer != null;
-        for (Teilnehmer t : teilnehmer) {
-            Div teilnehmerDiv = createTeilnehmerDiv(t);
-            teilnehmerItems.add(teilnehmerDiv);
+        if (teilnehmer.isEmpty()) {
+            teilnehmerItems.setText("Noch keine Teilnehmer in der Veranstaltung, fügen Sie noch welche hinzu.");
+            teilnehmerItems.getStyle().set("text-align", "center");
+        } else {
+            for (Teilnehmer t : teilnehmer) {
+                Div teilnehmerDiv = createTeilnehmerDiv(t);
+                teilnehmerItems.add(teilnehmerDiv);
+            }
         }
-
         Div scrollableList = new Div(teilnehmerItems);
         scrollableList.getStyle().set("overflow-y", "auto");
         scrollableList.getStyle().set("height", "calc(100% - 70px)");
