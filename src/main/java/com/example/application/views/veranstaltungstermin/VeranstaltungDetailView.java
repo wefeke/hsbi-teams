@@ -603,7 +603,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
      * @autor Lilli
      */
     public void createGruppenarbeitLoeschenDialog() {
-        gruppenarbeitLoeschenDialog = new GruppenarbeitLoeschenDialog(gruppenarbeitService, gruppeService, veranstaltungsterminService,this);
+        gruppenarbeitLoeschenDialog = new GruppenarbeitLoeschenDialog(gruppenarbeitService, gruppeService, veranstaltungsterminService,this, aktiveGruppenarbeit);
     }
 
     /**
@@ -1237,10 +1237,10 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         }
         Gruppenarbeit fullGruppenarbeit;
 
-        if (gruppenarbeit.getId() != null) {
+        if (gruppenarbeit != null) {
             fullGruppenarbeit = gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId());
         } else {
-            fullGruppenarbeit = null;
+            return;
         }
 
         assert fullGruppenarbeit != null;
@@ -1287,7 +1287,10 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             Gruppenarbeit gruppenarbeit = gruppenarbeitMap.get(aktiveKachelGruppenarbeit);
 
             Gruppenarbeit updatedGruppenarbeit = gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId());
-            updateGruppen(updatedGruppenarbeit);
+
+            if (aktiveGruppenarbeit != null && aktiveGruppenarbeit.getId().equals(gruppenarbeit.getId())) {
+                updateGruppen(updatedGruppenarbeit);
+            }
         }
     }
 
@@ -1326,6 +1329,12 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
      * @autor Joris
      */
     public void setAktiveKachelGruppenarbeit(Gruppenarbeit gruppenarbeit) {
+        // Überprüfen, ob die übergebene Gruppenarbeit die gleiche ist wie die aktuell aktive Gruppenarbeit
+        if (aktiveGruppenarbeit != null && aktiveGruppenarbeit.getId().equals(gruppenarbeit.getId())) {
+            return;
+        }
+
+        // Ansonsten setzen wir die aktive Gruppenarbeit neu
         Veranstaltungstermin neuerVeranstaltungstermin = veranstaltungsterminService.findVeranstaltungsterminById(gruppenarbeit.getVeranstaltungstermin().getId());
 
         if (neuerVeranstaltungstermin != null) {
@@ -1335,8 +1344,16 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 if (aktuelleGruppenarbeit.getId().equals(gruppenarbeit.getId())) {
                     for (Map.Entry<Div, Gruppenarbeit> entry : gruppenarbeitMap.entrySet()) {
                         if (entry.getValue().equals(aktuelleGruppenarbeit)) {
+                            // Entfernen der "kachel-active" Klasse von der vorher aktiven Kachel
+                            if (aktiveKachelGruppenarbeit != null) {
+                                aktiveKachelGruppenarbeit.removeClassName("kachel-active");
+                            }
+
+                            // Setzen der neuen aktiven Kachel und Hinzufügen der "kachel-active" Klasse
                             aktiveKachelGruppenarbeit = entry.getKey();
                             aktiveKachelGruppenarbeit.addClassName("kachel-active");
+
+                            // Setzen der neuen aktiven Gruppenarbeit
                             aktiveGruppenarbeit = aktuelleGruppenarbeit;
                             break;
                         }
