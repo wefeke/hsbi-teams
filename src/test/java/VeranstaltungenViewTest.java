@@ -98,7 +98,6 @@ public class VeranstaltungenViewTest {
         System.out.println("Aktive Profile: " + String.join(", ", env.getActiveProfiles()));
         Page page = browser.newPage();
 
-        // Verwenden Sie den dynamischen Port
         String url = "http://localhost:" + port + "/";
 
         page.navigate(url);
