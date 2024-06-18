@@ -34,7 +34,6 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
     private final Grid<Teilnehmer> grid = new Grid<>();
     private final TeilnehmerErstellenDialog dialog;
     private final AuthenticatedUser authenticatedUser;
-    //private final TeilnehmerErstellenDialog teilnehmerErstellenDialog;
 
 
     public TeilnehmerHinzufuegenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser) {
@@ -42,8 +41,6 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         this.teilnehmerService = teilnehmerService;
         this.veranstaltungId = veranstaltungId;
         this.authenticatedUser = authenticatedUser;
-        //this.teilnehmerErstellenDialog = teilnehmerErstellenDialog;
-       // StudierendeHinzufuegen studierendeHinzufuegen = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser, studierendeView);
 
         this.setWidth("80vw");
         this.setHeight("80vh");

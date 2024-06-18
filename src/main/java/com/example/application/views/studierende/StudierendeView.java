@@ -62,10 +62,8 @@ public class StudierendeView extends VerticalLayout {
     private final StudierendeHinzufuegen dialog;
     private H2 users = new H2("Studierende");
     private final Button delete = new Button("Studierenden löschen");
-    //private final Button aendern = new Button ("Studierende ändern");
     private final Component addStudiernedenButtonIcon;
     private final Component deleteIcon;
-    //private final Component aendernIcon;
     private final Button importButton = new Button("Importieren");
     private final Button exportButton = new Button("Exportieren");
     private AuthenticatedUser authenticatedUser;
@@ -87,7 +85,6 @@ public class StudierendeView extends VerticalLayout {
         StudierendeHinzufuegen studierendeHinzufuegen = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser, this);
         addStudiernedenButtonIcon = addStudiernedenButton.getIcon();
         deleteIcon = delete.getIcon();
-        //aendernIcon = aendern.getIcon();
 
         addClassName("Studierenden-view");
 
@@ -111,10 +108,6 @@ public class StudierendeView extends VerticalLayout {
         delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
         delete.getStyle().set("margin-inline-start", "auto");
 
-//        aendern.setEnabled(false);
-//        aendern.addThemeVariants(ButtonVariant.LUMO_ERROR);
-//        aendern.getStyle().set("margin-inline-start", "auto");
-
         // Click-Listener für den Lösch-Button
         delete.addClickListener(event -> {
             List<Teilnehmer> selectedTeilnehmer = new ArrayList<>(grid.getSelectedItems());
@@ -122,13 +115,6 @@ public class StudierendeView extends VerticalLayout {
                 deleteDialog.openDeleteDialog(selectedTeilnehmer);
             }
         });
-        // Click-Listener für den Ändern-Button
-//        aendern.addClickListener(event -> {
-//            Teilnehmer selectedTeilnehmer = grid.asSingleSelect().getValue();
-//            if (selectedTeilnehmer != null) {
-//                aendernDiolog(selectedTeilnehmer);
-//            }
-//        });
 
         exportButton.addClickListener(event -> {
             Optional<User> maybeUser = authenticatedUser.get();
@@ -189,7 +175,6 @@ public class StudierendeView extends VerticalLayout {
         grid.addSelectionListener(selection -> {
             int size = selection.getAllSelectedItems().size();
             delete.setEnabled(size != 0);
-            //aendern.setEnabled(size != 0);
         });
         Grid.Column<Teilnehmer> editColumn = grid.addComponentColumn(teilnehmer -> {
             Button editButton = new Button(LineAwesomeIcon.EDIT.create());
@@ -266,50 +251,6 @@ public class StudierendeView extends VerticalLayout {
         return toolbar2;
     }
 
-
-
-//    private void aendernDiolog (Teilnehmer teilnehmer) {
-//        FormLayout form = new FormLayout();
-//        Dialog aendernDiolog = new Dialog(form);
-//
-//        Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
-//
-//        binder.forField(vorname)
-//                .bind(Teilnehmer::getVorname, Teilnehmer::setVorname).isAsRequiredEnabled();
-//        binder.forField(nachname)
-//                .bind(Teilnehmer::getNachname, Teilnehmer::setNachname).isAsRequiredEnabled();
-//        binder.forField(matrikelNr)
-//                .withConverter(new DoubleToLongConverter())
-//                .bind(Teilnehmer::getId, Teilnehmer::setId).isAsRequiredEnabled();
-//        matrikelNr.setEnabled(false);
-//
-//        binder.setBean(teilnehmer);
-//
-//        form.add(vorname, nachname, matrikelNr, save, cancel);
-//        aendernDiolog.add(form);
-//
-//        aendernDiolog.open();
-//        aendernDiolog.setWidth("450px");
-//        aendernDiolog.setHeight("350px");
-//
-//        save.addClickListener(event -> {
-//            Teilnehmer selectedTeilnehmer = grid.asSingleSelect().getValue();
-//            if ((teilnehmer != null)) {
-//                Optional<User> maybeUser = authenticatedUser.get();
-//                User user = maybeUser.get();
-//                binder.writeBeanIfValid(teilnehmer);
-//                teilnehmerService.saveTeilnehmer(teilnehmer, user);
-//                Notification.show("Daten erfolgreich aktualisiert");
-//                updateStudierendeView();
-//                aendernDiolog.close();
-//            }
-//        });
-//        cancel.addClickListener(event -> {
-//            aendernDiolog.close();
-//        });
-//
-//    }
-
     private void makeButtonsSmall() {
 
         addStudiernedenButton.setText("+");
@@ -359,6 +300,4 @@ public class StudierendeView extends VerticalLayout {
         }
     });
     }
-
-
 }
