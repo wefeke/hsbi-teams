@@ -98,8 +98,6 @@ public class GruppeBearbeitenDialog extends Dialog {
 
         addNewGroupBtn.addClickListener(event -> {
             dataViews.subList(1, dataViews.size()).clear();
-//            dataViews.clear();
-//            gruppenGrids.clear();
             gruppenGrids.subList(1, gruppenGrids.size()).clear();
             titles.clear();
             int newGroupNumber = gruppen.size() + 1;
@@ -187,7 +185,6 @@ public class GruppeBearbeitenDialog extends Dialog {
                     otherGrid.setDropMode(GridDropMode.ON_GRID);
                 }
                 gruppenGrids.set(num, grid);
-                System.out.println(num);
 //                if(num!=0) {
 //                    titles.get(num - 1).setText("Gruppe " + (num) + ": " + dataViews.get(num).getItems().toList().size() + " Teilnehmer");
 //                }
@@ -202,7 +199,6 @@ public class GruppeBearbeitenDialog extends Dialog {
                 }
                 dataViews.get(num).addItem(draggedItem);
                 gruppenGrids.set(num, grid);
-                System.out.println(num);
                 if(num!=0&&num!=-1) {
                     titles.get(num - 1).setText("Gruppe " + (num) + ": " + dataViews.get(num).getItems().toList().size() + " Teilnehmer");
                 }
