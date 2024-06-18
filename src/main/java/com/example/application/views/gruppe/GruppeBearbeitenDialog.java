@@ -7,6 +7,7 @@ import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.GruppeService;
 import com.example.application.services.GruppenarbeitService;
+import com.example.application.views.veranstaltungstermin.VeranstaltungDetailView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -16,7 +17,10 @@ import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.grid.dnd.GridDropMode;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H5;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +38,8 @@ public class GruppeBearbeitenDialog extends Dialog {
     ArrayList<GridListDataView<Teilnehmer>> dataViews = new ArrayList<>();
     private final AuthenticatedUser authenticatedUser;
     private List<H5> titles = new ArrayList<>();
+    private VeranstaltungDetailView veranstaltungDetailView;
+    private List<Button> deleteButtons = new ArrayList<>();
 
     //UI Elements
     private final Button cancelBtn = new Button("Abbrechen");
@@ -49,19 +55,30 @@ public class GruppeBearbeitenDialog extends Dialog {
     //Test
     private Teilnehmer draggedItem;
 
-    public GruppeBearbeitenDialog(Gruppenarbeit gruppenarbeit, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, AuthenticatedUser authenticatedUser) {
+    public GruppeBearbeitenDialog(Gruppenarbeit gruppenarbeit, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, AuthenticatedUser authenticatedUser, VeranstaltungDetailView veranstaltungDetailView) {
         this.gruppenarbeit = gruppenarbeit;
         this.gruppenarbeitService = gruppenarbeitService;
         this.gruppeService = gruppeService;
         this.authenticatedUser = authenticatedUser;
+        this.veranstaltungDetailView = veranstaltungDetailView;
         this.gruppen = gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId()).getGruppen();
         this.allTeilnehmer = gruppenarbeit.getVeranstaltungstermin().getVeranstaltung().getTeilnehmer();
         this.gruppenarbeitTeilnehmer = gruppenarbeit.getTeilnehmer();
         this.otherTeilnehmer = new ArrayList<Teilnehmer>(allTeilnehmer);
         otherTeilnehmer.removeAll(gruppenarbeitTeilnehmer);
 
+        uebrigeTeilnehmer = new Grid<>(Teilnehmer.class, false);
+        uebrigeTeilnehmer.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");
+        uebrigeTeilnehmer.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
+        uebrigeTeilnehmer.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
+        uebrigeTeilnehmer.setRowsDraggable(true);
+        dataViews.add(uebrigeTeilnehmer.setItems(otherTeilnehmer));
+        gruppenGrids.add(uebrigeTeilnehmer);
+
         configureGroupsArea();
         groupGrids(gruppen.size(), gruppen);
+
+        deleteBtnsFunctionality();
 
         saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         addButtonFunctionalities();
@@ -69,9 +86,37 @@ public class GruppeBearbeitenDialog extends Dialog {
         add(createLayout());
     }
 
+    private void deleteBtnsFunctionality() {
+        for(Button btn: deleteButtons) {
+            btn.addClickListener(event -> {
+                int gruppenNr = deleteButtons.indexOf(btn);
+                deleteButtons.clear();
+                if(dataViews.get(gruppenNr+1) != null) {
+                    otherTeilnehmer.addAll(dataViews.get(gruppenNr + 1).getItems().toList());
+                    dataViews.getFirst().addItems(dataViews.get(gruppenNr + 1).getItems().toList());
+                }
+                gruppeService.deleteGruppe(gruppen.get(gruppenNr));
+
+                gruppen.remove(gruppenNr);
+                dataViews.subList(1, dataViews.size()).clear();
+                gruppenGrids.subList(1, gruppenGrids.size()).clear();
+                titles.clear();
+                groupsArea.removeAll();
+                groupGrids(gruppen.size(), gruppen);
+                deleteBtnsFunctionality();
+            });
+        }
+    }
+
     private void addButtonFunctionalities(){
         saveBtn.addClickListener(event ->{
             saveUpdatesToGruppenarbeit();
+
+            if (gruppenarbeit.getVeranstaltungstermin() != null) {
+                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
+                veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+            }
+            veranstaltungDetailView.update();
             close();
         });
 
@@ -80,9 +125,10 @@ public class GruppeBearbeitenDialog extends Dialog {
         });
 
         addNewGroupBtn.addClickListener(event -> {
-            dataViews.clear();
-            gruppenGrids.clear();
+            dataViews.subList(1, dataViews.size()).clear();
+            gruppenGrids.subList(1, gruppenGrids.size()).clear();
             titles.clear();
+            deleteButtons.clear();
             int newGroupNumber = gruppen.size() + 1;
             groupsArea.removeAll();
             Optional<User> maybeUser = authenticatedUser.get();
@@ -92,6 +138,7 @@ public class GruppeBearbeitenDialog extends Dialog {
                 gruppeService.save(neueGruppe);
                 gruppen.add(neueGruppe);
                 groupGrids(gruppen.size(), gruppen);
+                deleteBtnsFunctionality();
             }
             else {
                 Notification.show("Fehler");
@@ -109,6 +156,7 @@ public class GruppeBearbeitenDialog extends Dialog {
             gruppe.removeAllTeilnehmer();
             gruppe.addAllTeilnehmer(dataViews.get(gruppen.indexOf(gruppe)+1).getItems().toList());
             gruppe.setGruppenarbeit(gruppenarbeit);
+            gruppe.setNummer((long) gruppen.indexOf(gruppe)+1);
             gruppeService.save(gruppe);
         }
         gruppenarbeit.removeAllTeilnehmer();
@@ -125,13 +173,13 @@ public class GruppeBearbeitenDialog extends Dialog {
     }
 
     private void groupGrids(int numberOfGroups, List<Gruppe> gruppen) {
-        uebrigeTeilnehmer = new Grid<>(Teilnehmer.class, false);
-        uebrigeTeilnehmer.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");
-        uebrigeTeilnehmer.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
-        uebrigeTeilnehmer.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
-        uebrigeTeilnehmer.setRowsDraggable(true);
-        dataViews.add(uebrigeTeilnehmer.setItems(otherTeilnehmer));
-        gruppenGrids.add(uebrigeTeilnehmer);
+//        uebrigeTeilnehmer = new Grid<>(Teilnehmer.class, false);
+//        uebrigeTeilnehmer.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");
+//        uebrigeTeilnehmer.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
+//        uebrigeTeilnehmer.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
+//        uebrigeTeilnehmer.setRowsDraggable(true);
+//        dataViews.add(uebrigeTeilnehmer.setItems(otherTeilnehmer));
+//        gruppenGrids.add(uebrigeTeilnehmer);
 
         for(int i = 0; i< numberOfGroups; i++){
             Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class, false);
@@ -150,10 +198,15 @@ public class GruppeBearbeitenDialog extends Dialog {
             titles.add(title);
             title.addClassName("gruppen-gruppenarbeit-title");
 
-            Button deleteBtn = new Button("Entfernen");
-            Button addBtn = new Button("Hinzufügen");
-            HorizontalLayout buttonLayout = new HorizontalLayout(deleteBtn, addBtn);
-            Div titleAndGroups = new Div(title, buttonLayout, grid);
+            Button deleteBtn = new Button(new Icon(VaadinIcon.TRASH));
+            deleteButtons.add(deleteBtn);
+
+            HorizontalLayout topLayout = new HorizontalLayout(title, deleteBtn);
+            topLayout.setWidthFull();
+            topLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+            topLayout.setFlexGrow(1, title);
+
+            Div titleAndGroups = new Div(topLayout, grid);
             titleAndGroups.addClassName("gruppen-gruppenarbeit");
             groupsArea.add(titleAndGroups);
         }
@@ -168,7 +221,6 @@ public class GruppeBearbeitenDialog extends Dialog {
                     otherGrid.setDropMode(GridDropMode.ON_GRID);
                 }
                 gruppenGrids.set(num, grid);
-                System.out.println(num);
 //                if(num!=0) {
 //                    titles.get(num - 1).setText("Gruppe " + (num) + ": " + dataViews.get(num).getItems().toList().size() + " Teilnehmer");
 //                }
@@ -183,8 +235,7 @@ public class GruppeBearbeitenDialog extends Dialog {
                 }
                 dataViews.get(num).addItem(draggedItem);
                 gruppenGrids.set(num, grid);
-                System.out.println(num);
-                if(num!=0) {
+                if(num!=0&&num!=-1) {
                     titles.get(num - 1).setText("Gruppe " + (num) + ": " + dataViews.get(num).getItems().toList().size() + " Teilnehmer");
                 }
             });
@@ -192,7 +243,7 @@ public class GruppeBearbeitenDialog extends Dialog {
                 draggedItem = null;
                 grid.setDropMode(null);
                 int num = gruppenGrids.indexOf(grid);
-                if(num!=0) {
+                if(num!=0&&num!=-1) {
                     titles.get(num - 1).setText("Gruppe " + (num) + ": " + dataViews.get(num).getItems().toList().size() + " Teilnehmer");
                 }
             });

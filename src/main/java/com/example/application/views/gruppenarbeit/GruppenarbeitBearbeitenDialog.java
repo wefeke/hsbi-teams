@@ -4,6 +4,7 @@ package com.example.application.views.gruppenarbeit;
 
 import com.example.application.models.Gruppenarbeit;
 import com.example.application.services.GruppenarbeitService;
+import com.example.application.views.veranstaltungstermin.VeranstaltungDetailView;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -24,6 +25,7 @@ public class GruppenarbeitBearbeitenDialog extends Dialog {
 
     //Data
     private Gruppenarbeit gruppenarbeit;
+    private VeranstaltungDetailView veranstaltungDetailView;
 
     //UI Elements
     H3 infoText = new H3();
@@ -33,8 +35,9 @@ public class GruppenarbeitBearbeitenDialog extends Dialog {
     Button cancelBtn = new Button("Abbrechen");
 
 
-    public GruppenarbeitBearbeitenDialog(GruppenarbeitService gruppenarbeitService) {
+    public GruppenarbeitBearbeitenDialog(GruppenarbeitService gruppenarbeitService, VeranstaltungDetailView veranstaltungDetailView) {
         this.gruppenarbeitService = gruppenarbeitService;
+        this.veranstaltungDetailView = veranstaltungDetailView;
         this.gruppenarbeit = null;
 
         bindFields();
@@ -73,8 +76,17 @@ public class GruppenarbeitBearbeitenDialog extends Dialog {
     private void configureButtonFunctionalities(){
         saveBtn.addClickListener(event -> {
             saveChanges();
+
+            if (gruppenarbeit.getVeranstaltungstermin() != null) {
+                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
+
+                if (gruppenarbeit != null) {
+                    veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+                }
+            }
+            veranstaltungDetailView.update();
+
             close();
-            UI.getCurrent().getPage().reload();
         });
         cancelBtn.addClickListener(event -> {
             close();

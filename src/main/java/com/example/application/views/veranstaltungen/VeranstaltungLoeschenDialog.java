@@ -34,7 +34,7 @@ public class VeranstaltungLoeschenDialog extends Dialog {
     Paragraph warningText = new Paragraph("Empty");
     Paragraph noReturn = new Paragraph("Empty");
 
-    public VeranstaltungLoeschenDialog(VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungenService veranstaltungenService, TeilnehmerService teilnehmerService) {
+    public VeranstaltungLoeschenDialog(VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungenService veranstaltungenService, TeilnehmerService teilnehmerService, VeranstaltungenView veranstaltungenView) {
         warningText.addClassName("warning-text-delete");
         warningText.getStyle().set("white-space", "pre-line");
         noReturn.addClassName("no-return-text-delete");
@@ -49,7 +49,6 @@ public class VeranstaltungLoeschenDialog extends Dialog {
         deleteBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         deleteBtn.addClickListener(event -> {
-            //TODO: implement delete functionality
             List<Veranstaltungstermin> termine = this.veranstaltung.getVeranstaltungstermine();
             this.veranstaltung.removeAllTermine();
             Set<Teilnehmer> teilnehmer = this.veranstaltung.getTeilnehmer();
@@ -89,9 +88,9 @@ public class VeranstaltungLoeschenDialog extends Dialog {
             }
 
             veranstaltungenService.deleteVeranstaltung(veranstaltung);
+            veranstaltungenView.updateKachelContainer("");
 
             close();
-            UI.getCurrent().getPage().reload();
         });
 
         cancelBtn.addClickListener(event -> close());
@@ -136,8 +135,4 @@ public class VeranstaltungLoeschenDialog extends Dialog {
         getFooter().add(deleteBtn);
         return mainLayout;
     }
-
-
-
-
 }

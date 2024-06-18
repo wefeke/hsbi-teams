@@ -1,5 +1,6 @@
 package com.example.application.views.veranstaltungstermin;
 
+import com.example.application.models.Gruppenarbeit;
 import com.example.application.models.User;
 import com.example.application.models.Veranstaltung;
 import com.example.application.models.Veranstaltungstermin;
@@ -43,18 +44,22 @@ public class VeranstaltungsterminDialog extends Dialog {
     private AuthenticatedUser authenticatedUser;
 
     private VeranstaltungDetailView veranstaltungDetailView;
+    private Veranstaltungstermin aktiverVeranstaltungstermin;
+    private Gruppenarbeit aktiveGruppenarbeit;
 
     private Veranstaltung veranstaltung;
 
     //Data Binder
     Binder<Veranstaltungstermin> binder = new Binder<>(Veranstaltungstermin.class);
 
-    public VeranstaltungsterminDialog(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungDetailView veranstaltungDetailView, String veranstaltungId, AuthenticatedUser authenticatedUser) {
+    public VeranstaltungsterminDialog(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungDetailView veranstaltungDetailView, String veranstaltungId, AuthenticatedUser authenticatedUser, Veranstaltungstermin aktiverVeranstaltungstermin, Gruppenarbeit aktiveGruppenarbeit) {
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
         this.veranstaltungId = veranstaltungId;
         this.authenticatedUser = authenticatedUser;
         this.veranstaltungDetailView = veranstaltungDetailView;
+        this.aktiverVeranstaltungstermin = aktiverVeranstaltungstermin;
+        this.aktiveGruppenarbeit = aktiveGruppenarbeit;
 
         add(createLayout());
         configureElements();
@@ -113,6 +118,16 @@ public class VeranstaltungsterminDialog extends Dialog {
 
                 close();
                 clearFields();
+
+                veranstaltungDetailView.addTerminToTermine(veranstaltungstermin);
+
+                if (aktiverVeranstaltungstermin != null) {
+                    veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(aktiverVeranstaltungstermin);
+
+                    if (aktiveGruppenarbeit != null) {
+                        veranstaltungDetailView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
+                    }
+                }
                 veranstaltungDetailView.update();
 
             }

@@ -1,13 +1,12 @@
 package com.example.application.views.veranstaltungstermin;
 
+import com.example.application.models.Gruppenarbeit;
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
+import com.example.application.models.Veranstaltungstermin;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.VeranstaltungenService;
-import com.example.application.views.studierende.StudierendeHinzufuegen;
-import com.example.application.views.veranstaltungstermin.TeilnehmerErstellenDialog;
-import com.example.application.views.studierende.StudierendeView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -24,7 +23,6 @@ import java.util.Set;
 
 public class TeilnehmerHinzufuegenDialog extends Dialog {
 
-    private final VeranstaltungenService veranstaltungService;
     private final TeilnehmerService teilnehmerService;
     private final Long veranstaltungId;
     private final Button hinzufuegenButton = new Button("Hinzufügen");
@@ -35,9 +33,7 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
     private final TeilnehmerErstellenDialog dialog;
     private final AuthenticatedUser authenticatedUser;
 
-
-    public TeilnehmerHinzufuegenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser) {
-        this.veranstaltungService = veranstaltungService;
+    public TeilnehmerHinzufuegenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser, VeranstaltungDetailView veranstaltungDetailView, Veranstaltungstermin veranstaltungstermin, Gruppenarbeit gruppenarbeit) {
         this.teilnehmerService = teilnehmerService;
         this.veranstaltungId = veranstaltungId;
         this.authenticatedUser = authenticatedUser;
@@ -50,10 +46,8 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         hinzufuegenButton.getStyle().set("margin-inline-start", "auto");
 
         dialog = new TeilnehmerErstellenDialog(teilnehmerService, authenticatedUser,this);
-        anlegenButton.addClickListener(event -> {
-            dialog.open();
-
-        });
+        anlegenButton.addClickListener(event ->
+            dialog.open());
 
         hinzufuegenButton.addClickListener(event -> {
             Set<Teilnehmer> selectedTeilnehmer = new HashSet<>(grid.getSelectedItems());
@@ -63,8 +57,19 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
                     User user = maybeUser.get();
                     veranstaltungService.addTeilnehmer(veranstaltungId, selectedTeilnehmer, user);
 
-                    Notification.show(selectedTeilnehmer.size() + " Teilnehmer wurden hinzugefügt", 3000, Notification.Position.MIDDLE);
+                    Notification.show(selectedTeilnehmer.size() + " Teilnehmer wurden hinzugefügt");
+
+                    if (veranstaltungstermin != null) {
+                        veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(veranstaltungstermin);
+
+                        if (gruppenarbeit != null) {
+                            veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+                        }
+                    }
+                    veranstaltungDetailView.update();
+
                     updateGrid();
+                    close();
                 }
             } else {
                 Notification.show("Keine Teilnehmer ausgewählt", 3000, Notification.Position.MIDDLE);
@@ -74,14 +79,14 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
 
         configureGrid();
 
-
         Button cancelButton = new Button("Abbrechen", e -> close());
+        this.setHeaderTitle("Teilnehmer hinzufügen");
         add(
-
                 getToolbar(),
                 getContent(),
                 cancelButton
         );
+
         updateGrid();
 
     }

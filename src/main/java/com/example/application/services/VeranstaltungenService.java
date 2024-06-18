@@ -49,7 +49,9 @@ public class VeranstaltungenService {
     public void removeTeilnehmerFromVeranstaltung(Teilnehmer teilnehmer, Long veranstaltungId, User user) {
         Veranstaltung veranstaltung = veranstaltungenRepository.findByIdAndUser(veranstaltungId, user);
 
-        veranstaltung.getTeilnehmer().remove(teilnehmer);
+        Set<Teilnehmer> t = new HashSet<>(veranstaltung.getTeilnehmer());
+        t.remove(teilnehmer);
+        veranstaltung.setTeilnehmer(t);
         veranstaltungenRepository.save(veranstaltung);
     }
 

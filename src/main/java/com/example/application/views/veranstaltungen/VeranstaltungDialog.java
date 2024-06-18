@@ -156,7 +156,9 @@ public class VeranstaltungDialog extends Dialog {
                 veranstaltungenView.updateKachelContainer("");
                 clearFields();
                 close();
-                dialog.open();
+
+                if (!newTeilnehmerListe.isEmpty())
+                    dialog.open();
             }
             else {
                 Notification.show("Fehler beim Speichern");
@@ -215,6 +217,7 @@ public class VeranstaltungDialog extends Dialog {
         titelField.clear();
         datePicker.setValue(LocalDate.now());
         comboBox.clear();
+        newTeilnehmerListe.clear();
     }
 
 
