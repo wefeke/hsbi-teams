@@ -387,7 +387,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         terminZeit.addClassName("termin-zeit");
 
         Div terminNotiz = new Div();
-        terminNotiz.setText(veranstaltungstermin.getTitel());
+        String splitTitle = splitLongWords(veranstaltungstermin.getTitel());
+        terminNotiz.setText(splitTitle);
         terminNotiz.addClassName("termin-notiz");
 
         Div kachelContent = new Div(terminDatum, terminZeit, terminNotiz);
@@ -496,6 +497,35 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     }
 
     /**
+     * Teilt Wörter, die länger als eine bestimmte Länge sind, in kleinere Teile auf.
+     * Diese Methode nimmt einen Text und eine maximale Länge als Eingabe. Sie teilt den Text in Wörter auf und überprüft jedes Wort.
+     * Wenn ein Wort länger als die maximale Länge ist, teilt es das Wort an der Position der maximalen Länge in zwei Teile und fügt einen Bindestrich zwischen den Teilen ein.
+     * Der modifizierte Text wird dann zurückgegeben.
+     *
+     * @param text der Eingabetext, der möglicherweise lange Wörter enthält, die geteilt werden sollen
+     * @return der modifizierte Text mit langen Wörtern, die in kleinere Teile geteilt wurden
+     *
+     * @autor Joris
+     */
+    private String splitLongWords(String text) {
+        String[] words = text.split(" ");
+        StringBuilder newText = new StringBuilder();
+
+        int maxLength = 21;
+
+        for (String word : words) {
+            if (word.length() > maxLength) {
+                String splitWord = word.substring(0, maxLength - 1) + "-" + word.substring(maxLength - 1);
+                newText.append(splitWord).append(" ");
+            } else {
+                newText.append(word).append(" ");
+            }
+        }
+
+        return newText.toString().trim();
+    }
+
+    /**
      * Erstellt eine visuelle Kachel (Div) zum Hinzufügen eines neuen Veranstaltungstermins.
      * Die Kachel enthält ein Plus-Symbol und wird mit einem Klick-Listener ausgestattet, der einen Dialog zum Hinzufügen eines neuen Veranstaltungstermins öffnet.
      * Sie hat auch Hover-Effekte, die durch Mouseover- und Mouseout-Events gesteuert werden.
@@ -573,7 +603,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
      * @autor Lilli
      */
     public void createGruppenarbeitLoeschenDialog() {
-        gruppenarbeitLoeschenDialog = new GruppenarbeitLoeschenDialog(gruppenarbeitService, gruppeService, veranstaltungsterminService,this);
+        gruppenarbeitLoeschenDialog = new GruppenarbeitLoeschenDialog(gruppenarbeitService, gruppeService, veranstaltungsterminService,this, aktiveGruppenarbeit);
     }
 
     /**
@@ -627,7 +657,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
      */
     private Div gruppenarbeitKachel(Gruppenarbeit gruppenarbeit) {
         Div gruppenarbeitInfo = new Div();
-        gruppenarbeitInfo.setText(gruppenarbeit.getTitel());
+        String splitTitle = splitLongWords(gruppenarbeit.getTitel());
+        gruppenarbeitInfo.setText(splitTitle);
         gruppenarbeitInfo.addClassName("text-center");
 
         Div kachelContent = new Div(gruppenarbeitInfo);
@@ -928,11 +959,15 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         Div teilnehmerItems = new Div();
         assert teilnehmer != null;
-        for (Teilnehmer t : teilnehmer) {
-            Div teilnehmerDiv = createTeilnehmerDiv(t);
-            teilnehmerItems.add(teilnehmerDiv);
+        if (teilnehmer.isEmpty()) {
+            teilnehmerItems.setText("Noch keine Teilnehmer in der Veranstaltung, fügen Sie noch welche hinzu.");
+            teilnehmerItems.getStyle().set("text-align", "center");
+        } else {
+            for (Teilnehmer t : teilnehmer) {
+                Div teilnehmerDiv = createTeilnehmerDiv(t);
+                teilnehmerItems.add(teilnehmerDiv);
+            }
         }
-
         Div scrollableList = new Div(teilnehmerItems);
         scrollableList.getStyle().set("overflow-y", "auto");
         scrollableList.getStyle().set("height", "calc(100% - 70px)");
@@ -950,6 +985,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
         Button teilnehmerHinzufuegenButton = new Button();
         teilnehmerHinzufuegenButton.setText("Teilnehmer hinzufügen");
+        teilnehmerHinzufuegenButton.setId("teilnehmer-hinzufuegen-button");
         teilnehmerHinzufuegenButton.setWidthFull();
 
         teilnehmerHinzufuegenButton.addClickListener(e -> {
@@ -1201,10 +1237,10 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         }
         Gruppenarbeit fullGruppenarbeit;
 
-        if (gruppenarbeit.getId() != null) {
+        if (gruppenarbeit != null) {
             fullGruppenarbeit = gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId());
         } else {
-            fullGruppenarbeit = null;
+            return;
         }
 
         assert fullGruppenarbeit != null;
@@ -1251,7 +1287,10 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
             Gruppenarbeit gruppenarbeit = gruppenarbeitMap.get(aktiveKachelGruppenarbeit);
 
             Gruppenarbeit updatedGruppenarbeit = gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId());
-            updateGruppen(updatedGruppenarbeit);
+
+            if (aktiveGruppenarbeit != null && aktiveGruppenarbeit.getId().equals(gruppenarbeit.getId())) {
+                updateGruppen(updatedGruppenarbeit);
+            }
         }
     }
 
@@ -1290,6 +1329,12 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
      * @autor Joris
      */
     public void setAktiveKachelGruppenarbeit(Gruppenarbeit gruppenarbeit) {
+        // Überprüfen, ob die übergebene Gruppenarbeit die gleiche ist wie die aktuell aktive Gruppenarbeit
+        if (aktiveGruppenarbeit != null && aktiveGruppenarbeit.getId().equals(gruppenarbeit.getId())) {
+            return;
+        }
+
+        // Ansonsten setzen wir die aktive Gruppenarbeit neu
         Veranstaltungstermin neuerVeranstaltungstermin = veranstaltungsterminService.findVeranstaltungsterminById(gruppenarbeit.getVeranstaltungstermin().getId());
 
         if (neuerVeranstaltungstermin != null) {
@@ -1299,8 +1344,16 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 if (aktuelleGruppenarbeit.getId().equals(gruppenarbeit.getId())) {
                     for (Map.Entry<Div, Gruppenarbeit> entry : gruppenarbeitMap.entrySet()) {
                         if (entry.getValue().equals(aktuelleGruppenarbeit)) {
+                            // Entfernen der "kachel-active" Klasse von der vorher aktiven Kachel
+                            if (aktiveKachelGruppenarbeit != null) {
+                                aktiveKachelGruppenarbeit.removeClassName("kachel-active");
+                            }
+
+                            // Setzen der neuen aktiven Kachel und Hinzufügen der "kachel-active" Klasse
                             aktiveKachelGruppenarbeit = entry.getKey();
                             aktiveKachelGruppenarbeit.addClassName("kachel-active");
+
+                            // Setzen der neuen aktiven Gruppenarbeit
                             aktiveGruppenarbeit = aktuelleGruppenarbeit;
                             break;
                         }

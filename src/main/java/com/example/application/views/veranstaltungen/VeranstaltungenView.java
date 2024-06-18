@@ -108,6 +108,18 @@ public class VeranstaltungenView extends VerticalLayout  {
         add(mainLayout);
     }
 
+    /**
+     * Erstellt die Such- und Filterleiste für die VeranstaltungenView.
+     * Die Methode erstellt ein Textfeld für die Suche und einen Button zum Erstellen neuer Veranstaltungen.
+     * Wenn der Benutzer Text in das Suchfeld eingibt, wird der KachelContainer mit dem eingegebenen Text aktualisiert.
+     * Wenn der Benutzer auf den Button zum Erstellen neuer Veranstaltungen klickt, wird ein Dialog zum Erstellen neuer Veranstaltungen geöffnet.
+     * Ein Spacer wird hinzugefügt, um Platz zwischen den Komponenten zu schaffen.
+     * Schließlich wird ein HorizontalLayout mit dem Suchfeld, dem Button und dem Spacer erstellt und zurückgegeben.
+     *
+     * @return ein HorizontalLayout, das die Such- und Filterleiste darstellt
+     *
+     * @autor Joris
+     */
     private HorizontalLayout createSearchAndFilterBar() {
         // Textfeld für die Suche erstellen
         TextField searchField = new TextField();
@@ -123,6 +135,7 @@ public class VeranstaltungenView extends VerticalLayout  {
 
         // Button zum Erstellen neuer Veranstaltungen erstellen
         Button newEventButton = new Button(new Icon(VaadinIcon.PLUS));
+        newEventButton.setId("veranstaltung-erstellen-button");
         newEventButton.addClickListener(e -> createDialog.open());
 
         Div spacer = new Div();
@@ -132,13 +145,15 @@ public class VeranstaltungenView extends VerticalLayout  {
     }
 
     /**
-     * Erstellt die Such- und Filterleiste für die VeranstaltungenView.
-     * Die Methode erstellt ein Textfeld für die Suche und einen Button zum Erstellen neuer Veranstaltungen.
-     * Wenn der Benutzer Text in das Suchfeld eingibt, wird der KachelContainer mit dem eingegebenen Text aktualisiert.
-     * Wenn der Benutzer auf den Button zum Erstellen neuer Veranstaltungen klickt, wird ein Dialog zum Erstellen neuer Veranstaltungen geöffnet.
-     * Ein Spacer wird hinzugefügt, um Platz zwischen den Komponenten zu schaffen.
-     * Schließlich wird ein HorizontalLayout mit dem Suchfeld, dem Button und dem Spacer erstellt und zurückgegeben.
+     * Erstellt ein HorizontalLayout für die Such- und Filterleiste.
+     * Die Methode erstellt zunächst ein Select-Element für die Filteroptionen und setzt die Standardoption auf "Datum aufsteigend".
+     * Wenn der Benutzer eine Option auswählt, wird der KachelContainer mit dem ausgewählten Filter aktualisiert.
+     * Die Methode erstellt dann ein HorizontalLayout und fügt das Suchfeld, den Button zum Erstellen neuer Veranstaltungen, einen Spacer und das Select-Element hinzu.
+     * Das Layout wird so konfiguriert, dass es die volle Breite einnimmt und die Elemente zentriert ausrichtet.
      *
+     * @param searchField das Textfeld für die Suche
+     * @param newEventButton der Button zum Erstellen neuer Veranstaltungen
+     * @param spacer ein Div-Element, das als Spacer dient
      * @return ein HorizontalLayout, das die Such- und Filterleiste darstellt
      *
      * @autor Joris
@@ -381,6 +396,6 @@ public class VeranstaltungenView extends VerticalLayout  {
      * @autor Lilli
      */
     private void createVeranstaltungLoeschenDialog() {
-        veranstaltungLoeschenDialog = new VeranstaltungLoeschenDialog(veranstaltungsterminService, gruppenarbeitService, gruppeService, veranstaltungenService, teilnehmerService);
+        veranstaltungLoeschenDialog = new VeranstaltungLoeschenDialog(veranstaltungsterminService, gruppenarbeitService, gruppeService, veranstaltungenService, teilnehmerService, this);
     }
 }
