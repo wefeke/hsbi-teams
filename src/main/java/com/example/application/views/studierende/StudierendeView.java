@@ -51,8 +51,6 @@ import java.util.Optional;
 @PageTitle(value = "Studierende")
 @RolesAllowed({"ADMIN", "USER"})
 public class StudierendeView extends VerticalLayout {
-
-    private final ExcelExporter excelExporter;
     private final TeilnehmerService teilnehmerService;
     private final Grid<Teilnehmer> grid = new Grid<>();
     private final Editor<Teilnehmer> editor =grid.getEditor();
@@ -77,10 +75,9 @@ public class StudierendeView extends VerticalLayout {
     Button aufraeumenButton = new Button("Aufräumen");
 
     @Autowired
-    public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser,ExcelExporter excelExporter) {
+    public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
         this.authenticatedUser = authenticatedUser;
         this.teilnehmerService = teilnehmerService;
-        this.excelExporter = excelExporter;
         Aufraeumen aufraeumenDialog = new Aufraeumen(teilnehmerService, authenticatedUser, this);
         DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService, authenticatedUser, aufraeumenDialog, this);
         StudierendeHinzufuegen studierendeHinzufuegen = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser, this);
