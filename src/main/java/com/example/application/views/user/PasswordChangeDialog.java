@@ -11,7 +11,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
-public class PasswordChange extends Dialog {
+/**
+ * Dialog zur Änderung des Passworts eines authentifizierten Benutzers.
+ *
+ * @author Kennet
+ */
+public class PasswordChangeDialog extends Dialog {
 
     private PasswordField old_password = new PasswordField("Altes Password");
     private PasswordField new_password = new PasswordField("Neues Password");
@@ -22,7 +27,15 @@ public class PasswordChange extends Dialog {
     private AuthenticatedUser authenticatedUser;
     private User user;
 
-    public PasswordChange (AuthenticatedUser authenticatedUser, UserService userService, PasswordEncoder passwordEncoder) {
+    /**
+     * Konstruktor für die PasswordChange Klasse.
+     *
+     * @author Kennet
+     * @param authenticatedUser Ein AuthenticatedUser-Objekt, das Informationen über den authentifizierten Benutzer enthält.
+     * @param userService Ein UserService-Objekt, das Methoden zur Interaktion mit User-Objekten in der Datenbank bereitstellt.
+     * @param passwordEncoder Ein PasswordEncoder-Objekt, das zum Hashen von Passwörtern verwendet wird.
+     */
+    public PasswordChangeDialog(AuthenticatedUser authenticatedUser, UserService userService, PasswordEncoder passwordEncoder) {
         this.authenticatedUser = authenticatedUser;
         Optional<User> maybeUser = authenticatedUser.get();
         maybeUser.ifPresent(value -> this.user = value);
@@ -35,10 +48,22 @@ public class PasswordChange extends Dialog {
         setHeaderTitle("Passwort ändern");
     }
 
+    /**
+     * Erstellt die UI-Elemente für den Dialog.
+     *
+     * @author Kennet
+     */
     private void createElements() {
         add(old_password, new_password, password_check);
     }
 
+    /**
+     * Konfiguriert die UI-Elemente für den Dialog.
+     * Überprüft, ob das alte Passwort korrekt ist.
+     * Überprüft, ob die eingegebenen Passwörter übereinstimmen und speichert das neue Passwort in der Datenbank.
+     *
+     * @author Kennet
+     */
     private void configureElements() {
         old_password.setWidthFull();
         old_password.setRequired(true);
@@ -91,6 +116,11 @@ public class PasswordChange extends Dialog {
         }));
     }
 
+    /**
+     * Leert die Eingabefelder des Dialogs.
+     *
+     * @author Kennet
+     */
     private void clearFields() {
         old_password.clear();
         new_password.clear();

@@ -12,17 +12,32 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
-// LEON
+/**
+ * Eine Klasse zum Exportieren von Teilnehmerdaten im Excel-Format.
+ *
+ * @author Kennet
+ */
 @Service
 public class TeilnehmerExcelExporter {
     private XSSFWorkbook workbook;
     private XSSFSheet sheet;
     private List<Teilnehmer> teilnehmer;
 
+    /**
+     * Konstruktor für die TeilnehmerExcelExporter Klasse.
+     * Initialisiert das Workbook-Objekt.
+     *
+     * @author Kennet
+     */
     public TeilnehmerExcelExporter() {
         workbook = new XSSFWorkbook();
     }
 
+    /**
+     * Erstellt die Kopfzeile der Excel-Datei.
+     *
+     *  @author Kennet
+     */
     private void writeHeaderLine() {
         sheet = workbook.createSheet("Teilnehmer");
 
@@ -39,6 +54,15 @@ public class TeilnehmerExcelExporter {
         createCell(row, 2, "Nachname", style);
     }
 
+     /**
+     * Erstellt eine Zelle in der angegebenen Zeile und Spalte mit dem angegebenen Wert und Stil.
+     *
+      * @author Kennet
+     * @param row Die Zeile, in der die Zelle erstellt werden soll.
+     * @param columnCount Die Spalte, in der die Zelle erstellt werden soll.
+     * @param value Der Wert, der in die Zelle geschrieben werden soll.
+     * @param style Der Stil, der auf die Zelle angewendet werden soll.
+     */
     private void createCell(Row row, int columnCount, Object value, CellStyle style) {
         sheet.autoSizeColumn(columnCount);
         Cell cell = row.createCell(columnCount);
@@ -52,6 +76,11 @@ public class TeilnehmerExcelExporter {
         cell.setCellStyle(style);
     }
 
+    /**
+     * Schreibt die Datenzeilen in die Excel-Datei.
+     *
+     * @author Kennet
+     */
     private void writeDataLines() {
         int rowCount = 1;
 
@@ -69,6 +98,14 @@ public class TeilnehmerExcelExporter {
         }
     }
 
+    /**
+     * Exportiert die angegebene Liste von Teilnehmer-Objekten in eine Excel-Datei und gibt diese als byte-Array zurück.
+     *
+     * @author Kennet
+     * @param teilnehmer Die Liste von Teilnehmer-Objekten, die in die Excel-Datei exportiert werden sollen.
+     * @return Ein byte-Array, das die erstellte Excel-Datei repräsentiert.
+     * @throws IOException Wenn ein Fehler beim Schreiben in das ByteArrayOutputStream auftritt.
+     */
     public byte[] export(List<Teilnehmer> teilnehmer) throws IOException {
         this.teilnehmer = teilnehmer;
         writeHeaderLine();
@@ -79,12 +116,6 @@ public class TeilnehmerExcelExporter {
             workbook.write(bos);
         }
         return bos.toByteArray();
-    }
-
-    public void clear(){
-        workbook = new XSSFWorkbook();
-        if (teilnehmer != null)
-            teilnehmer.clear();
     }
 }
 

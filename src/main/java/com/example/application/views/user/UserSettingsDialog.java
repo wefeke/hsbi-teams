@@ -1,22 +1,18 @@
 package com.example.application.views.user;
 
 import com.example.application.models.User;
-import com.example.application.models.Veranstaltung;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.UserService;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.server.StreamResource;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -24,7 +20,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
-public class UserSettings extends Dialog {
+/**
+ * Dialog zur Anzeige und Änderung der Benutzereinstellungen.
+ *
+ * @author Kennet
+ */
+public class UserSettingsDialog extends Dialog {
 
     private final TextField name = new TextField("Name");
     private final TextField username = new TextField("Username");
@@ -46,7 +47,14 @@ public class UserSettings extends Dialog {
 
     private final Binder<User> binder = new Binder<>(User.class);
 
-    public UserSettings (AuthenticatedUser authenticatedUser, UserService userService) {
+    /**
+     * Konstruktor für die UserSettingsDialog Klasse.
+     *
+     * @author Kennet
+     * @param authenticatedUser Ein AuthenticatedUser-Objekt, das Informationen über den authentifizierten Benutzer enthält.
+     * @param userService Ein UserService-Objekt, das Methoden zur Interaktion mit User-Objekten in der Datenbank bereitstellt.
+     */
+    public UserSettingsDialog(AuthenticatedUser authenticatedUser, UserService userService) {
         this.authenticatedUser = authenticatedUser;
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
@@ -59,6 +67,11 @@ public class UserSettings extends Dialog {
         readBean();
     }
 
+    /**
+     * Erstellt die UI-Elemente für den Dialog.
+     *
+     * @author Kennet
+     */
     private void createElements() {
         VerticalLayout verticalLayout= new VerticalLayout(
                 avatar,
@@ -73,6 +86,14 @@ public class UserSettings extends Dialog {
         getFooter().add(cancelButton, saveButton);
     }
 
+    /**
+     * Konfiguriert die UI-Elemente für den Dialog.
+     * Hier werden die Aktionen für die UI-Elemente festgelegt.
+     * Beim Klicken auf den "Speichern" Button wird der Benutzer aktualisiert und ausgeloggt.
+     * Der Upload-Listener wird verwendet, um das hochgeladene Bild zu speichern.
+     *
+     * @author Kennet
+     */
     private void configureElements() {
         cancelButton.addClickListener(e -> close());
         saveButton.setTooltipText("!Achtung! Beim speichern werden Sie ausgeloggt");
@@ -118,6 +139,11 @@ public class UserSettings extends Dialog {
         username.setWidthFull();
     }
 
+    /**
+     * Bindet die Eingabefelder an die Eigenschaften des User-Objekts.
+     *
+     * @author Kennet
+     */
     private void bindFields() {
         binder.forField(name)
                 .bind(User::getName, User::setName);
@@ -127,6 +153,11 @@ public class UserSettings extends Dialog {
                 .bind(User::getUsername, User::setUsername);
     }
 
+    /**
+     * Liest die Eigenschaften des User-Objekts und aktualisiert die Eingabefelder entsprechend.
+     *
+     * @author Kennet
+     */
     public void readBean () {
         binder.readBean(user);
 
@@ -148,6 +179,11 @@ public class UserSettings extends Dialog {
         avatar.getElement().setAttribute("tabindex", "-1");
     }
 
+    /**
+     * Leert die Eingabefelder des Dialogs.
+     *
+     * @author Kennet
+     */
     private void clearFields () {
         name.clear();
         username.clear();

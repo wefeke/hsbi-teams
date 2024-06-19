@@ -15,18 +15,27 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
-import java.util.HashSet;
-import java.util.Set;
-
+/**
+ * Verwaltungsklasse zur Verwaltung von Benutzern durch einen Administrator.
+ *
+ * @author Kennet
+ */
 @PageTitle("User Management")
 @Route(value = "user-management", layout = MainLayout.class)
 @RolesAllowed({"ADMIN"})
-public class UserManagement extends VerticalLayout {
+public class UserManagementView extends VerticalLayout {
 
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
-    public UserManagement(UserService userService, PasswordEncoder passwordEncoder) {
+    /**
+     * Konstruktor für die UserManagementView Klasse.
+     *
+     * @author Kennet
+     * @param userService Ein UserService-Objekt, das Methoden zur Interaktion mit User-Objekten in der Datenbank bereitstellt.
+     * @param passwordEncoder Ein PasswordEncoder-Objekt, das zum Hashen von Passwörtern verwendet wird.
+     */
+    public UserManagementView(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
 
@@ -38,6 +47,13 @@ public class UserManagement extends VerticalLayout {
         add(createGrid());
     }
 
+    /**
+     * Erstellt ein Grid zur Anzeige der Benutzerinformationen.
+     * Der Administrator kann die Rollen, das Passwort und den Zugriff der Benutzer ändern.
+     *
+     * @author Kennet
+     * @return Ein Grid, das die Benutzerinformationen anzeigt.
+     */
     private Grid<User> createGrid(){
         Grid<User> grid = new Grid<>();
 
@@ -48,8 +64,8 @@ public class UserManagement extends VerticalLayout {
         grid.addColumn(new ComponentRenderer<>(user -> {
             Button button = new Button("Passwort ändern");
             button.addClickListener(event -> {
-                AdminPasswordChange adminPasswordChange = new AdminPasswordChange(passwordEncoder, userService, user);
-                adminPasswordChange.open();
+                AdminPasswordChangeDialog adminPasswordChangeDialog = new AdminPasswordChangeDialog(passwordEncoder, userService, user);
+                adminPasswordChangeDialog.open();
             });
             return button;
         })).setHeader("Passwort");

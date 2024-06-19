@@ -23,6 +23,11 @@ import com.vaadin.flow.data.binder.*;
 import java.time.LocalDate;
 import java.util.Optional;
 
+/**
+ * Dialog zur Erstellung und Bearbeitung eines Veranstaltungstermins.
+ *
+ * @author Kennet
+ */
 public class VeranstaltungsterminDialog extends Dialog {
 
     //Services
@@ -52,6 +57,19 @@ public class VeranstaltungsterminDialog extends Dialog {
     //Data Binder
     Binder<Veranstaltungstermin> binder = new Binder<>(Veranstaltungstermin.class);
 
+    /**
+     * Konstruktor für die VeranstaltungsterminDialog Klasse.
+     * Ruft die Methoden zum Erstellen und Konfigurieren der UI-Elemente auf.
+     *
+     * @author Kennet
+     * @param veranstaltungService Ein VeranstaltungenService-Objekt, das Methoden zur Interaktion mit Veranstaltungs-Objekten in der Datenbank bereitstellt.
+     * @param veranstaltungsterminService Ein VeranstaltungsterminService-Objekt, das Methoden zur Interaktion mit Veranstaltungstermin-Objekten in der Datenbank bereitstellt.
+     * @param veranstaltungDetailView Ein VeranstaltungDetailView-Objekt, das die Ansicht der Veranstaltungsdetails repräsentiert.
+     * @param veranstaltungId Die ID der Veranstaltung, für die der Veranstaltungstermin erstellt oder bearbeitet wird.
+     * @param authenticatedUser Ein AuthenticatedUser-Objekt, das Informationen über den authentifizierten Benutzer enthält.
+     * @param aktiverVeranstaltungstermin Ein Veranstaltungstermin-Objekt, das den aktiven Veranstaltungstermin repräsentiert.
+     * @param aktiveGruppenarbeit Ein Gruppenarbeit-Objekt, das die aktive Gruppenarbeit repräsentiert.
+     */
     public VeranstaltungsterminDialog(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungDetailView veranstaltungDetailView, String veranstaltungId, AuthenticatedUser authenticatedUser, Veranstaltungstermin aktiverVeranstaltungstermin, Gruppenarbeit aktiveGruppenarbeit) {
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
@@ -66,6 +84,12 @@ public class VeranstaltungsterminDialog extends Dialog {
         bindFields();
     }
 
+    /**
+     * Erstellt das Layout für den Dialog.
+     *
+     * @author Kennet
+     * @return Ein HorizontalLayout-Objekt, das das Layout des Dialogs repräsentiert.
+     */
     private HorizontalLayout createLayout () {
 
         setHeaderTitle("Veranstaltungstermin hinzufügen");
@@ -89,6 +113,13 @@ public class VeranstaltungsterminDialog extends Dialog {
                 );
     }
 
+    /**
+     * Konfiguriert die UI-Elemente für den Dialog.
+     * Überprüft, ob die eingegebenen Daten gültig sind und speichert den Veranstaltungstermin in der Datenbank.
+     * Es kann festgelegt werden, ob nur ein oder eine Serie von Terminen erstellt werden soll. Demnach wird das Enddatumsfeld angezeigt und die Serie von Terminen werden berechnet und gespeichert.
+     *
+     * @author Kennet
+     */
     private void configureElements(){
 
         //Radiobutton Implementation
@@ -151,6 +182,11 @@ public class VeranstaltungsterminDialog extends Dialog {
 
     }
 
+    /**
+     * Bindet die Eingabefelder an die Eigenschaften des Veranstaltungstermin-Objekts.
+     *
+     * @author Kennet
+     */
     private void bindFields(){
         binder.forField(titel)
                 .asRequired("Titel muss gefüllt sein")
@@ -171,6 +207,13 @@ public class VeranstaltungsterminDialog extends Dialog {
 
     }
 
+    /**
+     * Berechnet die Anzahl der Veranstaltungstermine und initiiert das Speichern der jeweiligen Veranstaltungstermine.
+     * Abhängig von der Auswahl des Benutzers können mehrere Veranstaltungstermine erstellt werden.
+     *
+     * @author Kennet
+     * @param veranstaltungstermin Ein Veranstaltungstermin-Objekt, das den zu speichernden Veranstaltungstermin repräsentiert.
+     */
     private void calcPersistVeranstaltungstermin (Veranstaltungstermin veranstaltungstermin) {
         LocalDate startDate = startDatePicker.getValue();
         LocalDate endDate = endDatePicker.getValue();
@@ -205,6 +248,12 @@ public class VeranstaltungsterminDialog extends Dialog {
         }
     }
 
+    /**
+     * Speichert den Veranstaltungstermin in der Datenbank.
+     *
+     * @author Kennet
+     * @param veranstaltungstermin Ein Veranstaltungstermin-Objekt, das den zu speichernden Veranstaltungstermin repräsentiert.
+     */
     public void persistVeranstaltungstermin (Veranstaltungstermin veranstaltungstermin) {
 
         Optional<User> maybeUser = authenticatedUser.get();
@@ -222,6 +271,11 @@ public class VeranstaltungsterminDialog extends Dialog {
         }
     }
 
+    /**
+     * Leert die Eingabefelder des Dialogs.
+     *
+     * @author Kennet
+     */
     public void clearFields(){
         //Clear all Fields after saving
         startDatePicker.setValue(LocalDate.now());

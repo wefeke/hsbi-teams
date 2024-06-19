@@ -43,6 +43,11 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.*;
 
+/**
+ * Dialog zur Erstellung einer neuen Veranstaltung.
+ *
+ * @author Kennet
+ */
 @Route(value = "addDialog")
 @RolesAllowed({"ADMIN", "USER"})
 public class VeranstaltungDialog extends Dialog {
@@ -73,6 +78,17 @@ public class VeranstaltungDialog extends Dialog {
     //Data Binder
     Binder<Veranstaltung> binder = new Binder<>(Veranstaltung.class);
 
+    /**
+     * Konstruktor für die VeranstaltungDialog Klasse.
+     * Ruft die Methoden zum Erstellen und Konfigurieren der UI-Elemente auf.
+     *
+     * @author Kennet
+     * @param veranstaltungenService Ein VeranstaltungenService-Objekt, das Methoden zur Interaktion mit Veranstaltungs-Objekten in der Datenbank bereitstellt.
+     * @param teilnehmerService Ein TeilnehmerService-Objekt, das Methoden zur Interaktion mit Teilnehmer-Objekten in der Datenbank bereitstellt.
+     * @param userService Ein UserService-Objekt, das Methoden zur Interaktion mit User-Objekten in der Datenbank bereitstellt.
+     * @param veranstaltungenView Ein VeranstaltungenView-Objekt, das die Ansicht der Veranstaltungen repräsentiert.
+     * @param authenticatedUser Ein AuthenticatedUser-Objekt, das Informationen über den authentifizierten Benutzer enthält.
+     */
     public VeranstaltungDialog(VeranstaltungenService veranstaltungenService, TeilnehmerService teilnehmerService, UserService userService, VeranstaltungenView veranstaltungenView, AuthenticatedUser authenticatedUser) {
         this.veranstaltungenService = veranstaltungenService;
         this.teilnehmerService = teilnehmerService;
@@ -91,6 +107,12 @@ public class VeranstaltungDialog extends Dialog {
         bindFields();
     }
 
+    /**
+     * Erstellt das Layout für den Dialog.
+     *
+     * @author Kennet
+     * @return Ein VerticalLayout-Objekt, das das Layout des Dialogs repräsentiert.
+     */
     private VerticalLayout createLayout() {
         setHeaderTitle("Veranstaltung hinzufügen");
         getFooter().add(cancelButton);
@@ -100,6 +122,15 @@ public class VeranstaltungDialog extends Dialog {
                 new VerticalLayout(titelField, datePicker, comboBox, upload));
         }
 
+    /**
+     * Konfiguriert die UI-Elemente für den Dialog.
+     * Durch den Upload-Button können Teilnehmer über eine Excel-Datei hinzugefügt werden, die dann in der Teilnehmerliste angezeigt und direkt ausgewählt werden.
+     * Wenn ein Teilnehmer bereits in der Datenbank existiert, wird dieser nicht erneut angelegt. Tut er das nicht, wird er angelegt.
+     * Beim Klicken auf den "Speichern" Button wird eine neue Veranstaltung mit den Werten der Eingabefelder gefüllt und mit den neuen Teilnehmern in der Datenbank gespeichert.
+     * Es wird ein eigener Renderer für das ComboBox-Element verwendet, um die Teilnehmer als Avatar anzuzeigen.
+     *
+     * @author Kennet
+     */
     private void configureElements() {
         //Combobox
         comboBox.setItems(teilnehmerService.findAllTeilnehmerByUserAndFilter(user,""));
@@ -127,7 +158,10 @@ public class VeranstaltungDialog extends Dialog {
             return row;
         }));
         comboBox.setSizeFull();
+
+        datePicker.setValue(LocalDate.now());
         datePicker.setSizeFull();
+
         titelField.setSizeFull();
 
         //Buttons
@@ -172,8 +206,6 @@ public class VeranstaltungDialog extends Dialog {
             close();
         });
 
-        datePicker.setValue(LocalDate.now());
-
         //Upload
         upload.addSucceededListener(event -> {
             try {
@@ -203,6 +235,11 @@ public class VeranstaltungDialog extends Dialog {
 
     }
 
+    /**
+     * Bindet die Eingabefelder an die Eigenschaften des Veranstaltung-Objekts.
+     *
+     * @author Kennet
+     */
     private void bindFields() {
         binder.forField(titelField)
                 .asRequired("Titel muss gefüllt sein")
@@ -214,6 +251,11 @@ public class VeranstaltungDialog extends Dialog {
                 .bind(Veranstaltung::getTeilnehmer, Veranstaltung::setTeilnehmer);
     }
 
+    /**
+     * Leert die Eingabefelder des Dialogs.
+     *
+     * @author Kennet
+     */
     public void clearFields(){
         titelField.clear();
         datePicker.setValue(LocalDate.now());

@@ -2,9 +2,9 @@
 package com.example.application.views;
 
 import com.example.application.services.UserService;
-import com.example.application.views.user.PasswordChange;
-import com.example.application.views.user.UserManagement;
-import com.example.application.views.user.UserSettings;
+import com.example.application.views.user.PasswordChangeDialog;
+import com.example.application.views.user.UserManagementView;
+import com.example.application.views.user.UserSettingsDialog;
 import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.VeranstaltungenService;
@@ -20,7 +20,6 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.SvgIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -35,8 +34,11 @@ import java.io.ByteArrayInputStream;
 import java.util.Optional;
 
 
-
-//MainLayout ist die Hauptansicht der Anwendung, die die Navigationsleiste enthält
+/**
+ * Hauptansicht der Anwendung, die die Navigationsleiste enthält.
+ *
+ * @author Kennet
+ */
 public class MainLayout extends AppLayout {
 
     private final VeranstaltungenService veranstaltungenService;
@@ -46,7 +48,17 @@ public class MainLayout extends AppLayout {
     private AuthenticatedUser authenticatedUser;
     private AccessAnnotationChecker accessChecker;
 
-
+    /**
+     * Konstruktor für die MainLayout Klasse.
+     * Initiiert das Erstellen des Headers.
+     *
+     * @author Kennet
+     * @param authenticatedUser Ein AuthenticatedUser-Objekt, das Informationen über den authentifizierten Benutzer enthält.
+     * @param accessChecker Ein AccessAnnotationChecker-Objekt, das die Zugriffsrechte überprüft.
+     * @param veranstaltungenService Ein VeranstaltungenService-Objekt, das Methoden zur Interaktion mit Veranstaltungs-Objekten in der Datenbank bereitstellt.
+     * @param userService Ein UserService-Objekt, das Methoden zur Interaktion mit User-Objekten in der Datenbank bereitstellt.
+     * @param passwordEncoder Ein PasswordEncoder-Objekt, das zum Verschlüsseln von Passwörtern verwendet wird.
+     */
     public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker, VeranstaltungenService veranstaltungenService, UserService userService, PasswordEncoder passwordEncoder){
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
@@ -55,6 +67,7 @@ public class MainLayout extends AppLayout {
         this.passwordEncoder = passwordEncoder;
         createHeader();
     }
+
 
     public static class MenuItemInfo extends ListItem {
 
@@ -85,17 +98,23 @@ public class MainLayout extends AppLayout {
 
     }
 
+
     private MenuItemInfo[] createMenuItems() {
         return new MenuItemInfo[]{ //
                 new MenuItemInfo("Veranstaltungen", LineAwesomeIcon.UNIVERSITY_SOLID.create(), VeranstaltungenView.class), //
                 new MenuItemInfo("Studierende", LineAwesomeIcon.ID_BADGE.create(), StudierendeView.class),
-                new MenuItemInfo("User Management", LineAwesomeIcon.ID_CARD.create(), UserManagement.class),
+                new MenuItemInfo("User Management", LineAwesomeIcon.ID_CARD.create(), UserManagementView.class),
         };
     }
 
     /**
      * Erstellt den Header der Hauptansicht mit Navigationsbuttons.
-     * Enthält Buttons für das Hauptlogo, Veranstaltungen und Studierende.
+     * Enthält Navigationselemente für das Hauptlogo, Veranstaltungen, Studierende und User Management.
+     * Der Zugriff des Benutzers auf die verschiedenen Ansichten wird überprüft und diese dementsprechend angezeigt.
+     * Enthält auch einen Button zum Wechseln des Themes.
+     * Enthält zudem einen Button zum Anzeigen des Benutzermenüs. Über die List-Elemente kann der Benutzer Einstellungen an seinem Profil tätigen, sein Passwort ändern oder sich abmelden.
+     *
+     * @author Kennet
      */
     private void createHeader() {
         HorizontalLayout header = new HorizontalLayout(); //Navigation-Bar
@@ -114,21 +133,20 @@ public class MainLayout extends AppLayout {
         configureButton(logoButton, "24px", false);
         logoButton.getStyle().set("padding-left", "20px");
 
-        // Wrap the links in a list; improves accessibility
+        // Navigation Items
         UnorderedList list = new UnorderedList();
         list.addClassName("nav-list");
         list.addClassNames(LumoUtility.Display.FLEX, LumoUtility.Gap.SMALL, LumoUtility.ListStyleType.NONE, LumoUtility.Margin.NONE, LumoUtility.Padding.NONE);
         navItems.add(list);
-
         navItems.add(logoButton, list);
-
         for (MenuItemInfo menuItem : createMenuItems()) {
             if (accessChecker.hasAccess(menuItem.getView())) {
                 list.add(menuItem);
             }
         }
 
-        //Theme Button
+        //Setting Items
+        //Theme Button (4th Element)
         Button themeToggleButton = new Button(LineAwesomeIcon.MOON.create());
         themeToggleButton.setText("Dunkel");
 
@@ -144,10 +162,9 @@ public class MainLayout extends AppLayout {
                 themeToggleButton.setIcon(LineAwesomeIcon.SUN_SOLID.create());
             }
         });
-        //themeToggleButton.getStyle().setMarginRight("10px");
         settingItems.add(themeToggleButton); //zur rechten Seite hinzufügen
 
-        // (Fifth Element) Login-Button
+        // (5th Element) Login-Button
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
             User user = maybeUser.get();
@@ -178,25 +195,25 @@ public class MainLayout extends AppLayout {
             div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
             userName.add(div);
 
-            UserSettings userSettings = new UserSettings(authenticatedUser, userService);
-            userSettings.addOpenedChangeListener(e -> {
+            UserSettingsDialog userSettingsDialog = new UserSettingsDialog(authenticatedUser, userService);
+            userSettingsDialog.addOpenedChangeListener(e -> {
                 if (e.isOpened()) {
-                    userSettings.readBean();
+                    userSettingsDialog.readBean();
                 }
             });
 
-            PasswordChange passwordChange = new PasswordChange(authenticatedUser, userService, passwordEncoder);
+            PasswordChangeDialog passwordChangeDialog = new PasswordChangeDialog(authenticatedUser, userService, passwordEncoder);
 
             // Create a HorizontalLayout and add the icon and text to it
             HorizontalLayout settingsItemLayout = new HorizontalLayout(LineAwesomeIcon.COG_SOLID.create(), new Text("Einstellungen"));
             userName.getSubMenu().addItem(settingsItemLayout, e ->
-                    userSettings.open()
+                    userSettingsDialog.open()
             );
 
             // Create a HorizontalLayout and add the icon and text to it
             HorizontalLayout passwordItemLayout = new HorizontalLayout(LineAwesomeIcon.KEY_SOLID.create(), new Text("Passwort"));
             userName.getSubMenu().addItem(passwordItemLayout, e ->
-                    passwordChange.open()
+                    passwordChangeDialog.open()
             );
 
             HorizontalLayout signOutItemLayout = new HorizontalLayout(LineAwesomeIcon.SIGN_OUT_ALT_SOLID.create(), new Text("Abmelden"));
@@ -206,7 +223,8 @@ public class MainLayout extends AppLayout {
 
             userMenu.getStyle().setMarginRight("10px");
             settingItems.add(userMenu); //zur rechten Seite hinzufügen
-        } else {
+        }
+        else {
             Div div = new Div();
             div.getElement().getStyle().set("display", "flex");
             div.getElement().getStyle().set("align-items", "center");
@@ -218,15 +236,13 @@ public class MainLayout extends AppLayout {
 
         header.add(navItems, settingItems);  //Linke und rechte Seite in die Navigationsbar
         addToNavbar(header);
-
-
     }
-
 
 
     /**
      * Konfiguriert das Aussehen eines Buttons.
      *
+     * @author Kennet
      * @param button Der zu konfigurierende Button.
      * @param fontSize Die Schriftgröße des Buttons.
      * @param colorControl Gibt an, ob die Farbe des Buttons angepasst werden soll.
@@ -239,11 +255,5 @@ public class MainLayout extends AppLayout {
         if (colorControl) {
             button.getStyle().set("color", "black");
         }
-    }
-
-
-    private void updateButtonStyles() {
-        //hier noch eine Methode einfügen um die Farben für die Buttons zu konfigurieren.
-        //muss irgendwie über die Route laufen, aber ich weiß gerade nciht wir ich die Route bekomme.
     }
 }
