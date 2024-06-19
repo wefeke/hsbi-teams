@@ -32,6 +32,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.HashSet;
 import java.util.Optional;
 
+/**
+ * Dialog zur Bearbeitung einer Veranstaltung.
+ *
+ * @author Kennet
+ */
 @Route(value = "editDialog")
 @RolesAllowed({"ADMIN", "USER"})
 public class VeranstaltungBearbeiten extends Dialog {
@@ -56,6 +61,18 @@ public class VeranstaltungBearbeiten extends Dialog {
     //Data Binder
     Binder<Veranstaltung> binder = new Binder<>(Veranstaltung.class);
 
+    /**
+     * Konstruktor für die VeranstaltungBearbeiten Klasse.
+     * Ruft die Methoden zum Erstellen und Konfigurieren der UI-Elemente auf.
+     *
+     * @author Kennet
+     * @param veranstaltungenService Ein VeranstaltungenService-Objekt, das Methoden zur Interaktion mit Veranstaltungs-Objekten in der Datenbank bereitstellt.
+     * @param teilnehmerService Ein TeilnehmerService-Objekt, das Methoden zur Interaktion mit Teilnehmer-Objekten in der Datenbank bereitstellt.
+     * @param userService Ein UserService-Objekt, das Methoden zur Interaktion mit User-Objekten in der Datenbank bereitstellt.
+     * @param veranstaltung Ein Veranstaltung-Objekt, das die zu bearbeitende Veranstaltung repräsentiert.
+     * @param veranstaltungenView Ein VeranstaltungenView-Objekt, das die Ansicht der Veranstaltungen repräsentiert.
+     * @param authenticatedUser Ein AuthenticatedUser-Objekt, das Informationen über den authentifizierten Benutzer enthält.
+     */
     public VeranstaltungBearbeiten(VeranstaltungenService veranstaltungenService, TeilnehmerService teilnehmerService, UserService userService, Veranstaltung veranstaltung, VeranstaltungenView veranstaltungenView, AuthenticatedUser authenticatedUser) {
         this.veranstaltungenService = veranstaltungenService;
         this.teilnehmerService = teilnehmerService;
@@ -72,6 +89,11 @@ public class VeranstaltungBearbeiten extends Dialog {
 
     }
 
+    /**
+     * Liest die Eigenschaften des Veranstaltung-Objekts und aktualisiert die Eingabefelder entsprechend.
+     *
+     * @author Kennet
+     */
     public void readBean (){
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
@@ -82,6 +104,12 @@ public class VeranstaltungBearbeiten extends Dialog {
         }
     }
 
+    /**
+     * Erstellt das Layout für den Dialog.
+     *
+     * @author Kennet
+     * @return Ein HorizontalLayout-Objekt, das das Layout des Dialogs repräsentiert.
+     */
     private HorizontalLayout createLayout() {
         setHeaderTitle("Veranstaltung \"" + veranstaltung.getTitel() +"\" bearbeiten");
         getFooter().add(cancelButton);
@@ -93,8 +121,15 @@ public class VeranstaltungBearbeiten extends Dialog {
                 ));
     }
 
+    /**
+     * Konfiguriert die UI-Elemente für den Dialog.
+     * Hier werden die Aktionen für die UI-Elemente festgelegt.
+     * Beim Klicken auf den "Speichern" Button wird die Veranstaltung mit den Werten der Eingabefelder aktualisiert.
+     * Es wird ein eigener Renderer für das ComboBox-Element verwendet, um die Teilnehmer als Avatar anzuzeigen.
+     *
+     * @author Kennet
+     */
     private void configureElements() {
-
         //Combobox
         comboBox.setItems(teilnehmerService.findAllTeilnehmerByUserAndFilter(authenticatedUser.get().get(),""));
         comboBox.setRenderer(new ComponentRenderer<>(teilnehmer -> {
@@ -157,6 +192,11 @@ public class VeranstaltungBearbeiten extends Dialog {
         });
     }
 
+    /**
+     * Bindet die Eingabefelder an die Eigenschaften des Veranstaltung-Objekts.
+     *
+     * @author Kennet
+     */
     private void bindFields() {
         binder.forField(titelField)
                 .asRequired("Titel muss gefüllt sein")
@@ -168,6 +208,11 @@ public class VeranstaltungBearbeiten extends Dialog {
                 .bind(Veranstaltung::getTeilnehmer, Veranstaltung::setTeilnehmer);
     }
 
+    /**
+     * Leert die Eingabefelder des Dialogs.
+     *
+     * @author Kennet
+     */
     public void clearFields(){
         titelField.clear();
         datePicker.clear();

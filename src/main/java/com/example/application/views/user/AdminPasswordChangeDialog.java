@@ -8,7 +8,12 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.PasswordField;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-public class AdminPasswordChange extends Dialog {
+/**
+ * Dialog zur Änderung des Passworts eines Benutzers durch einen Administrator.
+ *
+ * @author Kennet
+ */
+public class AdminPasswordChangeDialog extends Dialog {
 
     PasswordField new_password = new PasswordField("Neues Password");
     PasswordField password_check = new PasswordField("Password wiederholen");
@@ -18,7 +23,15 @@ public class AdminPasswordChange extends Dialog {
     PasswordEncoder passwordEncoder;
     User user;
 
-    public AdminPasswordChange (PasswordEncoder passwordEncoder, UserService userService, User user) {
+    /**
+     * Konstruktor für die AdminPasswordChange Klasse.
+     *
+     * @author Kennet
+     * @param passwordEncoder Ein PasswordEncoder-Objekt, das zum Hashen von Passwörtern verwendet wird.
+     * @param userService Ein UserService-Objekt, das Methoden zur Interaktion mit User-Objekten in der Datenbank bereitstellt.
+     * @param user Das User-Objekt, dessen Passwort geändert werden soll.
+     */
+    public AdminPasswordChangeDialog(PasswordEncoder passwordEncoder, UserService userService, User user) {
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
         this.user = user;
@@ -28,10 +41,21 @@ public class AdminPasswordChange extends Dialog {
         setHeaderTitle("Change Password");
     }
 
+    /**
+     * Erstellt die UI-Elemente für den Dialog.
+     *
+     * @author Kennet
+     */
     private void createElements() {
         add(new_password, password_check);
     }
 
+    /**
+     * Konfiguriert die UI-Elemente für den Dialog.
+     * Überprüft, ob die eingegebenen Passwörter übereinstimmen und speichert das neue Passwort in der Datenbank.
+     *
+     * @author Kennet
+     */
     private void configureElements() {
         new_password.setWidthFull();
         new_password.setRequired(true);
@@ -74,6 +98,12 @@ public class AdminPasswordChange extends Dialog {
         }));
     }
 
+
+    /**
+     * Leert die Eingabefelder des Dialogs.
+     *
+     * @author Kennet
+     */
     private void clearFields () {
         new_password.clear();
         password_check.clear();

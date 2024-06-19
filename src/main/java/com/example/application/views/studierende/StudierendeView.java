@@ -1,7 +1,7 @@
 package com.example.application.views.studierende;
 
 import com.example.application.DoubleToLongConverter;
-import com.example.application.ExcelReader.ExcelExporter;
+import com.example.application.ExcelReader.TeilnehmerExcelExporter;
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
@@ -29,7 +29,6 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.example.application.ExcelReader.ExcelExporter;
 
 
 import com.vaadin.flow.server.StreamResource;
@@ -39,10 +38,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -52,8 +49,6 @@ import java.util.Optional;
 @PageTitle(value = "Studierende")
 @RolesAllowed({"ADMIN", "USER"})
 public class StudierendeView extends VerticalLayout {
-
-    private final ExcelExporter excelExporter;
     private final TeilnehmerService teilnehmerService;
     private final Grid<Teilnehmer> grid = new Grid<>();
     private final Editor<Teilnehmer> editor =grid.getEditor();
@@ -78,10 +73,9 @@ public class StudierendeView extends VerticalLayout {
     Button aufraeumenButton = new Button("Aufräumen");
 
     @Autowired
-    public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser,ExcelExporter excelExporter) {
+    public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
         this.authenticatedUser = authenticatedUser;
         this.teilnehmerService = teilnehmerService;
-        this.excelExporter = excelExporter;
         Aufraeumen aufraeumenDialog = new Aufraeumen(teilnehmerService, authenticatedUser, this);
         DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService, authenticatedUser, aufraeumenDialog, this);
         StudierendeHinzufuegen studierendeHinzufuegen = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser, this);
@@ -130,27 +124,6 @@ public class StudierendeView extends VerticalLayout {
 //            }
 //        });
 
-        exportButton.addClickListener(event -> {
-            Optional<User> maybeUser = authenticatedUser.get();
-            if (maybeUser.isPresent()) {
-                User user = maybeUser.get();
-                List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue());
-                Notification.show(teilnehmerList.toString());
-                File tempFile = createTempFile();
-                if (tempFile != null) {
-                    System.out.println("Temp file created at: " + tempFile.getAbsolutePath()); // Log the file path
-                    Notification.show("File created at: " + tempFile.getAbsolutePath());
-                    excelExporter.exportTeilnehmerListe(teilnehmerList, tempFile.getAbsolutePath(), user.getUsername());
-                    if (tempFile.exists()) {
-                        System.out.println("Temp file exists"); // Check if the file exists
-                    } else {
-                        System.out.println("Temp file does not exist");
-                    }
-                    StreamResource resource = offerDownload(tempFile);
-                    System.out.println("Resource: " + resource.toString()); // Log the resource object
-                }
-            }
-        });
 
         UI.getCurrent().getPage().addBrowserWindowResizeListener(event -> {
             if (event.getWidth() <= 1000) {
@@ -236,6 +209,7 @@ public class StudierendeView extends VerticalLayout {
                 Notification.show("Fehler beim Speichern");
             }
         });
+
         Button cancelButton = new Button(VaadinIcon.CLOSE.create(),
                 e -> editor.cancel());
         cancelButton.addThemeVariants(ButtonVariant.LUMO_ICON,
@@ -258,8 +232,38 @@ public class StudierendeView extends VerticalLayout {
 
         return toolbar;
     }
+
+
     private Component getToolbar2() {
-        HorizontalLayout toolbar2 = new HorizontalLayout(importButton, exportButton, aufraeumenButton);
+
+        // Ein Anchor, unter welchem der Download der Daten möglich ist
+        Anchor anchor = new Anchor();
+        anchor.setText("Download");
+        anchor.getElement().getStyle().set("display", "none");
+        anchor.getElement().setAttribute("download", true);
+        Optional<User> maybeUser = authenticatedUser.get();
+
+        User user = maybeUser.get();
+        List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue());
+
+        // Die eigentlichen Daten werden in diesem Objekt gespeichert und dem Anchor übergeben
+        StreamResource resource = new StreamResource("teilnehmerliste_" + LocalDate.now() + ".xlsx", () -> {
+            byte[] data = null; // Your method to fetch data
+            try {
+                TeilnehmerExcelExporter teilnehmerExcelExporter = new TeilnehmerExcelExporter();
+                data = teilnehmerExcelExporter.export(teilnehmerList);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return new ByteArrayInputStream(data);
+        });
+        anchor.setHref(resource);
+
+        exportButton.addClickListener(event -> {
+            anchor.getElement().callJsFunction("click");
+        });
+
+        HorizontalLayout toolbar2 = new HorizontalLayout(importButton, anchor, exportButton, aufraeumenButton);
 
         toolbar2.addClassName("toolbar");
 
@@ -323,41 +327,6 @@ public class StudierendeView extends VerticalLayout {
         delete.setIcon(deleteIcon);
         delete.setText("Studierenden löschen");
 
-    }
-    private File createTempFile() {
-        try {
-            // Pfad zum Download-Ordner
-            String downloadFolderPath = System.getProperty("user.home") + "/Downloads";
-
-            // Erstellen Sie das Verzeichnis, wenn es noch nicht existiert
-            File dir = new File(downloadFolderPath);
-            if (!dir.exists()) {
-                dir.mkdir();
-            }
-
-            // Erstellen Sie die Datei im Download-Ordner
-            File tempFile = File.createTempFile("export", ".xlsx", dir);
-            return tempFile;
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private StreamResource offerDownload(File file) {
-        System.out.println("File name: " + file.getName());
-    return new StreamResource(file.getName(), () -> {
-        try {
-
-            return new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            System.out.println("File could not be offered: " + file.getName());
-            e.printStackTrace();
-
-            return null;
-        }
-    });
     }
 
 

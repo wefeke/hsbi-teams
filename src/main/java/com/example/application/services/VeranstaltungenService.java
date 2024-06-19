@@ -21,10 +21,12 @@ public class VeranstaltungenService {
         this.veranstaltungenRepository = veranstaltungenRepository;
     }
 
+    @Transactional
     public List<Veranstaltung> findAllVeranstaltungenByUser(User user) {
         return veranstaltungenRepository.findByUser(user);
     }
 
+    @Transactional
     public Veranstaltung findVeranstaltungById(Long id, User user) {
         return veranstaltungenRepository.findByIdAndUser(id, user);
     }

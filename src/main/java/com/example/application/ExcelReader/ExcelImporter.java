@@ -16,13 +16,24 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-
-public class ExcelImporter {
+/**
+ * Eine Klasse zum Importieren von Teilnehmerdaten aus einer Excel-Datei.
+ *
+ * @author Kennet
+ */
+ public class ExcelImporter {
 
     private TeilnehmerService teilnehmerService;
     private List<Teilnehmer> teilnehmerList = new ArrayList<>();
     private User user;
 
+    /**
+     * Konstruktor für die ExcelImporter Klasse.
+     *
+     * @author Kennet
+     * @param teilnehmerService Ein Service, der Methoden zur Interaktion mit Teilnehmer-Objekten in der Datenbank bereitstellt.
+     * @param authenticatedUser Ein AuthenticatedUser-Objekt, das Informationen über den aktuell authentifizierten Benutzer enthält.
+     */
     public ExcelImporter(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
         this.teilnehmerService = teilnehmerService;
         Optional<User> maybeUser = authenticatedUser.get();
@@ -38,7 +49,7 @@ public class ExcelImporter {
      * Wenn ein Teilnehmer mit der gleichen ID bereits in der Datenbank existiert, wird er übersprungen.
      * Wenn ein Teilnehmer mit dem gleichen Vornamen und Nachnamen, aber einer anderen ID existiert, wird eine Nummer an den Nachnamen angehängt.
      *
-     * @author: Kennet
+     * @author Kennet
      * @param inputStream der InputStream der Excel-Datei
      * @return eine Liste von Teilnehmer-Objekten, die aus der Excel-Datei gelesen wurden
      * @throws Exception wenn ein Fehler beim Lesen der Excel-Datei oder bei der Verarbeitung der Daten auftritt

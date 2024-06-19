@@ -27,6 +27,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+/**
+ * Eine Klasse, die die Registrierungsansicht der Anwendung repräsentiert.
+ * Hier können Benutzer ein neues Konto erstellen, um Zugang zu den Funktionen der Anwendung zu erhalten.
+ *
+ * @author Kennet
+ */
 @AnonymousAllowed
 @PageTitle("Registration")
 @Route(value = "registration")
@@ -58,6 +64,15 @@ public class RegistrationView extends VerticalLayout {
     //Hashing of Password
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Konstruktor für die RegistrationView Klasse.
+     * Hier wird das Main-Layout initialisiert und konfiguriert
+     * Es werden Methoden zum Initialisieren und konfigurieren der weiteren UI Elemente aufgerufen.
+     *
+     * @author Kennet
+     * @param userService Ein UserService-Objekt, das Methoden zur Interaktion mit User-Objekten in der Datenbank bereitstellt.
+     * @param passwordEncoder Ein PasswordEncoder-Objekt, das zum Hashen von Passwörtern verwendet wird.
+     */
     public RegistrationView(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
@@ -74,6 +89,12 @@ public class RegistrationView extends VerticalLayout {
         bindFields();
     }
 
+    /**
+     * Erstellt die UI-Elemente für die Registrierungsansicht.
+     *
+     * @author Kennet
+     * @return Ein VerticalLayout-Objekt, das die erstellten UI-Elemente enthält.
+     */
     private VerticalLayout createElements(){
 
         VerticalLayout verticalLayout = new VerticalLayout(submitButton, cancelButton);
@@ -89,15 +110,27 @@ public class RegistrationView extends VerticalLayout {
         );
     }
 
+    /**
+     * Konfiguriert die UI-Elemente für die Registrierungsansicht.
+     * Hier werden die Aktionen für die UI-Elemente festgelegt.
+     * Der Upload-Button ermöglicht das Hochladen eines Profilbildes.
+     * Der Submit-Button speichert den neuen Benutzer in der Datenbank, wenn alle Felder korrekt ausgefüllt sind.
+     * Bei einem Klick auf den Cancel- oder Submit-Button wird der Benutzer zur letzten aufgerufenen URL weitergeleitet.
+     *
+     * @author Kennet
+     */
     private void configureElements(){
         name.setWidthFull();
         username.setWidthFull();
+
         password.setWidthFull();
+        password.addValueChangeListener(event -> checkPasswordsMatch());
+
         password_check.setWidthFull();
-        upload.setWidthFull();
+        password_check.addValueChangeListener(event -> checkPasswordsMatch());
+
         submitButton.setWidthFull();
         submitButton.setThemeName("primary");
-
         submitButton.addClickListener(event -> {
             User user = new User();
             if (binder.writeBeanIfValid(user)) {
@@ -107,9 +140,6 @@ public class RegistrationView extends VerticalLayout {
                 if (user.getPassword() != null) {
                     user.setPassword(passwordEncoder.encode(user.getPassword())); // encode the password
                     userService.saveUser(user); //Angemeldeten User holen
-                }
-                else {
-                    Notification.show("Please enter a password" + user.getPassword());
                 }
 
                 Notification.show("User " + user.getName() + " angelegt!");
@@ -136,10 +166,8 @@ public class RegistrationView extends VerticalLayout {
             }
         });
 
-        password.addValueChangeListener(event -> checkPasswordsMatch());
-        password_check.addValueChangeListener(event -> checkPasswordsMatch());
-
         //Image Handling
+        upload.setWidthFull();
         upload.addSucceededListener(event -> {
             InputStream inputStream = buffer.getInputStream(event.getFileName());
             ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
@@ -162,6 +190,12 @@ public class RegistrationView extends VerticalLayout {
         upload.setMaxFiles(1);
     }
 
+    /**
+     * Überprüft, ob die eingegebenen Passwörter übereinstimmen.
+     * Wenn die Passwörter nicht übereinstimmen, wird eine Fehlermeldung angezeigt.
+     *
+     * @author Kennet
+     */
     private void checkPasswordsMatch() {
         if(!password.getValue().equals(password_check.getValue())){
             password_check.setInvalid(true);
@@ -172,6 +206,12 @@ public class RegistrationView extends VerticalLayout {
         }
     }
 
+    /**
+     * Bindet die UI-Elemente an die Felder des User-Objekts.
+     * Hier werden auch die Validatoren für die UI-Elemente festgelegt.
+     *
+     * @author Kennet
+     */
     private void bindFields(){
         //binder.forField(ID).bind(User::getId, User::setId);
         binder.forField(name)
@@ -189,6 +229,11 @@ public class RegistrationView extends VerticalLayout {
         password_check.setRequired(true);
     }
 
+    /**
+     * Leert die Eingabefelder der Registrierungsansicht.
+     *
+     * @author Kennet
+     */
     private void clearFields(){
         name.clear();
         username.clear();

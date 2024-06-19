@@ -19,6 +19,11 @@ import com.vaadin.flow.data.binder.*;
 
 import java.util.Optional;
 
+/**
+ * Dialog zur Bearbeitung eines Veranstaltungstermins.
+ *
+ * @author Kennet
+ */
 public class VeranstaltungsterminBearbeiten extends Dialog {
 
     //Services
@@ -45,6 +50,20 @@ public class VeranstaltungsterminBearbeiten extends Dialog {
     //Data Binder
     Binder<Veranstaltungstermin> binder = new Binder<>(Veranstaltungstermin.class);
 
+    /**
+     * Konstruktor für die VeranstaltungsterminBearbeiten Klasse.
+     * Ruft die Methoden zum Erstellen und Konfigurieren der UI-Elemente auf.
+     *
+     * @author Kennet
+     * @param veranstaltungService Ein VeranstaltungenService-Objekt, das Methoden zur Interaktion mit Veranstaltungs-Objekten in der Datenbank bereitstellt.
+     * @param veranstaltungsterminService Ein VeranstaltungsterminService-Objekt, das Methoden zur Interaktion mit Veranstaltungstermin-Objekten in der Datenbank bereitstellt.
+     * @param veranstaltungDetailView Ein VeranstaltungDetailView-Objekt, das die Ansicht der Veranstaltungsdetails repräsentiert.
+     * @param veranstaltungId Die ID der Veranstaltung, für die der Veranstaltungstermin bearbeitet wird.
+     * @param veranstaltungsterminId Die ID des zu bearbeitenden Veranstaltungstermins.
+     * @param authenticatedUser Ein AuthenticatedUser-Objekt, das Informationen über den authentifizierten Benutzer enthält.
+     * @param aktiverVeranstaltungstermin Ein Veranstaltungstermin-Objekt, das den aktiven Veranstaltungstermin repräsentiert.
+     * @param aktiveGruppenarbeit Ein Gruppenarbeit-Objekt, das die aktive Gruppenarbeit repräsentiert.
+     */
     public VeranstaltungsterminBearbeiten(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungDetailView veranstaltungDetailView, String veranstaltungId, Long veranstaltungsterminId, AuthenticatedUser authenticatedUser, Veranstaltungstermin aktiverVeranstaltungstermin, Gruppenarbeit aktiveGruppenarbeit) {
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
@@ -61,6 +80,12 @@ public class VeranstaltungsterminBearbeiten extends Dialog {
         readBean();
     }
 
+    /**
+     * Erstellt das Layout für den Dialog.
+     *
+     * @author Kennet
+     * @return Ein HorizontalLayout-Objekt, das das Layout des Dialogs repräsentiert.
+     */
     private HorizontalLayout createLayout () {
 
         setHeaderTitle("Veranstaltungstermin hinzufügen");
@@ -82,6 +107,12 @@ public class VeranstaltungsterminBearbeiten extends Dialog {
         );
     }
 
+    /**
+     * Konfiguriert die UI-Elemente für den Dialog.
+     * Speichert die Änderungen an dem Veranstaltungstermin in der Datenbank.
+     *
+     * @author Kennet
+     */
     private void configureElements(){
         //Footer Button Implementation
         saveButton.addClickListener( event -> {
@@ -114,6 +145,11 @@ public class VeranstaltungsterminBearbeiten extends Dialog {
         });
     }
 
+    /**
+     * Bindet die Eingabefelder an die Eigenschaften des Veranstaltungstermin-Objekts.
+     *
+     * @author Kennet
+     */
     private void bindFields(){
         binder.forField(notizen)
                 .bind(Veranstaltungstermin::getTitel, Veranstaltungstermin::setTitel);
@@ -133,11 +169,22 @@ public class VeranstaltungsterminBearbeiten extends Dialog {
 
     }
 
+    /**
+     * Liest die Eigenschaften des Veranstaltungstermin-Objekts und aktualisiert die Eingabefelder entsprechend.
+     *
+     * @author Kennet
+     */
     public void readBean (){
         //Read Data from the Binder
         binder.readBean(veranstaltungsterminService.findVeranstaltungsterminById(veranstaltungsterminId));
     }
 
+    /**
+     * Speichert den bearbeiteten Veranstaltungstermin in der Datenbank.
+     *
+     * @author Kennet
+     * @param veranstaltungstermin Ein Veranstaltungstermin-Objekt, das den zu speichernden Veranstaltungstermin repräsentiert.
+     */
     public void persistVeranstaltungstermin (Veranstaltungstermin veranstaltungstermin) {
         if (binder.writeBeanIfValid(veranstaltungstermin)){ //Validierung der neuen Instanz
             veranstaltungstermin.setId(veranstaltungsterminId);
@@ -152,6 +199,11 @@ public class VeranstaltungsterminBearbeiten extends Dialog {
         }
     }
 
+    /**
+     * Leert die Eingabefelder des Dialogs.
+     *
+     * @author Kennet
+     */
     public void clearFields(){
         //Clear all Fields after saving
         datePicker.clear();
