@@ -24,6 +24,7 @@ public class GruppenarbeitLoeschenDialog extends Dialog {
     private Veranstaltungstermin veranstaltungstermin;
     private VeranstaltungsterminService veranstaltungsterminService;
     private VeranstaltungDetailView veranstaltungDetailView;
+    private Gruppenarbeit aktiveGruppenarbeit;
 
     //Services
     private GruppenarbeitService gruppenarbeitService;
@@ -36,9 +37,10 @@ public class GruppenarbeitLoeschenDialog extends Dialog {
     Button deleteBtn = new Button("Gruppenarbeit endgültig löschen");
     Button cancelBtn = new Button("Abbrechen");
 
-    public GruppenarbeitLoeschenDialog(GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungDetailView veranstaltungsdetailView) {
+    public GruppenarbeitLoeschenDialog(GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungDetailView veranstaltungsdetailView, Gruppenarbeit aktiveGruppenarbeit) {
         this.gruppenarbeitService = gruppenarbeitService;
         this.veranstaltungDetailView = veranstaltungsdetailView;
+        this.aktiveGruppenarbeit = aktiveGruppenarbeit;
         this.gruppenarbeit = null;
         this.gruppeService = gruppeService;
         this.veranstaltungstermin = null;
@@ -62,17 +64,18 @@ public class GruppenarbeitLoeschenDialog extends Dialog {
             this.veranstaltungstermin.removeGruppenarbeit(gruppenarbeit);
             veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
 
+            if (veranstaltungstermin != null) {
+                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(veranstaltungstermin);
+
+                if (aktiveGruppenarbeit != gruppenarbeit && aktiveGruppenarbeit != null) {
+                    veranstaltungDetailView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
+                }
+            }
+
             gruppenarbeitService.deleteGruppenarbeit(gruppenarbeit);
 
             close();
 
-            if (veranstaltungstermin != null) {
-                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(veranstaltungstermin);
-
-                if (gruppenarbeit != null) {
-                    veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
-                }
-            }
             veranstaltungDetailView.update();
         });
 

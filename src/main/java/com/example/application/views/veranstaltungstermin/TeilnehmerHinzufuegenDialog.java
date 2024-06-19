@@ -80,6 +80,7 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         configureGrid();
 
         Button cancelButton = new Button("Abbrechen", e -> close());
+        this.setHeaderTitle("Teilnehmer hinzufügen");
         add(
                 getToolbar(),
                 getContent(),
