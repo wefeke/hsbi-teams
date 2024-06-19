@@ -233,6 +233,7 @@ public class StudierendeView extends VerticalLayout {
         return toolbar;
     }
 
+
     private Component getToolbar2() {
 
         // Ein Anchor, unter welchem der Download der Daten möglich ist
