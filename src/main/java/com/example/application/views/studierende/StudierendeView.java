@@ -328,27 +328,5 @@ public class StudierendeView extends VerticalLayout {
 
     }
 
-    private File createTempFile() {
-        try {
-            // Create a temporary file in the system's default temporary-file directory
-            File tempFile = File.createTempFile("export", ".xlsx");
-            return tempFile;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private StreamResource offerDownload(File file) {
-        return new StreamResource(file.getName(), () -> {
-            try {
-                return new FileInputStream(file);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                return null;
-            }
-        });
-    }
-
 
 }
