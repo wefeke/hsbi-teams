@@ -15,6 +15,7 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -56,9 +57,6 @@ public class VeranstaltungsterminLoeschenDialog extends Dialog {
         noReturn.getStyle().set("white-space", "pre-line");
 
         deleteBtn.addClickListener(event -> {
-            List<Gruppenarbeit> gruppenarbeiten = veranstaltungstermin.getGruppenarbeiten();
-            veranstaltungstermin.removeAllGruppenarbeiten();
-            veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
 
             if (aktiverVeranstaltungstermin != null) {
                 veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(aktiverVeranstaltungstermin);
@@ -68,22 +66,7 @@ public class VeranstaltungsterminLoeschenDialog extends Dialog {
                 }
             }
 
-            for(Gruppenarbeit gruppenarbeit: gruppenarbeiten){
-                List<Gruppe> gruppen = gruppenarbeit.getGruppen();
-                gruppenarbeit.removeAllGruppen();
-                gruppenarbeitService.save(gruppenarbeit);
-
-                for (Gruppe gruppe : gruppen) {
-                    gruppeService.deleteGruppe(gruppe);
-                }
-
-                this.veranstaltungstermin.removeGruppenarbeit(gruppenarbeit);
-                veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
-
-                gruppenarbeitService.deleteGruppenarbeit(gruppenarbeit);
-            }
-
-            veranstaltungsterminService.deleteVeranstaltungstermin(veranstaltungstermin);
+            deleteEverything(gruppeService, gruppenarbeitService, veranstaltungsterminService);
             veranstaltungsterminView.update();
 
             close();
@@ -94,6 +77,30 @@ public class VeranstaltungsterminLoeschenDialog extends Dialog {
 
         add(createLayout());
 
+    }
+
+    @Transactional
+    protected void deleteEverything(GruppeService gruppeService, GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService) {
+        List<Gruppenarbeit> gruppenarbeiten = veranstaltungstermin.getGruppenarbeiten();
+        veranstaltungstermin.removeAllGruppenarbeiten();
+        veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
+
+        for(Gruppenarbeit gruppenarbeit: gruppenarbeiten){
+            List<Gruppe> gruppen = gruppenarbeit.getGruppen();
+            gruppenarbeit.removeAllGruppen();
+            gruppenarbeitService.save(gruppenarbeit);
+
+            for (Gruppe gruppe : gruppen) {
+                gruppeService.deleteGruppe(gruppe);
+            }
+
+            this.veranstaltungstermin.removeGruppenarbeit(gruppenarbeit);
+            veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
+
+            gruppenarbeitService.deleteGruppenarbeit(gruppenarbeit);
+        }
+
+        veranstaltungsterminService.deleteVeranstaltungstermin(veranstaltungstermin);
     }
 
     public void setVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin) {

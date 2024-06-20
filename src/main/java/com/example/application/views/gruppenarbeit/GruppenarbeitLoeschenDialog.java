@@ -15,6 +15,7 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -54,25 +55,7 @@ public class GruppenarbeitLoeschenDialog extends Dialog {
         deleteBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         deleteBtn.addClickListener(event -> {
-            List<Gruppe> gruppen = gruppenarbeit.getGruppen();
-            gruppenarbeit.removeAllGruppen();
-            gruppenarbeitService.save(gruppenarbeit);
-
-            for (Gruppe gruppe : gruppen) {
-                gruppeService.deleteGruppe(gruppe);
-            }
-            this.veranstaltungstermin.removeGruppenarbeit(gruppenarbeit);
-            veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
-
-            if (veranstaltungstermin != null) {
-                veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(veranstaltungstermin);
-
-                if (aktiveGruppenarbeit != gruppenarbeit && aktiveGruppenarbeit != null) {
-                    veranstaltungsterminView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
-                }
-            }
-
-            gruppenarbeitService.deleteGruppenarbeit(gruppenarbeit);
+            deleteEverything(gruppenarbeitService, gruppeService, veranstaltungsterminService, aktiveGruppenarbeit);
 
             close();
 
@@ -83,6 +66,29 @@ public class GruppenarbeitLoeschenDialog extends Dialog {
 
         add(createLayout());
 
+    }
+
+    @Transactional
+    protected void deleteEverything(GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungsterminService veranstaltungsterminService, Gruppenarbeit aktiveGruppenarbeit) {
+        List<Gruppe> gruppen = gruppenarbeit.getGruppen();
+        gruppenarbeit.removeAllGruppen();
+        gruppenarbeitService.save(gruppenarbeit);
+
+        for (Gruppe gruppe : gruppen) {
+            gruppeService.deleteGruppe(gruppe);
+        }
+        this.veranstaltungstermin.removeGruppenarbeit(gruppenarbeit);
+        veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
+
+        if (veranstaltungstermin != null) {
+            veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(veranstaltungstermin);
+
+            if (aktiveGruppenarbeit != gruppenarbeit && aktiveGruppenarbeit != null) {
+                veranstaltungsterminView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
+            }
+        }
+
+        gruppenarbeitService.deleteGruppenarbeit(gruppenarbeit);
     }
 
     public void setGruppenarbeit(Gruppenarbeit gruppenarbeit) {
