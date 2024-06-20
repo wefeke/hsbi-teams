@@ -37,13 +37,13 @@ public class TeilnehmerEntfernenDialog extends Dialog {
      * @param teilnehmerService der Service zur Verwaltung von Teilnehmern
      * @param veranstaltungId die ID der Veranstaltung, aus der der Teilnehmer entfernt werden soll
      * @param authenticatedUser der authentifizierte Benutzer, der die Aktion ausführt
-     * @param veranstaltungDetailView die Detailansicht der Veranstaltung, die aktualisiert wird
+     * @param veranstaltungsterminView die Detailansicht der Veranstaltung, die aktualisiert wird
      * @param veranstaltungstermin der Veranstaltungstermin, der aktualisiert wird
      * @param gruppenarbeit die Gruppenarbeit, die aktualisiert wird
      *
      * @autor Joris
      */
-    public TeilnehmerEntfernenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser, VeranstaltungDetailView veranstaltungDetailView, Veranstaltungstermin veranstaltungstermin, Gruppenarbeit gruppenarbeit) {
+    public TeilnehmerEntfernenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser, VeranstaltungsterminView veranstaltungsterminView, Veranstaltungstermin veranstaltungstermin, Gruppenarbeit gruppenarbeit) {
         this.teilnehmerService = teilnehmerService;
         this.veranstaltungId = veranstaltungId;
 
@@ -73,13 +73,13 @@ public class TeilnehmerEntfernenDialog extends Dialog {
             }
 
             if (veranstaltungstermin != null) {
-                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(veranstaltungstermin);
+                veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(veranstaltungstermin);
 
                 if (gruppenarbeit != null) {
-                    veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+                    veranstaltungsterminView.setAktiveKachelGruppenarbeit(gruppenarbeit);
                 }
             }
-            veranstaltungDetailView.update();
+            veranstaltungsterminView.update();
 
             close();
         });

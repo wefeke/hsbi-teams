@@ -3,7 +3,7 @@ package com.example.application.views.gruppe;
 import com.example.application.models.*;
 import com.example.application.services.GruppenarbeitTeilnehmerService;
 import com.example.application.views.auswertung.Auswertung;
-import com.example.application.views.veranstaltungstermin.VeranstaltungDetailView;
+import com.example.application.views.veranstaltungstermin.VeranstaltungsterminView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -39,15 +39,15 @@ public class GruppeAuswertungDialog extends Dialog {
     // Service
     private final GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService;
     // View zum zurücknavigieren
-    private VeranstaltungDetailView veranstaltungDetailView;
+    private VeranstaltungsterminView veranstaltungsterminView;
 
 
-    public GruppeAuswertungDialog(Teilnehmer teilnehmer, Gruppenarbeit gruppenarbeit, GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService, VeranstaltungDetailView veranstaltungDetailView) {
+    public GruppeAuswertungDialog(Teilnehmer teilnehmer, Gruppenarbeit gruppenarbeit, GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService, VeranstaltungsterminView veranstaltungsterminView) {
         this.teilnehmer = teilnehmer;
         this.gruppenarbeit = gruppenarbeit;
         this.gruppenarbeitTeilnehmerService = gruppenarbeitTeilnehmerService;
         this.gruppenarbeitTeilnehmer = new GruppenarbeitTeilnehmer();
-        this.veranstaltungDetailView = veranstaltungDetailView;
+        this.veranstaltungsterminView = veranstaltungsterminView;
         gruppenarbeitTeilnehmer.setId(new GruppenarbeitTeilnehmerId(teilnehmer.getId(),gruppenarbeit.getId()));
         gruppenarbeitTeilnehmerResult = gruppenarbeitTeilnehmerService.findByID(gruppenarbeitTeilnehmer.getId()
         );
@@ -116,12 +116,12 @@ public class GruppeAuswertungDialog extends Dialog {
                 clearFields();
 
             if (gruppenarbeit.getVeranstaltungstermin() != null) {
-                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
+                veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
             }
 
-            veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+            veranstaltungsterminView.setAktiveKachelGruppenarbeit(gruppenarbeit);
 
-            veranstaltungDetailView.update();
+            veranstaltungsterminView.update();
         });
 
 

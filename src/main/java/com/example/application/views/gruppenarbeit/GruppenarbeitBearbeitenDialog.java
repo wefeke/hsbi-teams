@@ -4,8 +4,7 @@ package com.example.application.views.gruppenarbeit;
 
 import com.example.application.models.Gruppenarbeit;
 import com.example.application.services.GruppenarbeitService;
-import com.example.application.views.veranstaltungstermin.VeranstaltungDetailView;
-import com.vaadin.flow.component.UI;
+import com.example.application.views.veranstaltungstermin.VeranstaltungsterminView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -25,7 +24,7 @@ public class GruppenarbeitBearbeitenDialog extends Dialog {
 
     //Data
     private Gruppenarbeit gruppenarbeit;
-    private VeranstaltungDetailView veranstaltungDetailView;
+    private VeranstaltungsterminView veranstaltungsterminView;
 
     //UI Elements
     H3 infoText = new H3();
@@ -35,9 +34,9 @@ public class GruppenarbeitBearbeitenDialog extends Dialog {
     Button cancelBtn = new Button("Abbrechen");
 
 
-    public GruppenarbeitBearbeitenDialog(GruppenarbeitService gruppenarbeitService, VeranstaltungDetailView veranstaltungDetailView) {
+    public GruppenarbeitBearbeitenDialog(GruppenarbeitService gruppenarbeitService, VeranstaltungsterminView veranstaltungsterminView) {
         this.gruppenarbeitService = gruppenarbeitService;
-        this.veranstaltungDetailView = veranstaltungDetailView;
+        this.veranstaltungsterminView = veranstaltungsterminView;
         this.gruppenarbeit = null;
 
         bindFields();
@@ -78,13 +77,13 @@ public class GruppenarbeitBearbeitenDialog extends Dialog {
             saveChanges();
 
             if (gruppenarbeit.getVeranstaltungstermin() != null) {
-                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
+                veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
 
                 if (gruppenarbeit != null) {
-                    veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+                    veranstaltungsterminView.setAktiveKachelGruppenarbeit(gruppenarbeit);
                 }
             }
-            veranstaltungDetailView.update();
+            veranstaltungsterminView.update();
 
             close();
         });

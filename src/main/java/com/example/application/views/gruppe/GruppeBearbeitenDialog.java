@@ -7,7 +7,7 @@ import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.GruppeService;
 import com.example.application.services.GruppenarbeitService;
-import com.example.application.views.veranstaltungstermin.VeranstaltungDetailView;
+import com.example.application.views.veranstaltungstermin.VeranstaltungsterminView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -38,7 +38,7 @@ public class GruppeBearbeitenDialog extends Dialog {
     ArrayList<GridListDataView<Teilnehmer>> dataViews = new ArrayList<>();
     private final AuthenticatedUser authenticatedUser;
     private List<H5> titles = new ArrayList<>();
-    private VeranstaltungDetailView veranstaltungDetailView;
+    private VeranstaltungsterminView veranstaltungsterminView;
     private List<Button> deleteButtons = new ArrayList<>();
 
     //UI Elements
@@ -55,12 +55,12 @@ public class GruppeBearbeitenDialog extends Dialog {
     //Test
     private Teilnehmer draggedItem;
 
-    public GruppeBearbeitenDialog(Gruppenarbeit gruppenarbeit, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, AuthenticatedUser authenticatedUser, VeranstaltungDetailView veranstaltungDetailView) {
+    public GruppeBearbeitenDialog(Gruppenarbeit gruppenarbeit, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, AuthenticatedUser authenticatedUser, VeranstaltungsterminView veranstaltungsterminView) {
         this.gruppenarbeit = gruppenarbeit;
         this.gruppenarbeitService = gruppenarbeitService;
         this.gruppeService = gruppeService;
         this.authenticatedUser = authenticatedUser;
-        this.veranstaltungDetailView = veranstaltungDetailView;
+        this.veranstaltungsterminView = veranstaltungsterminView;
         this.gruppen = gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId()).getGruppen();
         this.allTeilnehmer = gruppenarbeit.getVeranstaltungstermin().getVeranstaltung().getTeilnehmer();
         this.gruppenarbeitTeilnehmer = gruppenarbeit.getTeilnehmer();
@@ -113,10 +113,10 @@ public class GruppeBearbeitenDialog extends Dialog {
             saveUpdatesToGruppenarbeit();
 
             if (gruppenarbeit.getVeranstaltungstermin() != null) {
-                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
-                veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+                veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
+                veranstaltungsterminView.setAktiveKachelGruppenarbeit(gruppenarbeit);
             }
-            veranstaltungDetailView.update();
+            veranstaltungsterminView.update();
             close();
         });
 

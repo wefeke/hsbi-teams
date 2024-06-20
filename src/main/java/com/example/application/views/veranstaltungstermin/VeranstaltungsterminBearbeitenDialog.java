@@ -39,7 +39,7 @@ public class VeranstaltungsterminBearbeitenDialog extends Dialog {
     private final TextField notizen = new TextField("Notizen");
     private final Button cancelButton= new Button("Abbrechen");
     private final Button saveButton= new Button("Änderungen speichern");
-    private final VeranstaltungDetailView veranstaltungDetailView;
+    private final VeranstaltungsterminView veranstaltungsterminView;
     private final Long veranstaltungsterminId;
 
     private final AuthenticatedUser authenticatedUser;
@@ -57,18 +57,18 @@ public class VeranstaltungsterminBearbeitenDialog extends Dialog {
      * @author Kennet
      * @param veranstaltungService Ein VeranstaltungenService-Objekt, das Methoden zur Interaktion mit Veranstaltungs-Objekten in der Datenbank bereitstellt.
      * @param veranstaltungsterminService Ein VeranstaltungsterminService-Objekt, das Methoden zur Interaktion mit Veranstaltungstermin-Objekten in der Datenbank bereitstellt.
-     * @param veranstaltungDetailView Ein VeranstaltungDetailView-Objekt, das die Ansicht der Veranstaltungsdetails repräsentiert.
+     * @param veranstaltungsterminView Ein VeranstaltungDetailView-Objekt, das die Ansicht der Veranstaltungsdetails repräsentiert.
      * @param veranstaltungId Die ID der Veranstaltung, für die der Veranstaltungstermin bearbeitet wird.
      * @param veranstaltungsterminId Die ID des zu bearbeitenden Veranstaltungstermins.
      * @param authenticatedUser Ein AuthenticatedUser-Objekt, das Informationen über den authentifizierten Benutzer enthält.
      * @param aktiverVeranstaltungstermin Ein Veranstaltungstermin-Objekt, das den aktiven Veranstaltungstermin repräsentiert.
      * @param aktiveGruppenarbeit Ein Gruppenarbeit-Objekt, das die aktive Gruppenarbeit repräsentiert.
      */
-    public VeranstaltungsterminBearbeitenDialog(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungDetailView veranstaltungDetailView, String veranstaltungId, Long veranstaltungsterminId, AuthenticatedUser authenticatedUser, Veranstaltungstermin aktiverVeranstaltungstermin, Gruppenarbeit aktiveGruppenarbeit) {
+    public VeranstaltungsterminBearbeitenDialog(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungsterminView veranstaltungsterminView, String veranstaltungId, Long veranstaltungsterminId, AuthenticatedUser authenticatedUser, Veranstaltungstermin aktiverVeranstaltungstermin, Gruppenarbeit aktiveGruppenarbeit) {
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
         this.veranstaltungId = veranstaltungId;
-        this.veranstaltungDetailView = veranstaltungDetailView;
+        this.veranstaltungsterminView = veranstaltungsterminView;
         this.veranstaltungsterminId = veranstaltungsterminId;
         this.authenticatedUser = authenticatedUser;
         this.aktiverVeranstaltungstermin = aktiverVeranstaltungstermin;
@@ -125,15 +125,15 @@ public class VeranstaltungsterminBearbeitenDialog extends Dialog {
                 close();
                 clearFields();
 
-                veranstaltungDetailView.removeAndAddTerminToTermine(veranstaltungstermin, veranstaltungsterminId);
+                veranstaltungsterminView.removeAndAddTerminToTermine(veranstaltungstermin, veranstaltungsterminId);
 
                 if (aktiverVeranstaltungstermin != null) {
-                    veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(aktiverVeranstaltungstermin);
+                    veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(aktiverVeranstaltungstermin);
                     if (aktiveGruppenarbeit != null) {
-                        veranstaltungDetailView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
+                        veranstaltungsterminView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
                     }
                 }
-                veranstaltungDetailView.update();
+                veranstaltungsterminView.update();
 
             }
         });

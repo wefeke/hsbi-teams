@@ -40,7 +40,7 @@ import java.util.*;
 @PageTitle("Veranstaltung Detail")
 @Route(value = "veranstaltung-detail/:veranstaltungId", layout = MainLayout.class)
 @RolesAllowed({"ADMIN", "USER"})
-public class VeranstaltungDetailView extends VerticalLayout implements HasUrlParameter<String> {
+public class VeranstaltungsterminView extends VerticalLayout implements HasUrlParameter<String> {
 
     //Services
     private final VeranstaltungenService veranstaltungService;
@@ -105,7 +105,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
      *
      * @author Joris
      */
-    public VeranstaltungDetailView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, GruppeService gruppeService, GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService, AuthenticatedUser authenticatedUser) {
+    public VeranstaltungsterminView(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, GruppeService gruppeService, GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService, AuthenticatedUser authenticatedUser) {
         // Initialisierung der Services
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
