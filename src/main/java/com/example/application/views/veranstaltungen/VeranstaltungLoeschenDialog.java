@@ -1,6 +1,7 @@
 package com.example.application.views.veranstaltungen;
 
 import com.example.application.models.*;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.*;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -14,6 +15,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class VeranstaltungLoeschenDialog extends Dialog {
@@ -26,6 +28,7 @@ public class VeranstaltungLoeschenDialog extends Dialog {
     private final GruppeService gruppeService;
     private final VeranstaltungenService veranstaltungenService;
     private final TeilnehmerService teilnehmerService;
+    private AuthenticatedUser authenticatedUser;
 
     //UI Elements
     H2 infoText = new H2("Empty");
@@ -34,7 +37,8 @@ public class VeranstaltungLoeschenDialog extends Dialog {
     Paragraph warningText = new Paragraph("Empty");
     Paragraph noReturn = new Paragraph("Empty");
 
-    public VeranstaltungLoeschenDialog(VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungenService veranstaltungenService, TeilnehmerService teilnehmerService, VeranstaltungenView veranstaltungenView) {
+    public VeranstaltungLoeschenDialog(VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungenService veranstaltungenService, TeilnehmerService teilnehmerService, VeranstaltungenView veranstaltungenView, AuthenticatedUser authenticatedUser) {
+        this.authenticatedUser = authenticatedUser;
         warningText.addClassName("warning-text-delete");
         warningText.getStyle().set("white-space", "pre-line");
         noReturn.addClassName("no-return-text-delete");
@@ -49,10 +53,18 @@ public class VeranstaltungLoeschenDialog extends Dialog {
         deleteBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         deleteBtn.addClickListener(event -> {
-            List<Veranstaltungstermin> termine = this.veranstaltung.getVeranstaltungstermine();
-            this.veranstaltung.removeAllTermine();
-            Set<Teilnehmer> teilnehmer = this.veranstaltung.getTeilnehmer();
-            this.veranstaltung.removeAllTeilnehmer();
+
+            Optional<User> maybeUser = authenticatedUser.get();
+            if (maybeUser.isPresent()) {
+                User user = maybeUser.get();
+                this.veranstaltung = veranstaltungenService.findVeranstaltungById(this.veranstaltung.getId(), user);
+            }
+
+            assert veranstaltung != null;
+            List<Veranstaltungstermin> termine = veranstaltung.getVeranstaltungstermine();
+            veranstaltung.removeAllTermine();
+            Set<Teilnehmer> teilnehmer = veranstaltung.getTeilnehmer();
+            veranstaltung.removeAllTeilnehmer();
             veranstaltungenService.saveVeranstaltung(veranstaltung);
 
             String str = "";

@@ -5,7 +5,6 @@ import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
-import com.example.application.views.veranstaltungen.VeranstaltungenView;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.Key;
@@ -20,7 +19,7 @@ import jakarta.annotation.security.RolesAllowed;
 import java.util.Optional;
 
 @RolesAllowed({"ADMIN", "USER"})
-public class StudierendeHinzufuegen extends Dialog {
+public class StudierendeHinzufuegenDialog extends Dialog {
 
     private final TeilnehmerService teilnehmerService;
     private AuthenticatedUser authenticatedUser;
@@ -35,7 +34,7 @@ public class StudierendeHinzufuegen extends Dialog {
     Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
     private StudierendeView studierendeView;
 
-    public StudierendeHinzufuegen(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser,StudierendeView studierendeView){
+    public StudierendeHinzufuegenDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, StudierendeView studierendeView){
         this.teilnehmerService = teilnehmerService;
         this.authenticatedUser = authenticatedUser;
         this.studierendeView = studierendeView;
@@ -66,7 +65,7 @@ public class StudierendeHinzufuegen extends Dialog {
                 } else {
                     saveTeilnehmer();
                     Notification.show("Teilnehmer gespeichert", 3000, Notification.Position.MIDDLE);
-                    //close();
+                    close();
                 }
             } else {
                 Notification.show("Bitte füllen Sie alle Felder aus", 3000, Notification.Position.MIDDLE);
@@ -132,50 +131,3 @@ public class StudierendeHinzufuegen extends Dialog {
         matrikelNr.clear();
     }
 }
-
-//        if (teilnehmer == null) {
-//            teilnehmer = new Teilnehmer();
-//        }
-//        teilnehmer.setVorname(firstName.getValue());
-//        teilnehmer.setNachname(lastName.getValue());
-//        teilnehmer.setId(matrikelNr.getValue().longValue());
-//
-//        Optional<User> maybeUser = authenticatedUser.get();
-//        User user = maybeUser.get();
-//        teilnehmerService.saveTeilnehmer(teilnehmer,user);
-//public class StudierendeHinzufuegen extends FormLayout {
-//
-//    private final TeilnehmerService teilnehmerService;
-//
-//    //User
-//    private AuthenticatedUser authenticatedUser;
-//
-//    TextField firstName = new TextField("Vorname");
-//    TextField lastName = new TextField("Nachname");
-//    NumberField matrikelNr = new NumberField("Matrikelnummer");
-//    Button save = new Button("Save");
-//    private Teilnehmer teilnehmer;
-//    Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
-//
-//    public StudierendeHinzufuegen(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
-//        this.teilnehmerService = teilnehmerService;
-//        this.authenticatedUser = authenticatedUser;
-//
-//
-//        add(
-//                createLayout(),
-//                new HorizontalLayout(save)
-//        );
-//
-//        configureSaveButton();
-//        bindFields();
-//    }
-
-//    public void setTeilnehmer(Teilnehmer teilnehmer) {
-//        this.teilnehmer = teilnehmer;
-//        if (teilnehmer != null) {
-//            firstName.setValue(teilnehmer.getVorname());
-//            lastName.setValue(teilnehmer.getNachname());
-//            matrikelNr.setValue(teilnehmer.getId().doubleValue());
-//        }
-//    }

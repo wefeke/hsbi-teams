@@ -18,8 +18,10 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class TeilnehmerHinzufuegenDialog extends Dialog {
 
@@ -33,7 +35,7 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
     private final TeilnehmerErstellenDialog dialog;
     private final AuthenticatedUser authenticatedUser;
 
-    public TeilnehmerHinzufuegenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser, VeranstaltungDetailView veranstaltungDetailView, Veranstaltungstermin veranstaltungstermin, Gruppenarbeit gruppenarbeit) {
+    public TeilnehmerHinzufuegenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser, VeranstaltungsterminView veranstaltungsterminView, Veranstaltungstermin veranstaltungstermin, Gruppenarbeit gruppenarbeit) {
         this.teilnehmerService = teilnehmerService;
         this.veranstaltungId = veranstaltungId;
         this.authenticatedUser = authenticatedUser;
@@ -60,13 +62,13 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
                     Notification.show(selectedTeilnehmer.size() + " Teilnehmer wurden hinzugefügt");
 
                     if (veranstaltungstermin != null) {
-                        veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(veranstaltungstermin);
+                        veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(veranstaltungstermin);
 
                         if (gruppenarbeit != null) {
-                            veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+                            veranstaltungsterminView.setAktiveKachelGruppenarbeit(gruppenarbeit);
                         }
                     }
-                    veranstaltungDetailView.update();
+                    veranstaltungsterminView.update();
 
                     updateGrid();
                     close();
@@ -81,10 +83,10 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
 
         Button cancelButton = new Button("Abbrechen", e -> close());
         this.setHeaderTitle("Teilnehmer hinzufügen");
+        getFooter().add(cancelButton);
         add(
                 getToolbar(),
-                getContent(),
-                cancelButton
+                getContent()
         );
 
         updateGrid();
@@ -105,10 +107,17 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
     }
 
     public void updateGrid() {
-            Optional<User> maybeUser = authenticatedUser.get();
-            if (maybeUser.isPresent()) {
-                User user = maybeUser.get();
-                grid.setItems(teilnehmerService.findAllTeilnehmerNotInVeranstaltung(veranstaltungId, user));
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+            String searchText = filterText.getValue().toLowerCase();
+            List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmerNotInVeranstaltung(veranstaltungId, user);
+            List<Teilnehmer> filteredTeilnehmerList = teilnehmerList.stream()
+                    .filter(teilnehmer -> teilnehmer.getVorname().toLowerCase().contains(searchText)
+                            || teilnehmer.getNachname().toLowerCase().contains(searchText)
+                            || Long.toString(teilnehmer.getId()).contains(searchText)) // Vergleicht den Suchtext mit der Matrikelnummer
+                    .collect(Collectors.toList());
+            grid.setItems(filteredTeilnehmerList);
         }
     }
 

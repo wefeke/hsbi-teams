@@ -28,7 +28,7 @@ import java.util.Optional;
  *
  * @author Kennet
  */
-public class VeranstaltungsterminDialog extends Dialog {
+public class VeranstaltungsterminHinzufuegenDialog extends Dialog {
 
     //Services
     private final VeranstaltungenService veranstaltungService;
@@ -48,7 +48,7 @@ public class VeranstaltungsterminDialog extends Dialog {
 
     private AuthenticatedUser authenticatedUser;
 
-    private VeranstaltungDetailView veranstaltungDetailView;
+    private VeranstaltungsterminView veranstaltungsterminView;
     private Veranstaltungstermin aktiverVeranstaltungstermin;
     private Gruppenarbeit aktiveGruppenarbeit;
 
@@ -64,18 +64,18 @@ public class VeranstaltungsterminDialog extends Dialog {
      * @author Kennet
      * @param veranstaltungService Ein VeranstaltungenService-Objekt, das Methoden zur Interaktion mit Veranstaltungs-Objekten in der Datenbank bereitstellt.
      * @param veranstaltungsterminService Ein VeranstaltungsterminService-Objekt, das Methoden zur Interaktion mit Veranstaltungstermin-Objekten in der Datenbank bereitstellt.
-     * @param veranstaltungDetailView Ein VeranstaltungDetailView-Objekt, das die Ansicht der Veranstaltungsdetails repräsentiert.
+     * @param veranstaltungsterminView Ein VeranstaltungDetailView-Objekt, das die Ansicht der Veranstaltungsdetails repräsentiert.
      * @param veranstaltungId Die ID der Veranstaltung, für die der Veranstaltungstermin erstellt oder bearbeitet wird.
      * @param authenticatedUser Ein AuthenticatedUser-Objekt, das Informationen über den authentifizierten Benutzer enthält.
      * @param aktiverVeranstaltungstermin Ein Veranstaltungstermin-Objekt, das den aktiven Veranstaltungstermin repräsentiert.
      * @param aktiveGruppenarbeit Ein Gruppenarbeit-Objekt, das die aktive Gruppenarbeit repräsentiert.
      */
-    public VeranstaltungsterminDialog(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungDetailView veranstaltungDetailView, String veranstaltungId, AuthenticatedUser authenticatedUser, Veranstaltungstermin aktiverVeranstaltungstermin, Gruppenarbeit aktiveGruppenarbeit) {
+    public VeranstaltungsterminHinzufuegenDialog(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungsterminView veranstaltungsterminView, String veranstaltungId, AuthenticatedUser authenticatedUser, Veranstaltungstermin aktiverVeranstaltungstermin, Gruppenarbeit aktiveGruppenarbeit) {
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
         this.veranstaltungId = veranstaltungId;
         this.authenticatedUser = authenticatedUser;
-        this.veranstaltungDetailView = veranstaltungDetailView;
+        this.veranstaltungsterminView = veranstaltungsterminView;
         this.aktiverVeranstaltungstermin = aktiverVeranstaltungstermin;
         this.aktiveGruppenarbeit = aktiveGruppenarbeit;
 
@@ -144,22 +144,23 @@ public class VeranstaltungsterminDialog extends Dialog {
 
             Veranstaltungstermin veranstaltungstermin = new Veranstaltungstermin();
 
+            if (aktiverVeranstaltungstermin != null) {
+                veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(aktiverVeranstaltungstermin);
+
+                if (aktiveGruppenarbeit != null) {
+                    veranstaltungsterminView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
+                }
+            }
+
             if (binder.writeBeanIfValid(veranstaltungstermin)){
                 calcPersistVeranstaltungstermin(veranstaltungstermin);
 
                 close();
                 clearFields();
 
-                veranstaltungDetailView.addTerminToTermine(veranstaltungstermin);
+                veranstaltungsterminView.addTerminToTermine(veranstaltungstermin);
 
-                if (aktiverVeranstaltungstermin != null) {
-                    veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(aktiverVeranstaltungstermin);
-
-                    if (aktiveGruppenarbeit != null) {
-                        veranstaltungDetailView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
-                    }
-                }
-                veranstaltungDetailView.update();
+                veranstaltungsterminView.update();
 
             }
         });

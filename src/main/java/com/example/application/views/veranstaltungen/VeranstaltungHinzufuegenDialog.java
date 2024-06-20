@@ -8,18 +8,13 @@ import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
-import com.example.application.views.veranstaltungstermin.TeilnehmerEntfernenDialog;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.listbox.ListBox;
-import com.vaadin.flow.component.listbox.MultiSelectListBox;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -31,11 +26,6 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.data.binder.Binder;
 import jakarta.annotation.security.RolesAllowed;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 
@@ -50,7 +40,7 @@ import java.util.*;
  */
 @Route(value = "addDialog")
 @RolesAllowed({"ADMIN", "USER"})
-public class VeranstaltungDialog extends Dialog {
+public class VeranstaltungHinzufuegenDialog extends Dialog {
 
     //Services
     private final VeranstaltungenService veranstaltungenService;
@@ -89,7 +79,7 @@ public class VeranstaltungDialog extends Dialog {
      * @param veranstaltungenView Ein VeranstaltungenView-Objekt, das die Ansicht der Veranstaltungen repräsentiert.
      * @param authenticatedUser Ein AuthenticatedUser-Objekt, das Informationen über den authentifizierten Benutzer enthält.
      */
-    public VeranstaltungDialog(VeranstaltungenService veranstaltungenService, TeilnehmerService teilnehmerService, UserService userService, VeranstaltungenView veranstaltungenView, AuthenticatedUser authenticatedUser) {
+    public VeranstaltungHinzufuegenDialog(VeranstaltungenService veranstaltungenService, TeilnehmerService teilnehmerService, UserService userService, VeranstaltungenView veranstaltungenView, AuthenticatedUser authenticatedUser) {
         this.veranstaltungenService = veranstaltungenService;
         this.teilnehmerService = teilnehmerService;
         this.userService = userService;

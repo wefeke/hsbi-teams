@@ -4,7 +4,7 @@ import com.example.application.models.*;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.*;
 import com.example.application.views.MainLayout;
-import com.example.application.views.veranstaltungstermin.VeranstaltungDetailView;
+import com.example.application.views.veranstaltungstermin.VeranstaltungsterminView;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -45,7 +45,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     //User
     private AuthenticatedUser authenticatedUser;
 
-    private VeranstaltungDetailView veranstaltungDetailView;
+    private VeranstaltungsterminView veranstaltungsterminView;
 
     //Data
     private List<Teilnehmer> allParticipants = new ArrayList<>();
@@ -78,7 +78,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
     //Konstruktor
     @Autowired
-    public GruppenarbeitHinzufuegenDialog(AuthenticatedUser authenticatedUser, String veranstaltungId, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungDetailView veranstaltungDetailView, VeranstaltungenService veranstaltungenService, Veranstaltungstermin veranstaltungstermin) {
+    public GruppenarbeitHinzufuegenDialog(AuthenticatedUser authenticatedUser, String veranstaltungId, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungsterminView veranstaltungsterminView, VeranstaltungenService veranstaltungenService, Veranstaltungstermin veranstaltungstermin) {
         this.veranstaltungId = veranstaltungId;
         this.gruppenarbeitService = gruppenarbeitService;
         this.teilnehmerService = teilnehmerService;
@@ -86,18 +86,18 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         this.gruppeService = gruppeService;
         this.veranstaltungstermin = veranstaltungstermin;
         this.authenticatedUser = authenticatedUser;
-        this.veranstaltungDetailView = veranstaltungDetailView;
+        this.veranstaltungsterminView = veranstaltungsterminView;
 
         //gruppenGroesse.setReadOnly(true);
 
-        configureDialog(authenticatedUser, veranstaltungId, gruppenarbeitService, veranstaltungsterminService, gruppeService, veranstaltungDetailView, veranstaltungenService, veranstaltungstermin);
+        configureDialog(authenticatedUser, veranstaltungId, gruppenarbeitService, veranstaltungsterminService, gruppeService, veranstaltungsterminView, veranstaltungenService, veranstaltungstermin);
 
         //Finales Zeugs
         add(createLayout());
         this.veranstaltungenService = veranstaltungenService;
     }
 
-    private void configureDialog(AuthenticatedUser authenticatedUser, String veranstaltungId, GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungDetailView veranstaltungDetailView, VeranstaltungenService veranstaltungenService, Veranstaltungstermin veranstaltungstermin) {
+    private void configureDialog(AuthenticatedUser authenticatedUser, String veranstaltungId, GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungsterminView veranstaltungsterminView, VeranstaltungenService veranstaltungenService, Veranstaltungstermin veranstaltungstermin) {
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
             User user = maybeUser.get();
@@ -109,20 +109,20 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         configureGroupsArea();
         groupSizeSelect();
         bindFields();
-        addBtnFunctionalities(gruppenarbeitService, veranstaltungsterminService, gruppeService, veranstaltungDetailView, veranstaltungstermin, maybeUser);
+        addBtnFunctionalities(gruppenarbeitService, veranstaltungsterminService, gruppeService, veranstaltungsterminView, veranstaltungstermin, maybeUser);
 
         groupSize.addValueChangeListener(event -> {
             randomize(gruppen);
         });
     }
 
-    private void addBtnFunctionalities(GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungDetailView veranstaltungDetailView, Veranstaltungstermin veranstaltungstermin, Optional<User> maybeUser) {
+    private void addBtnFunctionalities(GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungsterminView veranstaltungsterminView, Veranstaltungstermin veranstaltungstermin, Optional<User> maybeUser) {
         randomizeBtn.addClickListener(event -> {
             randomizeBtnFunctionality();
         });
 
         saveBtn.addClickListener(event -> {
-            saveBtnFunctionality(gruppenarbeitService, veranstaltungsterminService, gruppeService, veranstaltungDetailView, veranstaltungstermin, maybeUser);
+            saveBtnFunctionality(gruppenarbeitService, veranstaltungsterminService, gruppeService, veranstaltungsterminView, veranstaltungstermin, maybeUser);
         });
 
         cancelBtn.addClickListener(event -> {
@@ -167,7 +167,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         }
     }
 
-    private void saveBtnFunctionality(GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungDetailView veranstaltungDetailView, Veranstaltungstermin veranstaltungstermin, Optional<User> maybeUser) {
+    private void saveBtnFunctionality(GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungsterminView veranstaltungsterminView, Veranstaltungstermin veranstaltungstermin, Optional<User> maybeUser) {
         if(binderGruppenarbeit.writeBeanIfValid(gruppenarbeit)){
             saveGruppenarbeitWithGruppen(gruppenarbeitService, veranstaltungsterminService, gruppeService, veranstaltungstermin, maybeUser);
 
@@ -176,13 +176,13 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
             clearFields();
 
             if (gruppenarbeit.getVeranstaltungstermin() != null) {
-                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
+                veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
 
                 if (gruppenarbeit != null) {
-                    veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+                    veranstaltungsterminView.setAktiveKachelGruppenarbeit(gruppenarbeit);
                 }
             }
-            veranstaltungDetailView.update();
+            veranstaltungsterminView.update();
 
         }
         else {
