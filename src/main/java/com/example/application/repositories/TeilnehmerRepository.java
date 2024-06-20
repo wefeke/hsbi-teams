@@ -27,6 +27,8 @@ public interface TeilnehmerRepository extends JpaRepository<Teilnehmer, Long> {
 
     Optional<Teilnehmer> findTeilnehmerByVornameAndNachnameAndUser (String vorname, String nachname, User user);
 
+
+
     List<Teilnehmer> findAllByVornameAndNachnameAndUser (String vorname, String nachname, User user);
 
     Optional<Teilnehmer> findTeilnehmerByNachnameAndUser (String nachname, User user);
