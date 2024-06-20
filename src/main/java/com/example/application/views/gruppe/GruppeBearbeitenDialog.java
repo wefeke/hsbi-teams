@@ -18,6 +18,7 @@ import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.grid.dnd.GridDropMode;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H5;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -43,6 +44,7 @@ public class GruppeBearbeitenDialog extends Dialog {
     private List<H5> titles = new ArrayList<>();
     private VeranstaltungDetailView veranstaltungDetailView;
     private List<Button> deleteButtons = new ArrayList<>();
+    private List<Gruppe> groupsToDelete = new ArrayList<>();
 
     //UI Elements
     private final Button cancelBtn = new Button("Abbrechen");
@@ -100,7 +102,7 @@ public class GruppeBearbeitenDialog extends Dialog {
                     otherTeilnehmer.addAll(dataViews.get(gruppenNr + 1).getItems().toList());
                     dataViews.getFirst().addItems(dataViews.get(gruppenNr + 1).getItems().toList());
                 }
-                gruppeService.deleteGruppe(gruppen.get(gruppenNr));
+                groupsToDelete.add((gruppen.get(gruppenNr)));
 
                 gruppen.remove(gruppenNr);
                 dataViews.subList(1, dataViews.size()).clear();
@@ -158,7 +160,12 @@ public class GruppeBearbeitenDialog extends Dialog {
 
             ConfirmDialog confirmDialog = new ConfirmDialog();
             confirmDialog.setHeader("Gruppenanzahl auswählen");
-            confirmDialog.setText("Möchtest du eine neue Gruppenanzahl wählen oder in den vorhandenen Gruppen mischen?");
+            Paragraph question = new Paragraph();
+            question.setText("Möchtest du eine neue Gruppenanzahl wählen oder in den vorhandenen Gruppen mischen?");
+            confirmDialog.add(question);
+            question.addClassName("warning-text-delete");
+            question.getStyle().set("white-space", "pre-line");
+
             confirmDialog.setConfirmText("Gruppen neu bestimmen");
             confirmDialog.addConfirmListener(e -> {
                 Dialog chooseNewGroups = new Dialog();
@@ -192,7 +199,7 @@ public class GruppeBearbeitenDialog extends Dialog {
                     }
                     else{
                         for(Gruppe gruppe: gruppen){
-                            gruppeService.deleteGruppe(gruppe);
+                            groupsToDelete.add(gruppe);
                         }
                         dataViews.subList(1, dataViews.size()).clear();
                         gruppenGrids.subList(1, gruppenGrids.size()).clear();
@@ -206,13 +213,33 @@ public class GruppeBearbeitenDialog extends Dialog {
                         int[] sizes = groupSizes(groupNumber, participantsToMix.size());
                         randomizeParticipants(sizes, groupNumber, gruppen, participantsToMix);
                         groupGrids(gruppen.size(), gruppen);
+                        deleteBtnsFunctionality();
 
                         chooseNewGroups.close();
 
                     }
                         });
-
                 chooseNewGroups.open();
+            });
+            confirmDialog.setRejectable(true);
+            confirmDialog.setRejectText("Gruppen beibehalten");
+            confirmDialog.addRejectListener(reject -> {
+                int groupNumber = gruppen.size();
+                for(Gruppe gruppe: gruppen){
+                    gruppeService.deleteGruppe(gruppe);
+                }
+                dataViews.subList(1, dataViews.size()).clear();
+                gruppenGrids.subList(1, gruppenGrids.size()).clear();
+                titles.clear();
+                deleteButtons.clear();
+                groupsArea.removeAll();
+                gruppen.clear();
+
+                makeGroups(groupNumber, gruppen);
+                int[] sizes = groupSizes(groupNumber, participantsToMix.size());
+                randomizeParticipants(sizes, groupNumber, gruppen, participantsToMix);
+                groupGrids(gruppen.size(), gruppen);
+                deleteBtnsFunctionality();
             });
             confirmDialog.open();
         });
@@ -220,6 +247,9 @@ public class GruppeBearbeitenDialog extends Dialog {
 
     @Transactional
     protected void saveUpdatesToGruppenarbeit() {
+        for(Gruppe gruppe: groupsToDelete){
+            gruppeService.deleteGruppe(gruppe);
+        }
         for(Teilnehmer teilnehmer:allTeilnehmer){
             teilnehmer.removeGruppenarbeit(gruppenarbeit);
         }
