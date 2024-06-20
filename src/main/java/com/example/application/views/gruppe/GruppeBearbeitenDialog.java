@@ -10,6 +10,7 @@ import com.example.application.services.GruppenarbeitService;
 import com.example.application.views.veranstaltungstermin.VeranstaltungDetailView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -23,9 +24,11 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class GruppeBearbeitenDialog extends Dialog {
     //Data
@@ -45,8 +48,10 @@ public class GruppeBearbeitenDialog extends Dialog {
     private final Button cancelBtn = new Button("Abbrechen");
     private final Button saveBtn = new Button("Speichern");
     private final Button addNewGroupBtn = new Button("Eine neue Gruppe hinzufügen");
+    private final Button mixBtn = new Button("Neu mischen");
     private final Div groupsArea = new Div();
     private Grid<Teilnehmer> uebrigeTeilnehmer;
+    private final Select<String> groupSize = new Select<>();
 
     //Services
     private final GruppenarbeitService gruppenarbeitService;
@@ -143,7 +148,58 @@ public class GruppeBearbeitenDialog extends Dialog {
             else {
                 Notification.show("Fehler");
             }
+        });
 
+        mixBtn.addClickListener(event -> {
+            List<Teilnehmer> participantsToMix = new ArrayList<>();
+            for(GridListDataView<Teilnehmer> dataView: dataViews.subList(1, dataViews.size())){
+                participantsToMix.addAll(dataView.getItems().toList());
+            }
+
+            ConfirmDialog confirmDialog = new ConfirmDialog();
+            confirmDialog.setHeader("Gruppenanzahl auswählen");
+            confirmDialog.setText("Möchtest du eine neue Gruppenanzahl wählen oder in den vorhandenen Gruppen mischen?");
+            confirmDialog.setConfirmText("Gruppen neu bestimmen");
+            confirmDialog.addConfirmListener(e -> {
+//                dataViews.subList(1, dataViews.size()).clear();
+//                gruppenGrids.subList(1, gruppenGrids.size()).clear();
+//                titles.clear();
+//                deleteButtons.clear();
+//                groupsArea.removeAll();
+//                gruppen.clear();
+                Dialog chooseNewGroups = new Dialog();
+                chooseNewGroups.setHeaderTitle("Neue Gruppen wählen");
+                Button confirmBtn = new Button("Okay");
+                Button cancelBtnDialog = new Button("Abbrechen");
+
+                confirmBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+                chooseNewGroups.getFooter().add(cancelBtnDialog);
+                chooseNewGroups.getFooter().add(confirmBtn);
+
+                groupSize.setItems(getGroups(participantsToMix));
+                groupSize.setLabel("Gruppenanzahl und -größe wählen");
+                groupSize.setWidth("230px");
+                chooseNewGroups.add(groupSize);
+
+
+                cancelBtnDialog.addClickListener(cancel -> {
+                    chooseNewGroups.close();
+                });
+
+                confirmBtn.addClickListener(confirm -> {
+                    dataViews.subList(1, dataViews.size()).clear();
+                    gruppenGrids.subList(1, gruppenGrids.size()).clear();
+                    titles.clear();
+                    deleteButtons.clear();
+                    groupsArea.removeAll();
+                    gruppen.clear();
+
+                        });
+
+                chooseNewGroups.open();
+            });
+            confirmDialog.open();
         });
     }
 
@@ -255,6 +311,7 @@ public class GruppeBearbeitenDialog extends Dialog {
         setHeaderTitle("Gruppen bearbeiten");
 
         getFooter().add(addNewGroupBtn);
+        getFooter().add(mixBtn);
         getFooter().add(cancelBtn);
         getFooter().add(saveBtn);
 
@@ -266,5 +323,71 @@ public class GruppeBearbeitenDialog extends Dialog {
     private void configureGroupsArea() {
         groupsArea.setWidth("100%");
         groupsArea.setClassName("gruppen-container-gruppenarbeiten");
+    }
+
+    //Für die Select-Box der Gruppengrößen
+    private List<String> getGroups(List<Teilnehmer> participants) {
+        List<String> groups = new ArrayList<>();
+        if(participants.isEmpty()){
+            groups.add("Keine Teilnehmer ausgewählt.");
+            return groups;
+        }
+        groups = groupNumbersAndSizes(participants.size());
+        return groups;
+    }
+
+    //Berechnet die maximale Anzahl an Gruppen bei gegebener Teilnehmergröße
+    private int groupMax(int participants){
+        return participants/2;
+    }
+
+    //Berechnet alle möglichen Gruppenanzahlen
+    //Das sind dann eine mit allen Teilnehmern, 2 bis zur maximalen Anzahl und dann noch eine Gruppengröße, um alle
+    //Teilnehmer in eine eigene Gruppe zu packen
+    private int[] groupNumbers(int participants){
+        int groupMax = groupMax(participants);
+        int[] groupNumbers = new int[groupMax+1];
+        //Gruppen von 1 bis zum Maximum
+        for(int i=0; i<groupMax; i++){
+            groupNumbers[i] = i+1;
+        }
+        //Gruppenanzahl in der Anzahl der Teilnehmer, s.d. man jeden Teilnehmer in eigene Gruppe packen kann
+        groupNumbers[groupMax] = participants;
+        return groupNumbers;
+    }
+
+    //Berechnet die Gruppengröße(n) bei gegebener Gruppen- und Gesamtteilnehmeranzahl
+    private int[] groupSizes(int groups, int participants){
+        if(participants%groups == 0){
+            return new int[]{participants/groups};
+        }
+        else{
+            return new int[]{participants/groups, participants/groups+1};
+        }
+    }
+
+    //Gibt alle möglichen Gruppengrößen und zugehörige Teilnehmeranzahlen als Strings in einer Liste zurück
+    private List<String> groupNumbersAndSizes(int participants){
+        List<String> groupStrings = new ArrayList<String>();
+        for(int i:groupNumbers(participants))
+        {
+            String str = "";
+            str += i;
+            str += " x ";
+
+            for(Iterator<Integer> it = Arrays.stream(groupSizes(i, participants)).iterator(); it.hasNext();){
+                String nextSize = it.next().toString();
+                if(it.hasNext()){
+                    str += nextSize;
+                    str += " und ";
+                }
+                else{
+                    str += nextSize;
+                    str += " Teilnehmer";
+                }
+            }
+            groupStrings.add(str);
+        }
+        return groupStrings;
     }
 }
