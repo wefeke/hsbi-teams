@@ -161,12 +161,6 @@ public class GruppeBearbeitenDialog extends Dialog {
             confirmDialog.setText("Möchtest du eine neue Gruppenanzahl wählen oder in den vorhandenen Gruppen mischen?");
             confirmDialog.setConfirmText("Gruppen neu bestimmen");
             confirmDialog.addConfirmListener(e -> {
-//                dataViews.subList(1, dataViews.size()).clear();
-//                gruppenGrids.subList(1, gruppenGrids.size()).clear();
-//                titles.clear();
-//                deleteButtons.clear();
-//                groupsArea.removeAll();
-//                gruppen.clear();
                 Dialog chooseNewGroups = new Dialog();
                 chooseNewGroups.setHeaderTitle("Neue Gruppen wählen");
                 Button confirmBtn = new Button("Okay");
@@ -188,13 +182,6 @@ public class GruppeBearbeitenDialog extends Dialog {
                 });
 
                 confirmBtn.addClickListener(confirm -> {
-//                    dataViews.subList(1, dataViews.size()).clear();
-//                    gruppenGrids.subList(1, gruppenGrids.size()).clear();
-//                    titles.clear();
-//                    deleteButtons.clear();
-//                    groupsArea.removeAll();
-//                    gruppen.clear();
-
                     if(groupSize.getOptionalValue().isEmpty()){
                         Notification.show("Bitte wähle eine Gruppenverteilung aus");
                     }
@@ -241,6 +228,11 @@ public class GruppeBearbeitenDialog extends Dialog {
             gruppe.addAllTeilnehmer(dataViews.get(gruppen.indexOf(gruppe)+1).getItems().toList());
             gruppe.setGruppenarbeit(gruppenarbeit);
             gruppe.setNummer((long) gruppen.indexOf(gruppe)+1);
+            Optional<User> maybeUser = authenticatedUser.get();
+            if (maybeUser.isPresent()) {
+                User user = maybeUser.get();
+                gruppe.setUser(user);
+            }
             gruppeService.save(gruppe);
         }
         gruppenarbeit.removeAllTeilnehmer();
