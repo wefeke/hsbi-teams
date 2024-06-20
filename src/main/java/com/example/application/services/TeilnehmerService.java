@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
@@ -149,6 +150,9 @@ public class TeilnehmerService {
     @Transactional
     public Optional<Teilnehmer> findTeilnehmerByNachname(String nachname, User user) {
         return teilnehmerRepository.findTeilnehmerByNachnameAndUser(nachname, user);
+    }
+    public List<Veranstaltung> getVeranstaltungenOfTeilnehmer(Teilnehmer teilnehmer) {
+        return new ArrayList<>(teilnehmer.getVeranstaltungen());
     }
 
 }
