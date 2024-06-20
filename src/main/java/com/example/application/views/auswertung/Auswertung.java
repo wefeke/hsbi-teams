@@ -28,9 +28,17 @@ public class Auswertung {
 
     public String getTggHelperValues() {
         String res = "";
-        res = tggpHelper.getFirst().getGruppeAndCheckmark();
-        if (tggpHelper.size() >= 2) {
-            tggpHelper.removeFirst();
+
+        for (int i = 0; i < tggpHelper.size(); i++) {
+            if (tggpHelper.get(i).getUsed()) {
+                continue;
+            } else {
+                res = tggpHelper.get(i).getGruppeAndCheckmark();
+                tggpHelper.get(i).setUsedTrue();
+                break;
+            }
+
+
         }
         return res;
     }

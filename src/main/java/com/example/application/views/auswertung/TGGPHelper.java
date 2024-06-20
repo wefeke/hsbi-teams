@@ -14,6 +14,7 @@ public class TGGPHelper {
     Gruppe gruppe;
     Float punkte = 0f;
     private int tablePos = 0;
+    boolean used;
 
     public int getTablePos() {
         return tablePos;
@@ -74,5 +75,17 @@ public class TGGPHelper {
         } else {
          return  "Gehört zu keiner Gruppe!";
         }
+    }
+
+    public boolean getUsed() {
+    return used;
+    }
+
+    public void setUsedTrue() {
+        this.used = true;
+    }
+
+    public void setUsedFalse() {
+        this.used = false;
     }
 }
