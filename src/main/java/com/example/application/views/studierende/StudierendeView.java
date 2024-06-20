@@ -2,6 +2,7 @@ package com.example.application.views.studierende;
 
 import com.example.application.DoubleToLongConverter;
 import com.example.application.ExcelReader.ExcelExporter;
+import com.example.application.ExcelReader.ExcelImporter;
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
@@ -18,6 +19,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -25,12 +27,14 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.example.application.ExcelReader.ExcelExporter;
-
+import com. vaadin.flow.component.upload.SucceededEvent;
 
 import com.vaadin.flow.server.StreamResource;
 import jakarta.annotation.security.RolesAllowed;
@@ -39,10 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 @Route(value = "studierende", layout = MainLayout.class)
@@ -72,11 +73,20 @@ public class StudierendeView extends VerticalLayout {
     Button cancel = new Button ("Cancel");
     Button aufraeumenButton = new Button("Aufräumen");
 
+
+    MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
+    private final Upload upload = new Upload(buffer);
+    ExcelImporter excelImporter;
+    Set<Teilnehmer> newTeilnehmerListe = new HashSet<>();
+    private User user;
+
     @Autowired
     public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser,ExcelExporter excelExporter) {
         this.authenticatedUser = authenticatedUser;
         this.teilnehmerService = teilnehmerService;
         this.excelExporter = excelExporter;
+        this.excelImporter = new ExcelImporter(teilnehmerService, authenticatedUser);
+
         Aufraeumen aufraeumenDialog = new Aufraeumen(teilnehmerService, authenticatedUser, this);
         DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService, authenticatedUser, aufraeumenDialog, this);
         StudierendeHinzufuegen studierendeHinzufuegen = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser, this);
@@ -84,6 +94,10 @@ public class StudierendeView extends VerticalLayout {
         deleteIcon = delete.getIcon();
 
         addClassName("Studierenden-view");
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            this.user = maybeUser.get();
+        }
 
         setSizeFull();
         configureGrid();
@@ -118,9 +132,6 @@ public class StudierendeView extends VerticalLayout {
         });
 
         exportButton.addClickListener(event -> {
-            Optional<User> maybeUser = authenticatedUser.get();
-            if (maybeUser.isPresent()) {
-                User user = maybeUser.get();
                 List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue());
                 Notification.show(teilnehmerList.toString());
                 File tempFile = createTempFile();
@@ -136,8 +147,33 @@ public class StudierendeView extends VerticalLayout {
                     StreamResource resource = offerDownload(tempFile);
                     System.out.println("Resource: " + resource.toString()); // Log the resource object
                 }
-            }
+
         });
+
+//        upload.addSucceededListener(event -> {
+//            try {
+//                InputStream inputStream = buffer.getInputStream(event.getFileName());
+//                newTeilnehmerListe.addAll(excelImporter.readTeilnehmerFromExcel(inputStream));
+//
+//                List<Teilnehmer> combinedItems= new ArrayList<>();
+//                combinedItems.addAll(teilnehmerService.findAllTeilnehmerByUserAndFilter(user, ""));
+//                combinedItems.addAll(newTeilnehmerListe);
+//
+//                List<Teilnehmer> combinedValue = new ArrayList<>();
+//                combinedValue.addAll(newTeilnehmerListe);
+//
+//
+//            } catch (Exception e) {
+//                Notification.show("Error reading Excel file: " + e.getMessage());
+//                System.out.println(e.getMessage());
+//            }
+//        });
+//        upload.setUploadButton(new Button(LineAwesomeIcon.UPLOAD_SOLID.create()));
+//        upload.setDropLabelIcon(LineAwesomeIcon.ID_CARD.create());
+//        upload.setDropLabel(new Span("Teilnehmer Excel-Datei"));
+//        upload.setAcceptedFileTypes(".xlsx");
+//                });
+
 
         UI.getCurrent().getPage().addBrowserWindowResizeListener(event -> {
             if (event.getWidth() <= 1000) {
