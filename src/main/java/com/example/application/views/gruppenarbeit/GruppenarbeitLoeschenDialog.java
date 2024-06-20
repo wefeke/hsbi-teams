@@ -7,7 +7,7 @@ import com.example.application.models.Veranstaltungstermin;
 import com.example.application.services.GruppeService;
 import com.example.application.services.GruppenarbeitService;
 import com.example.application.services.VeranstaltungsterminService;
-import com.example.application.views.veranstaltungstermin.VeranstaltungDetailView;
+import com.example.application.views.veranstaltungstermin.VeranstaltungsterminView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -23,7 +23,7 @@ public class GruppenarbeitLoeschenDialog extends Dialog {
     private Gruppenarbeit gruppenarbeit;
     private Veranstaltungstermin veranstaltungstermin;
     private VeranstaltungsterminService veranstaltungsterminService;
-    private VeranstaltungDetailView veranstaltungDetailView;
+    private VeranstaltungsterminView veranstaltungsterminView;
     private Gruppenarbeit aktiveGruppenarbeit;
 
     //Services
@@ -37,9 +37,9 @@ public class GruppenarbeitLoeschenDialog extends Dialog {
     Button deleteBtn = new Button("Gruppenarbeit endgültig löschen");
     Button cancelBtn = new Button("Abbrechen");
 
-    public GruppenarbeitLoeschenDialog(GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungDetailView veranstaltungsdetailView, Gruppenarbeit aktiveGruppenarbeit) {
+    public GruppenarbeitLoeschenDialog(GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungsterminView veranstaltungsdetailView, Gruppenarbeit aktiveGruppenarbeit) {
         this.gruppenarbeitService = gruppenarbeitService;
-        this.veranstaltungDetailView = veranstaltungsdetailView;
+        this.veranstaltungsterminView = veranstaltungsdetailView;
         this.aktiveGruppenarbeit = aktiveGruppenarbeit;
         this.gruppenarbeit = null;
         this.gruppeService = gruppeService;
@@ -65,10 +65,10 @@ public class GruppenarbeitLoeschenDialog extends Dialog {
             veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
 
             if (veranstaltungstermin != null) {
-                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(veranstaltungstermin);
+                veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(veranstaltungstermin);
 
                 if (aktiveGruppenarbeit != gruppenarbeit && aktiveGruppenarbeit != null) {
-                    veranstaltungDetailView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
+                    veranstaltungsterminView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
                 }
             }
 
@@ -76,7 +76,7 @@ public class GruppenarbeitLoeschenDialog extends Dialog {
 
             close();
 
-            veranstaltungDetailView.update();
+            veranstaltungsterminView.update();
         });
 
         cancelBtn.addClickListener(event -> close());

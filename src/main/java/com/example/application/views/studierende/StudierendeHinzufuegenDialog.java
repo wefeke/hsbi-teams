@@ -19,7 +19,7 @@ import jakarta.annotation.security.RolesAllowed;
 import java.util.Optional;
 
 @RolesAllowed({"ADMIN", "USER"})
-public class StudierendeHinzufuegen extends Dialog {
+public class StudierendeHinzufuegenDialog extends Dialog {
 
     private final TeilnehmerService teilnehmerService;
     private AuthenticatedUser authenticatedUser;
@@ -34,7 +34,7 @@ public class StudierendeHinzufuegen extends Dialog {
     Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
     private StudierendeView studierendeView;
 
-    public StudierendeHinzufuegen(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser,StudierendeView studierendeView){
+    public StudierendeHinzufuegenDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, StudierendeView studierendeView){
         this.teilnehmerService = teilnehmerService;
         this.authenticatedUser = authenticatedUser;
         this.studierendeView = studierendeView;

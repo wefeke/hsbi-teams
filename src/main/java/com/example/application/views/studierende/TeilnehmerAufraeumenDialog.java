@@ -15,10 +15,10 @@ import java.util.*;
 
 
 @RolesAllowed({"ADMIN", "USER"})
-public class Aufraeumen extends Dialog {
+public class TeilnehmerAufraeumenDialog extends Dialog {
     private final TeilnehmerService teilnehmerService;
-    private final Button deleteOldButton = new Button("Älter als ... Jahre)");
-    private final Button deleteNoEventButton = new Button("Ohne Veranstaltung)");
+    private final Button deleteOldButton = new Button("Älter als ... Jahre");
+    private final Button deleteNoEventButton = new Button("Ohne Veranstaltung");
     private final Button deleteButton = new Button("Löschen");
     private final Button closeButton = new Button("Schließen");
     private final Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class);
@@ -27,11 +27,11 @@ public class Aufraeumen extends Dialog {
    private AuthenticatedUser authenticatedUser;
 
 
-    public Aufraeumen(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, StudierendeView studierendeView) {
+    public TeilnehmerAufraeumenDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, StudierendeView studierendeView) {
         this.teilnehmerService = teilnehmerService;
         this.authenticatedUser = authenticatedUser;
-        DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService, authenticatedUser, this, studierendeView);
-
+        TeilnehmerLoeschenDialog teilnehmerLoeschenDialog = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, this, studierendeView);
+        yearsField.setPlaceholder("Jahre");
 
         closeButton.addClickListener(event ->
                 close());
@@ -55,7 +55,7 @@ public class Aufraeumen extends Dialog {
             Set<Teilnehmer> selectedTeilnehmer = grid.getSelectedItems();
             if (!selectedTeilnehmer.isEmpty()) {
                 for (Teilnehmer teilnehmer : selectedTeilnehmer) {
-                    DeleteDialog deleteDialogForSelectedTeilnehmer = new DeleteDialog(teilnehmerService, authenticatedUser, this, studierendeView);
+                    TeilnehmerLoeschenDialog deleteDialogForSelectedTeilnehmer = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, this, studierendeView);
                     deleteDialogForSelectedTeilnehmer.setTeilnehmer(teilnehmer);
                     deleteDialogForSelectedTeilnehmer.open();
                 }
