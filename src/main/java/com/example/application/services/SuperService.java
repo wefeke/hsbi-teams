@@ -68,20 +68,24 @@ public class SuperService {
         }
 
         List<Auswertung> auswertungen = new ArrayList<Auswertung>();
+        // Für jeden Teilnehmer aus der Veranstaltung soll eine Auswertung angelegt werden
         for ( Teilnehmer teilnehmer : teilnehmern) {
             Auswertung auswertung = new Auswertung();
+            // Name und Matrikelnummer werden festgelegt
             auswertung.setName(teilnehmer.getVorname() + " " + teilnehmer.getNachname());
             auswertung.setMatrikelnummer(teilnehmer.getId());
-            // Punkte suchen für Teilnehmer
-            // Clonen der Liste für den jeweiligen Teilnehmer
-            //List<TGGPHelper> tggpHelperListSpecified = new ArrayList<TGGPHelper>(tggpHelperList);
+
+            // Auf Basis der tggHelperList, welche alle Veranstaltungstermine, die eine Gruppenarbeit haben, sollen nun die Werte (Gruppe) für den
+            // Teilnehmer hinzufügen
             for (TGGPHelper tggpHelper : tggpHelperList) {
                 if (tggpHelper.getGruppenarbeit() != null) {
                     List<Gruppe> gruppen = tggpHelper.getGruppenarbeit().getGruppen();
                     for (Gruppe gruppe : gruppen) {
-                        for (Teilnehmer teilnehmerinGruppe : gruppe.getTeilnehmer()) {
-                            if (Objects.equals(teilnehmerinGruppe.getId(), teilnehmer.getId())) {
-                                tggpHelper.setGruppe(gruppe);
+                        if (tggpHelper.getGruppenarbeit().equals(gruppe.getGruppenarbeit())) {
+                            for (Teilnehmer teilnehmerinGruppe : gruppe.getTeilnehmer()) {
+                                if (teilnehmerinGruppe.equals(teilnehmer)) {
+                                    tggpHelper.setGruppe(gruppe);
+                                }
                             }
                         }
                     }

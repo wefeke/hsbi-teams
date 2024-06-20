@@ -70,11 +70,9 @@ public class TGGPHelper {
     public String getGruppeAndCheckmark() {
         if (gruppe != null) {
             String unicodeString = "\u2705";
-
-                return "Gruppe " + ", " + unicodeString + gruppe.getNummer() + ", " + unicodeString;
-
+                return "Gruppe " + gruppe.getNummer();
         } else {
-         return  "Diese Gruppe ist nicht dabei";
+         return  "Gehört zu keiner Gruppe!";
         }
     }
 }
