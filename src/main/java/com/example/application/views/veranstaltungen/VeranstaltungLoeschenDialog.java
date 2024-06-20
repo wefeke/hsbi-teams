@@ -143,4 +143,5 @@ public class VeranstaltungLoeschenDialog extends Dialog {
         getFooter().add(deleteBtn);
         return mainLayout;
     }
+
 }
