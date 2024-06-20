@@ -301,9 +301,24 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
      * @autor Joris
      */
     public void update() {
-        triggerVeranstaltungsterminKachelClick();
-        triggerGruppenarbeitKachelClick();
         applyVeranstaltungsterminFilter();
+
+        //if (!(veranstaltungsterminService.findAllVeranstaltungstermine().isEmpty()) ) {
+        if ( aktiverVeranstaltungstermin != null && veranstaltungsterminService.findVeranstaltungsterminById(aktiverVeranstaltungstermin.getId()).isPresent()) {
+            triggerVeranstaltungsterminKachelClick();
+            triggerGruppenarbeitKachelClick();
+        } else {
+            gruppenarbeitContainer.removeAll();
+            if (gruppenarbeitLinie != null) {
+                gruppenarbeitLinie.setVisible(false);
+            }
+            gruppenContainer.removeAll();
+            if (gruppenLinie != null) {
+                gruppenLinie.setVisible(false);
+            }
+        }
+
+
         updateTeilnehmerListe();
     }
 
@@ -351,10 +366,13 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
      */
     public void removeAndAddTerminToTermine (Veranstaltungstermin veranstaltungstermin, Long veranstaltungsterminId) {
         if (veranstaltungstermin != null && veranstaltungsterminId != null){
-            Veranstaltungstermin v = veranstaltungsterminService.findVeranstaltungsterminById(veranstaltungsterminId);
-            termine.remove(v);
-
-            termine.add(veranstaltungstermin);
+            if (!veranstaltungsterminService.findAllVeranstaltungstermine().isEmpty()) {
+                Optional<Veranstaltungstermin> v = veranstaltungsterminService.findVeranstaltungsterminById(veranstaltungsterminId);
+                if (v.isPresent()) {
+                    termine.remove(v.get());
+                    termine.add(veranstaltungstermin);
+                }
+            }
         }
     }
 
@@ -1131,6 +1149,12 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
      * @autor Joris
      */
     private void applyVeranstaltungsterminFilter() {
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+            termine = veranstaltungsterminService.findVeranstaltungstermineByVeranstaltungId(Long.parseLong(veranstaltungIdString), user);
+        }
+
         String value = filterButton.getValue();
         if (value != null) {
             switch (value) {
@@ -1269,8 +1293,17 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         if (aktiveKachelVeranstaltungstermin != null) {
             Veranstaltungstermin termin = veranstaltungsterminMap.get(aktiveKachelVeranstaltungstermin);
 
-            Veranstaltungstermin updatedTermin = veranstaltungsterminService.findVeranstaltungsterminById(termin.getId());
-            updateGruppenarbeiten(updatedTermin);
+            if (!(veranstaltungsterminService.findAllVeranstaltungstermine().isEmpty())) {
+
+                Optional<Veranstaltungstermin> updatedTermin = veranstaltungsterminService.findVeranstaltungsterminById(termin.getId());
+
+                updatedTermin.ifPresent(this::updateGruppenarbeiten);
+            }
+        } else {
+            gruppenarbeitContainer.removeAll();
+            if (gruppenarbeitLinie != null) {
+                gruppenarbeitLinie.setVisible(false);
+            }
         }
     }
 
@@ -1290,6 +1323,11 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
 
             if (aktiveGruppenarbeit != null && aktiveGruppenarbeit.getId().equals(gruppenarbeit.getId())) {
                 updateGruppen(updatedGruppenarbeit);
+            }
+        } else {
+            gruppenContainer.removeAll();
+            if (gruppenLinie != null) {
+                gruppenLinie.setVisible(false);
             }
         }
     }
@@ -1335,30 +1373,32 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         }
 
         // Ansonsten setzen wir die aktive Gruppenarbeit neu
-        Veranstaltungstermin neuerVeranstaltungstermin = veranstaltungsterminService.findVeranstaltungsterminById(gruppenarbeit.getVeranstaltungstermin().getId());
+        if (!veranstaltungsterminService.findAllVeranstaltungstermine().isEmpty()) {
+            Optional<Veranstaltungstermin> neuerVeranstaltungstermin = veranstaltungsterminService.findVeranstaltungsterminById(gruppenarbeit.getVeranstaltungstermin().getId());
 
-        if (neuerVeranstaltungstermin != null) {
-            List<Gruppenarbeit> aktuelleGruppenarbeiten = neuerVeranstaltungstermin.getGruppenarbeiten();
+            if (neuerVeranstaltungstermin.isPresent()) {
+                List<Gruppenarbeit> aktuelleGruppenarbeiten = neuerVeranstaltungstermin.get().getGruppenarbeiten();
 
-            for (Gruppenarbeit aktuelleGruppenarbeit : aktuelleGruppenarbeiten) {
-                if (aktuelleGruppenarbeit.getId().equals(gruppenarbeit.getId())) {
-                    for (Map.Entry<Div, Gruppenarbeit> entry : gruppenarbeitMap.entrySet()) {
-                        if (entry.getValue().equals(aktuelleGruppenarbeit)) {
-                            // Entfernen der "kachel-active" Klasse von der vorher aktiven Kachel
-                            if (aktiveKachelGruppenarbeit != null) {
-                                aktiveKachelGruppenarbeit.removeClassName("kachel-active");
+                for (Gruppenarbeit aktuelleGruppenarbeit : aktuelleGruppenarbeiten) {
+                    if (aktuelleGruppenarbeit.getId().equals(gruppenarbeit.getId())) {
+                        for (Map.Entry<Div, Gruppenarbeit> entry : gruppenarbeitMap.entrySet()) {
+                            if (entry.getValue().equals(aktuelleGruppenarbeit)) {
+                                // Entfernen der "kachel-active" Klasse von der vorher aktiven Kachel
+                                if (aktiveKachelGruppenarbeit != null) {
+                                    aktiveKachelGruppenarbeit.removeClassName("kachel-active");
+                                }
+
+                                // Setzen der neuen aktiven Kachel und Hinzufügen der "kachel-active" Klasse
+                                aktiveKachelGruppenarbeit = entry.getKey();
+                                aktiveKachelGruppenarbeit.addClassName("kachel-active");
+
+                                // Setzen der neuen aktiven Gruppenarbeit
+                                aktiveGruppenarbeit = aktuelleGruppenarbeit;
+                                break;
                             }
-
-                            // Setzen der neuen aktiven Kachel und Hinzufügen der "kachel-active" Klasse
-                            aktiveKachelGruppenarbeit = entry.getKey();
-                            aktiveKachelGruppenarbeit.addClassName("kachel-active");
-
-                            // Setzen der neuen aktiven Gruppenarbeit
-                            aktiveGruppenarbeit = aktuelleGruppenarbeit;
-                            break;
                         }
+                        break;
                     }
-                    break;
                 }
             }
         }

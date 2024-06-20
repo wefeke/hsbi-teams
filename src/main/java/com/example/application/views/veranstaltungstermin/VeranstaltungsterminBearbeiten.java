@@ -172,11 +172,15 @@ public class VeranstaltungsterminBearbeiten extends Dialog {
     /**
      * Liest die Eigenschaften des Veranstaltungstermin-Objekts und aktualisiert die Eingabefelder entsprechend.
      *
-     * @author Kennet
+     * @author Joris
      */
     public void readBean (){
         //Read Data from the Binder
-        binder.readBean(veranstaltungsterminService.findVeranstaltungsterminById(veranstaltungsterminId));
+        if (veranstaltungsterminService.findAllVeranstaltungstermine() != null) {
+            Optional<Veranstaltungstermin> v = veranstaltungsterminService.findVeranstaltungsterminById(veranstaltungsterminId);
+
+            v.ifPresent(veranstaltungstermin -> binder.readBean(veranstaltungstermin));
+        }
     }
 
     /**

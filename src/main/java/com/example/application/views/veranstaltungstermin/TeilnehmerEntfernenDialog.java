@@ -47,6 +47,10 @@ public class TeilnehmerEntfernenDialog extends Dialog {
         this.teilnehmerService = teilnehmerService;
         this.veranstaltungId = veranstaltungId;
 
+        if ( teilnehmer != null) {
+            setTeilnehmer(teilnehmer);
+        }
+
         VerticalLayout layout = new VerticalLayout();
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         layout.add(infoText);
@@ -98,7 +102,7 @@ public class TeilnehmerEntfernenDialog extends Dialog {
 
         if (teilnehmerService.isTeilnehmerInGruppenarbeit(teilnehmer, veranstaltungId)) {
             infoText.setText("Teilnehmer " + teilnehmer.getVorname() + " " + teilnehmer.getNachname() + " löschen");
-            warningText.getElement().setProperty("innerHTML", "Der Teilnehmer " + teilnehmer.getVorname() + " " + teilnehmer.getNachname() + " <span class='highlight'>kann nicht entfernt werden</span>, da er bereits in einer aktiven Gruppenarbeit ist.");
+            warningText.setText("Der Teilnehmer " + teilnehmer.getVorname() + " " + teilnehmer.getNachname() + " kann nicht entfernt werden, da er bereits in einer aktiven Gruppenarbeit ist.");
             deleteBtn.setEnabled(false);
         } else {
             infoText.setText("Teilnehmer " + teilnehmer.getVorname() + " " + teilnehmer.getNachname() + " löschen");

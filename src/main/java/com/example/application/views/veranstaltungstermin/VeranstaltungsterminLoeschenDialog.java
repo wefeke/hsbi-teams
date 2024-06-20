@@ -45,7 +45,7 @@ public class VeranstaltungsterminLoeschenDialog extends Dialog {
         this.veranstaltungDetailView = veranstaltungDetailView;
         this.aktiverVeranstaltungstermin = aktiverVeranstaltungstermin;
         this.aktiveGruppenarbeit = aktiveGruppenarbeit;
-        this.veranstaltungstermin=null;
+        this.veranstaltungstermin = null;
         this.veranstaltung = veranstaltung;
         this.gruppeService = gruppeService;
         this.veranstaltungsterminService = veranstaltungsterminService;
@@ -60,6 +60,14 @@ public class VeranstaltungsterminLoeschenDialog extends Dialog {
             List<Gruppenarbeit> gruppenarbeiten = veranstaltungstermin.getGruppenarbeiten();
             veranstaltungstermin.removeAllGruppenarbeiten();
             veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
+
+            if (aktiverVeranstaltungstermin != null) {
+                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(aktiverVeranstaltungstermin);
+
+                if (aktiveGruppenarbeit != null) {
+                    veranstaltungDetailView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
+                }
+            }
 
             for(Gruppenarbeit gruppenarbeit: gruppenarbeiten){
                 List<Gruppe> gruppen = gruppenarbeit.getGruppen();
@@ -77,14 +85,6 @@ public class VeranstaltungsterminLoeschenDialog extends Dialog {
             }
 
             veranstaltungsterminService.deleteVeranstaltungstermin(veranstaltungstermin);
-
-            if (aktiverVeranstaltungstermin != null) {
-                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(aktiverVeranstaltungstermin);
-
-                if (aktiveGruppenarbeit != null) {
-                    veranstaltungDetailView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
-                }
-            }
             veranstaltungDetailView.update();
 
             close();
@@ -96,6 +96,7 @@ public class VeranstaltungsterminLoeschenDialog extends Dialog {
         add(createLayout());
 
     }
+
     public void setVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin) {
         this.veranstaltungstermin = veranstaltungstermin;
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");

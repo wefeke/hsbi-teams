@@ -144,6 +144,14 @@ public class VeranstaltungsterminDialog extends Dialog {
 
             Veranstaltungstermin veranstaltungstermin = new Veranstaltungstermin();
 
+            if (aktiverVeranstaltungstermin != null) {
+                veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(aktiverVeranstaltungstermin);
+
+                if (aktiveGruppenarbeit != null) {
+                    veranstaltungDetailView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
+                }
+            }
+
             if (binder.writeBeanIfValid(veranstaltungstermin)){
                 calcPersistVeranstaltungstermin(veranstaltungstermin);
 
@@ -152,13 +160,6 @@ public class VeranstaltungsterminDialog extends Dialog {
 
                 veranstaltungDetailView.addTerminToTermine(veranstaltungstermin);
 
-                if (aktiverVeranstaltungstermin != null) {
-                    veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(aktiverVeranstaltungstermin);
-
-                    if (aktiveGruppenarbeit != null) {
-                        veranstaltungDetailView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
-                    }
-                }
                 veranstaltungDetailView.update();
 
             }

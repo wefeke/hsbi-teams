@@ -4,11 +4,11 @@ import com.example.application.models.User;
 import com.example.application.models.Veranstaltung;
 import com.example.application.models.Veranstaltungstermin;
 import com.example.application.repositories.VeranstaltungsterminRepository;
-import org.hibernate.annotations.ColumnTransformer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class VeranstaltungsterminService {
@@ -22,6 +22,7 @@ public class VeranstaltungsterminService {
     }
 
     public List<Veranstaltungstermin> findAllVeranstaltungstermine() {
+        System.out.println(veranstaltungsterminRepository.findAll().size());
         return veranstaltungsterminRepository.findAll();
     }
 
@@ -30,9 +31,8 @@ public class VeranstaltungsterminService {
         return veranstaltungsterminRepository.findVeranstaltungstermineByVeranstaltungIdAndUser(id, user);
     }
 
-    public Veranstaltungstermin findVeranstaltungsterminById(Long id) {
-        return veranstaltungsterminRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Invalid Veranstaltungstermin Id:" + id));
+    public Optional<Veranstaltungstermin> findVeranstaltungsterminById(Long id) {
+        return veranstaltungsterminRepository.findById(id);
     }
 
     @Transactional
@@ -44,6 +44,7 @@ public class VeranstaltungsterminService {
         }
     }
 
+    @Transactional
     public void deleteVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin) {
         if (veranstaltungstermin != null) {
             Veranstaltung veranstaltung = veranstaltungstermin.getVeranstaltung();
