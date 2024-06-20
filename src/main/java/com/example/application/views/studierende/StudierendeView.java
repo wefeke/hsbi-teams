@@ -39,6 +39,9 @@ import jakarta.annotation.security.RolesAllowed;
 import org.hibernate.bytecode.enhance.internal.tracker.NoopCollectionTracker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIcon;
+import java.util.stream.Collectors;
+import com.vaadin.flow.data.provider.Query;
+
 
 
 import java.io.*;
@@ -53,7 +56,7 @@ public class StudierendeView extends VerticalLayout {
     private final TeilnehmerExcelExporter teilnehmerExcelExporter;
     private final TeilnehmerService teilnehmerService;
     private final Grid<Teilnehmer> grid = new Grid<>();
-    private final Editor<Teilnehmer> editor =grid.getEditor();
+    private final Editor<Teilnehmer> editor = grid.getEditor();
     private final TextField filterText = new TextField();
     private final Button addStudiernedenButton = new Button("Studierenden hinzufügen");
     private final StudierendeHinzufuegen dialog;
@@ -69,7 +72,7 @@ public class StudierendeView extends VerticalLayout {
     TextField nachname = new TextField("Nachname");
     NumberField matrikelNr = new NumberField("Matrikelnummer");
     Button save = new Button("Save");
-    Button cancel = new Button ("Cancel");
+    Button cancel = new Button("Cancel");
     Button aufraeumenButton = new Button("Aufräumen");
 
 
@@ -80,7 +83,7 @@ public class StudierendeView extends VerticalLayout {
     private User user;
 
     @Autowired
-    public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser,TeilnehmerExcelExporter teilnehmerExcelExporter) {
+    public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, TeilnehmerExcelExporter teilnehmerExcelExporter) {
         this.authenticatedUser = authenticatedUser;
         this.teilnehmerService = teilnehmerService;
         this.teilnehmerExcelExporter = teilnehmerExcelExporter;
@@ -146,9 +149,18 @@ public class StudierendeView extends VerticalLayout {
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
             User user = maybeUser.get();
-            grid.setItems(teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue()));
+            String searchText = filterText.getValue().toLowerCase();
+            List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmer(user);
+            List<Teilnehmer> filteredTeilnehmerList = teilnehmerList.stream()
+                    .filter(teilnehmer -> teilnehmer.getVorname().toLowerCase().contains(searchText)
+                            || teilnehmer.getNachname().toLowerCase().contains(searchText)
+                            || Long.toString(teilnehmer.getId()).contains(searchText)) // Vergleicht den Suchtext mit der Matrikelnummer
+                    .collect(Collectors.toList());
+            grid.setItems(filteredTeilnehmerList);
         }
     }
+
+
     private Component getContent() {
         HorizontalLayout content = new HorizontalLayout(grid);
         content.setFlexGrow(1, grid);
