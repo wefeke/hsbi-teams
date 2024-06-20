@@ -35,7 +35,7 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
     private final TeilnehmerErstellenDialog dialog;
     private final AuthenticatedUser authenticatedUser;
 
-    public TeilnehmerHinzufuegenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser, VeranstaltungDetailView veranstaltungDetailView, Veranstaltungstermin veranstaltungstermin, Gruppenarbeit gruppenarbeit) {
+    public TeilnehmerHinzufuegenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser, VeranstaltungsterminView veranstaltungsterminView, Veranstaltungstermin veranstaltungstermin, Gruppenarbeit gruppenarbeit) {
         this.teilnehmerService = teilnehmerService;
         this.veranstaltungId = veranstaltungId;
         this.authenticatedUser = authenticatedUser;
@@ -62,13 +62,13 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
                     Notification.show(selectedTeilnehmer.size() + " Teilnehmer wurden hinzugefügt");
 
                     if (veranstaltungstermin != null) {
-                        veranstaltungDetailView.setAktiveKachelVeranstaltungstermin(veranstaltungstermin);
+                        veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(veranstaltungstermin);
 
                         if (gruppenarbeit != null) {
-                            veranstaltungDetailView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+                            veranstaltungsterminView.setAktiveKachelGruppenarbeit(gruppenarbeit);
                         }
                     }
-                    veranstaltungDetailView.update();
+                    veranstaltungsterminView.update();
 
                     updateGrid();
                     close();

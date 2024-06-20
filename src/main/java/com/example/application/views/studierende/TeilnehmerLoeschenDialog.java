@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @RolesAllowed({"ADMIN", "USER"})
-public class DeleteDialog extends Dialog {
+public class TeilnehmerLoeschenDialog extends Dialog {
     private final TeilnehmerService teilnehmerService;
     private AuthenticatedUser authenticatedUser;
-    private Aufraeumen aufraeumen;
+    private TeilnehmerAufraeumenDialog teilnehmerAufraeumenDialog;
     private StudierendeView studierendeView;
     private Teilnehmer teilnehmer;
 
@@ -30,10 +30,10 @@ public class DeleteDialog extends Dialog {
     Paragraph warningText = new Paragraph("Empty");
     Paragraph noReturn = new Paragraph("Der Studierende ist in keiner Veranstaltung");
 
-    public DeleteDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, Aufraeumen aufraeumen, StudierendeView studierendeView) {
+    public TeilnehmerLoeschenDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, TeilnehmerAufraeumenDialog aufraeumen, StudierendeView studierendeView) {
         this.teilnehmerService = teilnehmerService;
         this.authenticatedUser = authenticatedUser;
-        this.aufraeumen = aufraeumen;
+        this.teilnehmerAufraeumenDialog = teilnehmerAufraeumenDialog;
         this.studierendeView = studierendeView;
 
         warningText.addClassName("warning-text-delete");

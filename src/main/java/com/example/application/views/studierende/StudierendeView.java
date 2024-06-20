@@ -8,14 +8,12 @@ import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.views.MainLayout;
+import com.example.application.views.veranstaltungstermin.TeilnehmerEntfernenDialog;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H2;
@@ -56,7 +54,7 @@ public class StudierendeView extends VerticalLayout {
     private final Editor<Teilnehmer> editor =grid.getEditor();
     private final TextField filterText = new TextField();
     private final Button addStudiernedenButton = new Button("Studierenden hinzufügen");
-    private final StudierendeHinzufuegen dialog;
+    private final StudierendeHinzufuegenDialog dialog;
     private H2 users = new H2("Studierende");
     private final Button delete = new Button("Studierenden löschen");
     private final Component addStudiernedenButtonIcon;
@@ -83,14 +81,18 @@ public class StudierendeView extends VerticalLayout {
     public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser,TeilnehmerExcelExporter teilnehmerExcelExporter) {
         this.authenticatedUser = authenticatedUser;
         this.teilnehmerService = teilnehmerService;
+        TeilnehmerAufraeumenDialog teilnehmerAufraeumenDialogDialog = new TeilnehmerAufraeumenDialog(teilnehmerService, authenticatedUser, this);
+        TeilnehmerLoeschenDialog teilnehmerLoeschenDialog = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, teilnehmerAufraeumenDialogDialog, this);
+        StudierendeHinzufuegenDialog studierendeHinzufuegenDialog = new StudierendeHinzufuegenDialog(teilnehmerService, authenticatedUser, this);
         this.teilnehmerExcelExporter = teilnehmerExcelExporter;
         this.excelImporter = new ExcelImporter(teilnehmerService, authenticatedUser);
 
-        Aufraeumen aufraeumenDialog = new Aufraeumen(teilnehmerService, authenticatedUser, this);
-        DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService, authenticatedUser, aufraeumenDialog, this);
-        StudierendeHinzufuegen studierendeHinzufuegen = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser, this);
+        TeilnehmerAufraeumenDialog aufraeumenDialog = new TeilnehmerAufraeumenDialog(teilnehmerService, authenticatedUser, this);
+        TeilnehmerLoeschenDialog deleteDialog = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, aufraeumenDialog, this);
+        StudierendeHinzufuegenDialog studierendeHinzufuegen = new StudierendeHinzufuegenDialog(teilnehmerService, authenticatedUser, this);
         addStudiernedenButtonIcon = addStudiernedenButton.getIcon();
         deleteIcon = delete.getIcon();
+        //aendernIcon = aendern.getIcon();
 
         addClassName("Studierenden-view");
         Optional<User> maybeUser = authenticatedUser.get();
@@ -107,7 +109,7 @@ public class StudierendeView extends VerticalLayout {
         );
         updateStudierendeView();
 
-        dialog = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser, this);
+        dialog = new StudierendeHinzufuegenDialog(teilnehmerService, authenticatedUser, this);
         addStudiernedenButton.addClickListener(event -> {
             dialog.open();
             updateStudierendeView();
@@ -123,7 +125,7 @@ public class StudierendeView extends VerticalLayout {
             Set<Teilnehmer> selectedTeilnehmer = grid.getSelectedItems();
             if (!selectedTeilnehmer.isEmpty()) {
                 for (Teilnehmer teilnehmer : selectedTeilnehmer) {
-                    DeleteDialog deleteDialogForSelectedTeilnehmer = new DeleteDialog(teilnehmerService, authenticatedUser, aufraeumenDialog, this);
+                    TeilnehmerLoeschenDialog deleteDialogForSelectedTeilnehmer = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, aufraeumenDialog, this);
                     deleteDialogForSelectedTeilnehmer.setTeilnehmer(teilnehmer);
                     deleteDialogForSelectedTeilnehmer.open();
                 }
@@ -139,7 +141,7 @@ public class StudierendeView extends VerticalLayout {
             }
         });
 
-        aufraeumenButton.addClickListener(event -> aufraeumenDialog.open());
+        aufraeumenButton.addClickListener(event -> teilnehmerAufraeumenDialogDialog.open());
     }
 
     public void updateStudierendeView() {
