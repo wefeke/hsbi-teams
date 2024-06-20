@@ -1,6 +1,6 @@
 package com.example.application.views.veranstaltungstermin;
 
-import com.example.application.DoubleToLongConverter;
+
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
@@ -66,8 +66,6 @@ public class TeilnehmerErstellenDialog extends Dialog {
                     Notification.show("Matrikelnummer existiert bereits", 3000, Notification.Position.MIDDLE);
                 } else {
                     saveTeilnehmer();
-                    Notification.show("Teilnehmer gespeichert", 3000, Notification.Position.MIDDLE);
-                    //close();
                 }
             } else {
                 Notification.show("Bitte füllen Sie alle Felder aus", 3000, Notification.Position.MIDDLE);
@@ -96,17 +94,19 @@ public class TeilnehmerErstellenDialog extends Dialog {
     private void saveTeilnehmer() {
         Teilnehmer teilnehmer = new Teilnehmer();
 
-        if (binder.writeBeanIfValid(teilnehmer)) {
-            Optional<User> maybeUser = authenticatedUser.get();
-            if (maybeUser.isPresent()) {
-                User user = maybeUser.get();
-                teilnehmerService.saveTeilnehmer(teilnehmer, user);
-                teilnehmerHinzufuegenDialog.updateGrid();// Grid aktualisieren
-                clearFields();
-                close();
-                Notification.show("Teilnehmer wurde angelegt");
-            } else {
-                Notification.show("Fehler beim Speichern");
+        if (matrikelNr.getValue() != null && String.valueOf(matrikelNr.getValue().longValue()).matches("\\d{7}")) {
+            if (binder.writeBeanIfValid(teilnehmer)) {
+                Optional<User> maybeUser = authenticatedUser.get();
+                if (maybeUser.isPresent()) {
+                    User user = maybeUser.get();
+                    teilnehmerService.saveTeilnehmer(teilnehmer, user);
+                    teilnehmerHinzufuegenDialog.updateGrid();
+                    clearFields();
+                    close();
+                    Notification.show("Teilnehmer wurde angelegt");
+                } else {
+                    Notification.show("Fehler beim Speichern");
+                }
             }
         }
     }
@@ -123,7 +123,7 @@ public class TeilnehmerErstellenDialog extends Dialog {
         binder.forField(matrikelNr)
                 .asRequired("Matrikelnummer muss gefüllt sein")
                 .withValidator(matrikelNr -> String.valueOf(matrikelNr.longValue()).matches("\\d{7}"), "Matrikelnummer muss genau 7 Zahlen enthalten")
-                .withConverter(new DoubleToLongConverter())
+                .withConverter(d -> Double.valueOf(d).longValue(), Long::doubleValue)
                 .bind(Teilnehmer::getId, Teilnehmer::setId);
     }
 

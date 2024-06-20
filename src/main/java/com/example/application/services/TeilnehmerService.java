@@ -77,11 +77,12 @@ public class TeilnehmerService {
 
     @Transactional
     public List<Teilnehmer> findAllTeilnehmerByUserAndFilter(User user, String filterText) {
-        if (filterText == null || filterText.isEmpty()) {
-            return teilnehmerRepository.findByUser(user);
-        } else {
-            return teilnehmerRepository.searchByUser(user, filterText);
-        }
+            if (filterText == null || filterText.isEmpty()) {
+                return teilnehmerRepository.findByUser(user);
+            } else {
+                return teilnehmerRepository.searchByUser(user, filterText);
+            }
+
     }
 
     @Transactional
@@ -112,6 +113,10 @@ public class TeilnehmerService {
     @Transactional
     public List<Teilnehmer> findAllTeilnehmerNotInVeranstaltung(Long veranstaltungId, User user) {
         return teilnehmerRepository.findAllTeilnehmerNotInVeranstaltung(veranstaltungId, user);
+    }
+    @Transactional
+    public List<Teilnehmer> findAllTeilnehmer(User user) {
+        return teilnehmerRepository.findByUser(user);
     }
 
     @Transactional

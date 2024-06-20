@@ -48,7 +48,6 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
         });
 
         deleteNoEventButton.addClickListener(event -> {
-            grid.getSelectedItems().forEach(teilnehmerService::deleteTeilnehmer);
             updateGridNoEvent();
             setHeaderTitle("Studierende ohne Veranstaltung");
         });

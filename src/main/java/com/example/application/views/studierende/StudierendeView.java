@@ -1,8 +1,7 @@
 package com.example.application.views.studierende;
 
-import com.example.application.DoubleToLongConverter;
+
 import com.example.application.ExcelReader.TeilnehmerExcelExporter;
-import com.example.application.ExcelReader.ExcelImporter;
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
@@ -17,8 +16,6 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -31,12 +28,11 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com. vaadin.flow.component.upload.SucceededEvent;
 import com.vaadin.flow.server.StreamResource;
 import jakarta.annotation.security.RolesAllowed;
-import org.hibernate.bytecode.enhance.internal.tracker.NoopCollectionTracker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIcon;
+import java.util.stream.Collectors;
 
 
 import java.io.*;
@@ -51,7 +47,7 @@ public class StudierendeView extends VerticalLayout {
     private final TeilnehmerExcelExporter teilnehmerExcelExporter;
     private final TeilnehmerService teilnehmerService;
     private final Grid<Teilnehmer> grid = new Grid<>();
-    private final Editor<Teilnehmer> editor =grid.getEditor();
+    private final Editor<Teilnehmer> editor = grid.getEditor();
     private final TextField filterText = new TextField();
     private final Button addStudiernedenButton = new Button("Studierenden hinzufügen");
     private final StudierendeHinzufuegenDialog dialog;
@@ -62,30 +58,32 @@ public class StudierendeView extends VerticalLayout {
     private final Button importButton = new Button("Importieren");
     private final Button exportButton = new Button("Exportieren");
     private AuthenticatedUser authenticatedUser;
+    private final StudierendeImportDialog studierendeImportDialog;
 
     TextField vorname = new TextField("Vorname");
     TextField nachname = new TextField("Nachname");
     NumberField matrikelNr = new NumberField("Matrikelnummer");
     Button save = new Button("Save");
-    Button cancel = new Button ("Cancel");
+    Button cancel = new Button("Cancel");
     Button aufraeumenButton = new Button("Aufräumen");
 
 
     MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
     private final Upload upload = new Upload(buffer);
-    ExcelImporter excelImporter;
+//    ExcelImporter excelImporter;
     Set<Teilnehmer> newTeilnehmerListe = new HashSet<>();
     private User user;
 
     @Autowired
-    public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser,TeilnehmerExcelExporter teilnehmerExcelExporter) {
+    public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, TeilnehmerExcelExporter teilnehmerExcelExporter) {
         this.authenticatedUser = authenticatedUser;
         this.teilnehmerService = teilnehmerService;
         TeilnehmerAufraeumenDialog teilnehmerAufraeumenDialogDialog = new TeilnehmerAufraeumenDialog(teilnehmerService, authenticatedUser, this);
         TeilnehmerLoeschenDialog teilnehmerLoeschenDialog = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, teilnehmerAufraeumenDialogDialog, this);
         StudierendeHinzufuegenDialog studierendeHinzufuegenDialog = new StudierendeHinzufuegenDialog(teilnehmerService, authenticatedUser, this);
         this.teilnehmerExcelExporter = teilnehmerExcelExporter;
-        this.excelImporter = new ExcelImporter(teilnehmerService, authenticatedUser);
+//        this.excelImporter = new ExcelImporter(teilnehmerService, authenticatedUser);
+        this.studierendeImportDialog = new StudierendeImportDialog(teilnehmerService, authenticatedUser, this);
 
         TeilnehmerAufraeumenDialog aufraeumenDialog = new TeilnehmerAufraeumenDialog(teilnehmerService, authenticatedUser, this);
         TeilnehmerLoeschenDialog deleteDialog = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, aufraeumenDialog, this);
@@ -132,6 +130,10 @@ public class StudierendeView extends VerticalLayout {
             }
         });
 
+        importButton.addClickListener(event -> {
+            studierendeImportDialog.open();
+        });
+
 
         UI.getCurrent().getPage().addBrowserWindowResizeListener(event -> {
             if (event.getWidth() <= 1000) {
@@ -148,9 +150,18 @@ public class StudierendeView extends VerticalLayout {
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
             User user = maybeUser.get();
-            grid.setItems(teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue()));
+            String searchText = filterText.getValue().toLowerCase();
+            List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmer(user);
+            List<Teilnehmer> filteredTeilnehmerList = teilnehmerList.stream()
+                    .filter(teilnehmer -> teilnehmer.getVorname().toLowerCase().contains(searchText)
+                            || teilnehmer.getNachname().toLowerCase().contains(searchText)
+                            || Long.toString(teilnehmer.getId()).contains(searchText)) // Vergleicht den Suchtext mit der Matrikelnummer
+                    .collect(Collectors.toList());
+            grid.setItems(filteredTeilnehmerList);
         }
     }
+
+
     private Component getContent() {
         HorizontalLayout content = new HorizontalLayout(grid);
         content.setFlexGrow(1, grid);
@@ -199,7 +210,7 @@ public class StudierendeView extends VerticalLayout {
 
         binder.forField(matrikelNr)
                 .asRequired("Matrikelnummer muss gefüllt sein")
-                .withConverter(new DoubleToLongConverter())
+                .withConverter(d -> Double.valueOf(d).longValue(), Long::doubleValue)
                 .bind(Teilnehmer::getId, Teilnehmer::setId);
         matrikelNrColumn.setEditorComponent(matrikelNr);
         matrikelNr.setEnabled(false);
