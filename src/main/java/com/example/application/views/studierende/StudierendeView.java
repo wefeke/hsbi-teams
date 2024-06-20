@@ -1,7 +1,7 @@
 package com.example.application.views.studierende;
 
 import com.example.application.DoubleToLongConverter;
-import com.example.application.ExcelReader.ExcelExporter;
+import com.example.application.ExcelReader.TeilnehmerExcelExporter;
 import com.example.application.ExcelReader.ExcelImporter;
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
@@ -33,9 +33,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.example.application.ExcelReader.ExcelExporter;
 import com. vaadin.flow.component.upload.SucceededEvent;
-
 import com.vaadin.flow.server.StreamResource;
 import jakarta.annotation.security.RolesAllowed;
 import org.hibernate.bytecode.enhance.internal.tracker.NoopCollectionTracker;
@@ -51,7 +49,7 @@ import java.util.*;
 @RolesAllowed({"ADMIN", "USER"})
 public class StudierendeView extends VerticalLayout {
 
-    private final ExcelExporter excelExporter;
+    private final TeilnehmerExcelExporter teilnehmerExcelExporter;
     private final TeilnehmerService teilnehmerService;
     private final Grid<Teilnehmer> grid = new Grid<>();
     private final Editor<Teilnehmer> editor =grid.getEditor();
@@ -81,10 +79,10 @@ public class StudierendeView extends VerticalLayout {
     private User user;
 
     @Autowired
-    public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser,ExcelExporter excelExporter) {
+    public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser,TeilnehmerExcelExporter teilnehmerExcelExporter) {
         this.authenticatedUser = authenticatedUser;
         this.teilnehmerService = teilnehmerService;
-        this.excelExporter = excelExporter;
+        this.teilnehmerExcelExporter = teilnehmerExcelExporter;
         this.excelImporter = new ExcelImporter(teilnehmerService, authenticatedUser);
 
         Aufraeumen aufraeumenDialog = new Aufraeumen(teilnehmerService, authenticatedUser, this);
