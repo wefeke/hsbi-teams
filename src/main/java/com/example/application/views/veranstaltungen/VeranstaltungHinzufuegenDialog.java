@@ -59,7 +59,9 @@ public class VeranstaltungHinzufuegenDialog extends Dialog {
     MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
     private final Upload upload = new Upload(buffer);
     ExcelImporter excelImporter;
+
     Set<Teilnehmer> newTeilnehmerListe = new HashSet<>();
+    Set<Teilnehmer> allTeilnehmerListe = new HashSet<>();
 
     //Security
     private AuthenticatedUser authenticatedUser;
@@ -164,23 +166,12 @@ public class VeranstaltungHinzufuegenDialog extends Dialog {
                 tempNewTeilnehmerSet.removeAll(comboBox.getValue()); // Teilnehmer die ich aus der Teilnehmerliste löschen muss
                 newTeilnehmerListe.removeAll(tempNewTeilnehmerSet);
 
-                Dialog dialog = new Dialog();
-                dialog.setMaxHeight(getHeight());
-                dialog.setHeaderTitle("Neue Teilnehmer");
-                dialog.getFooter().add(new Button("OK", e -> dialog.close()));
-                VerticalLayout dialogLayout = new VerticalLayout();
-                dialog.add(dialogLayout);
-
                 for (Teilnehmer teilnehmer : newTeilnehmerListe) {
                     teilnehmerService.saveTeilnehmer(teilnehmer, user);
-                    dialogLayout.add(new Span("Teilnehmer :" + teilnehmer.toString() + " angelegt"));
                 }
 
                 veranstaltungenService.saveVeranstaltung(veranstaltung);
                 veranstaltungenView.updateKachelContainer("");
-
-                if (!newTeilnehmerListe.isEmpty())
-                    dialog.open();
 
                 clearFields();
                 close();
@@ -199,8 +190,11 @@ public class VeranstaltungHinzufuegenDialog extends Dialog {
         //Upload
         upload.addSucceededListener(event -> {
             try {
-                InputStream inputStream = buffer.getInputStream(event.getFileName());
-                newTeilnehmerListe.addAll(excelImporter.readTeilnehmerFromExcel(inputStream));
+                System.out.println("Uploading file: " + event.getFileName());
+                System.out.println("List at start: " + newTeilnehmerListe.toString());
+                newTeilnehmerListe.addAll(excelImporter.readNewTeilnehmerFromExcel(buffer.getInputStream(event.getFileName())));
+
+                allTeilnehmerListe.addAll(excelImporter.readAllTeilnehmerFromExcel(buffer.getInputStream(event.getFileName())));
 
                 List<Teilnehmer> combinedItems= new ArrayList<>();
                 combinedItems.addAll(teilnehmerService.findAllTeilnehmerByUserAndFilter(user, ""));
@@ -208,10 +202,29 @@ public class VeranstaltungHinzufuegenDialog extends Dialog {
 
                 List<Teilnehmer> combinedValue = new ArrayList<>();
                 combinedValue.addAll(comboBox.getValue());
-                combinedValue.addAll(newTeilnehmerListe);
+                combinedValue.addAll(allTeilnehmerListe);
 
                 comboBox.setItems(combinedItems);
                 comboBox.setValue(combinedValue);
+
+                Dialog dialog = new Dialog();
+                dialog.setWidth(getWidth());
+                dialog.setHeight(getHeight());
+                dialog.setHeaderTitle(newTeilnehmerListe.size() + " neue Teilnehmer hinzugefügt");
+                dialog.getFooter().add(new Button("OK", e -> dialog.close()));
+                VerticalLayout dialogLayout = new VerticalLayout();
+                dialog.add(dialogLayout);
+
+                if (!newTeilnehmerListe.isEmpty()) {
+                    int i = 1;
+                    for (Teilnehmer teilnehmer : newTeilnehmerListe) {
+                        dialogLayout.add(new Span(i + ". Teilnehmer: " + teilnehmer.getMatrikelNr() + " / " + teilnehmer.getVorname() + " " + teilnehmer.getNachname()));
+                        i++;
+                    }
+                    dialog.open();
+                }
+
+                System.out.println("List at end: " + newTeilnehmerListe.toString());
 
             } catch (Exception e) {
                 Notification.show("Error reading Excel file: " + e.getMessage());
@@ -222,7 +235,6 @@ public class VeranstaltungHinzufuegenDialog extends Dialog {
         upload.setDropLabelIcon(LineAwesomeIcon.ID_CARD.create());
         upload.setDropLabel(new Span("Teilnehmer Excel-Datei"));
         upload.setAcceptedFileTypes(".xlsx");
-
     }
 
     /**
@@ -251,6 +263,7 @@ public class VeranstaltungHinzufuegenDialog extends Dialog {
         datePicker.setValue(LocalDate.now());
         comboBox.clear();
         newTeilnehmerListe.clear();
+        allTeilnehmerListe.clear();
     }
 
 

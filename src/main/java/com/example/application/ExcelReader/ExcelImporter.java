@@ -4,7 +4,6 @@ import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
-import com.vaadin.flow.component.notification.Notification;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -24,7 +23,6 @@ import java.util.Optional;
  public class ExcelImporter {
 
     private TeilnehmerService teilnehmerService;
-    private List<Teilnehmer> teilnehmerList = new ArrayList<>();
     private User user;
 
     /**
@@ -42,6 +40,40 @@ import java.util.Optional;
         }
     }
 
+    public List<Teilnehmer> readAllTeilnehmerFromExcel(InputStream inputStream) throws Exception {
+        List<Teilnehmer> teilnehmerList = new ArrayList<>();
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        Sheet sheet = workbook.getSheetAt(0);
+        Iterator<Row> rows = sheet.iterator();
+
+        if (rows.hasNext()) { // skip the header row
+            rows.next();
+        }
+
+        while (rows.hasNext()) {
+            Row currentRow = rows.next();
+            // Assuming the first cell is vorname and the second cell is nachname
+            Cell idCell = currentRow.getCell(0);
+            Cell vornameCell = currentRow.getCell(1);
+            Cell nachnameCell = currentRow.getCell(2);
+
+            Long id = ((long) idCell.getNumericCellValue());
+            String vorname = vornameCell.getStringCellValue();
+            String nachname = nachnameCell.getStringCellValue();
+
+            Teilnehmer teilnehmer = new Teilnehmer();
+            teilnehmer.setId(id);
+            teilnehmer.setVorname(vorname);
+            teilnehmer.setNachname(nachname);
+
+            teilnehmerList.add(teilnehmer);
+
+        }
+
+        workbook.close();
+        return teilnehmerList;
+    }
+
     /**
      * Liest Teilnehmerdaten aus einer Excel-Datei und gibt eine Liste von Teilnehmer-Objekten zurück.
      * Jede Zeile in der Excel-Datei sollte einen Teilnehmer darstellen, wobei die erste Zelle die ID,
@@ -54,8 +86,8 @@ import java.util.Optional;
      * @return eine Liste von Teilnehmer-Objekten, die aus der Excel-Datei gelesen wurden
      * @throws Exception wenn ein Fehler beim Lesen der Excel-Datei oder bei der Verarbeitung der Daten auftritt
      */
-    public List<Teilnehmer> readTeilnehmerFromExcel(InputStream inputStream) throws Exception {
-
+    public List<Teilnehmer> readNewTeilnehmerFromExcel(InputStream inputStream) throws Exception {
+        List<Teilnehmer> teilnehmerList = new ArrayList<>();
         Workbook workbook = new XSSFWorkbook(inputStream);
         Sheet sheet = workbook.getSheetAt(0);
         Iterator<Row> rows = sheet.iterator();
@@ -77,10 +109,10 @@ import java.util.Optional;
 
             // Check if the Teilnehmer already exists in the database
             Optional<Teilnehmer> existingTeilnehmer = (teilnehmerService.findByMatrikelNr(id, user));
-            System.out.println("existingTeilnehmer: " + existingTeilnehmer.toString());
+            System.out.println("Already existingTeilnehmer: " + existingTeilnehmer.toString());
 
             if (existingTeilnehmer.isPresent()) {
-                //nichts
+                System.out.println("Present -> Did Nothing");
             }
             else {
                 // If the Teilnehmer does not exist, add it to the list
@@ -104,12 +136,13 @@ import java.util.Optional;
                     teilnehmer.setNachname(newNachname);
                     System.out.println("Increased Nachname: " + teilnehmer.toString());
                 }
-                Notification.show("Teilnehmer hinzugefügt: " + teilnehmer.toString());
+                System.out.println("Teilnehmer hinzugefügt: " + teilnehmer.toString());
                 teilnehmerList.add(teilnehmer);
             }
         }
 
         workbook.close();
+        System.out.println("Returned: " + teilnehmerList.toString());
         return teilnehmerList;
     }
 }
