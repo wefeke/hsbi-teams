@@ -64,8 +64,6 @@ public class StudierendeHinzufuegen extends Dialog {
                     Notification.show("Matrikelnummer existiert bereits", 3000, Notification.Position.MIDDLE);
                 } else {
                     saveTeilnehmer();
-                    Notification.show("Teilnehmer gespeichert", 3000, Notification.Position.MIDDLE);
-                    close();
                 }
             } else {
                 Notification.show("Bitte füllen Sie alle Felder aus", 3000, Notification.Position.MIDDLE);
@@ -94,17 +92,20 @@ public class StudierendeHinzufuegen extends Dialog {
     private void saveTeilnehmer() {
         Teilnehmer teilnehmer = new Teilnehmer();
 
-        if (binder.writeBeanIfValid(teilnehmer)) {
-            Optional<User> maybeUser = authenticatedUser.get();
-            if (maybeUser.isPresent()) {
-                User user = maybeUser.get();
-                teilnehmerService.saveTeilnehmer(teilnehmer, user);
-                studierendeView.updateStudierendeView(); // Grid aktualisieren
-                clearFields();
-                close();
-                Notification.show("Teilnehmer wurde angelegt");
-            } else {
-                Notification.show("Fehler beim Speichern");
+        // Check if the Matrikelnummer is valid before saving the Teilnehmer
+        if (matrikelNr.getValue() != null && String.valueOf(matrikelNr.getValue().longValue()).matches("\\d{7}")) {
+            if (binder.writeBeanIfValid(teilnehmer)) {
+                Optional<User> maybeUser = authenticatedUser.get();
+                if (maybeUser.isPresent()) {
+                    User user = maybeUser.get();
+                    teilnehmerService.saveTeilnehmer(teilnehmer, user);
+                    studierendeView.updateStudierendeView();
+                    clearFields();
+                    close();
+                    Notification.show("Teilnehmer wurde angelegt");
+                } else {
+                    Notification.show("Fehler beim Speichern");
+                }
             }
         }
     }
