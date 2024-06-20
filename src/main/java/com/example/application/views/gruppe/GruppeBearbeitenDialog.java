@@ -188,13 +188,41 @@ public class GruppeBearbeitenDialog extends Dialog {
                 });
 
                 confirmBtn.addClickListener(confirm -> {
-                    dataViews.subList(1, dataViews.size()).clear();
-                    gruppenGrids.subList(1, gruppenGrids.size()).clear();
-                    titles.clear();
-                    deleteButtons.clear();
-                    groupsArea.removeAll();
-                    gruppen.clear();
+//                    dataViews.subList(1, dataViews.size()).clear();
+//                    gruppenGrids.subList(1, gruppenGrids.size()).clear();
+//                    titles.clear();
+//                    deleteButtons.clear();
+//                    groupsArea.removeAll();
+//                    gruppen.clear();
 
+                    if(groupSize.getOptionalValue().isEmpty()){
+                        Notification.show("Bitte wähle eine Gruppenverteilung aus");
+                    }
+                    else if(Objects.equals(groupSize.getValue(), "Keine Teilnehmer ausgewählt.")){
+                        Notification.show("Es gibt keine Teilnehmer, die an der Gruppenarbeit teilnehmen. " +
+                                "So kann keine neue Verteilung generiert werden.");
+                        chooseNewGroups.close();
+                    }
+                    else{
+                        for(Gruppe gruppe: gruppen){
+                            gruppeService.deleteGruppe(gruppe);
+                        }
+                        dataViews.subList(1, dataViews.size()).clear();
+                        gruppenGrids.subList(1, gruppenGrids.size()).clear();
+                        titles.clear();
+                        deleteButtons.clear();
+                        groupsArea.removeAll();
+                        gruppen.clear();
+
+                        int groupNumber = getNumberOfGroups();
+                        makeGroups(groupNumber, gruppen);
+                        int[] sizes = groupSizes(groupNumber, participantsToMix.size());
+                        randomizeParticipants(sizes, groupNumber, gruppen, participantsToMix);
+                        groupGrids(gruppen.size(), gruppen);
+
+                        chooseNewGroups.close();
+
+                    }
                         });
 
                 chooseNewGroups.open();
@@ -389,5 +417,33 @@ public class GruppeBearbeitenDialog extends Dialog {
             groupStrings.add(str);
         }
         return groupStrings;
+    }
+
+    private int getNumberOfGroups() {
+        String num = groupSize.getValue();
+        String[] splitString = num.split(" ");
+        return Integer.parseInt(splitString[0]);
+    }
+
+    private void makeGroups(int numberOfGroups, List<Gruppe> gruppen) {
+        for(int i = 0; i< numberOfGroups; i++){
+            gruppen.add(new Gruppe((long) i+1));
+        }
+    }
+
+    private void randomizeParticipants(int[] sizes, int numberOfGroups, List<Gruppe> gruppen, List<Teilnehmer> participants) {
+        Collections.shuffle(participants);
+        Iterator<Teilnehmer> teilnehmerIterator = participants.iterator();
+
+        for(int j = 0; j< sizes[sizes.length-1]; j++) {
+            for (int i = 0; i < numberOfGroups; i++) {
+                if(teilnehmerIterator.hasNext()){
+                    gruppen.get(i).addTeilnehmer(teilnehmerIterator.next());
+                }
+                else{
+                    break;
+                }
+            }
+        }
     }
 }
