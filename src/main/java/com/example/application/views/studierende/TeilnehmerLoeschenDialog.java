@@ -5,26 +5,23 @@ import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.notification.Notification;
 import jakarta.annotation.security.RolesAllowed;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
 @RolesAllowed({"ADMIN", "USER"})
-public class DeleteDialog extends Dialog {
+public class TeilnehmerLoeschenDialog extends Dialog {
     private final TeilnehmerService teilnehmerService;
     private AuthenticatedUser authenticatedUser;
-    private Aufraeumen aufraeumen;
+    private TeilnehmerAufraeumenDialog teilnehmerAufraeumenDialog;
     private StudierendeView studierendeView;
 
-    public DeleteDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, Aufraeumen aufraeumen, StudierendeView studierendeView) {
+    public TeilnehmerLoeschenDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, TeilnehmerAufraeumenDialog teilnehmerAufraeumenDialog, StudierendeView studierendeView) {
         this.teilnehmerService = teilnehmerService;
         this.authenticatedUser = authenticatedUser;
-        this.aufraeumen = aufraeumen;
+        this.teilnehmerAufraeumenDialog = teilnehmerAufraeumenDialog;
         this.studierendeView = studierendeView;
     }
 
@@ -86,9 +83,9 @@ public class DeleteDialog extends Dialog {
             }
             Notification.show("Studierende gelöscht");
             close();
-            aufraeumen.close();
+            teilnehmerAufraeumenDialog.close();
             studierendeView.updateStudierendeView();
-            aufraeumen.updateGridNoEvent();
+            teilnehmerAufraeumenDialog.updateGridNoEvent();
 
         });
 

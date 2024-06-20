@@ -3,22 +3,19 @@ package com.example.application.views.studierende;
 import com.example.application.models.*;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
-import com.example.application.views.MainLayout;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
-import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 
 import java.util.*;
 
 
 @RolesAllowed({"ADMIN", "USER"})
-public class Aufraeumen extends Dialog {
+public class TeilnehmerAufraeumenDialog extends Dialog {
     private final TeilnehmerService teilnehmerService;
     private final Button deleteOldButton = new Button("Älter als ... Jahre)");
     private final Button deleteNoEventButton = new Button("Ohne Veranstaltung)");
@@ -30,10 +27,10 @@ public class Aufraeumen extends Dialog {
    private AuthenticatedUser authenticatedUser;
 
 
-    public Aufraeumen(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, StudierendeView studierendeView) {
+    public TeilnehmerAufraeumenDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, StudierendeView studierendeView) {
         this.teilnehmerService = teilnehmerService;
         this.authenticatedUser = authenticatedUser;
-        DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService, authenticatedUser, this, studierendeView);
+        TeilnehmerLoeschenDialog teilnehmerLoeschenDialog = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, this, studierendeView);
 
 
         closeButton.addClickListener(event ->
@@ -59,7 +56,7 @@ public class Aufraeumen extends Dialog {
             Set<Teilnehmer> selectedTeilnehmer = grid.getSelectedItems();
             if (!selectedTeilnehmer.isEmpty()) {
                 List<Teilnehmer> teilnehmerList = new ArrayList<>(selectedTeilnehmer);
-                deleteDialog.openDeleteDialog(teilnehmerList);
+                teilnehmerLoeschenDialog.openDeleteDialog(teilnehmerList);
             }
         });
 

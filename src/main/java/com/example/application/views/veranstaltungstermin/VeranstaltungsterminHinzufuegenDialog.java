@@ -28,7 +28,7 @@ import java.util.Optional;
  *
  * @author Kennet
  */
-public class VeranstaltungsterminDialog extends Dialog {
+public class VeranstaltungsterminHinzufuegenDialog extends Dialog {
 
     //Services
     private final VeranstaltungenService veranstaltungService;
@@ -70,7 +70,7 @@ public class VeranstaltungsterminDialog extends Dialog {
      * @param aktiverVeranstaltungstermin Ein Veranstaltungstermin-Objekt, das den aktiven Veranstaltungstermin repräsentiert.
      * @param aktiveGruppenarbeit Ein Gruppenarbeit-Objekt, das die aktive Gruppenarbeit repräsentiert.
      */
-    public VeranstaltungsterminDialog(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungDetailView veranstaltungDetailView, String veranstaltungId, AuthenticatedUser authenticatedUser, Veranstaltungstermin aktiverVeranstaltungstermin, Gruppenarbeit aktiveGruppenarbeit) {
+    public VeranstaltungsterminHinzufuegenDialog(VeranstaltungenService veranstaltungService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungDetailView veranstaltungDetailView, String veranstaltungId, AuthenticatedUser authenticatedUser, Veranstaltungstermin aktiverVeranstaltungstermin, Gruppenarbeit aktiveGruppenarbeit) {
         this.veranstaltungService = veranstaltungService;
         this.veranstaltungsterminService = veranstaltungsterminService;
         this.veranstaltungId = veranstaltungId;

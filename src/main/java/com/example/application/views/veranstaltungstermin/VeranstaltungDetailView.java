@@ -8,7 +8,7 @@ import com.example.application.services.*;
 import com.example.application.models.*;
 import com.example.application.views.MainLayout;
 import com.example.application.views.gruppe.GruppeBearbeitenDialog;
-import com.example.application.views.gruppenarbeit.GruppeAuswertungDialog;
+import com.example.application.views.gruppe.GruppeAuswertungDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitBearbeitenDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitHinzufuegenDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitLoeschenDialog;
@@ -74,7 +74,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
     private final Select<String> filterButton;
 
     //Dialog Instance
-    private VeranstaltungsterminDialog veranstaltungsterminDialog;
+    private VeranstaltungsterminHinzufuegenDialog veranstaltungsterminHinzufuegenDialog;
     private GruppenarbeitHinzufuegenDialog gruppenarbeitHinzufuegenDialog;
     private GruppenarbeitBearbeitenDialog gruppenarbeitBearbeitenDialog;
     private GruppenarbeitLoeschenDialog gruppenarbeitLoeschenDialog;
@@ -416,7 +416,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
         veranstaltungsterminMap.put(kachel, veranstaltungstermin);
         kachel.addClassName("kachel");
 
-        VeranstaltungsterminBearbeiten editDialog = new VeranstaltungsterminBearbeiten(veranstaltungService, veranstaltungsterminService, this, veranstaltungIdString, veranstaltungstermin.getId(), authenticatedUser, aktiverVeranstaltungstermin, aktiveGruppenarbeit);
+        VeranstaltungsterminBearbeitenDialog editDialog = new VeranstaltungsterminBearbeitenDialog(veranstaltungService, veranstaltungsterminService, this, veranstaltungIdString, veranstaltungstermin.getId(), authenticatedUser, aktiverVeranstaltungstermin, aktiveGruppenarbeit);
 
         //Delete Icon
         Div deleteIcon = createDeleteIcon();
@@ -486,6 +486,8 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 if (aktiveKachelVeranstaltungstermin != null) {
                     aktiveKachelVeranstaltungstermin.removeClassName("kachel-active");
                     aktiverVeranstaltungstermin = null;
+                    aktiveKachelGruppenarbeit.removeClassName("kachel-active");
+                    aktiveGruppenarbeit = null;
                 }
 
                 gruppenarbeitContainer.removeAll();
@@ -569,7 +571,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
                 neueVeranstaltungsterminKachel.removeClassName("hover"));
 
         neueVeranstaltungsterminKachel.addClickListener(e ->
-                veranstaltungsterminDialog.open()
+                veranstaltungsterminHinzufuegenDialog.open()
         );
 
         return neueVeranstaltungsterminKachel;
@@ -583,7 +585,7 @@ public class VeranstaltungDetailView extends VerticalLayout implements HasUrlPar
      * @autor Joris
      */
     public void createVeranstaltungsterminDialog () {
-        veranstaltungsterminDialog = new VeranstaltungsterminDialog(veranstaltungService, veranstaltungsterminService, this, veranstaltungIdString, authenticatedUser, aktiverVeranstaltungstermin, aktiveGruppenarbeit);
+        veranstaltungsterminHinzufuegenDialog = new VeranstaltungsterminHinzufuegenDialog(veranstaltungService, veranstaltungsterminService, this, veranstaltungIdString, authenticatedUser, aktiverVeranstaltungstermin, aktiveGruppenarbeit);
     }
 
     /**

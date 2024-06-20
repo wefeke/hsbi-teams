@@ -1,4 +1,4 @@
-package com.example.application.views.gruppenarbeit;
+package com.example.application.views.gruppe;
 
 import com.example.application.models.*;
 import com.example.application.services.GruppenarbeitTeilnehmerService;
@@ -14,7 +14,6 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Route;
 import jakarta.validation.constraints.NotNull;
 
-import java.lang.annotation.Native;
 import java.util.Optional;
 
 // LEON

@@ -21,7 +21,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -132,7 +131,7 @@ public class VeranstaltungenView extends VerticalLayout  {
             updateKachelContainer(searchText);
         });
 
-        VeranstaltungDialog createDialog = new VeranstaltungDialog(veranstaltungenService, teilnehmerService, userService, this, authenticatedUser);
+        VeranstaltungHinzufuegenDialog createDialog = new VeranstaltungHinzufuegenDialog(veranstaltungenService, teilnehmerService, userService, this, authenticatedUser);
 
         // Button zum Erstellen neuer Veranstaltungen erstellen
         Button newEventButton = new Button(new Icon(VaadinIcon.PLUS));
@@ -309,7 +308,7 @@ public class VeranstaltungenView extends VerticalLayout  {
      * @autor Joris
      */
     private void createDefaultLayout() {
-        VeranstaltungDialog createDialog = new VeranstaltungDialog(veranstaltungenService, teilnehmerService, userService, this, authenticatedUser);
+        VeranstaltungHinzufuegenDialog createDialog = new VeranstaltungHinzufuegenDialog(veranstaltungenService, teilnehmerService, userService, this, authenticatedUser);
 
         Text noEventsText = new Text("Noch keine Veranstaltungen vorhanden, bitte legen Sie hier eine an:");
         Button createEventButton = new Button("Veranstaltung anlegen");
@@ -362,7 +361,7 @@ public class VeranstaltungenView extends VerticalLayout  {
             veranstaltungLoeschenDialog.open()
         ).addEventData("event.stopPropagation()");
 
-        VeranstaltungBearbeiten editDialog = new VeranstaltungBearbeiten(veranstaltungenService, teilnehmerService, userService, veranstaltung, this, authenticatedUser);
+        VeranstaltungBearbeitenDialog editDialog = new VeranstaltungBearbeitenDialog(veranstaltungenService, teilnehmerService, userService, veranstaltung, this, authenticatedUser);
 
         veranstaltungLoeschenDialog.setVeranstaltung(veranstaltung);
 

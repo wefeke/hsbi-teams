@@ -9,16 +9,12 @@ import com.example.application.services.TeilnehmerService;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -33,7 +29,6 @@ import com.vaadin.flow.router.Route;
 
 import com.vaadin.flow.server.StreamResource;
 import jakarta.annotation.security.RolesAllowed;
-import org.hibernate.bytecode.enhance.internal.tracker.NoopCollectionTracker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
@@ -41,7 +36,6 @@ import org.vaadin.lineawesome.LineAwesomeIcon;
 import java.io.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,7 +48,7 @@ public class StudierendeView extends VerticalLayout {
     private final Editor<Teilnehmer> editor =grid.getEditor();
     private final TextField filterText = new TextField();
     private final Button addStudiernedenButton = new Button("Studierenden hinzufügen");
-    private final StudierendeHinzufuegen dialog;
+    private final StudierendeHinzufuegenDialog dialog;
     private H2 users = new H2("Studierende");
     private final Button delete = new Button("Studierenden löschen");
     //private final Button aendern = new Button ("Studierende ändern");
@@ -76,9 +70,9 @@ public class StudierendeView extends VerticalLayout {
     public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
         this.authenticatedUser = authenticatedUser;
         this.teilnehmerService = teilnehmerService;
-        Aufraeumen aufraeumenDialog = new Aufraeumen(teilnehmerService, authenticatedUser, this);
-        DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService, authenticatedUser, aufraeumenDialog, this);
-        StudierendeHinzufuegen studierendeHinzufuegen = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser, this);
+        TeilnehmerAufraeumenDialog teilnehmerAufraeumenDialogDialog = new TeilnehmerAufraeumenDialog(teilnehmerService, authenticatedUser, this);
+        TeilnehmerLoeschenDialog teilnehmerLoeschenDialog = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, teilnehmerAufraeumenDialogDialog, this);
+        StudierendeHinzufuegenDialog studierendeHinzufuegenDialog = new StudierendeHinzufuegenDialog(teilnehmerService, authenticatedUser, this);
         addStudiernedenButtonIcon = addStudiernedenButton.getIcon();
         deleteIcon = delete.getIcon();
         //aendernIcon = aendern.getIcon();
@@ -94,7 +88,7 @@ public class StudierendeView extends VerticalLayout {
         );
         updateStudierendeView();
 
-        dialog = new StudierendeHinzufuegen(teilnehmerService, authenticatedUser, this);
+        dialog = new StudierendeHinzufuegenDialog(teilnehmerService, authenticatedUser, this);
         addStudiernedenButton.addClickListener(event -> {
             dialog.open();
             updateStudierendeView();
@@ -113,7 +107,7 @@ public class StudierendeView extends VerticalLayout {
         delete.addClickListener(event -> {
             List<Teilnehmer> selectedTeilnehmer = new ArrayList<>(grid.getSelectedItems());
             if (!selectedTeilnehmer.isEmpty()) {
-                deleteDialog.openDeleteDialog(selectedTeilnehmer);
+                teilnehmerLoeschenDialog.openDeleteDialog(selectedTeilnehmer);
             }
         });
         // Click-Listener für den Ändern-Button
@@ -133,7 +127,7 @@ public class StudierendeView extends VerticalLayout {
             }
         });
 
-        aufraeumenButton.addClickListener(event -> aufraeumenDialog.open());
+        aufraeumenButton.addClickListener(event -> teilnehmerAufraeumenDialogDialog.open());
     }
 
     public void updateStudierendeView() {

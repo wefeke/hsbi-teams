@@ -22,7 +22,6 @@ public class VeranstaltungsterminService {
     }
 
     public List<Veranstaltungstermin> findAllVeranstaltungstermine() {
-        System.out.println(veranstaltungsterminRepository.findAll().size());
         return veranstaltungsterminRepository.findAll();
     }
 
