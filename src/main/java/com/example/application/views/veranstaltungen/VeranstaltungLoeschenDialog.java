@@ -67,8 +67,6 @@ public class VeranstaltungLoeschenDialog extends Dialog {
             veranstaltung.removeAllTeilnehmer();
             veranstaltungenService.saveVeranstaltung(veranstaltung);
 
-            String str = "";
-
             for(Veranstaltungstermin termin: termine){
                 List<Gruppenarbeit> gruppenarbeiten = termin.getGruppenarbeiten();
                 termin.removeAllGruppenarbeiten();
@@ -93,8 +91,6 @@ public class VeranstaltungLoeschenDialog extends Dialog {
             }
 
             for(Teilnehmer teil: teilnehmer){
-                str += teil.toString();
-                Notification.show(str);
                 teil.removeVeranstaltung(veranstaltung);
                 teilnehmerService.updateTeilnehmer(teil);
             }
@@ -147,4 +143,5 @@ public class VeranstaltungLoeschenDialog extends Dialog {
         getFooter().add(deleteBtn);
         return mainLayout;
     }
+
 }

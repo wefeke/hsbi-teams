@@ -295,7 +295,8 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     }
 
     //Erstellt benötigte Anzahl an Gruppen
-    private static void makeGroups(int numberOfGroups, List<Gruppe> gruppen) {
+    //TODO: This was static but I changed it bc I didn't know why. See if there are any problems.
+    private void makeGroups(int numberOfGroups, List<Gruppe> gruppen) {
         for(int i = 0; i< numberOfGroups; i++){
             gruppen.add(new Gruppe((long) i+1));
         }
