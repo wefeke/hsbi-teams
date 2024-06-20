@@ -25,7 +25,7 @@ public class DeleteDialog extends Dialog {
     private Teilnehmer teilnehmer;
 
     H2 infoText = new H2("Empty");
-    Button deleteBtn = new Button("Veranstaltungstermin endgültig löschen");
+    Button deleteBtn = new Button("Studierenden endgültig löschen");
     Button cancelBtn = new Button("Abbrechen");
     Paragraph warningText = new Paragraph("Empty");
     Paragraph noReturn = new Paragraph("Der Studierende ist in keiner Veranstaltung");

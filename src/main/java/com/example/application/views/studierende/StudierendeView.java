@@ -42,6 +42,7 @@ import org.vaadin.lineawesome.LineAwesomeIcon;
 
 
 import java.io.*;
+import java.time.LocalDate;
 import java.util.*;
 
 @Route(value = "studierende", layout = MainLayout.class)
@@ -128,49 +129,6 @@ public class StudierendeView extends VerticalLayout {
                 }
             }
         });
-
-        exportButton.addClickListener(event -> {
-                List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue());
-                Notification.show(teilnehmerList.toString());
-                File tempFile = createTempFile();
-                if (tempFile != null) {
-                    System.out.println("Temp file created at: " + tempFile.getAbsolutePath()); // Log the file path
-                    Notification.show("File created at: " + tempFile.getAbsolutePath());
-                    excelExporter.exportTeilnehmerListe(teilnehmerList, tempFile.getAbsolutePath(), user.getUsername());
-                    if (tempFile.exists()) {
-                        System.out.println("Temp file exists"); // Check if the file exists
-                    } else {
-                        System.out.println("Temp file does not exist");
-                    }
-                    StreamResource resource = offerDownload(tempFile);
-                    System.out.println("Resource: " + resource.toString()); // Log the resource object
-                }
-
-        });
-
-//        upload.addSucceededListener(event -> {
-//            try {
-//                InputStream inputStream = buffer.getInputStream(event.getFileName());
-//                newTeilnehmerListe.addAll(excelImporter.readTeilnehmerFromExcel(inputStream));
-//
-//                List<Teilnehmer> combinedItems= new ArrayList<>();
-//                combinedItems.addAll(teilnehmerService.findAllTeilnehmerByUserAndFilter(user, ""));
-//                combinedItems.addAll(newTeilnehmerListe);
-//
-//                List<Teilnehmer> combinedValue = new ArrayList<>();
-//                combinedValue.addAll(newTeilnehmerListe);
-//
-//
-//            } catch (Exception e) {
-//                Notification.show("Error reading Excel file: " + e.getMessage());
-//                System.out.println(e.getMessage());
-//            }
-//        });
-//        upload.setUploadButton(new Button(LineAwesomeIcon.UPLOAD_SOLID.create()));
-//        upload.setDropLabelIcon(LineAwesomeIcon.ID_CARD.create());
-//        upload.setDropLabel(new Span("Teilnehmer Excel-Datei"));
-//        upload.setAcceptedFileTypes(".xlsx");
-//                });
 
 
         UI.getCurrent().getPage().addBrowserWindowResizeListener(event -> {
@@ -279,7 +237,35 @@ public class StudierendeView extends VerticalLayout {
         return toolbar;
     }
     private Component getToolbar2() {
-        HorizontalLayout toolbar2 = new HorizontalLayout(importButton, exportButton, aufraeumenButton);
+
+        // Ein Anchor, unter welchem der Download der Daten möglich ist
+        Anchor anchor = new Anchor();
+        anchor.setText("Download");
+        anchor.getElement().getStyle().set("display", "none");
+        anchor.getElement().setAttribute("download", true);
+        Optional<User> maybeUser = authenticatedUser.get();
+
+        User user = maybeUser.get();
+        List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue());
+
+        // Die eigentlichen Daten werden in diesem Objekt gespeichert und dem Anchor übergeben
+        StreamResource resource = new StreamResource("teilnehmerliste_" + LocalDate.now() + ".xlsx", () -> {
+            byte[] data = null; // Your method to fetch data
+            try {
+                TeilnehmerExcelExporter teilnehmerExcelExporter = new TeilnehmerExcelExporter();
+                data = teilnehmerExcelExporter.export(teilnehmerList);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return new ByteArrayInputStream(data);
+        });
+        anchor.setHref(resource);
+
+        exportButton.addClickListener(event -> {
+            anchor.getElement().callJsFunction("click");
+        });
+
+        HorizontalLayout toolbar2 = new HorizontalLayout(importButton, anchor, exportButton, aufraeumenButton);
 
         toolbar2.addClassName("toolbar");
 
