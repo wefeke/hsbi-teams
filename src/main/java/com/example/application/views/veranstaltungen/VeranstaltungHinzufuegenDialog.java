@@ -71,6 +71,7 @@ public class VeranstaltungHinzufuegenDialog extends Dialog {
     //Data Binder
     Binder<Veranstaltung> binder = new Binder<>(Veranstaltung.class);
 
+
     /**
      * Konstruktor für die VeranstaltungDialog Klasse.
      * Ruft die Methoden zum Erstellen und Konfigurieren der UI-Elemente auf.
