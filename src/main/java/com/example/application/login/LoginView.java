@@ -16,6 +16,12 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import java.util.Set;
 
+/**
+ * Eine Klasse, die die Login-Ansicht der Anwendung repräsentiert.
+ * Hier können Benutzer sich anmelden, um Zugang zu den Funktionen der Anwendung zu erhalten.
+ *
+ * @author Kennet
+ */
 @AnonymousAllowed
 @PageTitle("Login")
 @Route(value = "login")
@@ -24,6 +30,13 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
 
     private final AuthenticatedUser authenticatedUser;
 
+    /**
+     * Konstruktor für die LoginView Klasse.
+     * Hier werden die UI-Elemente initialisiert und die Aktionen für die UI-Elemente festgelegt.
+     *
+     * @author Kennet
+     * @param authenticatedUser Ein AuthenticatedUser-Objekt, das Informationen über den aktuell authentifizierten Benutzer enthält.
+     */
     public LoginView(AuthenticatedUser authenticatedUser) {
         this.authenticatedUser = authenticatedUser;
         setAction(RouteUtil.getRoutePath(VaadinService.getCurrent().getContext(), getClass()));
@@ -46,6 +59,14 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
         setOpened(true);
     }
 
+    /**
+     * Wird aufgerufen, bevor der Benutzer die Seite betritt.
+     * Überprüft, ob der Benutzer bereits eingeloggt ist und leitet ihn gegebenenfalls zur Hauptseite weiter.
+     * Zeigt außerdem eine Fehlermeldung an, wenn der Parameter "error" in der URL vorhanden ist.
+     *
+     * @author Kennet
+     * @param event Ein BeforeEnterEvent-Objekt, das Informationen über das bevorstehende Betreten der Seite enthält.
+     */
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
 
@@ -66,7 +87,5 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
             setError(false);
             setDescription("Login using user/user or admin/admin");
         }
-
-        //setError(event.getLocation().getQueryParameters().getParameters().containsKey("error"));
     }
 }

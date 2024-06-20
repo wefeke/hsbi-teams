@@ -11,15 +11,34 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+/**
+ * Konfigurationsklasse für die Sicherheitseinstellungen der Anwendung.
+ *
+ * @author Kennet
+ */
 @EnableWebSecurity
 @Configuration
 public class SecurityConfiguration extends VaadinWebSecurity {
 
+    /**
+     * Erstellt ein PasswordEncoder-Objekt, das zum Hashen von Passwörtern verwendet wird.
+     *
+     * @author Kennet
+     * @return Ein PasswordEncoder-Objekt.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Konfiguriert die Sicherheitseinstellungen der Anwendung.
+     * Hier werden die Zugriffsrechte für verschiedene URLs festgelegt und die Login-Seite konfiguriert.
+     *
+     * @author Kennet
+     * @param http Ein HttpSecurity-Objekt, das zur Konfiguration der Sicherheitseinstellungen verwendet wird.
+     * @throws Exception Wenn ein Fehler bei der Konfiguration auftritt.
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 

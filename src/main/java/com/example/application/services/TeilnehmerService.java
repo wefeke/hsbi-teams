@@ -35,6 +35,7 @@ public class TeilnehmerService {
 //            return teilnehmerRepository.search(filterText);
 //        }
 //    }
+    @Transactional
     public Optional<Teilnehmer> findByMatrikelNr(Long matrikelNr, User user) {
         return teilnehmerRepository.findTeilnehmerByMatrikelNrAndUser(matrikelNr, user);
     }
@@ -47,6 +48,8 @@ public class TeilnehmerService {
         } else
             System.err.println("Teilnehmer is null. Are you sure you have connected your form to the application?");
     }
+
+    @Transactional
     public void updateTeilnehmer(Teilnehmer teilnehmer) {
         if (teilnehmer != null) {
             teilnehmerRepository.save(teilnehmer);
@@ -62,6 +65,7 @@ public class TeilnehmerService {
             System.err.println("Test is null. Are you sure you have connected your form to the application?");
     }
 
+    @Transactional
     public boolean isTeilnehmerInVeranstaltung(Teilnehmer teilnehmer) {
         return !teilnehmer.getVeranstaltungen().isEmpty();
     }
@@ -71,6 +75,7 @@ public class TeilnehmerService {
         return teilnehmerRepository.findByVeranstaltungId(id);
     }
 
+    @Transactional
     public List<Teilnehmer> findAllTeilnehmerByUserAndFilter(User user, String filterText) {
         if (filterText == null || filterText.isEmpty()) {
             return teilnehmerRepository.findByUser(user);
@@ -79,26 +84,32 @@ public class TeilnehmerService {
         }
     }
 
+    @Transactional
     public Veranstaltung findTeilnehmerById(Long id, User user) {
         return teilnehmerRepository.findByIdAndUser(id, user);
     }
 
+    @Transactional
     public List<Teilnehmer> findAllTeilnehmerByUser(User user) {
         return teilnehmerRepository.findByUser(user);
     }
 
+    @Transactional
     public List<Teilnehmer> findStudierendeOhneVeranstaltung(User user) {
         return teilnehmerRepository.findStudierendeOhneVeranstaltung(user);
     }
 
+    @Transactional
     public boolean isTeilnehmerInGruppenarbeit(Teilnehmer teilnehmer, Long veranstaltungId) {
         return teilnehmerRepository.isTeilnehmerInGruppenarbeit(teilnehmer.getId(), veranstaltungId);
     }
 
+    @Transactional
     public List<Teilnehmer> findStudierendeVorJahren(int years, User user) {
         return teilnehmerRepository.findStudierendeVorJahren(LocalDateTime.now().minusYears(years), user);
     }
 
+    @Transactional
     public List<Teilnehmer> findAllTeilnehmerNotInVeranstaltung(Long veranstaltungId, User user) {
         return teilnehmerRepository.findAllTeilnehmerNotInVeranstaltung(veranstaltungId, user);
     }
@@ -116,22 +127,27 @@ public class TeilnehmerService {
         }
     }
 
+    @Transactional
     public Optional<Teilnehmer> findTeilnehmerByIdAndVornameAndNachname(Long id, String vorname, String nachname, User user) {
         return teilnehmerRepository.findTeilnehmerByIdAndVornameAndNachnameAndUser(id, vorname, nachname, user);
 }
 
+    @Transactional
     public Optional<Teilnehmer> findByMatrikelNrAndUserId(Long matrikelNr, Long userId) {
         return teilnehmerRepository.findByMatrikelNrAndUserId(matrikelNr, userId);
     }
 
+    @Transactional
     public Optional<Teilnehmer> findTeilnehmerByVornameAndNachname(String vorname, String nachname, User user) {
         return teilnehmerRepository.findTeilnehmerByVornameAndNachnameAndUser(vorname, nachname, user);
     }
 
+    @Transactional
     public List<Teilnehmer> findAllTeilnehmerByVornameAndNachname(String vorname, String nachname, User user) {
         return teilnehmerRepository.findAllByVornameAndNachnameAndUser(vorname, nachname, user);
     }
 
+    @Transactional
     public Optional<Teilnehmer> findTeilnehmerByNachname(String nachname, User user) {
         return teilnehmerRepository.findTeilnehmerByNachnameAndUser(nachname, user);
     }

@@ -1,6 +1,7 @@
 package com.example.application.views.user;
 
 import com.example.application.models.User;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.UserService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -8,7 +9,14 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.PasswordField;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-public class PasswordChange extends Dialog {
+import java.util.Optional;
+
+/**
+ * Dialog zur Änderung des Passworts eines authentifizierten Benutzers.
+ *
+ * @author Kennet
+ */
+public class PasswordChangeDialog extends Dialog {
 
     private PasswordField old_password = new PasswordField("Altes Password");
     private PasswordField new_password = new PasswordField("Neues Password");
@@ -16,22 +24,46 @@ public class PasswordChange extends Dialog {
 
     private PasswordEncoder passwordEncoder;
     private final UserService userService;
+    private AuthenticatedUser authenticatedUser;
     private User user;
 
-    public PasswordChange (PasswordEncoder passwordEncoder, UserService userService, User user) {
+    /**
+     * Konstruktor für die PasswordChange Klasse.
+     *
+     * @author Kennet
+     * @param authenticatedUser Ein AuthenticatedUser-Objekt, das Informationen über den authentifizierten Benutzer enthält.
+     * @param userService Ein UserService-Objekt, das Methoden zur Interaktion mit User-Objekten in der Datenbank bereitstellt.
+     * @param passwordEncoder Ein PasswordEncoder-Objekt, das zum Hashen von Passwörtern verwendet wird.
+     */
+    public PasswordChangeDialog(AuthenticatedUser authenticatedUser, UserService userService, PasswordEncoder passwordEncoder) {
+        this.authenticatedUser = authenticatedUser;
+        Optional<User> maybeUser = authenticatedUser.get();
+        maybeUser.ifPresent(value -> this.user = value);
+
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
-        this.user = user;
         createElements();
         configureElements();
 
-        setHeaderTitle("Change Password");
+        setHeaderTitle("Passwort ändern");
     }
 
+    /**
+     * Erstellt die UI-Elemente für den Dialog.
+     *
+     * @author Kennet
+     */
     private void createElements() {
         add(old_password, new_password, password_check);
     }
 
+    /**
+     * Konfiguriert die UI-Elemente für den Dialog.
+     * Überprüft, ob das alte Passwort korrekt ist.
+     * Überprüft, ob die eingegebenen Passwörter übereinstimmen und speichert das neue Passwort in der Datenbank.
+     *
+     * @author Kennet
+     */
     private void configureElements() {
         old_password.setWidthFull();
         old_password.setRequired(true);
@@ -46,7 +78,7 @@ public class PasswordChange extends Dialog {
             }
             else {
                 password_check.setInvalid(true);
-                password_check.setErrorMessage("Passwords do not match");
+                password_check.setErrorMessage("Passwörter sind nicht gleich");
             }
         });
 
@@ -56,7 +88,7 @@ public class PasswordChange extends Dialog {
             }
             else {
                 password_check.setInvalid(true);
-                password_check.setErrorMessage("Passwords do not match");
+                password_check.setErrorMessage("Passwörter sind nicht gleich");
             }
         });
 
@@ -71,7 +103,7 @@ public class PasswordChange extends Dialog {
             }
             else {
                 old_password.setInvalid(true);
-                old_password.setErrorMessage("Password is incorrect");
+                old_password.setErrorMessage("Password ist nicht korrekt");
             }
 
             if (!password_check.isInvalid() && !old_password.isInvalid() && !new_password.isInvalid()) {
@@ -84,6 +116,11 @@ public class PasswordChange extends Dialog {
         }));
     }
 
+    /**
+     * Leert die Eingabefelder des Dialogs.
+     *
+     * @author Kennet
+     */
     private void clearFields() {
         old_password.clear();
         new_password.clear();
