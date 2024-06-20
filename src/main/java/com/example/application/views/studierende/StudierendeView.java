@@ -2,7 +2,6 @@ package com.example.application.views.studierende;
 
 
 import com.example.application.ExcelReader.TeilnehmerExcelExporter;
-import com.example.application.ExcelReader.ExcelImporter;
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
@@ -10,17 +9,12 @@ import com.example.application.services.TeilnehmerService;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -33,15 +27,11 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com. vaadin.flow.component.upload.SucceededEvent;
 import com.vaadin.flow.server.StreamResource;
 import jakarta.annotation.security.RolesAllowed;
-import org.hibernate.bytecode.enhance.internal.tracker.NoopCollectionTracker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 import java.util.stream.Collectors;
-import com.vaadin.flow.data.provider.Query;
-
 
 
 import java.io.*;
@@ -67,6 +57,7 @@ public class StudierendeView extends VerticalLayout {
     private final Button importButton = new Button("Importieren");
     private final Button exportButton = new Button("Exportieren");
     private AuthenticatedUser authenticatedUser;
+    private final StudierendeImportDialog studierendeImportDialog;
 
     TextField vorname = new TextField("Vorname");
     TextField nachname = new TextField("Nachname");
@@ -78,7 +69,7 @@ public class StudierendeView extends VerticalLayout {
 
     MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
     private final Upload upload = new Upload(buffer);
-    ExcelImporter excelImporter;
+//    ExcelImporter excelImporter;
     Set<Teilnehmer> newTeilnehmerListe = new HashSet<>();
     private User user;
 
@@ -87,7 +78,8 @@ public class StudierendeView extends VerticalLayout {
         this.authenticatedUser = authenticatedUser;
         this.teilnehmerService = teilnehmerService;
         this.teilnehmerExcelExporter = teilnehmerExcelExporter;
-        this.excelImporter = new ExcelImporter(teilnehmerService, authenticatedUser);
+//        this.excelImporter = new ExcelImporter(teilnehmerService, authenticatedUser);
+        this.studierendeImportDialog = new StudierendeImportDialog(teilnehmerService, authenticatedUser, this);
 
         Aufraeumen aufraeumenDialog = new Aufraeumen(teilnehmerService, authenticatedUser, this);
         DeleteDialog deleteDialog = new DeleteDialog(teilnehmerService, authenticatedUser, aufraeumenDialog, this);
@@ -131,6 +123,10 @@ public class StudierendeView extends VerticalLayout {
                     deleteDialogForSelectedTeilnehmer.open();
                 }
             }
+        });
+
+        importButton.addClickListener(event -> {
+            studierendeImportDialog.open();
         });
 
 
