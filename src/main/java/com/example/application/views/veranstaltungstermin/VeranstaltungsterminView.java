@@ -486,7 +486,10 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
                 if (aktiveKachelVeranstaltungstermin != null) {
                     aktiveKachelVeranstaltungstermin.removeClassName("kachel-active");
                     aktiverVeranstaltungstermin = null;
-                    aktiveKachelGruppenarbeit.removeClassName("kachel-active");
+                    if(aktiveKachelGruppenarbeit!=null) {
+                        aktiveKachelGruppenarbeit.removeClassName("kachel-active");
+                        aktiveKachelGruppenarbeit = null;
+                    }
                     aktiveGruppenarbeit = null;
                 }
 
