@@ -12,6 +12,7 @@ import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,42 +61,7 @@ public class VeranstaltungLoeschenDialog extends Dialog {
                 this.veranstaltung = veranstaltungenService.findVeranstaltungById(this.veranstaltung.getId(), user);
             }
 
-            assert veranstaltung != null;
-            List<Veranstaltungstermin> termine = veranstaltung.getVeranstaltungstermine();
-            veranstaltung.removeAllTermine();
-            Set<Teilnehmer> teilnehmer = veranstaltung.getTeilnehmer();
-            veranstaltung.removeAllTeilnehmer();
-            veranstaltungenService.saveVeranstaltung(veranstaltung);
-
-            for(Veranstaltungstermin termin: termine){
-                List<Gruppenarbeit> gruppenarbeiten = termin.getGruppenarbeiten();
-                termin.removeAllGruppenarbeiten();
-                veranstaltungsterminService.saveVeranstaltungstermin(termin);
-
-                for(Gruppenarbeit gruppenarbeit: gruppenarbeiten){
-                    List<Gruppe> gruppen = gruppenarbeit.getGruppen();
-                    gruppenarbeit.removeAllGruppen();
-                    gruppenarbeitService.save(gruppenarbeit);
-
-                    for (Gruppe gruppe : gruppen) {
-                        gruppeService.deleteGruppe(gruppe);
-                    }
-
-                    termin.removeGruppenarbeit(gruppenarbeit);
-                    veranstaltungsterminService.saveVeranstaltungstermin(termin);
-
-                    gruppenarbeitService.deleteGruppenarbeit(gruppenarbeit);
-                }
-
-                veranstaltungsterminService.deleteVeranstaltungstermin(termin);
-            }
-
-            for(Teilnehmer teil: teilnehmer){
-                teil.removeVeranstaltung(veranstaltung);
-                teilnehmerService.updateTeilnehmer(teil);
-            }
-
-            veranstaltungenService.deleteVeranstaltung(veranstaltung);
+            deleteEverything(veranstaltungsterminService, gruppenarbeitService, gruppeService, veranstaltungenService, teilnehmerService);
             veranstaltungenView.updateKachelContainer("");
 
             close();
@@ -104,6 +70,46 @@ public class VeranstaltungLoeschenDialog extends Dialog {
         cancelBtn.addClickListener(event -> close());
 
         add(createLayout());
+    }
+
+    @Transactional
+    protected void deleteEverything(VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungenService veranstaltungenService, TeilnehmerService teilnehmerService) {
+        assert veranstaltung != null;
+        List<Veranstaltungstermin> termine = veranstaltung.getVeranstaltungstermine();
+        veranstaltung.removeAllTermine();
+        Set<Teilnehmer> teilnehmer = veranstaltung.getTeilnehmer();
+        veranstaltung.removeAllTeilnehmer();
+        veranstaltungenService.saveVeranstaltung(veranstaltung);
+
+//        for(Teilnehmer teil: teilnehmer){
+//            teil.removeVeranstaltung(veranstaltung);
+//            teilnehmerService.updateTeilnehmer(teil);
+//        }
+
+        for(Veranstaltungstermin termin: termine){
+            List<Gruppenarbeit> gruppenarbeiten = termin.getGruppenarbeiten();
+            termin.removeAllGruppenarbeiten();
+            veranstaltungsterminService.saveVeranstaltungstermin(termin);
+
+            for(Gruppenarbeit gruppenarbeit: gruppenarbeiten){
+                List<Gruppe> gruppen = gruppenarbeit.getGruppen();
+                gruppenarbeit.removeAllGruppen();
+                gruppenarbeitService.save(gruppenarbeit);
+
+                for (Gruppe gruppe : gruppen) {
+                    gruppeService.deleteGruppe(gruppe);
+                }
+
+                termin.removeGruppenarbeit(gruppenarbeit);
+                veranstaltungsterminService.saveVeranstaltungstermin(termin);
+
+                gruppenarbeitService.deleteGruppenarbeit(gruppenarbeit);
+            }
+
+            veranstaltungsterminService.deleteVeranstaltungstermin(termin);
+        }
+
+        veranstaltungenService.deleteVeranstaltung(veranstaltung);
     }
 
     public void setVeranstaltung(Veranstaltung veranstaltung) {
