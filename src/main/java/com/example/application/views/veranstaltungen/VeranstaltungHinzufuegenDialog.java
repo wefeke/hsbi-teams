@@ -14,6 +14,8 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -206,19 +208,19 @@ public class VeranstaltungHinzufuegenDialog extends Dialog {
                 comboBox.setValue(combinedValue);
 
                 Dialog dialog = new Dialog();
-                dialog.setWidth(getWidth());
                 dialog.setHeight(getHeight());
-                dialog.setHeaderTitle(newTeilnehmerListe.size() + " neue Teilnehmer hinzugefügt");
+                dialog.setHeaderTitle(newTeilnehmerListe.size() + " neue Teilnehmer gefunden");
                 dialog.getFooter().add(new Button("OK", e -> dialog.close()));
-                VerticalLayout dialogLayout = new VerticalLayout();
-                dialog.add(dialogLayout);
 
                 if (!newTeilnehmerListe.isEmpty()) {
-                    int i = 1;
-                    for (Teilnehmer teilnehmer : newTeilnehmerListe) {
-                        dialogLayout.add(new Span(i + ". Teilnehmer: " + teilnehmer.getMatrikelNr() + " / " + teilnehmer.getVorname() + " " + teilnehmer.getNachname()));
-                        i++;
-                    }
+                    Grid<Teilnehmer> grid = new Grid<>();
+                    grid.setItems(newTeilnehmerListe);
+                    grid.addColumn(Teilnehmer::getMatrikelNr).setHeader("MatrikelNr").setSortable(true).setAutoWidth(true);
+                    grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname").setSortable(true).setAutoWidth(true);
+                    grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname").setSortable(true).setAutoWidth(true);
+
+                    dialog.setWidth(grid.getWidth());
+                    dialog.add(grid);
                     dialog.open();
                 }
 
