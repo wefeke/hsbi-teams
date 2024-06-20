@@ -40,7 +40,7 @@ import java.util.Optional;
         }
     }
 
-    public List<Teilnehmer> readAllTeilnehmerFromExcel(InputStream inputStream) throws Exception {
+    public List<Teilnehmer> readOldTeilnehmerFromExcel(InputStream inputStream) throws Exception {
         List<Teilnehmer> teilnehmerList = new ArrayList<>();
         Workbook workbook = new XSSFWorkbook(inputStream);
         Sheet sheet = workbook.getSheetAt(0);
@@ -61,13 +61,21 @@ import java.util.Optional;
             String vorname = vornameCell.getStringCellValue();
             String nachname = nachnameCell.getStringCellValue();
 
-            Teilnehmer teilnehmer = new Teilnehmer();
-            teilnehmer.setId(id);
-            teilnehmer.setVorname(vorname);
-            teilnehmer.setNachname(nachname);
+            // Check if the Teilnehmer already exists in the database
+            Optional<Teilnehmer> existingTeilnehmer = (teilnehmerService.findByMatrikelNr(id, user));
+            System.out.println("Already existingTeilnehmer: " + existingTeilnehmer.toString());
 
-            teilnehmerList.add(teilnehmer);
+            if (existingTeilnehmer.isPresent()) {
+                // If the Teilnehmer does already exist, add it to the list
+                Teilnehmer teilnehmer = new Teilnehmer();
+                teilnehmer.setId(id);
+                teilnehmer.setVorname(vorname);
+                teilnehmer.setNachname(nachname);
+                System.out.println("Added Teilnehmer: " + teilnehmer.toString());
 
+                System.out.println("Teilnehmer hinzugefügt: " + teilnehmer.toString());
+                teilnehmerList.add(teilnehmer);
+            }
         }
 
         workbook.close();
@@ -112,7 +120,7 @@ import java.util.Optional;
             System.out.println("Already existingTeilnehmer: " + existingTeilnehmer.toString());
 
             if (existingTeilnehmer.isPresent()) {
-                System.out.println("Present -> Did Nothing");
+                //
             }
             else {
                 // If the Teilnehmer does not exist, add it to the list
@@ -142,7 +150,6 @@ import java.util.Optional;
         }
 
         workbook.close();
-        System.out.println("Returned: " + teilnehmerList.toString());
         return teilnehmerList;
     }
 }

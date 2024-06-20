@@ -29,7 +29,6 @@ import jakarta.annotation.security.RolesAllowed;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -61,7 +60,7 @@ public class VeranstaltungHinzufuegenDialog extends Dialog {
     ExcelImporter excelImporter;
 
     Set<Teilnehmer> newTeilnehmerListe = new HashSet<>();
-    Set<Teilnehmer> allTeilnehmerListe = new HashSet<>();
+    Set<Teilnehmer> oldTeilnehmerListe = new HashSet<>();
 
     //Security
     private AuthenticatedUser authenticatedUser;
@@ -190,11 +189,9 @@ public class VeranstaltungHinzufuegenDialog extends Dialog {
         //Upload
         upload.addSucceededListener(event -> {
             try {
-                System.out.println("Uploading file: " + event.getFileName());
-                System.out.println("List at start: " + newTeilnehmerListe.toString());
-                newTeilnehmerListe.addAll(excelImporter.readNewTeilnehmerFromExcel(buffer.getInputStream(event.getFileName())));
 
-                allTeilnehmerListe.addAll(excelImporter.readAllTeilnehmerFromExcel(buffer.getInputStream(event.getFileName())));
+                newTeilnehmerListe.addAll(excelImporter.readNewTeilnehmerFromExcel(buffer.getInputStream(event.getFileName())));
+                oldTeilnehmerListe.addAll(excelImporter.readOldTeilnehmerFromExcel(buffer.getInputStream(event.getFileName())));
 
                 List<Teilnehmer> combinedItems= new ArrayList<>();
                 combinedItems.addAll(teilnehmerService.findAllTeilnehmerByUserAndFilter(user, ""));
@@ -202,7 +199,8 @@ public class VeranstaltungHinzufuegenDialog extends Dialog {
 
                 List<Teilnehmer> combinedValue = new ArrayList<>();
                 combinedValue.addAll(comboBox.getValue());
-                combinedValue.addAll(allTeilnehmerListe);
+                combinedValue.addAll(oldTeilnehmerListe);
+                combinedValue.addAll(newTeilnehmerListe);
 
                 comboBox.setItems(combinedItems);
                 comboBox.setValue(combinedValue);
@@ -263,7 +261,7 @@ public class VeranstaltungHinzufuegenDialog extends Dialog {
         datePicker.setValue(LocalDate.now());
         comboBox.clear();
         newTeilnehmerListe.clear();
-        allTeilnehmerListe.clear();
+        oldTeilnehmerListe.clear();
     }
 
 
