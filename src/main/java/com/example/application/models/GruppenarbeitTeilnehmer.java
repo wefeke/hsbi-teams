@@ -5,6 +5,8 @@ import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
+import java.util.List;
+
 @Entity
 @Table(name = "gruppenarbeit_teilnehmer")
 public class GruppenarbeitTeilnehmer {

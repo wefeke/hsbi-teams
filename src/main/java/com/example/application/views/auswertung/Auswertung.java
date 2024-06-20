@@ -1,26 +1,48 @@
 package com.example.application.views.auswertung;
 
+import java.util.List;
+
 // Auswertung
 public class Auswertung {
 
     private Long matrikelnummer;
     private String name;
-    private String veranstaltung;
-    private String gruppenarbeit;
-    private Float punkte;
-
-    public Float getPunkte() {
-        return punkte;
-    }
-
-    public void setPunkte(Float punkte) {
-        this.punkte = punkte;
-    }
-
+    private Float gesamtPunkte =0f;
+    private List<TGGPHelper> tggpHelper;
 
     public Auswertung() {
 
     }
+
+    public List<TGGPHelper> getTggpHelper() {
+        return tggpHelper;
+    }
+
+    public void setTggpHelper(List<TGGPHelper> tggpHelper) {
+        this.tggpHelper = tggpHelper;
+    }
+
+    public void addToGesamtPunkte(Float punkte) {
+        gesamtPunkte+=punkte;
+    }
+
+    public String getTggHelperValues() {
+        String res = "";
+        res = tggpHelper.getFirst().getGruppeAndCheckmark();
+        if (tggpHelper.size() >= 2) {
+            tggpHelper.removeFirst();
+        }
+        return res;
+    }
+
+    public Float getGesamtPunkte() {
+        return gesamtPunkte;
+    }
+
+    public void setGesamtPunkte(Float gesamtPunkte) {
+        this.gesamtPunkte = gesamtPunkte;
+    }
+
     public Long getMatrikelnummer() {
         return matrikelnummer;
     }
@@ -29,7 +51,9 @@ public class Auswertung {
         this.matrikelnummer = matrikelnummer;
     }
 
-
+    public String getNameMatrikelnummer() {
+        return name + "\n" + "("+matrikelnummer+")";
+    }
 
     public String getName() {
         return name;
@@ -37,22 +61,6 @@ public class Auswertung {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getVeranstaltung() {
-        return veranstaltung;
-    }
-
-    public void setVeranstaltung(String veranstaltung) {
-        this.veranstaltung = veranstaltung;
-    }
-
-    public String getGruppenarbeit() {
-        return gruppenarbeit;
-    }
-
-    public void setGruppenarbeit(String gruppenarbeit) {
-        this.gruppenarbeit = gruppenarbeit;
     }
 
 

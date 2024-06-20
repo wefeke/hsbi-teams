@@ -4,9 +4,11 @@ package com.example.application.services;
 import com.example.application.models.Gruppe;
 import com.example.application.models.Gruppenarbeit;
 import com.example.application.models.User;
+import com.example.application.models.Veranstaltungstermin;
 import com.example.application.repositories.GruppenarbeitRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service

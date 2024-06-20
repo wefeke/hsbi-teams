@@ -17,7 +17,8 @@ import com.vaadin.flow.router.Route;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Optional;
+import java.util.*;
+
 //LEON
 @Route(value = "auswertung/:veranstaltungId", layout = MainLayout.class)
 @PageTitle("Auswertungen")
@@ -38,7 +39,8 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
     User user;
     Long veranstaltungsID;
     AuswertungExcelExporter auswertungExcelExporter;
-
+    Veranstaltung veranstaltung;
+    List<Auswertung> auswertungen;
     public AuswertungView(
            VeranstaltungenService veranstaltungenService,
            TeilnehmerService teilnehmerService,
@@ -61,7 +63,6 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
         maybeUser = authenticatedUser.get();
         user = validateUser(maybeUser);
         setSizeFull();
-        configureGrid();
     }
 
     private User validateUser( Optional<User> maybeUser) {
@@ -74,6 +75,7 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
     }
 
     private Component getContent() {
+
         VerticalLayout content = new VerticalLayout(grid01);
         content.setFlexGrow(2, grid01);
         content.addClassNames("content");
@@ -86,6 +88,14 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
     }
 
     private void configureGrid() {
+
+
+        // Eine einzelne Auswertung nehmen und alle Gruppenarbeiten als Columns darstellen
+        Auswertung auswertung = auswertungen.getFirst();
+        for (TGGPHelper tggpHelper : auswertung.getTggpHelper()) {
+
+            grid01.addColumn(Auswertung::getTggHelperValues).setHeader(tggpHelper.getTerminAndGruppenarbeit());
+        }
         grid01.addClassNames("contact-grid");
         grid01.setSizeFull();
         grid01.getColumns().forEach(col -> col.setAutoWidth(true));
@@ -137,7 +147,7 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
 
     // Unter der Nutzung der Methode updateList werden die Felder des Grids mit dem Daten aus dem SuperService gefüllt
     private void updateList() {
-      grid01.setItems(superService.findAllAuswertungenByVeranstaltung(veranstaltungsID));
+        grid01.setItems(superService.findAllAuswertungenByVeranstaltung(veranstaltungsID));
     }
 
     // Bevor die Seite geladen wird, sollen Felder und wichtige Methoden ausgeführt werden
@@ -152,8 +162,12 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
             // Da es mindestens eine Veranstaltung gibt, soll hier der Minimum-Wert 1 genommen werden.
             veranstaltungsID = 1L;
                 });
-        updateList(); // updateList muss hiernach aufgerufen werden, sonst ist veranstaltunsgId null
+        veranstaltung = veranstaltungenService.findVeranstaltungById(veranstaltungsID,user);
+        auswertungen = superService.findAllAuswertungenByVeranstaltung(veranstaltungsID);
         add(getToolbar(), getContent());
+        configureGrid();
+        updateList();
+
     }
 }
 

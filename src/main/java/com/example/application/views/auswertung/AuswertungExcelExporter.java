@@ -71,9 +71,9 @@ public class AuswertungExcelExporter {
             int columnCount = 0;
             createCell(row, columnCount++, auswertung.getMatrikelnummer(), style);
             createCell(row, columnCount++, auswertung.getName(), style);
-            createCell(row, columnCount++, auswertung.getGruppenarbeit(), style);
-            createCell(row, columnCount++, auswertung.getVeranstaltung(), style);
-            createCell(row, columnCount++, auswertung.getPunkte(), style);
+            //createCell(row, columnCount++, auswertung.getGruppenarbeit(), style);
+           // createCell(row, columnCount++, auswertung.getVeranstaltung(), style);
+           // createCell(row, columnCount++, auswertung.getPunkte(), style);
         }
     }
 
