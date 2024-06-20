@@ -1,6 +1,6 @@
 package com.example.application.views.studierende;
 
-import com.example.application.DoubleToLongConverter;
+
 import com.example.application.ExcelReader.TeilnehmerExcelExporter;
 import com.example.application.ExcelReader.ExcelImporter;
 import com.example.application.models.Teilnehmer;
@@ -197,7 +197,7 @@ public class StudierendeView extends VerticalLayout {
 
         binder.forField(matrikelNr)
                 .asRequired("Matrikelnummer muss gefüllt sein")
-                .withConverter(new DoubleToLongConverter())
+                .withConverter(d -> Double.valueOf(d).longValue(), Long::doubleValue)
                 .bind(Teilnehmer::getId, Teilnehmer::setId);
         matrikelNrColumn.setEditorComponent(matrikelNr);
         matrikelNr.setEnabled(false);

@@ -1,6 +1,6 @@
 package com.example.application.views.studierende;
 
-import com.example.application.DoubleToLongConverter;
+
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
@@ -121,7 +121,7 @@ public class StudierendeHinzufuegen extends Dialog {
         binder.forField(matrikelNr)
                 .asRequired("Matrikelnummer muss gefüllt sein")
                 .withValidator(matrikelNr -> String.valueOf(matrikelNr.longValue()).matches("\\d{7}"), "Matrikelnummer muss genau 7 Zahlen enthalten")
-                .withConverter(new DoubleToLongConverter())
+                .withConverter(d -> Double.valueOf(d).longValue(), Long::doubleValue)
                 .bind(Teilnehmer::getId, Teilnehmer::setId);
     }
 
