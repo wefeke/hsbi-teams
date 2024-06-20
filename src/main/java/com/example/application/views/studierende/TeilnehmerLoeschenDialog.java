@@ -30,7 +30,7 @@ public class TeilnehmerLoeschenDialog extends Dialog {
     Paragraph warningText = new Paragraph("Empty");
     Paragraph noReturn = new Paragraph("Der Studierende ist in keiner Veranstaltung");
 
-    public TeilnehmerLoeschenDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, TeilnehmerAufraeumenDialog teilnehmerAufraeumenDialog, StudierendeView studierendeView) {
+    public TeilnehmerLoeschenDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, TeilnehmerAufraeumenDialog aufraeumen, StudierendeView studierendeView) {
         this.teilnehmerService = teilnehmerService;
         this.authenticatedUser = authenticatedUser;
         this.teilnehmerAufraeumenDialog = teilnehmerAufraeumenDialog;

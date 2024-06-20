@@ -17,8 +17,8 @@ import java.util.*;
 @RolesAllowed({"ADMIN", "USER"})
 public class TeilnehmerAufraeumenDialog extends Dialog {
     private final TeilnehmerService teilnehmerService;
-    private final Button deleteOldButton = new Button("Älter als ... Jahre)");
-    private final Button deleteNoEventButton = new Button("Ohne Veranstaltung)");
+    private final Button deleteOldButton = new Button("Älter als ... Jahre");
+    private final Button deleteNoEventButton = new Button("Ohne Veranstaltung");
     private final Button deleteButton = new Button("Löschen");
     private final Button closeButton = new Button("Schließen");
     private final Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class);
@@ -31,7 +31,7 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
         this.teilnehmerService = teilnehmerService;
         this.authenticatedUser = authenticatedUser;
         TeilnehmerLoeschenDialog teilnehmerLoeschenDialog = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, this, studierendeView);
-
+        yearsField.setPlaceholder("Jahre");
 
         closeButton.addClickListener(event ->
                 close());
