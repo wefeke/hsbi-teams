@@ -55,8 +55,11 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
         deleteButton.addClickListener(event -> {
             Set<Teilnehmer> selectedTeilnehmer = grid.getSelectedItems();
             if (!selectedTeilnehmer.isEmpty()) {
-                List<Teilnehmer> teilnehmerList = new ArrayList<>(selectedTeilnehmer);
-                teilnehmerLoeschenDialog.openDeleteDialog(teilnehmerList);
+                for (Teilnehmer teilnehmer : selectedTeilnehmer) {
+                    TeilnehmerLoeschenDialog deleteDialogForSelectedTeilnehmer = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, this, studierendeView);
+                    deleteDialogForSelectedTeilnehmer.setTeilnehmer(teilnehmer);
+                    deleteDialogForSelectedTeilnehmer.open();
+                }
             }
         });
 
@@ -99,62 +102,9 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
         }
 
     }
+    public Double getYearsFieldValue() {
+        return yearsField.getValue();
+    }
 }
 
-//    private void delete (){
-//        if (teilnehmerService.isTeilnehmerInVeranstaltung(teilnehmer)) {
-//            add(new Text("Der Studierende " + teilnehmer.getVorname() + " " + teilnehmer.getNachname() + " ist noch in folgenden Veranstaltungen gespeichert:"));
-//
-//            Grid<Veranstaltung> grid = new Grid<>();
-//            grid.addColumn(Veranstaltung::toString).setHeader("Veranstaltungen");
-//            grid.setItems(teilnehmer.getVeranstaltungen());
-//            add(grid);
-//
-//            Button deleteButton = new Button("Löschen", event -> {
-//
-//                // Entfernen Sie den Teilnehmer aus allen Gruppen
-//                for (Gruppe gruppe : new HashSet<>(teilnehmer.getGruppen())) {
-//                    gruppe.getTeilnehmer().remove(teilnehmer);
-//                    teilnehmer.getGruppen().remove(gruppe);
-//                }
-//
-//                // Entfernen Sie den Teilnehmer aus allen Gruppenarbeiten
-//                for (Gruppenarbeit gruppenarbeit : new HashSet<>(teilnehmer.getGruppenarbeiten())) {
-//                    gruppenarbeit.getTeilnehmer().remove(teilnehmer);
-//                    teilnehmer.getGruppenarbeiten().remove(gruppenarbeit);
-//                }
-//                // Entfernen Sie den Teilnehmer aus allen Veranstaltungen
-//                for (Veranstaltung veranstaltung : new HashSet<>(teilnehmer.getVeranstaltungen())) {
-//                    veranstaltung.getTeilnehmer().remove(teilnehmer);
-//                    teilnehmer.getVeranstaltungen().remove(veranstaltung);
-//                }
-//
-//
-//                // Speichern Sie die Änderungen
-//                teilnehmerService.saveTeilnehmer(teilnehmer);
-//
-//                // Löschen Sie den Teilnehmer
-//                //teilnehmerService.deleteTeilnehmer(teilnehmer);
-//
-//                Notification.show("Studierender aus Veranstaltungen, Gruppen und Gruppenarbeiten entfernt");
-//                close();
-//            });
-//
-//            Button cancelButton = new Button("Abbrechen", event -> close());
-//
-//            add(deleteButton, cancelButton);
-//        } else {
-//            add(new Text("Möchten Sie den Studierenden " + teilnehmer.getVorname() + " " + teilnehmer.getNachname() + " wirklich löschen?"));
-//
-//            Button yesButton = new Button("Ja", event -> {
-//                teilnehmerService.deleteTeilnehmer(teilnehmer);
-//                Notification.show("Studierender gelöscht");
-//                close();
-//            });
-//
-//            Button noButton = new Button("Nein", event -> close());
-//
-//            add(yesButton, noButton);
-//        }
-//    }
 

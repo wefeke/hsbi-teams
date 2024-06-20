@@ -65,7 +65,7 @@ public class StudierendeHinzufuegenDialog extends Dialog {
                 } else {
                     saveTeilnehmer();
                     Notification.show("Teilnehmer gespeichert", 3000, Notification.Position.MIDDLE);
-                    //close();
+                    close();
                 }
             } else {
                 Notification.show("Bitte füllen Sie alle Felder aus", 3000, Notification.Position.MIDDLE);
@@ -131,50 +131,3 @@ public class StudierendeHinzufuegenDialog extends Dialog {
         matrikelNr.clear();
     }
 }
-
-//        if (teilnehmer == null) {
-//            teilnehmer = new Teilnehmer();
-//        }
-//        teilnehmer.setVorname(firstName.getValue());
-//        teilnehmer.setNachname(lastName.getValue());
-//        teilnehmer.setId(matrikelNr.getValue().longValue());
-//
-//        Optional<User> maybeUser = authenticatedUser.get();
-//        User user = maybeUser.get();
-//        teilnehmerService.saveTeilnehmer(teilnehmer,user);
-//public class StudierendeHinzufuegen extends FormLayout {
-//
-//    private final TeilnehmerService teilnehmerService;
-//
-//    //User
-//    private AuthenticatedUser authenticatedUser;
-//
-//    TextField firstName = new TextField("Vorname");
-//    TextField lastName = new TextField("Nachname");
-//    NumberField matrikelNr = new NumberField("Matrikelnummer");
-//    Button save = new Button("Save");
-//    private Teilnehmer teilnehmer;
-//    Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
-//
-//    public StudierendeHinzufuegen(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
-//        this.teilnehmerService = teilnehmerService;
-//        this.authenticatedUser = authenticatedUser;
-//
-//
-//        add(
-//                createLayout(),
-//                new HorizontalLayout(save)
-//        );
-//
-//        configureSaveButton();
-//        bindFields();
-//    }
-
-//    public void setTeilnehmer(Teilnehmer teilnehmer) {
-//        this.teilnehmer = teilnehmer;
-//        if (teilnehmer != null) {
-//            firstName.setValue(teilnehmer.getVorname());
-//            lastName.setValue(teilnehmer.getNachname());
-//            matrikelNr.setValue(teilnehmer.getId().doubleValue());
-//        }
-//    }
