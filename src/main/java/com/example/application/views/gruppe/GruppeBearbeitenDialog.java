@@ -35,8 +35,8 @@ public class GruppeBearbeitenDialog extends Dialog {
     //Data
     private final Gruppenarbeit gruppenarbeit;
     private final List<Gruppe> gruppen;
-    private final Set<Teilnehmer> allTeilnehmer;
-    private final List<Teilnehmer> gruppenarbeitTeilnehmer;
+    private Set<Teilnehmer> allTeilnehmer;
+    private List<Teilnehmer> gruppenarbeitTeilnehmer;
     private List<Teilnehmer> otherTeilnehmer;
     private List<Grid<Teilnehmer>> gruppenGrids = new ArrayList<>();
     ArrayList<GridListDataView<Teilnehmer>> dataViews = new ArrayList<>();
@@ -51,6 +51,7 @@ public class GruppeBearbeitenDialog extends Dialog {
     private final Button saveBtn = new Button("Speichern");
     private final Button addNewGroupBtn = new Button("Eine neue Gruppe hinzufügen");
     private final Button mixBtn = new Button("Neu mischen");
+    private final Button addAllToGroupBtn = new Button("Alle Veranstaltungsteilnehmer zu Gruppe 1 hinzufügen");
     private final Div groupsArea = new Div();
     private Grid<Teilnehmer> uebrigeTeilnehmer;
     private final Select<String> groupSize = new Select<>();
@@ -119,6 +120,15 @@ public class GruppeBearbeitenDialog extends Dialog {
         saveBtn.addClickListener(event ->{
             saveUpdatesToGruppenarbeit();
 
+            gruppen.clear();
+            gruppen.addAll(gruppenarbeit.getGruppen());
+            dataViews.subList(1, dataViews.size()).clear();
+            gruppenGrids.subList(1, gruppenGrids.size()).clear();
+            titles.clear();
+            groupsArea.removeAll();
+            groupGrids(gruppen.size(), gruppen);
+            deleteBtnsFunctionality();
+
             if (gruppenarbeit.getVeranstaltungstermin() != null) {
                 veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
                 veranstaltungsterminView.setAktiveKachelGruppenarbeit(gruppenarbeit);
@@ -128,6 +138,21 @@ public class GruppeBearbeitenDialog extends Dialog {
         });
 
         cancelBtn.addClickListener(event -> {
+            gruppen.clear();
+            gruppen.addAll(gruppenarbeit.getGruppen());
+            dataViews.clear();
+
+            allTeilnehmer = gruppenarbeit.getVeranstaltungstermin().getVeranstaltung().getTeilnehmer();
+            gruppenarbeitTeilnehmer = gruppenarbeit.getTeilnehmer();
+            otherTeilnehmer = new ArrayList<Teilnehmer>(allTeilnehmer);
+            otherTeilnehmer.removeAll(gruppenarbeitTeilnehmer);
+            dataViews.add(uebrigeTeilnehmer.setItems(otherTeilnehmer));
+
+            gruppenGrids.subList(1, gruppenGrids.size()).clear();
+            titles.clear();
+            groupsArea.removeAll();
+            groupGrids(gruppen.size(), gruppen);
+            deleteBtnsFunctionality();
             close();
         });
 
@@ -243,10 +268,29 @@ public class GruppeBearbeitenDialog extends Dialog {
             });
             confirmDialog.open();
         });
+
+        addAllToGroupBtn.addClickListener(event -> {
+            if(dataViews.size()>1){
+                dataViews.get(1).addItems(dataViews.get(0).getItems().toList());
+                dataViews.get(0).removeItems(dataViews.get(1).getItems().toList());
+                titles.get(0).setText("Gruppe 1: " + dataViews.get(1).getItems().toList().size() + " Teilnehmer");
+            }
+            else {
+                Notification.show("Erst eine neue Gruppe hinzufügen!");
+            }
+        });
     }
 
     @Transactional
     protected void saveUpdatesToGruppenarbeit() {
+        List<Gruppe> emptyGroups = new ArrayList<Gruppe>();
+        for(Gruppe gruppe: gruppen){
+            if(dataViews.get(gruppen.indexOf(gruppe)+1).getItems().toList().isEmpty()){
+                emptyGroups.add(gruppe);
+                groupsToDelete.add(gruppe);
+            }
+        }
+        gruppen.removeAll(emptyGroups);
         for(Gruppe gruppe: groupsToDelete){
             gruppeService.deleteGruppe(gruppe);
         }
@@ -360,6 +404,7 @@ public class GruppeBearbeitenDialog extends Dialog {
         VerticalLayout mainLayout = new VerticalLayout();
         setHeaderTitle("Gruppen bearbeiten");
 
+        getFooter().add(addAllToGroupBtn);
         getFooter().add(addNewGroupBtn);
         getFooter().add(mixBtn);
         getFooter().add(cancelBtn);
@@ -468,5 +513,4 @@ public class GruppeBearbeitenDialog extends Dialog {
             }
         }
     }
-
 }
