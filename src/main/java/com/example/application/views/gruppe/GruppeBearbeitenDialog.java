@@ -121,6 +121,7 @@ public class GruppeBearbeitenDialog extends Dialog {
             saveUpdatesToGruppenarbeit();
 
             gruppen.clear();
+            deleteButtons.clear();
             gruppen.addAll(gruppenarbeit.getGruppen());
             dataViews.subList(1, dataViews.size()).clear();
             gruppenGrids.subList(1, gruppenGrids.size()).clear();
