@@ -35,8 +35,8 @@ public class GruppeBearbeitenDialog extends Dialog {
     //Data
     private final Gruppenarbeit gruppenarbeit;
     private final List<Gruppe> gruppen;
-    private final Set<Teilnehmer> allTeilnehmer;
-    private final List<Teilnehmer> gruppenarbeitTeilnehmer;
+    private Set<Teilnehmer> allTeilnehmer;
+    private List<Teilnehmer> gruppenarbeitTeilnehmer;
     private List<Teilnehmer> otherTeilnehmer;
     private List<Grid<Teilnehmer>> gruppenGrids = new ArrayList<>();
     ArrayList<GridListDataView<Teilnehmer>> dataViews = new ArrayList<>();
@@ -119,6 +119,15 @@ public class GruppeBearbeitenDialog extends Dialog {
         saveBtn.addClickListener(event ->{
             saveUpdatesToGruppenarbeit();
 
+            gruppen.clear();
+            gruppen.addAll(gruppenarbeit.getGruppen());
+            dataViews.subList(1, dataViews.size()).clear();
+            gruppenGrids.subList(1, gruppenGrids.size()).clear();
+            titles.clear();
+            groupsArea.removeAll();
+            groupGrids(gruppen.size(), gruppen);
+            deleteBtnsFunctionality();
+
             if (gruppenarbeit.getVeranstaltungstermin() != null) {
                 veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
                 veranstaltungsterminView.setAktiveKachelGruppenarbeit(gruppenarbeit);
@@ -128,6 +137,21 @@ public class GruppeBearbeitenDialog extends Dialog {
         });
 
         cancelBtn.addClickListener(event -> {
+            gruppen.clear();
+            gruppen.addAll(gruppenarbeit.getGruppen());
+            dataViews.clear();
+
+            allTeilnehmer = gruppenarbeit.getVeranstaltungstermin().getVeranstaltung().getTeilnehmer();
+            gruppenarbeitTeilnehmer = gruppenarbeit.getTeilnehmer();
+            otherTeilnehmer = new ArrayList<Teilnehmer>(allTeilnehmer);
+            otherTeilnehmer.removeAll(gruppenarbeitTeilnehmer);
+            dataViews.add(uebrigeTeilnehmer.setItems(otherTeilnehmer));
+
+            gruppenGrids.subList(1, gruppenGrids.size()).clear();
+            titles.clear();
+            groupsArea.removeAll();
+            groupGrids(gruppen.size(), gruppen);
+            deleteBtnsFunctionality();
             close();
         });
 
@@ -247,6 +271,14 @@ public class GruppeBearbeitenDialog extends Dialog {
 
     @Transactional
     protected void saveUpdatesToGruppenarbeit() {
+        List<Gruppe> emptyGroups = new ArrayList<Gruppe>();
+        for(Gruppe gruppe: gruppen){
+            if(dataViews.get(gruppen.indexOf(gruppe)+1).getItems().toList().isEmpty()){
+                emptyGroups.add(gruppe);
+                groupsToDelete.add(gruppe);
+            }
+        }
+        gruppen.removeAll(emptyGroups);
         for(Gruppe gruppe: groupsToDelete){
             gruppeService.deleteGruppe(gruppe);
         }
