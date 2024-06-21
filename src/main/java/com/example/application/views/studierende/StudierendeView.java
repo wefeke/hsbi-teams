@@ -238,7 +238,7 @@ public class StudierendeView extends VerticalLayout {
     }
 
     private Component getToolbar() {
-        filterText.setPlaceholder("Name...");
+        filterText.setPlaceholder("Suche...");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateStudierendeView());
@@ -256,25 +256,26 @@ public class StudierendeView extends VerticalLayout {
         anchor.setText("Download");
         anchor.getElement().getStyle().set("display", "none");
         anchor.getElement().setAttribute("download", true);
-        Optional<User> maybeUser = authenticatedUser.get();
-
-        User user = maybeUser.get();
-        List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue());
-
-        // Die eigentlichen Daten werden in diesem Objekt gespeichert und dem Anchor übergeben
-        StreamResource resource = new StreamResource("teilnehmerliste_" + LocalDate.now() + ".xlsx", () -> {
-            byte[] data = null; // Your method to fetch data
-            try {
-                TeilnehmerExcelExporter teilnehmerExcelExporter = new TeilnehmerExcelExporter();
-                data = teilnehmerExcelExporter.export(teilnehmerList);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            return new ByteArrayInputStream(data);
-        });
-        anchor.setHref(resource);
 
         exportButton.addClickListener(event -> {
+            Optional<User> maybeUser = authenticatedUser.get();
+
+            User user = maybeUser.get();
+            List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue());
+
+            // Die eigentlichen Daten werden in diesem Objekt gespeichert und dem Anchor übergeben
+            StreamResource resource = new StreamResource("teilnehmerliste_" + LocalDate.now() + ".xlsx", () -> {
+                byte[] data = null; // Your method to fetch data
+                try {
+                    TeilnehmerExcelExporter teilnehmerExcelExporter = new TeilnehmerExcelExporter();
+                    data = teilnehmerExcelExporter.export(teilnehmerList);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return new ByteArrayInputStream(data);
+            });
+            anchor.setHref(resource);
+
             anchor.getElement().callJsFunction("click");
         });
 

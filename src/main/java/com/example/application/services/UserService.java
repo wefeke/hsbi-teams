@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class UserService {
@@ -18,11 +17,6 @@ public class UserService {
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-    }
-
-    @Transactional
-    public List<User> findAllUser() {
-        return userRepository.findAll();
     }
 
     @Transactional
@@ -36,16 +30,6 @@ public class UserService {
     }
 
     @Transactional
-    public User findUserById(Long id) {
-        return userRepository.findUserById(id);
-    }
-
-    @Transactional
-    public User findUserByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
-
-    @Transactional
     public void saveUser(User user) {
         if (user != null) {
             userRepository.save(user);
@@ -56,48 +40,15 @@ public class UserService {
 
     @Transactional
     public Boolean isUsernameAvailable (String username) {
-       if (userRepository.findByUsername(username) == null)
-           return true;
-       else
-              return false;
-    }
-
-    @Transactional
-    public void lockUser(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-        user.setLocked(true);
-        userRepository.save(user);
-    }
-
-    @Transactional
-    public void unlockUser(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-        user.setLocked(false);
-        userRepository.save(user);
-    }
-
-    @Transactional
-    public class UserNotFoundException extends RuntimeException {
-        public UserNotFoundException(Long userId) {
-            super("User with id " + userId + " not found");
-        }
+        return userRepository.findByUsername(username) == null;
     }
 
     @Transactional
     public Boolean isUsernameAvailableExcept (String username, String exception) {
-
         if (userRepository.findByUsername(username) == null) {
-            //Notification.show("Found no User with this Username");
             return true;
         }
-        else if (username.equals(exception)) {
-            //Notification.show("Found only this User with this Username");
-            return true;
-        }
-        else {
-            //Notification.show("User is already taken" +username + exception);
-            return false;
-        }
+        else return username.equals(exception);
     }
 
     @Transactional

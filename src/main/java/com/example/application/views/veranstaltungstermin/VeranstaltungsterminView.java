@@ -366,11 +366,15 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
      */
     public void removeAndAddTerminToTermine (Veranstaltungstermin veranstaltungstermin, Long veranstaltungsterminId) {
         if (veranstaltungstermin != null && veranstaltungsterminId != null){
-            if (!veranstaltungsterminService.findAllVeranstaltungstermine().isEmpty()) {
-                Optional<Veranstaltungstermin> v = veranstaltungsterminService.findVeranstaltungsterminById(veranstaltungsterminId);
-                if (v.isPresent()) {
-                    termine.remove(v.get());
-                    termine.add(veranstaltungstermin);
+            Optional<User> maybeUser = authenticatedUser.get();
+            if (maybeUser.isPresent()) {
+                User user = maybeUser.get();
+                if (!veranstaltungsterminService.findAllVeranstaltungstermine(user).isEmpty()) {
+                    Optional<Veranstaltungstermin> v = veranstaltungsterminService.findVeranstaltungsterminById(veranstaltungsterminId);
+                    if (v.isPresent()) {
+                        termine.remove(v.get());
+                        termine.add(veranstaltungstermin);
+                    }
                 }
             }
         }
@@ -1097,6 +1101,7 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
         deleteIcon.getStyle().set("visibility", "hidden");
         deleteIcon.getStyle().set("margin-right", "8px");
         deleteIcon.getStyle().set("cursor", "pointer");
+        deleteIcon.getStyle().set("color", "red");
 
         teilnehmerDiv.getElement().addEventListener("mouseover", e -> deleteIcon.getStyle().set("visibility", "visible"));
 
@@ -1298,11 +1303,15 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
         if (aktiveKachelVeranstaltungstermin != null) {
             Veranstaltungstermin termin = veranstaltungsterminMap.get(aktiveKachelVeranstaltungstermin);
 
-            if (!(veranstaltungsterminService.findAllVeranstaltungstermine().isEmpty())) {
+            Optional<User> maybeUser = authenticatedUser.get();
+            if (maybeUser.isPresent()) {
+                User user = maybeUser.get();
+                if (!(veranstaltungsterminService.findAllVeranstaltungstermine(user).isEmpty())) {
 
-                Optional<Veranstaltungstermin> updatedTermin = veranstaltungsterminService.findVeranstaltungsterminById(termin.getId());
+                    Optional<Veranstaltungstermin> updatedTermin = veranstaltungsterminService.findVeranstaltungsterminById(termin.getId());
 
-                updatedTermin.ifPresent(this::updateGruppenarbeiten);
+                    updatedTermin.ifPresent(this::updateGruppenarbeiten);
+                }
             }
         } else {
             gruppenarbeitContainer.removeAll();
@@ -1378,31 +1387,35 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
         }
 
         // Ansonsten setzen wir die aktive Gruppenarbeit neu
-        if (!veranstaltungsterminService.findAllVeranstaltungstermine().isEmpty()) {
-            Optional<Veranstaltungstermin> neuerVeranstaltungstermin = veranstaltungsterminService.findVeranstaltungsterminById(gruppenarbeit.getVeranstaltungstermin().getId());
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+            if (!veranstaltungsterminService.findAllVeranstaltungstermine(user).isEmpty()) {
+                Optional<Veranstaltungstermin> neuerVeranstaltungstermin = veranstaltungsterminService.findVeranstaltungsterminById(gruppenarbeit.getVeranstaltungstermin().getId());
 
-            if (neuerVeranstaltungstermin.isPresent()) {
-                List<Gruppenarbeit> aktuelleGruppenarbeiten = neuerVeranstaltungstermin.get().getGruppenarbeiten();
+                if (neuerVeranstaltungstermin.isPresent()) {
+                    List<Gruppenarbeit> aktuelleGruppenarbeiten = neuerVeranstaltungstermin.get().getGruppenarbeiten();
 
-                for (Gruppenarbeit aktuelleGruppenarbeit : aktuelleGruppenarbeiten) {
-                    if (aktuelleGruppenarbeit.getId().equals(gruppenarbeit.getId())) {
-                        for (Map.Entry<Div, Gruppenarbeit> entry : gruppenarbeitMap.entrySet()) {
-                            if (entry.getValue().equals(aktuelleGruppenarbeit)) {
-                                // Entfernen der "kachel-active" Klasse von der vorher aktiven Kachel
-                                if (aktiveKachelGruppenarbeit != null) {
-                                    aktiveKachelGruppenarbeit.removeClassName("kachel-active");
+                    for (Gruppenarbeit aktuelleGruppenarbeit : aktuelleGruppenarbeiten) {
+                        if (aktuelleGruppenarbeit.getId().equals(gruppenarbeit.getId())) {
+                            for (Map.Entry<Div, Gruppenarbeit> entry : gruppenarbeitMap.entrySet()) {
+                                if (entry.getValue().equals(aktuelleGruppenarbeit)) {
+                                    // Entfernen der "kachel-active" Klasse von der vorher aktiven Kachel
+                                    if (aktiveKachelGruppenarbeit != null) {
+                                        aktiveKachelGruppenarbeit.removeClassName("kachel-active");
+                                    }
+
+                                    // Setzen der neuen aktiven Kachel und Hinzufügen der "kachel-active" Klasse
+                                    aktiveKachelGruppenarbeit = entry.getKey();
+                                    aktiveKachelGruppenarbeit.addClassName("kachel-active");
+
+                                    // Setzen der neuen aktiven Gruppenarbeit
+                                    aktiveGruppenarbeit = aktuelleGruppenarbeit;
+                                    break;
                                 }
-
-                                // Setzen der neuen aktiven Kachel und Hinzufügen der "kachel-active" Klasse
-                                aktiveKachelGruppenarbeit = entry.getKey();
-                                aktiveKachelGruppenarbeit.addClassName("kachel-active");
-
-                                // Setzen der neuen aktiven Gruppenarbeit
-                                aktiveGruppenarbeit = aktuelleGruppenarbeit;
-                                break;
                             }
+                            break;
                         }
-                        break;
                     }
                 }
             }

@@ -30,6 +30,7 @@
     bottom: 5px;
     right: 5px;
     visibility: hidden;
+    color: red;
 }
 
 .edit-icon {
@@ -218,7 +219,7 @@
 }
 
 .auswertung-button {
-    background-color: #ff7f7f;
+    background-color: #ffbe61;
     color: black;
     border: none;
     padding: 10px 20px;
