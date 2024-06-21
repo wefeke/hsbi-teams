@@ -176,10 +176,14 @@ public class VeranstaltungsterminBearbeitenDialog extends Dialog {
      */
     public void readBean (){
         //Read Data from the Binder
-        if (veranstaltungsterminService.findAllVeranstaltungstermine() != null) {
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+        if (veranstaltungsterminService.findAllVeranstaltungstermine(user) != null) {
             Optional<Veranstaltungstermin> v = veranstaltungsterminService.findVeranstaltungsterminById(veranstaltungsterminId);
 
             v.ifPresent(veranstaltungstermin -> binder.readBean(veranstaltungstermin));
+        }
         }
     }
 

@@ -21,8 +21,9 @@ public class VeranstaltungsterminService {
         this.veranstaltungService = veranstaltungService;
     }
 
-    public List<Veranstaltungstermin> findAllVeranstaltungstermine() {
-        return veranstaltungsterminRepository.findAll();
+    @Transactional
+    public List<Veranstaltungstermin> findAllVeranstaltungstermine(User user) {
+        return veranstaltungsterminRepository.findAllByUser(user);
     }
 
     @Transactional
@@ -30,6 +31,7 @@ public class VeranstaltungsterminService {
         return veranstaltungsterminRepository.findVeranstaltungstermineByVeranstaltungIdAndUser(id, user);
     }
 
+    @Transactional
     public Optional<Veranstaltungstermin> findVeranstaltungsterminById(Long id) {
         return veranstaltungsterminRepository.findById(id);
     }

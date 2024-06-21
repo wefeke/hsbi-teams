@@ -1,13 +1,10 @@
 //Autor: Lilli
 package com.example.application.services;
 
-import com.example.application.models.Gruppe;
 import com.example.application.models.Gruppenarbeit;
-import com.example.application.models.User;
 import com.example.application.repositories.GruppenarbeitRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class GruppenarbeitService {
@@ -17,10 +14,12 @@ public class GruppenarbeitService {
         this.gruppenarbeitRepository = gruppenarbeitRepository;
     }
 
+    @Transactional
     public void save(Gruppenarbeit gruppenarbeit) {
         gruppenarbeitRepository.save(gruppenarbeit);
     }
 
+    @Transactional
     public void deleteGruppenarbeit(Gruppenarbeit gruppenarbeit) {
         if( gruppenarbeit != null) {
             gruppenarbeitRepository.delete(gruppenarbeit);
@@ -29,6 +28,7 @@ public class GruppenarbeitService {
         }
     }
 
+    @Transactional
     public Gruppenarbeit findGruppenarbeitByIdWithGruppen(Long id) {
         return gruppenarbeitRepository.findByIdWithGruppen(id);
     }

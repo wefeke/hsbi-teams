@@ -3,38 +3,18 @@ package com.example.application.repositories;
 import com.example.application.models.Teilnehmer;
 
 import com.example.application.models.User;
-import com.example.application.models.Veranstaltung;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.awt.print.Pageable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 public interface TeilnehmerRepository extends JpaRepository<Teilnehmer, Long> {
-  /*  @Query("select c from Teilnehmer c " +
-            "where lower(c.vorname) like lower(concat('%', :searchTerm, '%')) " +
-            "or lower(c.nachname) like lower(concat('%', :searchTerm, '%'))")
-    List<Teilnehmer> search(@Param("searchTerm") String searchTerm);
-
-    Optional<Teilnehmer> findByMatrikelNr(Long matrikelNr);
-*/
-
-    Optional<Teilnehmer> findTeilnehmerByIdAndVornameAndNachnameAndUser(Long id, String vorname, String nachname, User user);
-
     Optional<Teilnehmer> findTeilnehmerByVornameAndNachnameAndUser (String vorname, String nachname, User user);
 
-
-
-    List<Teilnehmer> findAllByVornameAndNachnameAndUser (String vorname, String nachname, User user);
-
-    Optional<Teilnehmer> findTeilnehmerByNachnameAndUser (String nachname, User user);
-
     Optional<Teilnehmer> findTeilnehmerByMatrikelNrAndUser (Long matrikelNr, User user);
-
 
     @Query("select c from Teilnehmer c " +
             "where c.user = :user " +
@@ -46,13 +26,10 @@ public interface TeilnehmerRepository extends JpaRepository<Teilnehmer, Long> {
     @Query("SELECT t FROM Teilnehmer t JOIN t.veranstaltungen v WHERE v.id = :id")
     List<Teilnehmer> findByVeranstaltungId(@Param("id") Long id);
 
-
     @Query("select t from Teilnehmer t where t.hinzugefuegtAm <= :datum and t.user = :user")
     List<Teilnehmer> findStudierendeVorJahren(@Param("datum") LocalDateTime datum, @Param("user") User user);
 
     List<Teilnehmer> findByUser(User user);
-
-    Veranstaltung findByIdAndUser(Long Id, User user);
 
     @Query("select t from Teilnehmer t where t.veranstaltungen is empty and t.user = :user")
     List<Teilnehmer> findStudierendeOhneVeranstaltung(@Param("user") User user);
@@ -62,8 +39,6 @@ public interface TeilnehmerRepository extends JpaRepository<Teilnehmer, Long> {
 
     @Query(value = "SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END FROM Teilnehmer t JOIN t.gruppenarbeiten g WHERE t.matrikelNr = :teilnehmerId AND g.veranstaltungstermin.veranstaltung.id = :veranstaltungId")
     Boolean isTeilnehmerInGruppenarbeit(@Param("teilnehmerId") Long teilnehmerId, @Param("veranstaltungId") Long veranstaltungId);
-
-
 
     Optional<Teilnehmer> findByMatrikelNrAndUserId(Long matrikelNr, Long userId);
 }

@@ -5,6 +5,7 @@ import com.example.application.models.Gruppe;
 import com.example.application.repositories.GruppenRepository;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class GruppeService {
@@ -15,15 +16,17 @@ public class GruppeService {
         this.gruppenRepository = gruppenRepository;
     }
 
+    @Transactional
     public void save(Gruppe gruppe) {
         gruppenRepository.save(gruppe);
     }
 
+    @Transactional
     public Gruppe findGruppeByIdWithTeilnehmer(Long id) {
         return gruppenRepository.findByIdWithTeilnehmer(id);
     }
 
-    //Lilli
+    @Transactional
     public void deleteGruppe(Gruppe gruppe) {
         gruppenRepository.delete(gruppe);
     }

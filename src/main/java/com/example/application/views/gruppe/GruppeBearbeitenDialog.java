@@ -27,6 +27,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import org.springframework.transaction.annotation.Transactional;
+import org.vaadin.lineawesome.LineAwesomeIcon;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -349,7 +350,8 @@ public class GruppeBearbeitenDialog extends Dialog {
             titles.add(title);
             title.addClassName("gruppen-gruppenarbeit-title");
 
-            Button deleteBtn = new Button(new Icon(VaadinIcon.TRASH));
+            Button deleteBtn = new Button(LineAwesomeIcon.TRASH_ALT.create());
+            deleteBtn.addThemeVariants(ButtonVariant.LUMO_ERROR);
             deleteButtons.add(deleteBtn);
 
             HorizontalLayout topLayout = new HorizontalLayout(title, deleteBtn);

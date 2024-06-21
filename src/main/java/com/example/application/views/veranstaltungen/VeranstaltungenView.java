@@ -23,6 +23,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.vaadin.lineawesome.LineAwesomeIcon;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
@@ -161,7 +162,7 @@ public class VeranstaltungenView extends VerticalLayout  {
     private HorizontalLayout createHorizontalLayout(TextField searchField, Button newEventButton, Div spacer) {
         Select<String> sortSelect = new Select<>();
         sortSelect.setItems("Datum aufsteigend", "Datum absteigend", "A-Z", "Z-A");
-        sortSelect.setValue("Datum aufsteigend");
+        sortSelect.setValue("Datum absteigend");
         sortSelect.addValueChangeListener(e -> {
             String selectedFilter = e.getValue();
             updateKachelContainerWithFilter(selectedFilter);
@@ -354,7 +355,7 @@ public class VeranstaltungenView extends VerticalLayout  {
         Div spacer = new Div();
         spacer.getStyle().set("flex-grow", "1");
 
-        Button deleteButton = new Button(new Icon(VaadinIcon.TRASH));
+        Button deleteButton = new Button(LineAwesomeIcon.TRASH_ALT.create());
         deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
         deleteButton.getStyle().set("cursor", "pointer");
         deleteButton.getElement().addEventListener("click", e ->
@@ -365,8 +366,7 @@ public class VeranstaltungenView extends VerticalLayout  {
 
         veranstaltungLoeschenDialog.setVeranstaltung(veranstaltung);
 
-        Button editButton = new Button(new Icon(VaadinIcon.EDIT));
-        ((Icon)editButton.getIcon()).setColor("#2B64D6");
+        Button editButton = new Button(LineAwesomeIcon.EDIT.create());
         editButton.getStyle().set("cursor", "pointer");
         editButton.getElement().addEventListener("click", e-> {
             editDialog.open();
