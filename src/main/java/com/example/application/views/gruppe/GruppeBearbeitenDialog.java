@@ -51,6 +51,7 @@ public class GruppeBearbeitenDialog extends Dialog {
     private final Button saveBtn = new Button("Speichern");
     private final Button addNewGroupBtn = new Button("Eine neue Gruppe hinzufügen");
     private final Button mixBtn = new Button("Neu mischen");
+    private final Button addAllToGroupBtn = new Button("Alle Veranstaltungsteilnehmer zu Gruppe 1 hinzufügen");
     private final Div groupsArea = new Div();
     private Grid<Teilnehmer> uebrigeTeilnehmer;
     private final Select<String> groupSize = new Select<>();
@@ -267,6 +268,17 @@ public class GruppeBearbeitenDialog extends Dialog {
             });
             confirmDialog.open();
         });
+
+        addAllToGroupBtn.addClickListener(event -> {
+            if(dataViews.size()>1){
+                dataViews.get(1).addItems(dataViews.get(0).getItems().toList());
+                dataViews.get(0).removeItems(dataViews.get(1).getItems().toList());
+                titles.get(0).setText("Gruppe 1: " + dataViews.get(1).getItems().toList().size() + " Teilnehmer");
+            }
+            else {
+                Notification.show("Erst eine neue Gruppe hinzufügen!");
+            }
+        });
     }
 
     @Transactional
@@ -392,6 +404,7 @@ public class GruppeBearbeitenDialog extends Dialog {
         VerticalLayout mainLayout = new VerticalLayout();
         setHeaderTitle("Gruppen bearbeiten");
 
+        getFooter().add(addAllToGroupBtn);
         getFooter().add(addNewGroupBtn);
         getFooter().add(mixBtn);
         getFooter().add(cancelBtn);

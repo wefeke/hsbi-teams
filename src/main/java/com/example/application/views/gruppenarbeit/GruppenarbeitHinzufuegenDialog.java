@@ -25,6 +25,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.List;
@@ -190,31 +191,35 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         }
     }
 
-    private void saveGruppenarbeitWithGruppen(GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, Veranstaltungstermin veranstaltungstermin, Optional<User> maybeUser) {
+    @Transactional
+    protected void saveGruppenarbeitWithGruppen(GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, Veranstaltungstermin veranstaltungstermin, Optional<User> maybeUser) {
         if (maybeUser.isPresent()) {
             User user = maybeUser.get();
             gruppenarbeit.setUser(user);
         }
 
         gruppenarbeit.setVeranstaltungstermin(veranstaltungstermin);
-
-        for (Gruppe gruppe : gruppen) {
-            if (maybeUser.isPresent()) {
-                User user = maybeUser.get();
-                gruppe.setUser(user);
-            }
-            gruppeService.save(gruppe);
-        }
-
-        //der Gruppenarbeit die Teilnehmer übergeben
-        selectedParticipants = participants.getSelectedItems();
-        gruppenarbeit.setTeilnehmer(selectedParticipants.stream().toList());
         gruppenarbeitService.save(gruppenarbeit);
 
-        //den Gruppen die Gruppenarbeit übergeben
-        for (Gruppe gruppe : gruppen) {
-            gruppe.setGruppenarbeit(gruppenarbeit);
-            gruppeService.save(gruppe);
+        //der Gruppenarbeit die Teilnehmer übergeben
+        if(!(gruppen.isEmpty())) {
+            for (Gruppe gruppe : gruppen) {
+                if (maybeUser.isPresent()) {
+                    User user = maybeUser.get();
+                    gruppe.setUser(user);
+                }
+                gruppeService.save(gruppe);
+            }
+
+            selectedParticipants = participants.getSelectedItems();
+            gruppenarbeit.setTeilnehmer(selectedParticipants.stream().toList());
+            gruppenarbeitService.save(gruppenarbeit);
+
+            //den Gruppen die Gruppenarbeit übergeben
+            for (Gruppe gruppe : gruppen) {
+                gruppe.setGruppenarbeit(gruppenarbeit);
+                gruppeService.save(gruppe);
+            }
         }
 
         //Gruppenarbeit zum Veranstaltungstermin hinzufügen
