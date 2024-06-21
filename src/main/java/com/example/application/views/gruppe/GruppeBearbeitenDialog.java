@@ -513,5 +513,4 @@ public class GruppeBearbeitenDialog extends Dialog {
             }
         }
     }
-
 }
