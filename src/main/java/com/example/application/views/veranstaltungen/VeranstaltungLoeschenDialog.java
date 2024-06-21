@@ -135,7 +135,7 @@ public class VeranstaltungLoeschenDialog extends Dialog {
                 termine.size() + "), \ndie zu den Terminen gehörenden Gruppenarbeiten (Gesamtzahl: " +
                 anzGruppenarbeiten + ") \nund die zu den Gruppenarbeiten gehörenden Gruppen (Gesamtzahl: "
                 + anzGruppen + ") gelöscht.");
-        noReturn.setText("Bist du sicher, dass du den Veranstaltungstermin " + this.veranstaltung.getTitel() +
+        noReturn.setText("Bist du sicher, dass du die Veranstaltung " + this.veranstaltung.getTitel() +
                 " löschen willst?\n" + "Das kann nicht rückgängig gemacht werden!");
     }
 
