@@ -273,7 +273,6 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     }
 
     //Erstellt benötigte Anzahl an Gruppen
-    //TODO: This was static but I changed it bc I didn't know why. See if there are any problems.
     private void makeGroups(int numberOfGroups, List<Gruppe> gruppen) {
         for(int i = 0; i< numberOfGroups; i++){
             gruppen.add(new Gruppe((long) i+1));
@@ -343,6 +342,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
             Avatar avatar = new Avatar();
             avatar.setName(participant.getFullName());
             avatar.setImage(null);
+            avatar.addClassName("profilbild");
 
             Span name = new Span(participant.getFullName());
             Span matrikelnr = new Span(String.valueOf(participant.getId()));
@@ -455,8 +455,10 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         binderGruppenarbeit.forField(titleField)
                 .asRequired("Titel muss gefüllt sein")
                 .bind(Gruppenarbeit::getTitel, Gruppenarbeit::setTitel);
+        titleField.setMaxLength(255);
         binderGruppenarbeit.forField(descriptionArea)
                 .bind(Gruppenarbeit::getBeschreibung, Gruppenarbeit::setBeschreibung);
+        descriptionArea.setMaxLength(255);
     }
 
 }
