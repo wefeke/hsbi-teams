@@ -38,6 +38,17 @@ import org.vaadin.lineawesome.LineAwesomeIcon;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+/**
+ * Diese Klasse repräsentiert die Ansicht für eine spezifische Veranstaltung in der Anwendung.
+ * Sie ist mit @PageTitle annotiert, um den Titel der Webseite festzulegen.
+ * Die @Route Annotation definiert die URL-Route für diese Ansicht, die einen Parameter für die Veranstaltungs-ID enthält.
+ * Die @RolesAllowed Annotation beschränkt den Zugriff auf diese Ansicht auf Benutzer mit den Rollen "ADMIN" oder "USER".
+ * Sie implementiert auch HasUrlParameter, was es ihr ermöglicht, einen URL-Parameter zu akzeptieren (in diesem Fall die Veranstaltungs-ID).
+ * Die Klasse enthält mehrere Dienste, die zur Interaktion mit den Daten in der Anwendung verwendet werden.
+ * Diese Dienste werden über den Konstruktor injiziert.
+ *
+ * @author Joris
+ */
 @PageTitle("Veranstaltung Detail")
 @Route(value = "veranstaltung-detail/:veranstaltungId", layout = MainLayout.class)
 @RolesAllowed({"ADMIN", "USER"})
@@ -408,12 +419,16 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
         terminZeit.setText(startZeit + "-" + endZeit);
         terminZeit.addClassName("termin-zeit");
 
+        Div terminOrt = new Div();
+        terminOrt.setText(veranstaltungstermin.getOrt());
+        terminOrt.addClassName("termin-ort");
+
         Div terminNotiz = new Div();
         String splitTitle = splitLongWords(veranstaltungstermin.getTitel());
         terminNotiz.setText(splitTitle);
         terminNotiz.addClassName("termin-notiz");
 
-        Div kachelContent = new Div(terminDatum, terminZeit, terminNotiz);
+        Div kachelContent = new Div(terminDatum, terminZeit, terminOrt, terminNotiz);
         kachelContent.addClassName("kachel-content");
 
         Div kachel = new Div(kachelContent);
