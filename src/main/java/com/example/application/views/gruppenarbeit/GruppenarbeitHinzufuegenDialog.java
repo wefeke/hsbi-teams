@@ -24,7 +24,6 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -34,7 +33,6 @@ import java.util.List;
 @PageTitle("Gruppenarbeiten")
 @Route(value = "gruppenarbeiten", layout = MainLayout.class)
 public class GruppenarbeitHinzufuegenDialog extends Dialog {
-
     private final VeranstaltungenService veranstaltungenService;
 
     //Services
@@ -78,14 +76,14 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     H4 groupsTitle = new H4("Gruppen");
 
     //Konstruktor
-    @Autowired
     public GruppenarbeitHinzufuegenDialog(AuthenticatedUser authenticatedUser, String veranstaltungId, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungsterminView veranstaltungsterminView, VeranstaltungenService veranstaltungenService, Veranstaltungstermin veranstaltungstermin) {
         this.veranstaltungId = veranstaltungId;
+        this.veranstaltungstermin = veranstaltungstermin;
+
         this.gruppenarbeitService = gruppenarbeitService;
         this.teilnehmerService = teilnehmerService;
         this.veranstaltungsterminService = veranstaltungsterminService;
         this.gruppeService = gruppeService;
-        this.veranstaltungstermin = veranstaltungstermin;
         this.authenticatedUser = authenticatedUser;
         this.veranstaltungsterminView = veranstaltungsterminView;
 
@@ -223,7 +221,6 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         }
 
         //Gruppenarbeit zum Veranstaltungstermin hinzufügen
-        //TODO: ist das nötig?
         veranstaltungstermin.addGruppenarbeit(gruppenarbeit);
         veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
     }
