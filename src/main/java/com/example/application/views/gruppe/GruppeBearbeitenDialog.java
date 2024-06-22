@@ -517,13 +517,10 @@ public class GruppeBearbeitenDialog extends Dialog {
         dataViews.add(uebrigeTeilnehmer.setItems(otherTeilnehmer));
         gruppenGrids.add(uebrigeTeilnehmer);
 
-        configureGroupsArea();
         groupGrids(gruppen.size(), gruppen);
 
         deleteBtnsFunctionality();
 
-        saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        addButtonFunctionalities();
 
         add(createLayout());
     }
