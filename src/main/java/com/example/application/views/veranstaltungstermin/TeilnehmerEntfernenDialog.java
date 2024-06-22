@@ -17,6 +17,17 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import java.util.Optional;
 
+/**
+ * Diese Klasse repräsentiert einen Dialog zum Entfernen eines Teilnehmers aus einer Veranstaltung.
+ * Der Dialog enthält Informationen und Warnungen sowie Schaltflächen zum Bestätigen oder Abbrechen der Aktion.
+ * Wenn der "Löschen"-Button geklickt wird, wird der Teilnehmer aus der Veranstaltung entfernt und die Ansicht aktualisiert.
+ * Wenn der "Abbrechen"-Button geklickt wird, wird der Dialog geschlossen.
+ * Der Dialog aktualisiert auch den Text und den Zustand des Buttons, abhängig davon, ob der Teilnehmer in einer Gruppenarbeit ist.
+ * Wenn der Teilnehmer in einer Gruppenarbeit ist, wird der Text des Dialogs anzeigen, dass der Teilnehmer nicht entfernt werden kann und der Löschen-Button wird deaktiviert.
+ * Wenn der Teilnehmer nicht in einer Gruppenarbeit ist, wird der Text des Dialogs um Bestätigung bitten, den Teilnehmer zu entfernen und der Löschen-Button wird aktiviert.
+ *
+ * @author Joris
+ */
 public class TeilnehmerEntfernenDialog extends Dialog {
 
     private final TeilnehmerService teilnehmerService;

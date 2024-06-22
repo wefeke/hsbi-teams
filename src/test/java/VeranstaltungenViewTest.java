@@ -63,7 +63,7 @@ public class VeranstaltungenViewTest {
     }
 
     @Test
-    public void testAddVeranstaltungDialogWithoutTeilnehmer() {
+    public void testAddVeranstaltungDialogWithoutTeilnehmer () {
         System.out.println("Aktive Profile: " + String.join(", ", env.getActiveProfiles()));
         Page page = browser.newPage();
 
@@ -94,7 +94,7 @@ public class VeranstaltungenViewTest {
     }
 
     @Test
-    public void testAddTeilnehmerToVeranstaltung() {
+    public void testAddTeilnehmerToVeranstaltung () {
         System.out.println("Aktive Profile: " + String.join(", ", env.getActiveProfiles()));
         Page page = browser.newPage();
 
