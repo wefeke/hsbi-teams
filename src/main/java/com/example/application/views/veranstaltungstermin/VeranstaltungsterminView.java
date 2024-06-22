@@ -642,7 +642,7 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
      * @autor Lilli
      */
     private void createVeranstaltungsterminLoeschenDialog() {
-        veranstaltungsterminLoeschenDialog = new VeranstaltungsterminLoeschenDialog(veranstaltung, gruppeService, gruppenarbeitService, this, aktiverVeranstaltungstermin, aktiveGruppenarbeit, veranstaltungsterminService, veranstaltungService);
+        veranstaltungsterminLoeschenDialog = new VeranstaltungsterminLoeschenDialog(gruppeService, gruppenarbeitService, this, aktiverVeranstaltungstermin, aktiveGruppenarbeit, veranstaltungsterminService);
     }
 
     /**

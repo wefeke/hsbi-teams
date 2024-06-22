@@ -3,33 +3,22 @@ package com.example.application.views.veranstaltungen;
 import com.example.application.models.*;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.*;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
+@SuppressWarnings("SpringTransactionalMethodCallsInspection")
 public class VeranstaltungLoeschenDialog extends Dialog {
     //Data
     private Veranstaltung veranstaltung;
-
-    //Services
-    private final VeranstaltungsterminService veranstaltungsterminService;
-    private final GruppenarbeitService gruppenarbeitService;
-    private final GruppeService gruppeService;
-    private final VeranstaltungenService veranstaltungenService;
-    private final TeilnehmerService teilnehmerService;
-    private AuthenticatedUser authenticatedUser;
 
     //UI Elements
     H2 infoText = new H2("Empty");
@@ -38,18 +27,13 @@ public class VeranstaltungLoeschenDialog extends Dialog {
     Paragraph warningText = new Paragraph("Empty");
     Paragraph noReturn = new Paragraph("Empty");
 
-    public VeranstaltungLoeschenDialog(VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungenService veranstaltungenService, TeilnehmerService teilnehmerService, VeranstaltungenView veranstaltungenView, AuthenticatedUser authenticatedUser) {
-        this.authenticatedUser = authenticatedUser;
+    public VeranstaltungLoeschenDialog(VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungenService veranstaltungenService, VeranstaltungenView veranstaltungenView, AuthenticatedUser authenticatedUser) {
         warningText.addClassName("warning-text-delete");
         warningText.getStyle().set("white-space", "pre-line");
         noReturn.addClassName("no-return-text-delete");
         noReturn.getStyle().set("white-space", "pre-line");
 
-        this.veranstaltungsterminService = veranstaltungsterminService;
-        this.gruppenarbeitService = gruppenarbeitService;
-        this.gruppeService = gruppeService;
-        this.veranstaltungenService = veranstaltungenService;
-        this.teilnehmerService = teilnehmerService;
+        //Services
 
         deleteBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
@@ -61,7 +45,7 @@ public class VeranstaltungLoeschenDialog extends Dialog {
                 this.veranstaltung = veranstaltungenService.findVeranstaltungById(this.veranstaltung.getId(), user);
             }
 
-            deleteEverything(veranstaltungsterminService, gruppenarbeitService, gruppeService, veranstaltungenService, teilnehmerService);
+            deleteEverything(veranstaltungsterminService, gruppenarbeitService, gruppeService, veranstaltungenService);
             veranstaltungenView.updateKachelContainer("");
 
             close();
@@ -73,18 +57,13 @@ public class VeranstaltungLoeschenDialog extends Dialog {
     }
 
     @Transactional
-    protected void deleteEverything(VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungenService veranstaltungenService, TeilnehmerService teilnehmerService) {
+    protected void deleteEverything(VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungenService veranstaltungenService) {
         assert veranstaltung != null;
         List<Veranstaltungstermin> termine = veranstaltung.getVeranstaltungstermine();
         veranstaltung.removeAllTermine();
-        Set<Teilnehmer> teilnehmer = veranstaltung.getTeilnehmer();
+        veranstaltung.getTeilnehmer();
         veranstaltung.removeAllTeilnehmer();
         veranstaltungenService.saveVeranstaltung(veranstaltung);
-
-//        for(Teilnehmer teil: teilnehmer){
-//            teil.removeVeranstaltung(veranstaltung);
-//            teilnehmerService.updateTeilnehmer(teil);
-//        }
 
         for(Veranstaltungstermin termin: termine){
             List<Gruppenarbeit> gruppenarbeiten = termin.getGruppenarbeiten();
