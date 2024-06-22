@@ -364,7 +364,7 @@ public class VeranstaltungenView extends VerticalLayout  {
         Div spacer = new Div();
         spacer.getStyle().set("flex-grow", "1");
 
-        VeranstaltungLoeschenDialog veranstaltungLoeschenDialog = new VeranstaltungLoeschenDialog(veranstaltungsterminService, gruppenarbeitService, gruppeService, veranstaltungenService, teilnehmerService, this, authenticatedUser);
+        VeranstaltungLoeschenDialog veranstaltungLoeschenDialog = new VeranstaltungLoeschenDialog(veranstaltungsterminService, gruppenarbeitService, gruppeService, veranstaltungenService, this, authenticatedUser);
 
         Button deleteButton = new Button(LineAwesomeIcon.TRASH_ALT.create());
         deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
