@@ -30,16 +30,16 @@ import java.util.*;
 @SuppressWarnings("SpringTransactionalMethodCallsInspection")
 public class GruppeBearbeitenDialog extends Dialog {
     //Data
-    private final Gruppenarbeit gruppenarbeit;
-    private final List<Gruppe> gruppen;
+    private Gruppenarbeit gruppenarbeit;
+    private List<Gruppe> gruppen;
     private Set<Teilnehmer> allTeilnehmer;
     private List<Teilnehmer> gruppenarbeitTeilnehmer;
     private List<Teilnehmer> otherTeilnehmer;
     private final List<Grid<Teilnehmer>> gruppenGrids = new ArrayList<>();
     private final ArrayList<GridListDataView<Teilnehmer>> dataViews = new ArrayList<>();
-    private final AuthenticatedUser authenticatedUser;
+    private AuthenticatedUser authenticatedUser;
     private final List<H5> titles = new ArrayList<>();
-    private final VeranstaltungsterminView veranstaltungsterminView;
+    private VeranstaltungsterminView veranstaltungsterminView;
     private final List<Button> deleteButtons = new ArrayList<>();
     private final List<Gruppe> groupsToDelete = new ArrayList<>();
 
@@ -50,12 +50,12 @@ public class GruppeBearbeitenDialog extends Dialog {
     private final Button mixBtn = new Button("Neu mischen");
     private final Button addAllToGroupBtn = new Button("Alle Veranstaltungsteilnehmer zu Gruppe 1 hinzufügen");
     private final Div groupsArea = new Div();
-    private final Grid<Teilnehmer> uebrigeTeilnehmer;
+    private Grid<Teilnehmer> uebrigeTeilnehmer;
     private final Select<String> groupSize = new Select<>();
 
     //Services
-    private final GruppenarbeitService gruppenarbeitService;
-    private final GruppeService gruppeService;
+    private GruppenarbeitService gruppenarbeitService;
+    private GruppeService gruppeService;
 
     //Test
     private Teilnehmer draggedItem;
@@ -496,5 +496,35 @@ public class GruppeBearbeitenDialog extends Dialog {
                 }
             }
         }
+    }
+
+    public void update(){
+
+        this.gruppen = gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId()).getGruppen();
+        this.allTeilnehmer = gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId()).getVeranstaltungstermin().getVeranstaltung().getTeilnehmer();
+        this.gruppenarbeitTeilnehmer = gruppenarbeit.getTeilnehmer();
+        this.otherTeilnehmer = new ArrayList<>(allTeilnehmer);
+        otherTeilnehmer.removeAll(gruppenarbeitTeilnehmer);
+        dataViews.clear();
+        gruppenGrids.clear();
+        removeAll();
+
+        uebrigeTeilnehmer = new Grid<>(Teilnehmer.class, false);
+        uebrigeTeilnehmer.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");
+        uebrigeTeilnehmer.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
+        uebrigeTeilnehmer.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
+        uebrigeTeilnehmer.setRowsDraggable(true);
+        dataViews.add(uebrigeTeilnehmer.setItems(otherTeilnehmer));
+        gruppenGrids.add(uebrigeTeilnehmer);
+
+        configureGroupsArea();
+        groupGrids(gruppen.size(), gruppen);
+
+        deleteBtnsFunctionality();
+
+        saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        addButtonFunctionalities();
+
+        add(createLayout());
     }
 }

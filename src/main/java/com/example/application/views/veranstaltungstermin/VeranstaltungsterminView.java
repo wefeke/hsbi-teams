@@ -1257,7 +1257,10 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
             HorizontalLayout lineWithText = createLineWithText("Gruppen");
 
             Button editButton = createEditButton();
-            editButton.addClickListener(event -> gruppeBearbeitenDialog.open());
+            editButton.addClickListener(event -> {
+                gruppeBearbeitenDialog.update();
+                gruppeBearbeitenDialog.open();
+            });
 
             Hr lineAfter = new Hr();
             lineAfter.addClassName("line-after-icon");
