@@ -30,7 +30,7 @@ INSERT INTO public.user_roles (user_id, roles) VALUES
                                                    (2, 'USER');
 
 INSERT INTO public.veranstaltung (id, semester, titel, user_id) VALUES
-(1001, '2024-05-01', 'Materialwirtschaft und Produktionsplanung/-steuerung (Sose 2024-5 WI(P) 23)', 1),
+(1001, '2024-06-12', 'Materialwirtschaft und Produktionsplanung/-steuerung (Sose 2024-5 WI(P) 23)', 1),
 (1002, '2024-05-01', 'Mathematik für Ökonomen (Sose 2024-5 M/S 01)', 1),
 (1003, '2024-05-26', 'Webtechnologien (Sose 2024-5 WI(P) 13)', 1),
 (1004, '2024-05-30', 'Softwareprojekt (Sose 2024-5 WI(P) 28)', 2);
