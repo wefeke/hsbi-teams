@@ -34,6 +34,17 @@ public class StudierendeHinzufuegenDialog extends Dialog {
     Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
     private StudierendeView studierendeView;
 
+    /**
+     * Konstruktor für die StudierendeHinzufuegenDialog Klasse.
+     * Initialisiert den TeilnehmerService, den authentifizierten Benutzer und die StudierendeView.
+     * Setzt den Titel des Dialogs und fügt das erstellte Layout hinzu.
+     * Fügt die Schaltflächen "Speichern" und "Abbrechen" zum Dialog hinzu.
+     * Konfiguriert die Schaltflächen und bindet die Felder an den Teilnehmer.
+     *
+     * @param teilnehmerService Der Service, der für die Verwaltung der Studierenden benötigt wird.
+     * @param authenticatedUser Der aktuell authentifizierte Benutzer.
+     * @param studierendeView Die StudierendeView, die aktualisiert wird, wenn ein neuer Studierender hinzugefügt wird.
+     */
     public StudierendeHinzufuegenDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, StudierendeView studierendeView){
         this.teilnehmerService = teilnehmerService;
         this.authenticatedUser = authenticatedUser;
@@ -49,6 +60,12 @@ public class StudierendeHinzufuegenDialog extends Dialog {
         bindFields();
     }
 
+    /**
+     * Erstellt ein FormLayout und fügt die Felder "firstName", "lastName" und "matrikelNr" hinzu.
+     * Setzt außerdem den ThemeVariant des "save"-Buttons auf LUMO_PRIMARY und fügt einen ClickShortcut hinzu.
+     *
+     * @return Das erstellte FormLayout mit den hinzugefügten Feldern.
+     */
     private FormLayout createLayout() {
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         save.addClickShortcut(Key.ENTER);
@@ -57,6 +74,14 @@ public class StudierendeHinzufuegenDialog extends Dialog {
         return formLayout;
     }
 
+    /**
+     * Konfiguriert die Aktionen der "Speichern" und "Abbrechen" Buttons.
+     * Wenn der "Speichern"-Button geklickt wird, wird überprüft, ob die Eingabe gültig ist und ob die Matrikelnummer bereits existiert.
+     * Wenn die Eingabe ungültig ist, wird eine Benachrichtigung angezeigt.
+     * Wenn die Matrikelnummer bereits existiert, wird ebenfalls eine Benachrichtigung angezeigt.
+     * Ansonsten wird der Teilnehmer gespeichert.
+     * Wenn der "Abbrechen"-Button geklickt wird, wird der Dialog geschlossen.
+     */
     private void configureButtons() {
         save.addClickListener(event -> {
             if (isValidInput()) {
@@ -74,10 +99,24 @@ public class StudierendeHinzufuegenDialog extends Dialog {
         });
     }
 
+    /**
+     * Überprüft, ob die Eingabefelder "firstName", "lastName" und "matrikelNr" gültige Werte enthalten.
+     *
+     * @return true, wenn "firstName" und "lastName" nicht leer sind und "matrikelNr" nicht null ist, sonst false.
+     */
     private boolean isValidInput() {
         return !firstName.isEmpty() && !lastName.isEmpty() && matrikelNr.getValue() != null;
     }
 
+    /**
+     * Überprüft, ob die Matrikelnummer bereits existiert.
+     * Holt den Wert der Matrikelnummer und den authentifizierten Benutzer.
+     * Wenn der Benutzer vorhanden ist, wird die ID des Benutzers geholt und es wird versucht, einen existierenden Teilnehmer mit der gleichen Matrikelnummer und Benutzer-ID zu finden.
+     * Wenn ein solcher Teilnehmer gefunden wird und er nicht der aktuell bearbeitete Teilnehmer ist, wird true zurückgegeben.
+     * Wenn kein Benutzer vorhanden ist oder kein Teilnehmer gefunden wird, wird false zurückgegeben.
+     *
+     * @return true, wenn die Matrikelnummer bereits existiert und nicht dem aktuell bearbeiteten Teilnehmer gehört, sonst false.
+     */
     private boolean isDuplicateMatrikelNr() {
     Long matrikelNrValue = matrikelNr.getValue().longValue();
     Optional<User> maybeUser = authenticatedUser.get();
@@ -87,8 +126,15 @@ public class StudierendeHinzufuegenDialog extends Dialog {
         return existingTeilnehmer.isPresent() && (teilnehmer == null || !existingTeilnehmer.get().getId().equals(teilnehmer.getId()));
     }
     return false;
-}
+    }
 
+    /**
+     * Speichert den Teilnehmer, wenn die Matrikelnummer gültig ist.
+     * Erstellt einen neuen Teilnehmer und versucht, die Werte der Eingabefelder in den Teilnehmer zu schreiben.
+     * Holt den authentifizierten Benutzer und speichert den Teilnehmer mit dem Benutzer.
+     * Aktualisiert die StudierendeView und schließt den Dialog.
+     * Zeigt eine Benachrichtigung an, wenn der Teilnehmer erfolgreich gespeichert wurde.
+     */
     private void saveTeilnehmer() {
         Teilnehmer teilnehmer = new Teilnehmer();
 
@@ -110,6 +156,10 @@ public class StudierendeHinzufuegenDialog extends Dialog {
         }
     }
 
+    /**
+     * Bindet die Felder "firstName", "lastName" und "matrikelNr" an den Teilnehmer.
+     * Setzt die Felder als erforderlich und bindet sie an die entsprechenden Teilnehmer-Attribute.
+     */
     private void bindFields() {
         binder.forField(firstName)
                 .asRequired("Vorname muss gefüllt sein")
@@ -126,6 +176,9 @@ public class StudierendeHinzufuegenDialog extends Dialog {
                 .bind(Teilnehmer::getId, Teilnehmer::setId);
     }
 
+    /**
+     * Löscht die Werte der Eingabefelder "firstName", "lastName" und "matrikelNr".
+     */
     private void clearFields() {
         firstName.clear();
         lastName.clear();

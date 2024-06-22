@@ -4,10 +4,8 @@ import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
 import com.example.application.models.Veranstaltung;
 import com.example.application.repositories.TeilnehmerRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,17 +22,7 @@ public class TeilnehmerService {
         this.veranstaltungenService = veranstaltungenService;
     }
 
-    public List<Teilnehmer> findAllTeilnehmer2() {
-        return teilnehmerRepository.findAll();
-    }
 
-    //    public List<Teilnehmer> findAllTeilnehmer(String filterText) {
-//        if (filterText == null || filterText.isEmpty()) {
-//            return teilnehmerRepository.findAll();
-//        } else {
-//            return teilnehmerRepository.search(filterText);
-//        }
-//    }
     @Transactional
     public Optional<Teilnehmer> findByMatrikelNr(Long matrikelNr, User user) {
         return teilnehmerRepository.findTeilnehmerByMatrikelNrAndUser(matrikelNr, user);
@@ -86,16 +74,6 @@ public class TeilnehmerService {
     }
 
     @Transactional
-    public Veranstaltung findTeilnehmerById(Long id, User user) {
-        return teilnehmerRepository.findByIdAndUser(id, user);
-    }
-
-    @Transactional
-    public List<Teilnehmer> findAllTeilnehmerByUser(User user) {
-        return teilnehmerRepository.findByUser(user);
-    }
-
-    @Transactional
     public List<Teilnehmer> findStudierendeOhneVeranstaltung(User user) {
         return teilnehmerRepository.findStudierendeOhneVeranstaltung(user);
     }
@@ -120,24 +98,6 @@ public class TeilnehmerService {
     }
 
     @Transactional
-    public void addTeilnehmerToVeranstaltung(Teilnehmer teilnehmer, Long veranstaltungId, User user) {
-        Veranstaltung veranstaltung = veranstaltungenService.findVeranstaltungById(veranstaltungId, user);
-        if (veranstaltung != null) {
-            veranstaltung.getTeilnehmer().add(teilnehmer);
-            teilnehmer.getVeranstaltungen().add(veranstaltung); // Update the participant's list of events
-            veranstaltungenService.saveVeranstaltung(veranstaltung);
-            teilnehmerRepository.save(teilnehmer); // Save the participant
-        } else {
-            throw new IllegalArgumentException("Invalid Veranstaltung Id:" + veranstaltungId);
-        }
-    }
-
-    @Transactional
-    public Optional<Teilnehmer> findTeilnehmerByIdAndVornameAndNachname(Long id, String vorname, String nachname, User user) {
-        return teilnehmerRepository.findTeilnehmerByIdAndVornameAndNachnameAndUser(id, vorname, nachname, user);
-}
-
-    @Transactional
     public Optional<Teilnehmer> findByMatrikelNrAndUserId(Long matrikelNr, Long userId) {
         return teilnehmerRepository.findByMatrikelNrAndUserId(matrikelNr, userId);
     }
@@ -147,15 +107,6 @@ public class TeilnehmerService {
         return teilnehmerRepository.findTeilnehmerByVornameAndNachnameAndUser(vorname, nachname, user);
     }
 
-    @Transactional
-    public List<Teilnehmer> findAllTeilnehmerByVornameAndNachname(String vorname, String nachname, User user) {
-        return teilnehmerRepository.findAllByVornameAndNachnameAndUser(vorname, nachname, user);
-    }
-
-    @Transactional
-    public Optional<Teilnehmer> findTeilnehmerByNachname(String nachname, User user) {
-        return teilnehmerRepository.findTeilnehmerByNachnameAndUser(nachname, user);
-    }
     public List<Veranstaltung> getVeranstaltungenOfTeilnehmer(Teilnehmer teilnehmer) {
         return new ArrayList<>(teilnehmer.getVeranstaltungen());
     }

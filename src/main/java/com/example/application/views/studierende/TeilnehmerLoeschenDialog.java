@@ -30,6 +30,16 @@ public class TeilnehmerLoeschenDialog extends Dialog {
     Paragraph warningText = new Paragraph("Empty");
     Paragraph noReturn = new Paragraph("Der Studierende ist in keiner Veranstaltung");
 
+    /**
+     * Konstruktor für die Klasse TeilnehmerLoeschenDialog.
+     * Initialisiert die Instanzvariablen und setzt die Klick-Listener für die Schaltflächen "deleteBtn" und "cancelBtn".
+     * Fügt das erstellte Layout zum Dialog hinzu.
+     *
+     * @param teilnehmerService Der Service, der für die Verwaltung von Teilnehmern verwendet wird.
+     * @param authenticatedUser Der authentifizierte Benutzer.
+     * @param aufraeumen Der Dialog, der zum Aufräumen von Teilnehmern verwendet wird.
+     * @param studierendeView Die Ansicht, die die Studierenden anzeigt.
+     */
     public TeilnehmerLoeschenDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, TeilnehmerAufraeumenDialog aufraeumen, StudierendeView studierendeView) {
         this.teilnehmerService = teilnehmerService;
         this.authenticatedUser = authenticatedUser;
@@ -61,6 +71,13 @@ public class TeilnehmerLoeschenDialog extends Dialog {
         add(createLayout());
     }
 
+    /**
+     * Setzt den Teilnehmer und aktualisiert die Benutzeroberfläche entsprechend.
+     * Wenn der Teilnehmer in einer Veranstaltung ist, wird eine Warnmeldung angezeigt und der "deleteBtn" wird deaktiviert.
+     * Wenn der Teilnehmer nicht in einer Veranstaltung ist, wird eine Bestätigungsnachricht angezeigt und der "deleteBtn" wird aktiviert.
+     *
+     * @param teilnehmer Der Teilnehmer, der gesetzt werden soll.
+     */
     public void setTeilnehmer(Teilnehmer teilnehmer) {
         this.teilnehmer = teilnehmer;
 
@@ -82,6 +99,14 @@ public class TeilnehmerLoeschenDialog extends Dialog {
             deleteBtn.setEnabled(true);
         }
     }
+
+    /**
+     * Erstellt ein VerticalLayout und fügt die Info-, Warn- und NoReturn-Texte hinzu.
+     * Setzt die Ausrichtung der Elemente auf Zentrum.
+     * Fügt die "cancelBtn" und "deleteBtn" zum Footer hinzu.
+     *
+     * @return Das erstellte VerticalLayout mit den hinzugefügten Elementen.
+     */
     public VerticalLayout createLayout(){
         VerticalLayout mainLayout = new VerticalLayout();
         mainLayout.setAlignItems(FlexComponent.Alignment.CENTER);

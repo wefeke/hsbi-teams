@@ -4,9 +4,9 @@ package com.example.application.models;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,9 +29,9 @@ public class Teilnehmer {
     @ManyToMany (mappedBy = "teilnehmer", fetch = FetchType.EAGER)
     private List<Veranstaltung> veranstaltungen = new ArrayList<>();
     @ManyToMany (mappedBy = "teilnehmer", fetch = FetchType.EAGER)
-    private List<Gruppenarbeit> gruppenarbeiten = new ArrayList<>();
+    private final List<Gruppenarbeit> gruppenarbeiten = new ArrayList<>();
     @ManyToMany (mappedBy = "teilnehmer", fetch = FetchType.EAGER)
-    private List<Gruppe> gruppen = new ArrayList<>();
+    private final List<Gruppe> gruppen = new ArrayList<>();
 
     public Teilnehmer() {
     }
@@ -49,14 +49,6 @@ public class Teilnehmer {
 
     public void setId(Long matrikelNummer) {
         this.matrikelNr = matrikelNummer;
-    }
-
-    public Long getMatrikelNr() {
-        return matrikelNr;
-    }
-
-    public void setMatrikelNr(Long matrikelNr) {
-        this.matrikelNr = matrikelNr;
     }
 
     public String getVorname() {
@@ -86,10 +78,6 @@ public class Teilnehmer {
 
     public void setVeranstaltungen(List<Veranstaltung> veranstaltungen) {
         this.veranstaltungen = veranstaltungen;
-    }
-
-    public void addVerastaltung (Veranstaltung veranstaltung){
-        this.veranstaltungen.add(veranstaltung);
     }
 
     @Override
