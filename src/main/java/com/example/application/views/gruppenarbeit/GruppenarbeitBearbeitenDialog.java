@@ -24,7 +24,7 @@ public class GruppenarbeitBearbeitenDialog extends Dialog {
 
     //Data
     private Gruppenarbeit gruppenarbeit;
-    private VeranstaltungsterminView veranstaltungsterminView;
+    private final VeranstaltungsterminView veranstaltungsterminView;
 
     //UI Elements
     H3 infoText = new H3();
@@ -87,9 +87,7 @@ public class GruppenarbeitBearbeitenDialog extends Dialog {
 
             close();
         });
-        cancelBtn.addClickListener(event -> {
-            close();
-        });
+        cancelBtn.addClickListener(event -> close());
     }
 
     //Passt optische Aspekte an

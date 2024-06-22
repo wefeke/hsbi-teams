@@ -19,17 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@SuppressWarnings("SpringTransactionalMethodCallsInspection")
 public class GruppenarbeitLoeschenDialog extends Dialog {
     //Data
     private Gruppenarbeit gruppenarbeit;
     private Veranstaltungstermin veranstaltungstermin;
-    private VeranstaltungsterminService veranstaltungsterminService;
-    private VeranstaltungsterminView veranstaltungsterminView;
-    private Gruppenarbeit aktiveGruppenarbeit;
-
-    //Services
-    private GruppenarbeitService gruppenarbeitService;
-    private GruppeService gruppeService;
+    private final VeranstaltungsterminView veranstaltungsterminView;
 
     //UI-Elemente
     H2 infoText = new H2("Empty");
@@ -39,13 +34,10 @@ public class GruppenarbeitLoeschenDialog extends Dialog {
     Button cancelBtn = new Button("Abbrechen");
 
     public GruppenarbeitLoeschenDialog(GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungsterminView veranstaltungsdetailView, Gruppenarbeit aktiveGruppenarbeit) {
-        this.gruppenarbeitService = gruppenarbeitService;
+        //Services
         this.veranstaltungsterminView = veranstaltungsdetailView;
-        this.aktiveGruppenarbeit = aktiveGruppenarbeit;
         this.gruppenarbeit = null;
-        this.gruppeService = gruppeService;
         this.veranstaltungstermin = null;
-        this.veranstaltungsterminService = veranstaltungsterminService;
 
         warningText.addClassName("warning-text-delete");
         warningText.getStyle().set("white-space", "pre-line");

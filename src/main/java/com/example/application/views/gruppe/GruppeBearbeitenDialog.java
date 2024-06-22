@@ -16,11 +16,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.grid.dnd.GridDropMode;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H5;
-import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -30,22 +26,22 @@ import org.springframework.transaction.annotation.Transactional;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
+@SuppressWarnings("SpringTransactionalMethodCallsInspection")
 public class GruppeBearbeitenDialog extends Dialog {
     //Data
     private final Gruppenarbeit gruppenarbeit;
-    private final List<Gruppe> gruppen;
+    private List<Gruppe> gruppen;
     private Set<Teilnehmer> allTeilnehmer;
     private List<Teilnehmer> gruppenarbeitTeilnehmer;
     private List<Teilnehmer> otherTeilnehmer;
-    private List<Grid<Teilnehmer>> gruppenGrids = new ArrayList<>();
-    ArrayList<GridListDataView<Teilnehmer>> dataViews = new ArrayList<>();
+    private final List<Grid<Teilnehmer>> gruppenGrids = new ArrayList<>();
+    private final ArrayList<GridListDataView<Teilnehmer>> dataViews = new ArrayList<>();
     private final AuthenticatedUser authenticatedUser;
-    private List<H5> titles = new ArrayList<>();
-    private VeranstaltungsterminView veranstaltungsterminView;
-    private List<Button> deleteButtons = new ArrayList<>();
-    private List<Gruppe> groupsToDelete = new ArrayList<>();
+    private final List<H5> titles = new ArrayList<>();
+    private final VeranstaltungsterminView veranstaltungsterminView;
+    private final List<Button> deleteButtons = new ArrayList<>();
+    private final List<Gruppe> groupsToDelete = new ArrayList<>();
 
     //UI Elements
     private final Button cancelBtn = new Button("Abbrechen");
@@ -73,7 +69,7 @@ public class GruppeBearbeitenDialog extends Dialog {
         this.gruppen = gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId()).getGruppen();
         this.allTeilnehmer = gruppenarbeit.getVeranstaltungstermin().getVeranstaltung().getTeilnehmer();
         this.gruppenarbeitTeilnehmer = gruppenarbeit.getTeilnehmer();
-        this.otherTeilnehmer = new ArrayList<Teilnehmer>(allTeilnehmer);
+        this.otherTeilnehmer = new ArrayList<>(allTeilnehmer);
         otherTeilnehmer.removeAll(gruppenarbeitTeilnehmer);
 
         uebrigeTeilnehmer = new Grid<>(Teilnehmer.class, false);
@@ -146,7 +142,7 @@ public class GruppeBearbeitenDialog extends Dialog {
 
             allTeilnehmer = gruppenarbeit.getVeranstaltungstermin().getVeranstaltung().getTeilnehmer();
             gruppenarbeitTeilnehmer = gruppenarbeit.getTeilnehmer();
-            otherTeilnehmer = new ArrayList<Teilnehmer>(allTeilnehmer);
+            otherTeilnehmer = new ArrayList<>(allTeilnehmer);
             otherTeilnehmer.removeAll(gruppenarbeitTeilnehmer);
             dataViews.add(uebrigeTeilnehmer.setItems(otherTeilnehmer));
 
@@ -211,9 +207,7 @@ public class GruppeBearbeitenDialog extends Dialog {
                 chooseNewGroups.add(groupSize);
 
 
-                cancelBtnDialog.addClickListener(cancel -> {
-                    chooseNewGroups.close();
-                });
+                cancelBtnDialog.addClickListener(cancel -> chooseNewGroups.close());
 
                 confirmBtn.addClickListener(confirm -> {
                     if(groupSize.getOptionalValue().isEmpty()){
@@ -225,9 +219,7 @@ public class GruppeBearbeitenDialog extends Dialog {
                         chooseNewGroups.close();
                     }
                     else{
-                        for(Gruppe gruppe: gruppen){
-                            groupsToDelete.add(gruppe);
-                        }
+                        groupsToDelete.addAll(gruppen);
                         dataViews.subList(1, dataViews.size()).clear();
                         gruppenGrids.subList(1, gruppenGrids.size()).clear();
                         titles.clear();
@@ -248,9 +240,10 @@ public class GruppeBearbeitenDialog extends Dialog {
                         });
                 chooseNewGroups.open();
             });
-            confirmDialog.setRejectable(true);
-            confirmDialog.setRejectText("Gruppen beibehalten");
-            confirmDialog.addRejectListener(reject -> {
+            confirmDialog.setCancelable(true);
+
+            confirmDialog.setCancelButton(new Button("Gruppen beibehalten"));
+            confirmDialog.addCancelListener(cancel -> {
                 int groupNumber = gruppen.size();
                 for(Gruppe gruppe: gruppen){
                     gruppeService.deleteGruppe(gruppe);
@@ -275,7 +268,7 @@ public class GruppeBearbeitenDialog extends Dialog {
             if(dataViews.size()>1){
                 dataViews.get(1).addItems(dataViews.get(0).getItems().toList());
                 dataViews.get(0).removeItems(dataViews.get(1).getItems().toList());
-                titles.get(0).setText("Gruppe 1: " + dataViews.get(1).getItems().toList().size() + " Teilnehmer");
+                titles.getFirst().setText("Gruppe 1: " + dataViews.get(1).getItems().toList().size() + " Teilnehmer");
             }
             else {
                 Notification.show("Erst eine neue Gruppe hinzufügen!");
@@ -285,7 +278,7 @@ public class GruppeBearbeitenDialog extends Dialog {
 
     @Transactional
     protected void saveUpdatesToGruppenarbeit() {
-        List<Gruppe> emptyGroups = new ArrayList<Gruppe>();
+        List<Gruppe> emptyGroups = new ArrayList<>();
         for(Gruppe gruppe: gruppen){
             if(dataViews.get(gruppen.indexOf(gruppe)+1).getItems().toList().isEmpty()){
                 emptyGroups.add(gruppe);
@@ -325,14 +318,6 @@ public class GruppeBearbeitenDialog extends Dialog {
     }
 
     private void groupGrids(int numberOfGroups, List<Gruppe> gruppen) {
-//        uebrigeTeilnehmer = new Grid<>(Teilnehmer.class, false);
-//        uebrigeTeilnehmer.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");
-//        uebrigeTeilnehmer.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
-//        uebrigeTeilnehmer.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
-//        uebrigeTeilnehmer.setRowsDraggable(true);
-//        dataViews.add(uebrigeTeilnehmer.setItems(otherTeilnehmer));
-//        gruppenGrids.add(uebrigeTeilnehmer);
-
         for(int i = 0; i< numberOfGroups; i++){
             Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class, false);
             grid.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");
@@ -374,10 +359,6 @@ public class GruppeBearbeitenDialog extends Dialog {
                     otherGrid.setDropMode(GridDropMode.ON_GRID);
                 }
                 gruppenGrids.set(num, grid);
-//                if(num!=0) {
-//                    titles.get(num - 1).setText("Gruppe " + (num) + ": " + dataViews.get(num).getItems().toList().size() + " Teilnehmer");
-//                }
-
             });
             grid.addDropListener(e -> {
                 int num = gruppenGrids.indexOf(grid);
@@ -413,7 +394,7 @@ public class GruppeBearbeitenDialog extends Dialog {
         getFooter().add(cancelBtn);
         getFooter().add(saveBtn);
 
-        mainLayout.add(uebrigeTeilnehmer, groupsArea);
+        mainLayout.add(new H4("Veranstaltungsteilnehmer, die nicht an der Gruppenarbeit teilnehmen"), uebrigeTeilnehmer, groupsArea);
 
         return mainLayout;
     }
@@ -466,25 +447,25 @@ public class GruppeBearbeitenDialog extends Dialog {
 
     //Gibt alle möglichen Gruppengrößen und zugehörige Teilnehmeranzahlen als Strings in einer Liste zurück
     private List<String> groupNumbersAndSizes(int participants){
-        List<String> groupStrings = new ArrayList<String>();
+        List<String> groupStrings = new ArrayList<>();
         for(int i:groupNumbers(participants))
         {
-            String str = "";
-            str += i;
-            str += " x ";
+            StringBuilder str = new StringBuilder();
+            str.append(i);
+            str.append(" x ");
 
             for(Iterator<Integer> it = Arrays.stream(groupSizes(i, participants)).iterator(); it.hasNext();){
                 String nextSize = it.next().toString();
                 if(it.hasNext()){
-                    str += nextSize;
-                    str += " und ";
+                    str.append(nextSize);
+                    str.append(" und ");
                 }
                 else{
-                    str += nextSize;
-                    str += " Teilnehmer";
+                    str.append(nextSize);
+                    str.append(" Teilnehmer");
                 }
             }
-            groupStrings.add(str);
+            groupStrings.add(str.toString());
         }
         return groupStrings;
     }
@@ -515,5 +496,32 @@ public class GruppeBearbeitenDialog extends Dialog {
                 }
             }
         }
+    }
+
+    public void update(){
+
+        this.gruppen = gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId()).getGruppen();
+        this.allTeilnehmer = gruppenarbeitService.findGruppenarbeitByIdWithGruppen(gruppenarbeit.getId()).getVeranstaltungstermin().getVeranstaltung().getTeilnehmer();
+        this.gruppenarbeitTeilnehmer = gruppenarbeit.getTeilnehmer();
+        this.otherTeilnehmer = new ArrayList<>(allTeilnehmer);
+        otherTeilnehmer.removeAll(gruppenarbeitTeilnehmer);
+        dataViews.clear();
+        gruppenGrids.clear();
+        removeAll();
+
+        uebrigeTeilnehmer = new Grid<>(Teilnehmer.class, false);
+        uebrigeTeilnehmer.addColumn(Teilnehmer::getId).setHeader("Matrikelnr");
+        uebrigeTeilnehmer.addColumn(Teilnehmer::getVorname).setHeader("Vorname");
+        uebrigeTeilnehmer.addColumn(Teilnehmer::getNachname).setHeader("Nachname");
+        uebrigeTeilnehmer.setRowsDraggable(true);
+        dataViews.add(uebrigeTeilnehmer.setItems(otherTeilnehmer));
+        gruppenGrids.add(uebrigeTeilnehmer);
+
+        groupGrids(gruppen.size(), gruppen);
+
+        deleteBtnsFunctionality();
+
+
+        add(createLayout());
     }
 }
