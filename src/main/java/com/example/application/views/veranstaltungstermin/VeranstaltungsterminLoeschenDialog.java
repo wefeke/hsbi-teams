@@ -2,11 +2,9 @@ package com.example.application.views.veranstaltungstermin;
 
 import com.example.application.models.Gruppe;
 import com.example.application.models.Gruppenarbeit;
-import com.example.application.models.Veranstaltung;
 import com.example.application.models.Veranstaltungstermin;
 import com.example.application.services.GruppeService;
 import com.example.application.services.GruppenarbeitService;
-import com.example.application.services.VeranstaltungenService;
 import com.example.application.services.VeranstaltungsterminService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -20,19 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+@SuppressWarnings("SpringTransactionalMethodCallsInspection")
 public class VeranstaltungsterminLoeschenDialog extends Dialog {
-    //Data
-    private final Veranstaltung veranstaltung;
     private Veranstaltungstermin veranstaltungstermin;
-    private VeranstaltungsterminView veranstaltungsterminView;
-    private Veranstaltungstermin aktiverVeranstaltungstermin;
-    private Gruppenarbeit aktiveGruppenarbeit;
-
-    //Services
-    private GruppeService gruppeService;
-    private GruppenarbeitService gruppenarbeitService;
-    private VeranstaltungsterminService veranstaltungsterminService;
-    private VeranstaltungenService veranstaltungenService;
 
     //UI-Elements
     H2 infoText = new H2("Empty");
@@ -41,15 +29,10 @@ public class VeranstaltungsterminLoeschenDialog extends Dialog {
     Paragraph warningText = new Paragraph("Empty");
     Paragraph noReturn = new Paragraph("Empty");
 
-    public VeranstaltungsterminLoeschenDialog(Veranstaltung veranstaltung, GruppeService gruppeService, GruppenarbeitService gruppenarbeitService, VeranstaltungsterminView veranstaltungsterminView, Veranstaltungstermin aktiverVeranstaltungstermin, Gruppenarbeit aktiveGruppenarbeit, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungenService veranstaltungenService) {
-        this.veranstaltungsterminView = veranstaltungsterminView;
-        this.aktiverVeranstaltungstermin = aktiverVeranstaltungstermin;
-        this.aktiveGruppenarbeit = aktiveGruppenarbeit;
+    public VeranstaltungsterminLoeschenDialog(GruppeService gruppeService, GruppenarbeitService gruppenarbeitService, VeranstaltungsterminView veranstaltungsterminView, Veranstaltungstermin aktiverVeranstaltungstermin, Gruppenarbeit aktiveGruppenarbeit, VeranstaltungsterminService veranstaltungsterminService) {
         this.veranstaltungstermin = null;
-        this.veranstaltung = veranstaltung;
-        this.gruppeService = gruppeService;
-        this.veranstaltungsterminService = veranstaltungsterminService;
-        this.veranstaltungenService = veranstaltungenService;
+        //Data
+        //Services
 
         warningText.addClassName("warning-text-delete");
         warningText.getStyle().set("white-space", "pre-line");

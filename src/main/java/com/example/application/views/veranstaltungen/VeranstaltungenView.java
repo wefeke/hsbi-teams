@@ -396,6 +396,6 @@ public class VeranstaltungenView extends VerticalLayout  {
      * @autor Lilli
      */
     private void createVeranstaltungLoeschenDialog() {
-        veranstaltungLoeschenDialog = new VeranstaltungLoeschenDialog(veranstaltungsterminService, gruppenarbeitService, gruppeService, veranstaltungenService, teilnehmerService, this, authenticatedUser);
+        veranstaltungLoeschenDialog = new VeranstaltungLoeschenDialog(veranstaltungsterminService, gruppenarbeitService, gruppeService, veranstaltungenService, this, authenticatedUser);
     }
 }
