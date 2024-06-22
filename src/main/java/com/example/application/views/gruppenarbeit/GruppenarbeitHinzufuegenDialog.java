@@ -59,10 +59,10 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     Button saveBtn = new Button("Gruppenarbeit speichern");
     Button randomizeBtn = new Button("Neu mischen");
     Button cancelBtn = new Button("Abbrechen");
-    Button clearGroupsBtn = new Button("Nur Gruppen leeren");
-    Button clearAllFieldsBtn = new Button("Formular leeren");
-    Button deselectAllParticipantsBtn = new Button("Alle Teilnehmer entfernen");
-    Button selectAllParticipantsBtn = new Button("Alle Teilnehmer auswählen");
+    Button clearGroupsBtn = new Button("Nur Gruppen");
+    Button clearAllFieldsBtn = new Button("Formular");
+    Button deselectAllParticipantsBtn = new Button("Entfernen");
+    Button selectAllParticipantsBtn = new Button("Auswählen");
     H4 groupsTitle = new H4("Gruppen");
 
     //Konstruktor
@@ -427,12 +427,34 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
         titleField.setWidth("400px");
         gruppenarbeitText.add(titleField);
-        descriptionArea.setHeight("270px");
+        descriptionArea.setHeight("240px");
         descriptionArea.setWidth("400px");
         gruppenarbeitText.add(descriptionArea);
 
-        groupSize.setWidth("230px");
-        buttonsLayout.add(groupSize, randomizeBtn, clearAllFieldsBtn, clearGroupsBtn, deselectAllParticipantsBtn, selectAllParticipantsBtn);
+        groupSize.setWidth("320px");
+        randomizeBtn.setWidth("320px");
+        clearAllFieldsBtn.setWidth("150px");
+        clearGroupsBtn.setWidth("150px");
+        deselectAllParticipantsBtn.setWidth("150px");
+        selectAllParticipantsBtn.setWidth("150px");
+
+        VerticalLayout clearBtnsWithText = new VerticalLayout();
+        clearBtnsWithText.setAlignItems(FlexComponent.Alignment.CENTER);
+        HorizontalLayout clearBtns = new HorizontalLayout(clearAllFieldsBtn, clearGroupsBtn);
+        H5 clear = new H5("Leeren");
+        clear.getStyle().set("color", "#0562dc");
+        clearBtnsWithText.add(clear, clearBtns);
+        clearBtnsWithText.getStyle().set("padding", "0px");
+
+        VerticalLayout allParticipantsBtnsWithText = new VerticalLayout();
+        allParticipantsBtnsWithText.setAlignItems(FlexComponent.Alignment.CENTER);
+        HorizontalLayout allParticipantsBtns = new HorizontalLayout(selectAllParticipantsBtn, deselectAllParticipantsBtn);
+        H5 allParticipantsText = new H5("Alle Teilnehmer");
+        allParticipantsText.getStyle().set("color", "#0562dc");
+        allParticipantsBtnsWithText.add(allParticipantsText, allParticipantsBtns);
+        allParticipantsBtnsWithText.getStyle().set("padding", "0px");
+
+        buttonsLayout.add(groupSize, randomizeBtn, clearBtnsWithText, allParticipantsBtnsWithText);
         buttonsLayout.setAlignItems(FlexComponent.Alignment.CENTER);
         getFooter().add(cancelBtn);
         getFooter().add(saveBtn);
