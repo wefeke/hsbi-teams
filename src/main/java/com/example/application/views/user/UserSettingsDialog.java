@@ -101,7 +101,8 @@ public class UserSettingsDialog extends Dialog {
 
         saveButton.addClickListener(e -> {
             if (binder.writeBeanIfValid(user)) {
-                user.setProfilePicture(uploadedImage);
+                if (uploadedImage != null)
+                    user.setProfilePicture(uploadedImage);
                 userService.saveUser(user);
                 Notification.show("User aktualisiert");
                 clearFields();
