@@ -16,9 +16,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.grid.dnd.GridDropMode;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H5;
-import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -242,9 +240,10 @@ public class GruppeBearbeitenDialog extends Dialog {
                         });
                 chooseNewGroups.open();
             });
-            confirmDialog.setRejectable(true);
-            confirmDialog.setRejectText("Gruppen beibehalten");
-            confirmDialog.addRejectListener(reject -> {
+            confirmDialog.setCancelable(true);
+
+            confirmDialog.setCancelButton(new Button("Gruppen beibehalten"));
+            confirmDialog.addCancelListener(cancel -> {
                 int groupNumber = gruppen.size();
                 for(Gruppe gruppe: gruppen){
                     gruppeService.deleteGruppe(gruppe);
@@ -395,7 +394,7 @@ public class GruppeBearbeitenDialog extends Dialog {
         getFooter().add(cancelBtn);
         getFooter().add(saveBtn);
 
-        mainLayout.add(uebrigeTeilnehmer, groupsArea);
+        mainLayout.add(new H4("Veranstaltungsteilnehmer, die nicht an der Gruppenarbeit teilnehmen"), uebrigeTeilnehmer, groupsArea);
 
         return mainLayout;
     }
