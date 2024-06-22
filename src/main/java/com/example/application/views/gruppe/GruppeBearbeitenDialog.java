@@ -30,16 +30,16 @@ import java.util.*;
 @SuppressWarnings("SpringTransactionalMethodCallsInspection")
 public class GruppeBearbeitenDialog extends Dialog {
     //Data
-    private Gruppenarbeit gruppenarbeit;
+    private final Gruppenarbeit gruppenarbeit;
     private List<Gruppe> gruppen;
     private Set<Teilnehmer> allTeilnehmer;
     private List<Teilnehmer> gruppenarbeitTeilnehmer;
     private List<Teilnehmer> otherTeilnehmer;
     private final List<Grid<Teilnehmer>> gruppenGrids = new ArrayList<>();
     private final ArrayList<GridListDataView<Teilnehmer>> dataViews = new ArrayList<>();
-    private AuthenticatedUser authenticatedUser;
+    private final AuthenticatedUser authenticatedUser;
     private final List<H5> titles = new ArrayList<>();
-    private VeranstaltungsterminView veranstaltungsterminView;
+    private final VeranstaltungsterminView veranstaltungsterminView;
     private final List<Button> deleteButtons = new ArrayList<>();
     private final List<Gruppe> groupsToDelete = new ArrayList<>();
 
@@ -54,8 +54,8 @@ public class GruppeBearbeitenDialog extends Dialog {
     private final Select<String> groupSize = new Select<>();
 
     //Services
-    private GruppenarbeitService gruppenarbeitService;
-    private GruppeService gruppeService;
+    private final GruppenarbeitService gruppenarbeitService;
+    private final GruppeService gruppeService;
 
     //Test
     private Teilnehmer draggedItem;
