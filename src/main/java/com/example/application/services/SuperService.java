@@ -7,6 +7,8 @@ import com.example.application.views.auswertung.TGGPHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.Console;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -57,7 +59,21 @@ public class SuperService {
         List<Veranstaltungstermin> veranstaltungstermine = veranstaltung.getVeranstaltungstermine();
         List<Gruppenarbeit> gruppenarbeiten = new ArrayList<>();
         // Damit die tggHelperListe bei jedem Teilnehmer gleich lang ist, muss sie jede Gruppenarbeit beinhalten
+
         List<TGGPHelper> tggpHelperList = new ArrayList<>();
+
+        // Aufgrund der Randbedingung, dass aus die Liste nicht leer sein darf, beim Herausschreiben muss mindestens ein Element
+        // noch vorherhinzugefügt werden
+        TGGPHelper tggpHelperLastElement = new TGGPHelper();
+        /*
+        Veranstaltungstermin veranstaltungsterminLastElement = new Veranstaltungstermin(LocalDate.now(), LocalTime.now(), LocalTime.now(), new String("ort"), new String("titel"), new User(), new Veranstaltung());
+        Gruppenarbeit gruppenarbeitLastElement = new Gruppenarbeit(new String("beschreibung"), new String("titel"), new User(), new Veranstaltungstermin());
+        Gruppe gruppeLastElement = new Gruppe();
+        tggpHelperLastElement.setVeranstaltungtermin(veranstaltungsterminLastElement);
+        tggpHelperLastElement.setGruppenarbeit(gruppenarbeitLastElement);
+        tggpHelperLastElement.setGruppe(gruppeLastElement);
+        tggpHelperList.add(tggpHelperLastElement);
+         */
         for (Veranstaltungstermin veranstaltungstermin : veranstaltungstermine) {
             for (Gruppenarbeit gruppenarbeit : veranstaltungstermin.getGruppenarbeiten()) {
                 TGGPHelper tggpHelper = new TGGPHelper();
@@ -70,10 +86,11 @@ public class SuperService {
         List<Auswertung> auswertungen = new ArrayList<Auswertung>();
         // Für jeden Teilnehmer aus der Veranstaltung soll eine Auswertung angelegt werden
         for ( Teilnehmer teilnehmer : teilnehmern) {
+
             Auswertung auswertung = new Auswertung();
             // Name und Matrikelnummer werden festgelegt
-            auswertung.setName(teilnehmer.getVorname() + " " + teilnehmer.getNachname());
-            auswertung.setMatrikelnummer(teilnehmer.getId());
+            auswertung.setNameMatrikelnummer(teilnehmer.getVorname() + " " + teilnehmer.getNachname() + "("+teilnehmer.getId()+")");
+
 
             // Auf Basis der tggHelperList, welche alle Veranstaltungstermine, die eine Gruppenarbeit haben, sollen nun die Werte (Gruppe) für den
             // Teilnehmer hinzufügen
@@ -81,26 +98,23 @@ public class SuperService {
                 if (tggpHelper.getGruppenarbeit() != null) {
                     List<Gruppe> gruppen = tggpHelper.getGruppenarbeit().getGruppen();
                     for (Gruppe gruppe : gruppen) {
-                        if (tggpHelper.getGruppenarbeit().equals(gruppe.getGruppenarbeit())) {
-                            for (Teilnehmer teilnehmerinGruppe : gruppe.getTeilnehmer()) {
-                                if (teilnehmerinGruppe.equals(teilnehmer)) {
-                                    tggpHelper.setGruppe(gruppe);
-                                }
+                        // if (tggpHelper.getGruppenarbeit().equals(gruppe.getGruppenarbeit())) {
+                        for (Teilnehmer teilnehmerinGruppe : gruppe.getTeilnehmer()) {
+                            if (teilnehmerinGruppe.equals(teilnehmer)) {
+                                tggpHelper.addGruppe(gruppe);
+                                auswertung.addGruppe(gruppe);
+
                             }
                         }
+
                     }
                 }
-                tggpHelper.setPunkte(
-                        gruppenarbeitTeilnehmerService.
-                                findPunkteByMatrikelNrAndGruppenarbeitId(
-                                        teilnehmer.getId(), tggpHelper.getGruppenarbeit().getId()
-                                ));
                 auswertung.addToGesamtPunkte(gruppenarbeitTeilnehmerService.
                         findPunkteByMatrikelNrAndGruppenarbeitId(
                                 teilnehmer.getId(), tggpHelper.getGruppenarbeit().getId()
                         ));
             }
-            auswertung.setTggpHelper(tggpHelperList);
+           auswertung.setTggpHelper(tggpHelperList);
             auswertungen.add(auswertung);
             }
         

@@ -90,12 +90,15 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
     private void configureGrid() {
 
 
+        grid01.removeAllColumns();
         // Eine einzelne Auswertung nehmen und alle Gruppenarbeiten als Columns darstellen
         Auswertung auswertung = auswertungen.getFirst();
+        grid01.addColumn(Auswertung::getNameMatrikelnummer).setHeader("");
         for (TGGPHelper tggpHelper : auswertung.getTggpHelper()) {
-
             grid01.addColumn(Auswertung::getTggHelperValues).setHeader(tggpHelper.getTerminAndGruppenarbeit());
         }
+        grid01.addColumn(Auswertung::getGesamtPunkte).setHeader("Gesamtpunkte");
+
         grid01.addClassNames("contact-grid");
         grid01.setSizeFull();
         grid01.getColumns().forEach(col -> col.setAutoWidth(true));

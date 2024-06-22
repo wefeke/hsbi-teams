@@ -32,12 +32,14 @@ public class AuswertungExcelExporter {
         font.setBold(true);
         font.setFontHeight(16);
         style.setFont(font);
-
+        int columnCount=1;
+        Auswertung auswertung = auswertungen.getFirst();
         createCell(row, 0, "Matrikelnummer", style);
-        createCell(row, 1, "Name", style);
-        createCell(row, 2, "Gruppenarbeit", style);
-        createCell(row, 3, "Veranstaltung", style);
-        createCell(row, 4, "Punkte", style);
+        for (TGGPHelper tggpHelper : auswertung.getTggpHelper()) {
+            createCell(row, columnCount++, tggpHelper.getTerminAndGruppenarbeit(), style);
+        }
+
+        createCell(row, columnCount, "Gesamtpunkte", style);
 
     }
 
@@ -69,11 +71,15 @@ public class AuswertungExcelExporter {
         for (Auswertung auswertung : auswertungen) {
             Row row = sheet.createRow(rowCount++);
             int columnCount = 0;
-            createCell(row, columnCount++, auswertung.getMatrikelnummer(), style);
-            createCell(row, columnCount++, auswertung.getName(), style);
-            //createCell(row, columnCount++, auswertung.getGruppenarbeit(), style);
-           // createCell(row, columnCount++, auswertung.getVeranstaltung(), style);
-           // createCell(row, columnCount++, auswertung.getPunkte(), style);
+            // Eine einzelne Auswertung nehmen und alle Gruppenarbeiten als Columns darstellen
+
+
+            createCell(row, columnCount++, auswertung.getNameMatrikelnummer(), style);
+            for (TGGPHelper tggpHelper : auswertung.getTggpHelper()) {
+                createCell(row, columnCount++, auswertung.getTggHelperValues(), style);
+            }
+            createCell(row, columnCount++, auswertung.getGesamtPunkte(), style);
+
         }
     }
 

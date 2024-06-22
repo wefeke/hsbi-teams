@@ -2,7 +2,11 @@ package com.example.application.views.auswertung;
 
 import com.example.application.models.Gruppe;
 import com.example.application.models.Gruppenarbeit;
+import com.example.application.models.Teilnehmer;
 import com.example.application.models.Veranstaltungstermin;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 // TGGP ist das Akronym für Termin-Gruppenarbeit-Gruppe-Punkte und dient als Helper-Klasse, um eine
@@ -11,7 +15,8 @@ import com.example.application.models.Veranstaltungstermin;
 public class TGGPHelper {
     Veranstaltungstermin veranstaltungtermin;
     Gruppenarbeit gruppenarbeit;
-    Gruppe gruppe;
+    List<Gruppe> gruppe = new ArrayList<>();
+    List<Teilnehmer> teilnehmer;
     Float punkte = 0f;
     private int tablePos = 0;
     boolean used;
@@ -45,11 +50,15 @@ public class TGGPHelper {
     }
 
     public Gruppe getGruppe() {
-        return gruppe;
+        if (!gruppe.isEmpty()) {
+            return gruppe.getFirst();
+        } else {
+            return null;
+        }
     }
 
-    public void setGruppe(Gruppe gruppe) {
-        this.gruppe = gruppe;
+    public void addGruppe(Gruppe gruppe) {
+        this.gruppe.add(gruppe);
     }
 
     public Float getPunkte() {
@@ -69,9 +78,11 @@ public class TGGPHelper {
     }
 
     public String getGruppeAndCheckmark() {
-        if (gruppe != null) {
+        if (!gruppe.isEmpty()) {
             String unicodeString = "\u2705";
-                return "Gruppe " + gruppe.getNummer();
+            String res = ""+gruppe.getFirst();
+            gruppe.remove(gruppe.getFirst());
+                return res;
         } else {
          return  "Gehört zu keiner Gruppe!";
         }
@@ -87,5 +98,17 @@ public class TGGPHelper {
 
     public void setUsedFalse() {
         this.used = false;
+    }
+
+    public void setGruppe(List<Gruppe> gruppe) {
+        this.gruppe = gruppe;
+    }
+
+    public List<Teilnehmer> getTeilnehmer() {
+        return teilnehmer;
+    }
+
+    public void setTeilnehmer(List<Teilnehmer> teilnehmer) {
+        this.teilnehmer = teilnehmer;
     }
 }

@@ -1,14 +1,18 @@
 package com.example.application.views.auswertung;
 
+import com.example.application.models.Gruppe;
+
+import java.util.ArrayList;
 import java.util.List;
 
 // Auswertung
 public class Auswertung {
 
-    private Long matrikelnummer;
-    private String name;
-    private Float gesamtPunkte =0f;
+
+    private String nameMatrikelnummer;
+    private Float gesamtPunkte = 0.0f;
     private List<TGGPHelper> tggpHelper;
+    private List<Gruppe> gruppe = new ArrayList<Gruppe>();
 
     public Auswertung() {
 
@@ -27,22 +31,46 @@ public class Auswertung {
     }
 
     public String getTggHelperValues() {
-        String res = "";
-
-        for (int i = 0; i < tggpHelper.size(); i++) {
-            if (tggpHelper.get(i).getUsed()) {
-                continue;
-            } else {
-                res = tggpHelper.get(i).getGruppeAndCheckmark();
-                tggpHelper.get(i).setUsedTrue();
-                break;
-            }
-
+        StringBuilder result = new StringBuilder();
+        if (tggpHelper.isEmpty()) {
+            result = new StringBuilder("Keine Teilnahme");
+        }
+        if (!gruppe.isEmpty()) {
+                result.append("Gruppe ").append(gruppe.getFirst().getNummer());
+                gruppe.removeFirst();
 
         }
-        return res;
+
+        if (gesamtPunkte != 0.0f) {
+            result.append(" \u2705");
+        }
+
+        return ""+result.toString();
     }
 
+
+    public Gruppe getGruppe() {
+        if (gruppe.isEmpty()) {
+            return null;
+        } else {
+            return gruppe.getFirst();
+        }
+
+    }
+
+    public void addGruppe(Gruppe gruppe) {
+        this.gruppe.add(gruppe);
+    }
+
+
+
+    public boolean gruppeAdded() {
+        if (gruppe != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     public Float getGesamtPunkte() {
         return gesamtPunkte;
     }
@@ -51,25 +79,13 @@ public class Auswertung {
         this.gesamtPunkte = gesamtPunkte;
     }
 
-    public Long getMatrikelnummer() {
-        return matrikelnummer;
-    }
-
-    public void setMatrikelnummer(Long matrikelnummer) {
-        this.matrikelnummer = matrikelnummer;
-    }
 
     public String getNameMatrikelnummer() {
-        return name + "\n" + "("+matrikelnummer+")";
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        return nameMatrikelnummer;
     }
 
 
+    public void setNameMatrikelnummer(String nameMatrikelnummer) {
+        this.nameMatrikelnummer = nameMatrikelnummer;
+    }
 }
