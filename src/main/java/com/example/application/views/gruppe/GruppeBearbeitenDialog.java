@@ -507,6 +507,9 @@ public class GruppeBearbeitenDialog extends Dialog {
         otherTeilnehmer.removeAll(gruppenarbeitTeilnehmer);
         dataViews.clear();
         gruppenGrids.clear();
+        groupsArea.removeAll();
+        deleteButtons.clear();
+        titles.clear();
         removeAll();
 
         uebrigeTeilnehmer = new Grid<>(Teilnehmer.class, false);
