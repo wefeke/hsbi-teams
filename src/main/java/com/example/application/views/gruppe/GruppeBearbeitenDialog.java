@@ -115,24 +115,63 @@ public class GruppeBearbeitenDialog extends Dialog {
 
     private void addButtonFunctionalities(){
         saveBtn.addClickListener(event ->{
-            saveUpdatesToGruppenarbeit();
+            ConfirmDialog confirmDialog = new ConfirmDialog();
+            confirmDialog.setHeader("Updates zur Gruppenarbeit speichern");
+            confirmDialog.setConfirmText("Speichern");
+            confirmDialog.addConfirmListener(confirm -> {
+                saveUpdatesToGruppenarbeit();
 
-            gruppen.clear();
-            deleteButtons.clear();
-            gruppen.addAll(gruppenarbeit.getGruppen());
-            dataViews.subList(1, dataViews.size()).clear();
-            gruppenGrids.subList(1, gruppenGrids.size()).clear();
-            titles.clear();
-            groupsArea.removeAll();
-            groupGrids(gruppen.size(), gruppen);
-            deleteBtnsFunctionality();
+                gruppen.clear();
+                deleteButtons.clear();
+                gruppen.addAll(gruppenarbeit.getGruppen());
+                dataViews.subList(1, dataViews.size()).clear();
+                gruppenGrids.subList(1, gruppenGrids.size()).clear();
+                titles.clear();
+                groupsArea.removeAll();
+                groupGrids(gruppen.size(), gruppen);
+                deleteBtnsFunctionality();
 
-            if (gruppenarbeit.getVeranstaltungstermin() != null) {
-                veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
-                veranstaltungsterminView.setAktiveKachelGruppenarbeit(gruppenarbeit);
-            }
-            veranstaltungsterminView.update();
-            close();
+                if (gruppenarbeit.getVeranstaltungstermin() != null) {
+                    veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
+                    veranstaltungsterminView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+                }
+                veranstaltungsterminView.update();
+
+                close();
+            });
+            confirmDialog.setCancelable(true);
+            confirmDialog.setCancelText("Abbrechen");
+            confirmDialog.addCancelListener(cancel -> {
+                confirmDialog.close();
+            });
+
+            Paragraph info = new Paragraph("Wenn du die Updates zu den Gruppen speicherst, werden eventuell bereits" +
+                    " vergebene Punkte überschrieben.");
+            info.addClassName("warning-text-delete");
+            Paragraph areYouSure = new Paragraph("Bist du sicher, dass du die Updates speichern möchtest?");
+            areYouSure.addClassName("no-return-text-delete");
+            confirmDialog.add(info, areYouSure);
+
+            confirmDialog.open();
+
+//            saveUpdatesToGruppenarbeit();
+//
+//            gruppen.clear();
+//            deleteButtons.clear();
+//            gruppen.addAll(gruppenarbeit.getGruppen());
+//            dataViews.subList(1, dataViews.size()).clear();
+//            gruppenGrids.subList(1, gruppenGrids.size()).clear();
+//            titles.clear();
+//            groupsArea.removeAll();
+//            groupGrids(gruppen.size(), gruppen);
+//            deleteBtnsFunctionality();
+//
+//            if (gruppenarbeit.getVeranstaltungstermin() != null) {
+//                veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
+//                veranstaltungsterminView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+//            }
+//            veranstaltungsterminView.update();
+//            close();
         });
 
         cancelBtn.addClickListener(event -> {
