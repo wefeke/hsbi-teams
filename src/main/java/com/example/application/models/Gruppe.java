@@ -1,4 +1,4 @@
-//Autor: Kennet
+//Autor: Lilli
 package com.example.application.models;
 
 import jakarta.persistence.*;
