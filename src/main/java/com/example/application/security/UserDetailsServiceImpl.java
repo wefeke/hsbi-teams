@@ -49,10 +49,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
         if (user == null) {
-            throw new UsernameNotFoundException("No user present with username: " + username);
+            throw new UsernameNotFoundException("Keinen User mit Usernamen : " + username + " gefunden");
         }
         else if (user.isLocked()) { //Implementiert die User locked Funktionalität
-            throw new UsernameNotFoundException("User account is locked");
+            throw new UserIsLockedException("User " + username + " ist nicht freigegeben");
         }
         else {
             return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
@@ -70,6 +70,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private static List<GrantedAuthority> getAuthorities(User user) {
         return user.getRoles().stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                 .collect(Collectors.toList());
+    }
+
+    public class UserIsLockedException extends RuntimeException {
+        public UserIsLockedException(String message) {
+            super(message);
+        }
     }
 
 }

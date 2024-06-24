@@ -96,7 +96,6 @@ public class MainLayout extends AppLayout {
         public Class<?> getView() {
             return view;
         }
-
     }
 
 

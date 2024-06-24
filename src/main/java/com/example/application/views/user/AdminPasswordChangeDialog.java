@@ -91,7 +91,7 @@ public class AdminPasswordChangeDialog extends Dialog {
             if (!password_check.isInvalid() && !new_password.isInvalid()) {
                 user.setPassword(passwordEncoder.encode(new_password.getValue()));
                 userService.saveUser(user);
-                Notification.show("Passwort für [" + user.getUsername() + "] auf [" + new_password.getValue() + "] geändert");
+                Notification.show("Passwort erfolgreich geändert");
                 close();
                 clearFields();
             }

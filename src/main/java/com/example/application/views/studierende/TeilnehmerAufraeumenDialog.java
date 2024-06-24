@@ -26,7 +26,17 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
 
    private AuthenticatedUser authenticatedUser;
 
-
+    /**
+     * Konstruktor für die TeilnehmerAufraeumenDialog Klasse.
+     * Initialisiert den TeilnehmerService, den authentifizierten Benutzer und die StudierendeView.
+     * Setzt den Platzhalter für das yearsField und konfiguriert die Aktionen der "closeButton", "deleteOldButton", "deleteNoEventButton" und "deleteButton".
+     * Setzt die Breite und Höhe des Dialogs und konfiguriert das Grid.
+     * Aktualisiert das Grid und fügt das erstellte Layout hinzu.
+     *
+     * @param teilnehmerService Der Service, der für die Verwaltung der Teilnehmer benötigt wird.
+     * @param authenticatedUser Der aktuell authentifizierte Benutzer.
+     * @param studierendeView Die StudierendeView, die aktualisiert wird, wenn ein Teilnehmer gelöscht wird.
+     */
     public TeilnehmerAufraeumenDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, StudierendeView studierendeView) {
         this.teilnehmerService = teilnehmerService;
         this.authenticatedUser = authenticatedUser;
@@ -71,6 +81,14 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
                 createLayout()
         );
     }
+
+    /**
+     * Erstellt ein VerticalLayout und fügt das Grid hinzu.
+     * Setzt den Titel des Headers auf "Studierende ohne Veranstaltung" und fügt die Buttons "deleteNoEventButton", "deleteOldButton" und das "yearsField" zum Header hinzu.
+     * Fügt die Buttons "closeButton" und "deleteButton" zum Footer hinzu.
+     *
+     * @return Das erstellte VerticalLayout mit dem hinzugefügten Grid.
+     */
     private VerticalLayout createLayout() {
         setHeaderTitle("Studierende ohne Veranstaltung");
         getHeader().add(deleteNoEventButton);
@@ -82,6 +100,14 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
         return (
                 new VerticalLayout(grid));
     }
+
+    /**
+     * Aktualisiert das Grid mit Teilnehmern, die seit einer bestimmten Anzahl von Jahren registriert sind.
+     * Holt den authentifizierten Benutzer und, wenn vorhanden, holt es die Liste der Teilnehmer, die seit der angegebenen Anzahl von Jahren registriert sind.
+     * Setzt die Elemente des Grids auf diese Liste von Teilnehmern.
+     *
+     * @param years Die Anzahl der Jahre, die die Teilnehmer registriert sein sollen.
+     */
     public void updateGridOld(int years) {
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
@@ -92,6 +118,11 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
 
     }
 
+    /**
+     * Aktualisiert das Grid mit Teilnehmern, die keine Veranstaltung haben.
+     * Holt den authentifizierten Benutzer und, wenn vorhanden, holt es die Liste der Teilnehmer, die keine Veranstaltung haben.
+     * Setzt die Elemente des Grids auf diese Liste von Teilnehmern.
+     */
     public void updateGridNoEvent() {
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
@@ -99,8 +130,13 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
             List<Teilnehmer> studierendeOhneVeranstaltung = teilnehmerService.findStudierendeOhneVeranstaltung(user);
             grid.setItems(studierendeOhneVeranstaltung);
         }
-
     }
+
+    /**
+     * Gibt den Wert des "yearsField" zurück.
+     *
+     * @return Der Wert des "yearsField" als Double. Kann null sein, wenn kein Wert gesetzt wurde.
+     */
     public Double getYearsFieldValue() {
         return yearsField.getValue();
     }

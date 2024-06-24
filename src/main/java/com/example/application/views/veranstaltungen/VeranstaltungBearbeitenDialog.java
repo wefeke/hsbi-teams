@@ -131,17 +131,17 @@ public class VeranstaltungBearbeitenDialog extends Dialog {
             row.setAlignItems(FlexComponent.Alignment.CENTER);
 
             Avatar avatar = new Avatar();
-            avatar.setName(teilnehmer.getNachname());
+            avatar.setName(teilnehmer.getFullName());
             avatar.setImage(null);
             avatar.setColorIndex(teilnehmer.getId().intValue() % 5);
 
-            Span nachname = new Span(teilnehmer.getNachname());
-            Span vorname = new Span(teilnehmer.getVorname());
-            vorname.getStyle()
+            Span name = new Span(teilnehmer.getFullName());
+            Span matrikelnr = new Span(String.valueOf(teilnehmer.getId()));
+            matrikelnr.getStyle()
                     .set("color", "var(--lumo-secondary-text-color)")
                     .set("font-size", "var(--lumo-font-size-s)");
 
-            VerticalLayout column = new VerticalLayout(vorname, nachname);
+            VerticalLayout column = new VerticalLayout(name, matrikelnr);
             column.setPadding(false);
             column.setSpacing(false);
 
@@ -194,6 +194,7 @@ public class VeranstaltungBearbeitenDialog extends Dialog {
     private void bindFields() {
         binder.forField(titelField)
                 .asRequired("Titel muss gefüllt sein")
+                .withValidator(titel -> titel.length() <= 255, "Der Titel darf maximal 255 Zeichen lang sein")
                 .bind(Veranstaltung::getTitel, Veranstaltung::setTitel);
         binder.forField(datePicker)
                 .asRequired("Datum darf nicht leer sein")

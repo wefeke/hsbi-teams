@@ -1074,7 +1074,7 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
         if (gruppenarbeit != null) {
             Float punkte = gruppenarbeitTeilnehmerService.findPunkteByMatrikelNrAndGruppenarbeitId(t.getId(), gruppenarbeit.getId());
 
-            if (punkte != null) {
+            if (punkte != null && punkte != 0.0 ) {
                 punkteDiv.setText(punkte.toString());
             }
         }
