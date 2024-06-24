@@ -72,10 +72,4 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .collect(Collectors.toList());
     }
 
-    public class UserIsLockedException extends RuntimeException {
-        public UserIsLockedException(String message) {
-            super(message);
-        }
-    }
-
 }
