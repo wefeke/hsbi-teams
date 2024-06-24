@@ -21,39 +21,39 @@ public class VeranstaltungLoeschenDialog extends Dialog {
     private Veranstaltung veranstaltung;
 
     //UI Elements
-    H2 infoText = new H2("Empty");
-    Button deleteBtn = new Button("Veranstaltung endgültig löschen");
-    Button cancelBtn = new Button("Abbrechen");
-    Paragraph warningText = new Paragraph("Empty");
-    Paragraph noReturn = new Paragraph("Empty");
+    private final H2 infoText = new H2("Empty");
+    private final Button deleteBtn = new Button("Veranstaltung endgültig löschen");
+    private final Button cancelBtn = new Button("Abbrechen");
+    private final Paragraph warningText = new Paragraph("Empty");
+    private final Paragraph noReturn = new Paragraph("Empty");
 
     public VeranstaltungLoeschenDialog(VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungenService veranstaltungenService, VeranstaltungenView veranstaltungenView, AuthenticatedUser authenticatedUser) {
-        warningText.addClassName("warning-text-delete");
-        warningText.getStyle().set("white-space", "pre-line");
-        noReturn.addClassName("no-return-text-delete");
-        noReturn.getStyle().set("white-space", "pre-line");
+        styleElements();
+        addButtonFunctionalities(veranstaltungsterminService, gruppenarbeitService, gruppeService, veranstaltungenService, veranstaltungenView, authenticatedUser);
+        add(createLayout());
+    }
 
-        //Services
-
-        deleteBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
+    private void addButtonFunctionalities(VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungenService veranstaltungenService, VeranstaltungenView veranstaltungenView, AuthenticatedUser authenticatedUser) {
         deleteBtn.addClickListener(event -> {
-
             Optional<User> maybeUser = authenticatedUser.get();
             if (maybeUser.isPresent()) {
                 User user = maybeUser.get();
                 this.veranstaltung = veranstaltungenService.findVeranstaltungById(this.veranstaltung.getId(), user);
             }
-
             deleteEverything(veranstaltungsterminService, gruppenarbeitService, gruppeService, veranstaltungenService);
             veranstaltungenView.updateKachelContainer("");
-
             close();
         });
-
         cancelBtn.addClickListener(event -> close());
+    }
 
-        add(createLayout());
+    private void styleElements() {
+        warningText.addClassName("warning-text-delete");
+        warningText.getStyle().set("white-space", "pre-line");
+        noReturn.addClassName("no-return-text-delete");
+        noReturn.getStyle().set("white-space", "pre-line");
+
+        deleteBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     }
 
     @Transactional
