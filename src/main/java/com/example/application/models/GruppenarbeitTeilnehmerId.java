@@ -99,6 +99,7 @@ public class GruppenarbeitTeilnehmerId implements Serializable {
      *
      * @autor Leon
      */
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
