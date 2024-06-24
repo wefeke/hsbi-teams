@@ -20,27 +20,25 @@ import java.util.List;
 
 @SuppressWarnings("SpringTransactionalMethodCallsInspection")
 public class VeranstaltungsterminLoeschenDialog extends Dialog {
+    //Data
     private Veranstaltungstermin veranstaltungstermin;
 
     //UI-Elements
-    H2 infoText = new H2("Empty");
-    Button deleteBtn = new Button("Veranstaltungstermin endgültig löschen");
-    Button cancelBtn = new Button("Abbrechen");
-    Paragraph warningText = new Paragraph("Empty");
-    Paragraph noReturn = new Paragraph("Empty");
+    private final H2 infoText = new H2("Empty");
+    private final Button deleteBtn = new Button("Veranstaltungstermin endgültig löschen");
+    private final Button cancelBtn = new Button("Abbrechen");
+    private final Paragraph warningText = new Paragraph("Empty");
+    private final Paragraph noReturn = new Paragraph("Empty");
 
     public VeranstaltungsterminLoeschenDialog(GruppeService gruppeService, GruppenarbeitService gruppenarbeitService, VeranstaltungsterminView veranstaltungsterminView, Veranstaltungstermin aktiverVeranstaltungstermin, Gruppenarbeit aktiveGruppenarbeit, VeranstaltungsterminService veranstaltungsterminService) {
         this.veranstaltungstermin = null;
-        //Data
-        //Services
+        styleElements();
+        addButtonsFunctionalities(gruppeService, gruppenarbeitService, veranstaltungsterminView, aktiverVeranstaltungstermin, aktiveGruppenarbeit, veranstaltungsterminService);
+        add(createLayout());
+    }
 
-        warningText.addClassName("warning-text-delete");
-        warningText.getStyle().set("white-space", "pre-line");
-        noReturn.addClassName("no-return-text-delete");
-        noReturn.getStyle().set("white-space", "pre-line");
-
+    private void addButtonsFunctionalities(GruppeService gruppeService, GruppenarbeitService gruppenarbeitService, VeranstaltungsterminView veranstaltungsterminView, Veranstaltungstermin aktiverVeranstaltungstermin, Gruppenarbeit aktiveGruppenarbeit, VeranstaltungsterminService veranstaltungsterminService) {
         deleteBtn.addClickListener(event -> {
-
             if (aktiverVeranstaltungstermin != null) {
                 veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(aktiverVeranstaltungstermin);
 
@@ -48,18 +46,21 @@ public class VeranstaltungsterminLoeschenDialog extends Dialog {
                     veranstaltungsterminView.setAktiveKachelGruppenarbeit(aktiveGruppenarbeit);
                 }
             }
-
             deleteEverything(gruppeService, gruppenarbeitService, veranstaltungsterminService);
             veranstaltungsterminView.update();
-
             close();
         });
-        deleteBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         cancelBtn.addClickListener(event -> close());
+    }
 
-        add(createLayout());
+    private void styleElements() {
+        warningText.addClassName("warning-text-delete");
+        warningText.getStyle().set("white-space", "pre-line");
+        noReturn.addClassName("no-return-text-delete");
+        noReturn.getStyle().set("white-space", "pre-line");
 
+        deleteBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     }
 
     @Transactional
