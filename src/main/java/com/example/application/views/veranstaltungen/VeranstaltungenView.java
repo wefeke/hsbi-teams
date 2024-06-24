@@ -76,7 +76,7 @@ public class VeranstaltungenView extends VerticalLayout  {
      * @param gruppenarbeitService der Service für die Gruppenarbeiten
      * @param gruppeService der Service für die Gruppen
      *
-     * @autor Joris
+     * @author Joris
      */
     @Autowired
     public VeranstaltungenView(VeranstaltungenService veranstaltungenService, UserService userService, TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService) {
@@ -129,7 +129,7 @@ public class VeranstaltungenView extends VerticalLayout  {
      *
      * @return ein HorizontalLayout, das die Such- und Filterleiste darstellt
      *
-     * @autor Joris
+     * @author Joris
      */
     private HorizontalLayout createSearchAndFilterBar() {
         // Textfeld für die Suche erstellen
@@ -142,7 +142,7 @@ public class VeranstaltungenView extends VerticalLayout  {
             updateKachelContainer(searchText);
         });
 
-        VeranstaltungHinzufuegenDialog createDialog = new VeranstaltungHinzufuegenDialog(veranstaltungenService, teilnehmerService, userService, this, authenticatedUser);
+        VeranstaltungHinzufuegenDialog createDialog = new VeranstaltungHinzufuegenDialog(veranstaltungenService, teilnehmerService, this, authenticatedUser);
 
         // Button zum Erstellen neuer Veranstaltungen erstellen
         Button newEventButton = new Button(new Icon(VaadinIcon.PLUS));
@@ -167,7 +167,7 @@ public class VeranstaltungenView extends VerticalLayout  {
      * @param spacer ein Div-Element, das als Spacer dient
      * @return ein HorizontalLayout, das die Such- und Filterleiste darstellt
      *
-     * @autor Joris
+     * @author Joris
      */
     private HorizontalLayout createHorizontalLayout(TextField searchField, Button newEventButton, Div spacer) {
         Select<String> sortSelect = new Select<>();
@@ -195,7 +195,7 @@ public class VeranstaltungenView extends VerticalLayout  {
      *
      * @return ein HorizontalLayout, das einen Text zwischen zwei horizontalen Linien darstellt
      *
-     * @autor Joris
+     * @author Joris
      */
     private HorizontalLayout createLineWithText() {
         Text text = new Text("Veranstaltungen");
@@ -231,7 +231,7 @@ public class VeranstaltungenView extends VerticalLayout  {
      *
      * @param filter der ausgewählte Filter zum Sortieren der Veranstaltungen
      *
-     * @autor Joris
+     * @author Joris
      */
     public void updateKachelContainerWithFilter(String filter) {
         kachelContainer.removeAll();
@@ -278,7 +278,7 @@ public class VeranstaltungenView extends VerticalLayout  {
      *
      * @param searchText der Suchtext zum Filtern der Veranstaltungen
      *
-     * @autor Joris
+     * @author Joris
      */
     public void updateKachelContainer(String searchText) {
         kachelContainer.removeAll();
@@ -316,10 +316,10 @@ public class VeranstaltungenView extends VerticalLayout  {
      * Die Methode erstellt dann ein VerticalLayout und fügt den Text und den Button hinzu. Das Layout wird so konfiguriert, dass es die volle Größe einnimmt und die Elemente zentriert ausrichtet.
      * Schließlich wird das Layout zum KachelContainer hinzugefügt.
      *
-     * @autor Joris
+     * @author Joris
      */
     private void createDefaultLayout() {
-        VeranstaltungHinzufuegenDialog createDialog = new VeranstaltungHinzufuegenDialog(veranstaltungenService, teilnehmerService, userService, this, authenticatedUser);
+        VeranstaltungHinzufuegenDialog createDialog = new VeranstaltungHinzufuegenDialog(veranstaltungenService, teilnehmerService, this, authenticatedUser);
 
         Text noEventsText = new Text("Noch keine Veranstaltungen vorhanden, bitte legen Sie hier eine an:");
         Button createEventButton = new Button("Veranstaltung anlegen");
@@ -348,7 +348,7 @@ public class VeranstaltungenView extends VerticalLayout  {
      * @param veranstaltung die Veranstaltung, für die die Kachel erstellt wird
      * @return ein HorizontalLayout, das die Kachel für die Veranstaltung darstellt
      *
-     * @autor Joris
+     * @author Joris
      */
     private HorizontalLayout createVeranstaltungKachel(Veranstaltung veranstaltung) {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");

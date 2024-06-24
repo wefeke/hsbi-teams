@@ -18,13 +18,12 @@ import java.util.Optional;
  */
 public class PasswordChangeDialog extends Dialog {
 
-    private PasswordField old_password = new PasswordField("Altes Password");
-    private PasswordField new_password = new PasswordField("Neues Password");
-    private PasswordField password_check = new PasswordField("Password wiederholen");
+    private final PasswordField old_password = new PasswordField("Altes Password");
+    private final PasswordField new_password = new PasswordField("Neues Password");
+    private final PasswordField password_check = new PasswordField("Password wiederholen");
 
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
     private final UserService userService;
-    private AuthenticatedUser authenticatedUser;
     private User user;
 
     /**
@@ -36,7 +35,6 @@ public class PasswordChangeDialog extends Dialog {
      * @param passwordEncoder Ein PasswordEncoder-Objekt, das zum Hashen von Passwörtern verwendet wird.
      */
     public PasswordChangeDialog(AuthenticatedUser authenticatedUser, UserService userService, PasswordEncoder passwordEncoder) {
-        this.authenticatedUser = authenticatedUser;
         Optional<User> maybeUser = authenticatedUser.get();
         maybeUser.ifPresent(value -> this.user = value);
 

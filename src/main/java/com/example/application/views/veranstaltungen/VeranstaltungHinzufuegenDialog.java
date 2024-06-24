@@ -6,7 +6,6 @@ import com.example.application.models.User;
 import com.example.application.models.Veranstaltung;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
-import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
@@ -15,7 +14,6 @@ import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -46,7 +44,6 @@ public class VeranstaltungHinzufuegenDialog extends Dialog {
     //Services
     private final VeranstaltungenService veranstaltungenService;
     private final TeilnehmerService teilnehmerService;
-    private final UserService userService;
     private final VeranstaltungenView veranstaltungenView;
 
     //Dialog Items
@@ -64,8 +61,6 @@ public class VeranstaltungHinzufuegenDialog extends Dialog {
     Set<Teilnehmer> newTeilnehmerListe = new HashSet<>();
     Set<Teilnehmer> oldTeilnehmerListe = new HashSet<>();
 
-    //Security
-    private AuthenticatedUser authenticatedUser;
     private User user;
 
     //Data Binder
@@ -79,22 +74,18 @@ public class VeranstaltungHinzufuegenDialog extends Dialog {
      * @author Kennet
      * @param veranstaltungenService Ein VeranstaltungenService-Objekt, das Methoden zur Interaktion mit Veranstaltungs-Objekten in der Datenbank bereitstellt.
      * @param teilnehmerService Ein TeilnehmerService-Objekt, das Methoden zur Interaktion mit Teilnehmer-Objekten in der Datenbank bereitstellt.
-     * @param userService Ein UserService-Objekt, das Methoden zur Interaktion mit User-Objekten in der Datenbank bereitstellt.
      * @param veranstaltungenView Ein VeranstaltungenView-Objekt, das die Ansicht der Veranstaltungen repräsentiert.
      * @param authenticatedUser Ein AuthenticatedUser-Objekt, das Informationen über den authentifizierten Benutzer enthält.
      */
-    public VeranstaltungHinzufuegenDialog(VeranstaltungenService veranstaltungenService, TeilnehmerService teilnehmerService, UserService userService, VeranstaltungenView veranstaltungenView, AuthenticatedUser authenticatedUser) {
+    public VeranstaltungHinzufuegenDialog(VeranstaltungenService veranstaltungenService, TeilnehmerService teilnehmerService, VeranstaltungenView veranstaltungenView, AuthenticatedUser authenticatedUser) {
         this.veranstaltungenService = veranstaltungenService;
         this.teilnehmerService = teilnehmerService;
-        this.userService = userService;
         this.veranstaltungenView = veranstaltungenView;
-        this.authenticatedUser = authenticatedUser;
+        //Security
         this.excelImporter = new ExcelImporter(teilnehmerService, authenticatedUser);
 
         Optional<User> maybeUser = authenticatedUser.get();
-        if (maybeUser.isPresent()) {
-            this.user = maybeUser.get();
-        }
+        maybeUser.ifPresent(value -> this.user = value);
 
         add(createLayout());
         configureElements();
