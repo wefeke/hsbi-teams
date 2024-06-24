@@ -216,7 +216,7 @@ public class VeranstaltungHinzufuegenDialog extends Dialog {
                 if (!newTeilnehmerListe.isEmpty()) {
                     Grid<Teilnehmer> grid = new Grid<>();
                     grid.setItems(newTeilnehmerListe);
-                    grid.addColumn(Teilnehmer::getMatrikelNr).setHeader("MatrikelNr").setSortable(true).setAutoWidth(true);
+                    grid.addColumn(Teilnehmer::getId).setHeader("MatrikelNr").setSortable(true).setAutoWidth(true);
                     grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname").setSortable(true).setAutoWidth(true);
                     grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname").setSortable(true).setAutoWidth(true);
 

@@ -7,7 +7,6 @@ import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.views.MainLayout;
-import com.example.application.views.veranstaltungstermin.TeilnehmerEntfernenDialog;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Component;
@@ -18,6 +17,7 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
@@ -74,6 +74,17 @@ public class StudierendeView extends VerticalLayout {
     Set<Teilnehmer> newTeilnehmerListe = new HashSet<>();
     private User user;
 
+    /**
+     * Konstruktor für die StudierendeView Klasse.
+     * Initialisiert die benötigten Services, Dialoge und Buttons.
+     * Setzt den authentifizierten Benutzer und den ExcelExporter.
+     * Fügt die notwendigen Komponenten zur Ansicht hinzu und konfiguriert das Grid.
+     * Setzt Click-Listener für die Buttons und einen Resize-Listener für das Browserfenster.
+     *
+     * @param teilnehmerService Der Service, der für die Verwaltung der Studierenden benötigt wird.
+     * @param authenticatedUser Der aktuell authentifizierte Benutzer.
+     * @param teilnehmerExcelExporter Der ExcelExporter, der für den Export der Studierendendaten benötigt wird.
+     */
     @Autowired
     public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, TeilnehmerExcelExporter teilnehmerExcelExporter) {
         this.authenticatedUser = authenticatedUser;
@@ -146,6 +157,12 @@ public class StudierendeView extends VerticalLayout {
         aufraeumenButton.addClickListener(event -> teilnehmerAufraeumenDialogDialog.open());
     }
 
+    /**
+    * Aktualisiert die Ansicht der Studierenden in der Tabelle (Grid).
+    * Es werden alle Studierenden, die dem authentifizierten Benutzer zugeordnet sind, abgerufen und basierend auf dem Suchtext gefiltert.
+    * Der Suchtext wird mit dem Vornamen, Nachnamen und der ID (Matrikelnummer) der Studierenden verglichen.
+    * Die gefilterte Liste der Studierenden wird dann als Elemente der Tabelle gesetzt.
+    */
     public void updateStudierendeView() {
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
@@ -153,25 +170,41 @@ public class StudierendeView extends VerticalLayout {
             String searchText = filterText.getValue().toLowerCase();
             List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmer(user);
             List<Teilnehmer> filteredTeilnehmerList = teilnehmerList.stream()
-                    .filter(teilnehmer -> teilnehmer.getVorname().toLowerCase().contains(searchText)
-                            || teilnehmer.getNachname().toLowerCase().contains(searchText)
-                            || Long.toString(teilnehmer.getId()).contains(searchText)) // Vergleicht den Suchtext mit der Matrikelnummer
-                    .collect(Collectors.toList());
+                .filter(teilnehmer -> teilnehmer.getVorname().toLowerCase().contains(searchText)
+                        || teilnehmer.getNachname().toLowerCase().contains(searchText)
+                        || Long.toString(teilnehmer.getId()).contains(searchText)) // Vergleicht den Suchtext mit der Matrikelnummer
+                .collect(Collectors.toList());
             grid.setItems(filteredTeilnehmerList);
         }
     }
 
 
+    /**
+    * Erstellt und gibt eine Komponente zurück, die das Hauptlayout für die Anzeige der Studierenden enthält.
+    * Das Layout ist ein HorizontalLayout, das ein Grid enthält, welches die Studierenden anzeigt.
+    * Das Grid nimmt den gesamten verfügbaren Platz im Layout ein.
+    *
+    * @return Eine Komponente, die das Hauptlayout für die Anzeige der Studierenden enthält.
+    */
     private Component getContent() {
         HorizontalLayout content = new HorizontalLayout(grid);
         content.setFlexGrow(1, grid);
         content.addClassName("content");
         content.setSizeFull();
 
-
         return content;
     }
-
+    /**
+     * Konfiguriert das Grid für die Anzeige der Studierenden.
+     * Es werden Spalten für Vorname, Nachname und Matrikelnummer erstellt und entsprechende Header gesetzt.
+     * Die Spalten sind sortierbar.
+     * Ein Editor wird konfiguriert, um die Daten der Studierenden zu bearbeiten.
+     * Der Editor verwendet einen Binder, um die Daten der Studierenden an die Felder zu binden.
+     * Bei Auswahl eines Studierenden im Grid wird der Lösch-Button aktiviert.
+     * Ein Button zum Speichern und ein Button zum Abbrechen der Bearbeitung werden hinzugefügt.
+     * Bei Klick auf den Speichern-Button wird der aktuell bearbeitete Studierende gespeichert.
+     * Bei Klick auf den Abbrechen-Button wird die Bearbeitung abgebrochen.
+     */
     private void configureGrid() {
         grid.setSizeFull();
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
@@ -236,7 +269,13 @@ public class StudierendeView extends VerticalLayout {
         actions.setPadding(false);
         editColumn.setEditorComponent(actions);
     }
-
+    /**
+     * Erstellt und gibt eine Komponente zurück, die die Werkzeugleiste für die Studierendenansicht enthält.
+     * Die Werkzeugleiste besteht aus einem Filtertextfeld und zwei Buttons zum Hinzufügen und Löschen von Studierenden.
+     * Das Filtertextfeld hat einen Platzhaltertext, einen Löschen-Button und einen Listener, der die Studierendenansicht aktualisiert, wenn sich der Text ändert.
+     *
+     * @return Eine Komponente, die die Werkzeugleiste für die Studierendenansicht enthält.
+     */
     private Component getToolbar() {
         filterText.setPlaceholder("Suche...");
         filterText.setClearButtonVisible(true);
@@ -249,6 +288,15 @@ public class StudierendeView extends VerticalLayout {
 
         return toolbar;
     }
+
+    /**
+     * Erstellt und gibt eine Komponente zurück, die die zweite Werkzeugleiste für die Studierendenansicht enthält.
+     * Die Werkzeugleiste besteht aus einem Import-Button, einem versteckten Download-Link (Anchor), einem Export-Button und einem Aufräumen-Button.
+     * Der Download-Link wird mit einer StreamResource verbunden, die eine Excel-Datei mit den Studierendendaten generiert.
+     * Der Export-Button löst einen Klick auf den Download-Link aus, um den Download der Excel-Datei zu starten.
+     *
+     * @return Eine Komponente, die die zweite Werkzeugleiste für die Studierendenansicht enthält.
+     */
     private Component getToolbar2() {
 
         // Ein Anchor, unter welchem der Download der Daten möglich ist
@@ -279,19 +327,28 @@ public class StudierendeView extends VerticalLayout {
             anchor.getElement().callJsFunction("click");
         });
 
+
         HorizontalLayout toolbar2 = new HorizontalLayout(importButton, anchor, exportButton, aufraeumenButton);
-
+        toolbar2.setWidthFull();
         toolbar2.addClassName("toolbar");
-
+        toolbar2.setJustifyContentMode(FlexComponent.JustifyContentMode.END); // Buttons nach rechts verschieben
         return toolbar2;
     }
 
+    /**
+     * Ändert den Text der Buttons "addStudiernedenButton" und "delete" auf kleinere Symbole.
+     * Dies ist nützlich für kleinere Bildschirmauflösungen oder wenn mehr Platz benötigt wird.
+     */
     private void makeButtonsSmall() {
 
         addStudiernedenButton.setText("+");
         delete.setText("-");
     }
 
+    /**
+     * Stellt den ursprünglichen Text und das Icon der Buttons "addStudiernedenButton" und "delete" wieder her.
+     * Dies ist nützlich, wenn die Bildschirmauflösung wieder größer wird oder weniger Platz benötigt wird.
+     */
     private void restoreButtons() {
         addStudiernedenButton.setIcon(addStudiernedenButtonIcon);
         addStudiernedenButton.setText("Studierenden hinzufügen");
@@ -299,40 +356,5 @@ public class StudierendeView extends VerticalLayout {
         delete.setIcon(deleteIcon);
         delete.setText("Studierenden löschen");
 
-    }
-    private File createTempFile() {
-        try {
-            // Pfad zum Download-Ordner
-            String downloadFolderPath = System.getProperty("user.home") + "/Downloads";
-
-            // Erstellen Sie das Verzeichnis, wenn es noch nicht existiert
-            File dir = new File(downloadFolderPath);
-            if (!dir.exists()) {
-                dir.mkdir();
-            }
-
-            // Erstellen Sie die Datei im Download-Ordner
-            File tempFile = File.createTempFile("export", ".xlsx", dir);
-            return tempFile;
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private StreamResource offerDownload(File file) {
-        System.out.println("File name: " + file.getName());
-    return new StreamResource(file.getName(), () -> {
-        try {
-
-            return new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            System.out.println("File could not be offered: " + file.getName());
-            e.printStackTrace();
-
-            return null;
-        }
-    });
     }
 }
