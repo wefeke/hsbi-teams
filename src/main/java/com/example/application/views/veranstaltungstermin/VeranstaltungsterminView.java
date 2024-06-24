@@ -166,6 +166,7 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
             UI.getCurrent().navigate(route);
         });
 
+
         toggleTeilnehmerListeButton.addClickListener(e -> {
             // Umschalten der Sichtbarkeit der Teilnehmerliste
             teilnehmerListe.setVisible(!teilnehmerListe.isVisible());

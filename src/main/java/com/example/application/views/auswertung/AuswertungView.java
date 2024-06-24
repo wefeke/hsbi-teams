@@ -1,4 +1,6 @@
+//Author: Leon
 package com.example.application.views.auswertung;
+
 import com.example.application.models.*;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.*;
@@ -17,37 +19,57 @@ import com.vaadin.flow.router.Route;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Optional;
+import java.util.*;
+
 //LEON
 @Route(value = "auswertung/:veranstaltungId", layout = MainLayout.class)
 @PageTitle("Auswertungen")
 @RolesAllowed({"ADMIN", "USER"})
 public class AuswertungView extends VerticalLayout implements BeforeEnterObserver{
-    // Grid-Field
+    // Grid-Field für die Anzeige der Auswertungen
     Grid<Auswertung> grid01 = new Grid<>(Auswertung.class);
-    //Services
+    // Services für die verschiedenen Entitäten und Logiken
     VeranstaltungenService veranstaltungenService;
     TeilnehmerService teilnehmerService;
     GruppenarbeitService gruppenarbeitService;
     GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService;
     SuperService superService;
     UserService userService;
-    // Fields
+
+    // Authentifizierter Benutzer und zugehörige Felder
     AuthenticatedUser authenticatedUser;
     Optional<User> maybeUser;
     User user;
     Long veranstaltungsID;
     AuswertungExcelExporter auswertungExcelExporter;
+    Veranstaltung veranstaltung;
+    List<Auswertung> auswertungen;
 
+    /**
+     * Konstruktor für die AuswertungView Klasse.
+     * Initialisiert die Services und die benötigten Felder.
+     * Ruft die Methode validateUser() auf, um den authentifizierten Benutzer zu validieren.
+     *
+     * @param veranstaltungenService der Service für die Veranstaltungen
+     * @param teilnehmerService der Service für die Teilnehmer
+     * @param gruppenarbeitService der Service für die Gruppenarbeiten
+     * @param gruppenarbeitTeilnehmerService der Service für die Gruppenarbeitsteilnehmer
+     * @param userService der Service für die Benutzer
+     * @param authenticatedUser der aktuell authentifizierte Benutzer
+     * @param superService der Service für übergeordnete Funktionen
+     * @param studierendeExcelExporter der Exporter für die Auswertungen in Excel-Format
+     *
+     * @autor Leon
+     */
     public AuswertungView(
-           VeranstaltungenService veranstaltungenService,
-           TeilnehmerService teilnehmerService,
-           GruppenarbeitService gruppenarbeitService,
-           GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService,
-           UserService userService,
-           AuthenticatedUser authenticatedUser,
-           SuperService superService,
-           AuswertungExcelExporter studierendeExcelExporter) {
+            VeranstaltungenService veranstaltungenService,
+            TeilnehmerService teilnehmerService,
+            GruppenarbeitService gruppenarbeitService,
+            GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService,
+            UserService userService,
+            AuthenticatedUser authenticatedUser,
+            SuperService superService,
+            AuswertungExcelExporter studierendeExcelExporter) {
         this.veranstaltungenService = veranstaltungenService;
         this.teilnehmerService = teilnehmerService;
         this.gruppenarbeitService = gruppenarbeitService;
@@ -61,10 +83,19 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
         maybeUser = authenticatedUser.get();
         user = validateUser(maybeUser);
         setSizeFull();
-        configureGrid();
     }
 
-    private User validateUser( Optional<User> maybeUser) {
+    /**
+     * Validiert den authentifizierten Benutzer.
+     * Wenn der Benutzer vorhanden ist, wird er zurückgegeben.
+     * Andernfalls wird ein neuer Benutzer erstellt und zurückgegeben.
+     *
+     * @param maybeUser der optionale authentifizierte Benutzer
+     * @return der validierte Benutzer
+     *
+     * @autor Leon
+     */
+    private User validateUser(Optional<User> maybeUser) {
         if (maybeUser.isPresent()) {
             User user = maybeUser.get();
             return user;
@@ -73,6 +104,14 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
         }
     }
 
+    /**
+     * Erstellt den Hauptinhalt der AuswertungView.
+     * Der Inhalt besteht aus einem VerticalLayout, das das Grid enthält.
+     *
+     * @return der erstellte Hauptinhalt als Component
+     *
+     * @autor Leon
+     */
     private Component getContent() {
         VerticalLayout content = new VerticalLayout(grid01);
         content.setFlexGrow(2, grid01);
@@ -81,16 +120,46 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
         return content;
     }
 
+    /**
+     * Konfiguriert das Formular. (Platzhalter für zukünftige Implementierung)
+     *
+     * @autor Leon
+     */
     private void configureForm() {
-      //
+        // Noch keine Implementierung
     }
 
+    /**
+     * Konfiguriert das Grid für die Anzeige der Auswertungen.
+     * Entfernt alle Spalten und fügt neue Spalten basierend auf den Gruppenarbeiten hinzu.
+     * Setzt allgemeine Eigenschaften des Grids wie Breite und automatische Anpassung der Spalten.
+     *
+     * @autor Leon
+     */
     private void configureGrid() {
+        grid01.removeAllColumns();
+        // Eine einzelne Auswertung nehmen und alle Gruppenarbeiten als Columns darstellen
+        Auswertung auswertung = auswertungen.getFirst();
+        grid01.addColumn(Auswertung::getNameMatrikelnummer).setHeader("");
+        for (TGGPHelper tggpHelper : auswertung.getTggpHelper()) {
+            grid01.addColumn(Auswertung::getTggHelperValues).setHeader(tggpHelper.getTerminAndGruppenarbeit());
+        }
+        grid01.addColumn(Auswertung::getGesamtPunkte).setHeader("Gesamtpunkte");
+
         grid01.addClassNames("contact-grid");
-        grid01.setSizeFull();
+        grid01.setWidthFull();
         grid01.getColumns().forEach(col -> col.setAutoWidth(true));
     }
 
+    /**
+     * Erstellt und konfiguriert die Toolbar für die AuswertungView.
+     * Die Toolbar enthält eine Überschrift, einen Download-Button und einen unsichtbaren Anchor für den Dateidownload.
+     * Der Download-Button löst ein Click-Event aus, um den Anchor zu triggern und die Auswertung als Excel-Datei herunterzuladen.
+     *
+     * @return die erstellte Toolbar als HorizontalLayout
+     *
+     * @autor Leon
+     */
     private HorizontalLayout getToolbar() {
         // Timestamp für das Laden der aktuellen Daten
         String timeStamp = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(new java.util.Date());
@@ -113,34 +182,52 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
         anchor.getElement().setAttribute("download", true);
 
         // Die eigentlichen Daten werden in diesem Objekt gespeichert und dem Anchor übergeben
-        StreamResource resource = new StreamResource("auswertung_"+veranstaltungenService.findVeranstaltungById(veranstaltungsID,user).getTitel()+"_"+timeStamp+".xlsx", () -> {
-            byte[] data = null; // Your method to fetch data
-            try {
-                data = auswertungExcelExporter.export(superService.findAllAuswertungenByVeranstaltung(veranstaltungsID));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            return new ByteArrayInputStream(data);
-        });
-        anchor.setHref(resource);
+
 
         // Dieser Button wird gedrückt und führt ein Click-Event aus, um den Anchor zu triggern
         Button button = new Button("Download");
         button.addClickListener(event -> {
+            StreamResource resource = new StreamResource("auswertung_"+veranstaltungenService.findVeranstaltungById(veranstaltungsID,user).getTitel()+"_"+timeStamp+".xlsx", () -> {
+                byte[] data = null; // Your method to fetch data
+                try {
+                    data = auswertungExcelExporter.export(superService.findAllAuswertungenByVeranstaltung(veranstaltungsID));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return new ByteArrayInputStream(data);
+            });
+            anchor.setHref(resource);
             anchor.getElement().callJsFunction("click");
         });
         add(anchor, button);
+
         var toolbar = new HorizontalLayout(username,anchor,button);
+        toolbar.setAlignItems(Alignment.CENTER);
+        toolbar.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        toolbar.setWidthFull();
         toolbar.addClassName("toolbar");
         return toolbar;
     }
 
-    // Unter der Nutzung der Methode updateList werden die Felder des Grids mit dem Daten aus dem SuperService gefüllt
+    /**
+     * Aktualisiert die Liste der Auswertungen im Grid.
+     * Ruft die Auswertungen für die aktuelle Veranstaltung aus dem SuperService ab und setzt sie im Grid.
+     *
+     * @autor Leon
+     */
     private void updateList() {
-      grid01.setItems(superService.findAllAuswertungenByVeranstaltung(veranstaltungsID));
+        grid01.setItems(superService.findAllAuswertungenByVeranstaltung(veranstaltungsID));
     }
 
-    // Bevor die Seite geladen wird, sollen Felder und wichtige Methoden ausgeführt werden
+    /**
+     * Methode, die vor dem Laden der Seite ausgeführt wird.
+     * Liest die Veranstaltungs-ID aus den Route-Parametern und ruft die entsprechenden Daten ab.
+     * Initialisiert die Toolbar, den Inhalt und konfiguriert das Grid.
+     *
+     * @param event das BeforeEnterEvent
+     *
+     * @autor Leon
+     */
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         // Der Route-Parameter enthält die Veranstaltungs-ID, welche genutzt wird, um die aktuelle Veranstaltung zu suchen
@@ -149,11 +236,13 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
                     veranstaltungsID = Long.parseLong(id);
                 },
                 () -> {
-            // Da es mindestens eine Veranstaltung gibt, soll hier der Minimum-Wert 1 genommen werden.
-            veranstaltungsID = 1L;
+                    // Da es mindestens eine Veranstaltung gibt, soll hier der Minimum-Wert 1 genommen werden.
+                    veranstaltungsID = 1L;
                 });
-        updateList(); // updateList muss hiernach aufgerufen werden, sonst ist veranstaltunsgId null
+        veranstaltung = veranstaltungenService.findVeranstaltungById(veranstaltungsID,user);
+        auswertungen = superService.findAllAuswertungenByVeranstaltung(veranstaltungsID);
         add(getToolbar(), getContent());
+        configureGrid();
+        updateList();
     }
 }
-

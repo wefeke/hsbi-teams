@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Gruppenarbeit {
@@ -117,5 +118,7 @@ public class Gruppenarbeit {
     public void addTeilnehmer(Teilnehmer teilnehmer) {
         this.teilnehmer.add(teilnehmer);
     }
+
 }
+
 
