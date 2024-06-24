@@ -144,7 +144,7 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
         for (TGGPHelper tggpHelper : auswertung.getTggpHelper()) {
             grid01.addColumn(Auswertung::getTggHelperValues).setHeader(tggpHelper.getTerminAndGruppenarbeit());
         }
-        grid01.addColumn(Auswertung::getGesamtPunkte).setHeader("Gesamtpunkte");
+        grid01.addColumn(Auswertung::getGesamtPunkteAndGruppenarbeiten).setHeader("Gesamtpunkte und teilgenommene Gruppenarbeiten");
 
         grid01.addClassNames("contact-grid");
         grid01.setWidthFull();
@@ -187,7 +187,7 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
         // Dieser Button wird gedrückt und führt ein Click-Event aus, um den Anchor zu triggern
         Button button = new Button("Download");
         button.addClickListener(event -> {
-            StreamResource resource = new StreamResource("auswertung_"+veranstaltungenService.findVeranstaltungById(veranstaltungsID,user).getTitel()+"_"+timeStamp+".xlsx", () -> {
+            StreamResource resource = new StreamResource("auswertung_"+timeStamp+".xlsx", () -> {
                 byte[] data = null; // Your method to fetch data
                 try {
                     data = auswertungExcelExporter.export(superService.findAllAuswertungenByVeranstaltung(veranstaltungsID));

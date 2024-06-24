@@ -16,8 +16,9 @@ public class Auswertung {
     private String nameMatrikelnummer;
     private Float gesamtPunkte = 0.0f;
     private List<TGGPHelper> tggpHelper;
-    private List<Gruppe> gruppe = new ArrayList<>();
-
+    private List<Gruppe> gruppen = new ArrayList<>();
+    private List<Float> punkte = new ArrayList<>();
+    private int anzahlGruppenarbeiten;
     /**
      * Standardkonstruktor für die Klasse Auswertung.
      *
@@ -70,16 +71,17 @@ public class Auswertung {
      */
     public String getTggHelperValues() {
         StringBuilder result = new StringBuilder();
-        if (tggpHelper.isEmpty()) {
-            result = new StringBuilder("Keine Teilnahme");
-        }
-        if (!gruppe.isEmpty()) {
-            result.append("Gruppe ").append(gruppe.get(0).getNummer());
-            gruppe.remove(0);
-        }
-
-        if (gesamtPunkte != 0.0f) {
-            result.append(" \u2705");
+        if (tggpHelper.isEmpty() && gruppen.isEmpty()) {
+            result = new StringBuilder("");
+        } else if (!gruppen.isEmpty()) {
+                result.append(gruppen.get(0).getNummer());
+                gruppen.remove(0);
+                if (!punkte.isEmpty() && punkte.get(0) != 0.0f) {
+                    result.append(", ").append(punkte.get(0));
+                    punkte.remove(0);
+                }
+        } else {
+            result.append("");
         }
 
         return result.toString();
@@ -92,11 +94,11 @@ public class Auswertung {
      *
      * @autor Leon
      */
-    public Gruppe getGruppe() {
-        if (gruppe.isEmpty()) {
+    public List<Gruppe> getGruppen() {
+        if (gruppen.isEmpty()) {
             return null;
         } else {
-            return gruppe.get(0);
+            return gruppen;
         }
     }
 
@@ -108,7 +110,7 @@ public class Auswertung {
      * @autor Leon
      */
     public void addGruppe(Gruppe gruppe) {
-        this.gruppe.add(gruppe);
+        this.gruppen.add(gruppe);
     }
 
     /**
@@ -119,7 +121,7 @@ public class Auswertung {
      * @autor Leon
      */
     public boolean gruppeAdded() {
-        return gruppe != null;
+        return gruppen != null;
     }
 
     /**
@@ -129,8 +131,8 @@ public class Auswertung {
      *
      * @autor Leon
      */
-    public Float getGesamtPunkte() {
-        return gesamtPunkte;
+    public String getGesamtPunkteAndGruppenarbeiten() {
+        return gesamtPunkte + ", " + anzahlGruppenarbeiten;
     }
 
     /**
@@ -164,5 +166,42 @@ public class Auswertung {
      */
     public void setNameMatrikelnummer(String nameMatrikelnummer) {
         this.nameMatrikelnummer = nameMatrikelnummer;
+    }
+
+    /**
+     * Gibt die Liste der Punkte für die Gruppenarbeitn zurück.
+     *
+     * @return die Punkte
+     *
+     * @autor Leon
+     */
+    public List<Float> getPunkte() {
+        return punkte;
+    }
+    /**
+     * Setzt die Punkte der Gruppenarbeiten.
+     *
+     * @param punkte die neuen Punkte für die Gruppenarbeiten
+     *
+     * @autor Leon
+     */
+    public void setPunkte(List<Float> punkte) {
+        this.punkte = punkte;
+    }
+
+    public void addPunkte(Float punkte) {
+        this.punkte.add(punkte);
+    }
+
+    public int getAnzahlGruppenarbeiten() {
+        return anzahlGruppenarbeiten;
+    }
+
+    public void setAnzahlGruppenarbeiten(int anzahlGruppenarbeiten) {
+        this.anzahlGruppenarbeiten = anzahlGruppenarbeiten;
+    }
+
+    public void incrementAnzahlGruppenarbeiten() {
+        anzahlGruppenarbeiten++;
     }
 }

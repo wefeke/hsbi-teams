@@ -156,6 +156,7 @@ public class VeranstaltungsterminBearbeitenDialog extends Dialog {
                 .withValidator(titel -> titel.length() <= 255, "Der Titel darf maximal 255 Zeichen lang sein")
                 .bind(Veranstaltungstermin::getTitel, Veranstaltungstermin::setTitel);
         binder.forField(ort)
+                .withValidator(ort -> ort.length() <= 14, "Der Ort darf maximal 14 Zeichen lang sein")
                 .bind(Veranstaltungstermin::getOrt, Veranstaltungstermin::setOrt);
         binder.forField(startTimePicker)
                 .asRequired("Startzeit darf nicht leer sein")
