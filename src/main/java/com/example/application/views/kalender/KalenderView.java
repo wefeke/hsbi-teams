@@ -99,7 +99,7 @@ public class KalenderView extends VerticalLayout {
      * @autor Leon
      */
     private void updateCalendar() {
-        List<Veranstaltungstermin> veranstaltungstermine = veranstaltungsterminService.findAllVeranstaltungstermine();
+        List<Veranstaltungstermin> veranstaltungstermine = veranstaltungsterminService.findAllVeranstaltungstermine(user);
         for (Veranstaltungstermin veranstaltungstermin : veranstaltungstermine) {
             Entry entry = new Entry();
             entry.setTitle(veranstaltungstermin.getTitel());

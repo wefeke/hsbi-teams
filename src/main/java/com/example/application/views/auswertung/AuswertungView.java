@@ -182,20 +182,21 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
         anchor.getElement().setAttribute("download", true);
 
         // Die eigentlichen Daten werden in diesem Objekt gespeichert und dem Anchor übergeben
-        StreamResource resource = new StreamResource("auswertung_"+veranstaltungenService.findVeranstaltungById(veranstaltungsID,user).getTitel()+"_"+timeStamp+".xlsx", () -> {
-            byte[] data = null; // Your method to fetch data
-            try {
-                data = auswertungExcelExporter.export(superService.findAllAuswertungenByVeranstaltung(veranstaltungsID));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            return new ByteArrayInputStream(data);
-        });
-        anchor.setHref(resource);
+
 
         // Dieser Button wird gedrückt und führt ein Click-Event aus, um den Anchor zu triggern
         Button button = new Button("Download");
         button.addClickListener(event -> {
+            StreamResource resource = new StreamResource("auswertung_"+veranstaltungenService.findVeranstaltungById(veranstaltungsID,user).getTitel()+"_"+timeStamp+".xlsx", () -> {
+                byte[] data = null; // Your method to fetch data
+                try {
+                    data = auswertungExcelExporter.export(superService.findAllAuswertungenByVeranstaltung(veranstaltungsID));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return new ByteArrayInputStream(data);
+            });
+            anchor.setHref(resource);
             anchor.getElement().callJsFunction("click");
         });
         add(anchor, button);

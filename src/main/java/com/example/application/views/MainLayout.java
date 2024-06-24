@@ -2,6 +2,7 @@
 package com.example.application.views;
 
 import com.example.application.services.UserService;
+import com.example.application.views.kalender.KalenderView;
 import com.example.application.views.user.PasswordChangeDialog;
 import com.example.application.views.user.UserManagementView;
 import com.example.application.views.user.UserSettingsDialog;
@@ -103,6 +104,7 @@ public class MainLayout extends AppLayout {
         return new MenuItemInfo[]{ //
                 new MenuItemInfo("Veranstaltungen", LineAwesomeIcon.UNIVERSITY_SOLID.create(), VeranstaltungenView.class), //
                 new MenuItemInfo("Studierende", LineAwesomeIcon.ID_BADGE.create(), StudierendeView.class),
+                new MenuItemInfo("Kalender", LineAwesomeIcon.CALENDAR.create(), KalenderView.class),
                 new MenuItemInfo("User Management", LineAwesomeIcon.ID_CARD.create(), UserManagementView.class),
         };
     }
