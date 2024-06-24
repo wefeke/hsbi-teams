@@ -159,26 +159,6 @@ public class TGGPHelper {
     public boolean hasPunkte() {
         return punkte >= 0f;
     }
-
-    /**
-     * Gibt die erste Gruppe und ein Häkchen zurück, wenn vorhanden.
-     * Entfernt die erste Gruppe aus der Liste nach Rückgabe.
-     *
-     * @return die erste Gruppe und ein Häkchen oder ein Hinweis, dass keine Gruppe vorhanden ist
-     *
-     * @autor Leon
-     */
-    public String getGruppeAndCheckmark() {
-        if (!gruppe.isEmpty()) {
-            String unicodeString = "\u2705";
-            String res = "" + gruppe.get(0);
-            gruppe.remove(0);
-            return res;
-        } else {
-            return "Gehört zu keiner Gruppe!";
-        }
-    }
-
     /**
      * Gibt den Zustand zurück, ob die Gruppe verwendet wird.
      *

@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -122,18 +123,31 @@ public class SuperService {
                     List<Gruppe> gruppen = tggpHelper.getGruppenarbeit().getGruppen();
                     for (Gruppe gruppe : gruppen) {
                         for (Teilnehmer teilnehmerInGruppe : gruppe.getTeilnehmer()) {
-                            if (teilnehmerInGruppe.equals(teilnehmer)) {
+                            if (Objects.equals(teilnehmerInGruppe.getId(), teilnehmer.getId())) {
                                 tggpHelper.addGruppe(gruppe);
                                 auswertung.addGruppe(gruppe);
                             }
                         }
                     }
                 }
-                auswertung.addToGesamtPunkte(gruppenarbeitTeilnehmerService.
+                Float punkt = gruppenarbeitTeilnehmerService.
                         findPunkteByMatrikelNrAndGruppenarbeitId(
-                                teilnehmer.getId(), tggpHelper.getGruppenarbeit().getId()
-                        ));
+                                teilnehmer.getId(), tggpHelper.getGruppenarbeit().getId());
+
+                auswertung.addToGesamtPunkte(punkt);
+                auswertung.addPunkte(punkt);
             }
+
+            for (Veranstaltungstermin v : veranstaltungstermine) {
+                for (Gruppenarbeit g: v.getGruppenarbeiten()) {
+                    for (Teilnehmer t: g.getTeilnehmer()) {
+                        if (Objects.equals(t.getId(), teilnehmer.getId())) {
+                            auswertung.incrementAnzahlGruppenarbeiten();
+                        }
+                    }
+                }
+            }
+
             auswertung.setTggpHelper(tggpHelperList);
             auswertungen.add(auswertung);
         }
