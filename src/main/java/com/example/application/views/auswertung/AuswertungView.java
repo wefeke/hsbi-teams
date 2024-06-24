@@ -35,6 +35,7 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
     GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService;
     SuperService superService;
     UserService userService;
+
     // Authentifizierter Benutzer und zugehörige Felder
     AuthenticatedUser authenticatedUser;
     Optional<User> maybeUser;
