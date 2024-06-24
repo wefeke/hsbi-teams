@@ -36,6 +36,7 @@ import java.util.List;
 @Route(value = "gruppenarbeiten", layout = MainLayout.class)
 public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
+    //Services
     private final TeilnehmerService teilnehmerService;
 
     //Data
@@ -46,39 +47,31 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     private final List<Gruppe> gruppen = new ArrayList<>();
 
     //Binder
-    Binder<Gruppenarbeit> binderGruppenarbeit = new Binder<>(Gruppenarbeit.class);
+    private final Binder<Gruppenarbeit> binderGruppenarbeit = new Binder<>(Gruppenarbeit.class);
 
-    //Dialog Items
-    TextField titleField = new TextField("Titel");
-    TextArea descriptionArea = new TextArea("Beschreibung");
-    MultiSelectListBox<Teilnehmer> participants = new MultiSelectListBox<>();
-    Select<String> groupSize = new Select<>();
-    Grid<Gruppe> groupsGrid = new Grid<>(Gruppe.class, false);
-    //TextField gruppenGroesse = new TextField("Teilnehmeranzahl");
-    Div groupsArea = new Div();
-    Button saveBtn = new Button("Gruppenarbeit speichern");
-    Button randomizeBtn = new Button("Neu mischen");
-    Button cancelBtn = new Button("Abbrechen");
-    Button clearGroupsBtn = new Button("Nur Gruppen");
-    Button clearAllFieldsBtn = new Button("Formular");
-    Button deselectAllParticipantsBtn = new Button("Entfernen");
-    Button selectAllParticipantsBtn = new Button("Auswählen");
-    H4 groupsTitle = new H4("Gruppen");
+    //UI Elements
+    private final TextField titleField = new TextField("Titel");
+    private final TextArea descriptionArea = new TextArea("Beschreibung");
+    private final MultiSelectListBox<Teilnehmer> participants = new MultiSelectListBox<>();
+    private final Select<String> groupSize = new Select<>();
+    private final Grid<Gruppe> groupsGrid = new Grid<>(Gruppe.class, false);
+    private final Div groupsArea = new Div();
+    private final Button saveBtn = new Button("Gruppenarbeit speichern");
+    private final Button randomizeBtn = new Button("Neu mischen");
+    private final Button cancelBtn = new Button("Abbrechen");
+    private final Button clearGroupsBtn = new Button("Nur Gruppen");
+    private final Button clearAllFieldsBtn = new Button("Formular");
+    private final Button deselectAllParticipantsBtn = new Button("Entfernen");
+    private final Button selectAllParticipantsBtn = new Button("Auswählen");
+    private final H4 groupsTitle = new H4("Gruppen");
 
     //Konstruktor
     @Autowired
     public GruppenarbeitHinzufuegenDialog(AuthenticatedUser authenticatedUser, String veranstaltungId, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungsterminView veranstaltungsterminView, VeranstaltungenService veranstaltungenService, Veranstaltungstermin veranstaltungstermin) {
         this.veranstaltungId = veranstaltungId;
-
-        //Services
         this.teilnehmerService = teilnehmerService;
-        //User
-
-        //gruppenGroesse.setReadOnly(true);
-
         configureDialog(authenticatedUser, veranstaltungId, gruppenarbeitService, veranstaltungsterminService, gruppeService, veranstaltungsterminView, veranstaltungenService, veranstaltungstermin);
 
-        //Finales Zeugs
         add(createLayout());
     }
 
@@ -335,29 +328,31 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
             groupSize.setItems(groups);
             groupsGrid.setVisible(false);
         });
-        participants.setRenderer(new ComponentRenderer<>(participant ->{
-            HorizontalLayout row = new HorizontalLayout();
-            row.setAlignItems(FlexComponent.Alignment.CENTER);
+        participants.setRenderer(new ComponentRenderer<>(GruppenarbeitHinzufuegenDialog::getRenderLayoutParticipants));
+    }
 
-            Avatar avatar = new Avatar();
-            avatar.setName(participant.getFullName());
-            avatar.setImage(null);
-            avatar.addClassName("profilbild");
+    private static HorizontalLayout getRenderLayoutParticipants(Teilnehmer participant) {
+        HorizontalLayout row = new HorizontalLayout();
+        row.setAlignItems(FlexComponent.Alignment.CENTER);
 
-            Span name = new Span(participant.getFullName());
-            Span matrikelnr = new Span(String.valueOf(participant.getId()));
-            matrikelnr.getStyle()
-                    .set("color", "var(--lumo-secondary-text-color)")
-                    .set("font-size", "var(--lumo-font-size-s)");
+        Avatar avatar = new Avatar();
+        avatar.setName(participant.getFullName());
+        avatar.setImage(null);
+        avatar.addClassName("profilbild");
 
-            VerticalLayout column = new VerticalLayout(name, matrikelnr);
-            column.setPadding(false);
-            column.setSpacing(false);
+        Span name = new Span(participant.getFullName());
+        Span matrikelnr = new Span(String.valueOf(participant.getId()));
+        matrikelnr.getStyle()
+                .set("color", "var(--lumo-secondary-text-color)")
+                .set("font-size", "var(--lumo-font-size-s)");
 
-            row.add(avatar, column);
-            row.getStyle().set("line-height", "var(--lumo-line-height-m)");
-            return row;
-        }));
+        VerticalLayout column = new VerticalLayout(name, matrikelnr);
+        column.setPadding(false);
+        column.setSpacing(false);
+
+        row.add(avatar, column);
+        row.getStyle().set("line-height", "var(--lumo-line-height-m)");
+        return row;
     }
 
 
