@@ -28,6 +28,8 @@ public class GruppenarbeitTeilnehmerService {
 
     @Transactional
     public Float findPunkteByMatrikelNrAndGruppenarbeitId(Long matrikelNr, Long gruppenarbeitId) {
-        return gruppenarbeitTeilnehmerRepository.findPunkteByMatrikelNrAndGruppenarbeitId(matrikelNr, gruppenarbeitId);
+        Float f = gruppenarbeitTeilnehmerRepository.findPunkteByMatrikelNrAndGruppenarbeitId(matrikelNr, gruppenarbeitId);
+        if (f != null) return f;
+        else return 0f;
     }
 }
