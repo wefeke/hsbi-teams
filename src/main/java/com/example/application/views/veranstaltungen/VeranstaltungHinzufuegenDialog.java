@@ -246,6 +246,7 @@ public class VeranstaltungHinzufuegenDialog extends Dialog {
     private void bindFields() {
         binder.forField(titelField)
                 .asRequired("Titel muss gefüllt sein")
+                .withValidator(titel -> titel.length() <= 255, "Der Titel darf maximal 255 Zeichen lang sein")
                 .bind(Veranstaltung::getTitel, Veranstaltung::setTitel);
         binder.forField(datePicker)
                 .asRequired("Datum muss gefüllt sein")

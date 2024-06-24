@@ -100,8 +100,8 @@ public class UserManagementView extends VerticalLayout {
      */
     private Grid<User> createGrid(){
         //grid.setItems(userService.findAllUserByRole(Role.USER));
-        grid.addColumn(User::getName).setHeader("Name"); // Add a column for the user name
-        grid.addColumn(User::getUsername).setHeader("Username");
+        grid.addColumn(User::getName).setHeader("Name").setSortable(true); // Add a column for the user name
+        grid.addColumn(User::getUsername).setHeader("Username").setSortable(true);
 
         grid.addColumn(new ComponentRenderer<>(user -> {
             Button button = new Button("Passwort ändern");
@@ -135,6 +135,8 @@ public class UserManagementView extends VerticalLayout {
             return comboBox;
         })).setHeader("Rollen");
 
+
+
         // Add a column with a button to toggle the isLocked attribute
         grid.addColumn(new ComponentRenderer<>(user -> {
             Button button = new Button(user.isLocked() ? "Freigeben" : "Sperren");
@@ -147,7 +149,7 @@ public class UserManagementView extends VerticalLayout {
                 userService.saveUser(user); // Update the user in the database
             });
             return button;
-        })).setHeader("Zugriff");
+        })).setHeader("Zugriff").setSortable(true).setComparator((user1, user2) -> Boolean.compare(user1.isLocked(), user2.isLocked()));
 
         grid.setSizeFull();
         grid.setThemeName("row-stripes");

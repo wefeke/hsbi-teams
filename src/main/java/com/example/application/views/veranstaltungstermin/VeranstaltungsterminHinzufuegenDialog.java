@@ -191,6 +191,7 @@ public class VeranstaltungsterminHinzufuegenDialog extends Dialog {
     private void bindFields(){
         binder.forField(titel)
                 .asRequired("Titel muss gefüllt sein")
+                .withValidator(titel -> titel.length() <= 255, "Der Titel darf maximal 255 Zeichen lang sein")
                 .bind(Veranstaltungstermin::getTitel, Veranstaltungstermin::setTitel);
         binder.forField(ort)
                 .bind(Veranstaltungstermin::getOrt, Veranstaltungstermin::setOrt);
@@ -219,32 +220,34 @@ public class VeranstaltungsterminHinzufuegenDialog extends Dialog {
         LocalDate startDate = startDatePicker.getValue();
         LocalDate endDate = endDatePicker.getValue();
 
-        //"Einmalig" Save Event wird in jedem Fall ausgeführt
-        persistVeranstaltungstermin(veranstaltungstermin);
-
+        //"Einmalig" wird einmal ausgeführt
+        if (radioGroup.getValue().equals("Einmalig")) {
+            persistVeranstaltungstermin(veranstaltungstermin);
+        }
         //Bei "Wöchentlich" werden noch weitere Termine (7-Tage-Abstand) erzeugt die jeweils vorher validiert werden müssen
-        if (radioGroup.getValue().equals("Wöchentlich")) {
-            while (!startDate.isAfter(endDate)) {
-
-                startDate = startDate.plusWeeks(1);
-                startDatePicker.setValue(startDate);
+        else if (radioGroup.getValue().equals("Wöchentlich")) {
+            while (startDate.isBefore(endDate) || startDate.isEqual(endDate)) {
 
                 Veranstaltungstermin folgetermine = new Veranstaltungstermin();
                 if (binder.writeBeanIfValid(folgetermine)){ //Validierung der neuen Instanz
                     persistVeranstaltungstermin(folgetermine);
                 }
+
+                startDate = startDate.plusWeeks(1);
+                startDatePicker.setValue(startDate);
             }
         }
         //Bei "Monatlich" werden noch weitere Termine (1-Monat-Abstand) erzeugt die jeweils vorher validiert werden müssen
         else if (radioGroup.getValue().equals("Monatlich")) {
-            while (!startDate.isAfter(endDate)) {
-                startDate = startDate.plusMonths(1);
-                startDatePicker.setValue(startDate);
+            while (!startDate.isAfter(endDate) || startDate.isEqual(endDate)) {
 
                 Veranstaltungstermin folgeTermine = new Veranstaltungstermin();
                 if (binder.writeBeanIfValid(folgeTermine)){ //Validierung der neuen Instanz
                     persistVeranstaltungstermin(folgeTermine);
                 }
+
+                startDate = startDate.plusMonths(1);
+                startDatePicker.setValue(startDate);
             }
         }
     }
