@@ -471,9 +471,11 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     private void bindFields(){
         binderGruppenarbeit.forField(titleField)
                 .asRequired("Titel muss gefüllt sein")
+                .withValidator(titel -> titel.length() <= 255, "Der Titel darf maximal 255 Zeichen lang sein")
                 .bind(Gruppenarbeit::getTitel, Gruppenarbeit::setTitel);
         titleField.setMaxLength(255);
         binderGruppenarbeit.forField(descriptionArea)
+                .withValidator(beschreibung -> beschreibung.length() <= 255, "Die Beschreibung darf maximal 255 Zeichen lang sein")
                 .bind(Gruppenarbeit::getBeschreibung, Gruppenarbeit::setBeschreibung);
         descriptionArea.setMaxLength(255);
     }
