@@ -57,7 +57,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
                     formLogin.loginPage("/login");
                     formLogin.loginProcessingUrl("/login");
                     formLogin.defaultSuccessUrl("/", true);
-                    //formLogin.failureHandler(new CustomAuthenticationFailureHandler());
+                    formLogin.failureHandler(new CustomAuthenticationFailureHandler());
                 });
     }
 }

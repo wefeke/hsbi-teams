@@ -75,7 +75,6 @@ import java.util.Optional;
 
             // Check if the Teilnehmer already exists in the database
             Optional<Teilnehmer> existingTeilnehmer = (teilnehmerService.findByMatrikelNr(id, user));
-            System.out.println("Already existingTeilnehmer: " + existingTeilnehmer.toString());
 
             if (existingTeilnehmer.isPresent()) {
                 // If the Teilnehmer does already exist, add it to the list
@@ -83,9 +82,6 @@ import java.util.Optional;
                 teilnehmer.setId(id);
                 teilnehmer.setVorname(vorname);
                 teilnehmer.setNachname(nachname);
-                System.out.println("Added Teilnehmer: " + teilnehmer.toString());
-
-                System.out.println("Teilnehmer hinzugefügt: " + teilnehmer.toString());
                 teilnehmerList.add(teilnehmer);
             }
         }
@@ -129,7 +125,6 @@ import java.util.Optional;
 
             // Check if the Teilnehmer already exists in the database
             Optional<Teilnehmer> existingTeilnehmer = (teilnehmerService.findByMatrikelNr(id, user));
-            System.out.println("Already existingTeilnehmer: " + existingTeilnehmer.toString());
 
             if (existingTeilnehmer.isPresent()) {
                 //
@@ -140,7 +135,6 @@ import java.util.Optional;
                 teilnehmer.setId(id);
                 teilnehmer.setVorname(vorname);
                 teilnehmer.setNachname(nachname);
-                System.out.println("Added Teilnehmer: " + teilnehmer.toString());
 
                 // Check if there is another Teilnehmer with the same Vorname and Nachname but different ID
                 Optional<Teilnehmer> sameNameTeilnehmer = teilnehmerService.findTeilnehmerByVornameAndNachname(vorname, nachname, user);
@@ -154,9 +148,7 @@ import java.util.Optional;
                         newNachname = nachname + "(" + count + ")";
                     }
                     teilnehmer.setNachname(newNachname);
-                    System.out.println("Increased Nachname: " + teilnehmer.toString());
                 }
-                System.out.println("Teilnehmer hinzugefügt: " + teilnehmer.toString());
                 teilnehmerList.add(teilnehmer);
             }
         }

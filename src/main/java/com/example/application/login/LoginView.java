@@ -22,7 +22,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 @PageTitle("Login")
 @Route(value = "login")
 public class LoginView extends LoginOverlay implements BeforeEnterObserver {
-
+    LoginI18n i18n;
 
     private final AuthenticatedUser authenticatedUser;
 
@@ -37,11 +37,21 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
         this.authenticatedUser = authenticatedUser;
         setAction(RouteUtil.getRoutePath(VaadinService.getCurrent().getContext(), getClass()));
 
-        LoginI18n i18n = LoginI18n.createDefault();
+        i18n = LoginI18n.createDefault();
         i18n.setHeader(new LoginI18n.Header());
         i18n.getHeader().setTitle("HSBI Teams");
         i18n.getHeader().setDescription("Einfaches Einteilen IHRER Studenten");
+        i18n.setForm(new LoginI18n.Form());
+        i18n.getForm().setTitle("Anmelden");
+        i18n.getForm().setPassword("Passwort");
+        i18n.getForm().setUsername("Username");
+        i18n.getForm().setForgotPassword("Passwort vergessen");
+        i18n.getForm().setSubmit("Anmelden");
         i18n.setAdditionalInformation(null);
+        i18n.setErrorMessage(new LoginI18n.ErrorMessage());
+        i18n.getErrorMessage().setTitle("Anmeldung fehlgeschlagen");
+        i18n.getErrorMessage().setMessage("Falscher Username oder falsches Passwort. Wenn Sie Ihr Passwort vergessen haben, wenden Sie sich an Ihren Administrator.");
+
         setI18n(i18n);
 
         Button registerButton = new Button("Registrieren", event -> getUI().ifPresent(ui -> ui.navigate("registration")));
@@ -70,20 +80,22 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
             event.forwardTo("");
         }
 
-        if(event.getLocation()
+        if (event.getLocation()
+                .getQueryParameters()
+                .getParameters()
+                .containsKey("lockerror")) {
+            setError(true);
+            i18n.getErrorMessage().setMessage("Ihr Account wurde gesperrt. Bitte wenden Sie sich an Ihren Administrator.");
+        } else if(event.getLocation()
                 .getQueryParameters()
                 .getParameters()
                 .containsKey("error")) {
             setError(true);
-            if (authenticatedUser.get().isPresent() && authenticatedUser.get().get().isLocked()) {
-                setDescription("Ihr Konto ist gesperrt. Bitte kontaktieren Sie einen Administrator, um Ihr Konto zu entsperren.");
-            } else {
-                setDescription("Falsches Passwort. Bitte versuchen Sie es erneut.");
-            }
+            i18n.getErrorMessage().setMessage("Falscher Username oder falsches Passwort. Wenn Sie Ihr Passwort vergessen haben, wenden Sie sich an Ihren Administrator.");
         }
         else {
             setError(false);
-            setDescription("Login using user/user or admin/admin");
         }
+        setI18n(i18n);
     }
 }

@@ -8,7 +8,6 @@ import com.example.application.views.user.UserManagementView;
 import com.example.application.views.user.UserSettingsDialog;
 import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
-import com.example.application.services.VeranstaltungenService;
 import com.example.application.views.studierende.StudierendeView;
 import com.example.application.views.veranstaltungen.VeranstaltungenView;
 import com.vaadin.flow.component.Component;
@@ -42,12 +41,11 @@ import java.util.Optional;
  */
 public class MainLayout extends AppLayout {
 
-    private final VeranstaltungenService veranstaltungenService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
-    private AuthenticatedUser authenticatedUser;
-    private AccessAnnotationChecker accessChecker;
+    private final AuthenticatedUser authenticatedUser;
+    private final AccessAnnotationChecker accessChecker;
 
     /**
      * Konstruktor für die MainLayout Klasse.
@@ -56,14 +54,12 @@ public class MainLayout extends AppLayout {
      * @author Kennet
      * @param authenticatedUser Ein AuthenticatedUser-Objekt, das Informationen über den authentifizierten Benutzer enthält.
      * @param accessChecker Ein AccessAnnotationChecker-Objekt, das die Zugriffsrechte überprüft.
-     * @param veranstaltungenService Ein VeranstaltungenService-Objekt, das Methoden zur Interaktion mit Veranstaltungs-Objekten in der Datenbank bereitstellt.
      * @param userService Ein UserService-Objekt, das Methoden zur Interaktion mit User-Objekten in der Datenbank bereitstellt.
      * @param passwordEncoder Ein PasswordEncoder-Objekt, das zum Verschlüsseln von Passwörtern verwendet wird.
      */
-    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker, VeranstaltungenService veranstaltungenService, UserService userService, PasswordEncoder passwordEncoder){
+    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker, UserService userService, PasswordEncoder passwordEncoder){
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
-        this.veranstaltungenService = veranstaltungenService;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         createHeader();

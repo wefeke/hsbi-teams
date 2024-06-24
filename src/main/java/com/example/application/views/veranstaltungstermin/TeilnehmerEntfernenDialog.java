@@ -52,7 +52,7 @@ public class TeilnehmerEntfernenDialog extends Dialog {
      * @param veranstaltungstermin der Veranstaltungstermin, der aktualisiert wird
      * @param gruppenarbeit die Gruppenarbeit, die aktualisiert wird
      *
-     * @autor Joris
+     * @author Joris
      */
     public TeilnehmerEntfernenDialog(VeranstaltungenService veranstaltungService, TeilnehmerService teilnehmerService, Long veranstaltungId, AuthenticatedUser authenticatedUser, VeranstaltungsterminView veranstaltungsterminView, Veranstaltungstermin veranstaltungstermin, Gruppenarbeit gruppenarbeit) {
         this.teilnehmerService = teilnehmerService;
@@ -107,7 +107,7 @@ public class TeilnehmerEntfernenDialog extends Dialog {
      *
      * @param teilnehmer der Teilnehmer, der für diesen Dialog festgelegt werden soll
      *
-     * @autor Joris */
+     * @author Joris */
     public void setTeilnehmer(Teilnehmer teilnehmer) {
         this.teilnehmer = teilnehmer;
 
