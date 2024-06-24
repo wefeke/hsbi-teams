@@ -29,7 +29,7 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
     private final Long veranstaltungId;
     private final Button hinzufuegenButton = new Button("Hinzufügen");
     private final Button anlegenButton = new Button("Teilnehmer anlegen");
-    private final Button importButton = new Button("importieren");
+    private final Button importButton = new Button("Importieren");
     private final TextField filterText = new TextField();
     private final Grid<Teilnehmer> grid = new Grid<>();
     private final TeilnehmerErstellenDialog dialog;
@@ -94,7 +94,7 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
     }
 
     private Component getToolbar() {
-        filterText.setPlaceholder("Name...");
+        filterText.setPlaceholder("Suche...");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateGrid());

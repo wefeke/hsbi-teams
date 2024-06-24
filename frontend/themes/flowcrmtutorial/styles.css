@@ -30,6 +30,7 @@
     bottom: 5px;
     right: 5px;
     visibility: hidden;
+    color: red;
 }
 
 .edit-icon {
@@ -173,6 +174,13 @@
     font-size: 0.8em;
 }
 
+.termin-ort {
+    position: absolute;
+    top: 6px;
+    left: 10px;
+    font-size: 0.8em;
+}
+
 .termin-notiz {
     text-align: center;
     margin-top: 6px;
@@ -218,7 +226,7 @@
 }
 
 .auswertung-button {
-    background-color: #ff7f7f;
+    background-color: #ffbe61;
     color: black;
     border: none;
     padding: 10px 20px;

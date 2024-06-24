@@ -12,6 +12,7 @@ import com.example.application.views.gruppe.GruppeAuswertungDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitBearbeitenDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitHinzufuegenDialog;
 import com.example.application.views.gruppenarbeit.GruppenarbeitLoeschenDialog;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -37,6 +38,17 @@ import org.vaadin.lineawesome.LineAwesomeIcon;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+/**
+ * Diese Klasse repräsentiert die Ansicht für eine spezifische Veranstaltung in der Anwendung.
+ * Sie ist mit @PageTitle annotiert, um den Titel der Webseite festzulegen.
+ * Die @Route Annotation definiert die URL-Route für diese Ansicht, die einen Parameter für die Veranstaltungs-ID enthält.
+ * Die @RolesAllowed Annotation beschränkt den Zugriff auf diese Ansicht auf Benutzer mit den Rollen "ADMIN" oder "USER".
+ * Sie implementiert auch HasUrlParameter, was es ihr ermöglicht, einen URL-Parameter zu akzeptieren (in diesem Fall die Veranstaltungs-ID).
+ * Die Klasse enthält mehrere Dienste, die zur Interaktion mit den Daten in der Anwendung verwendet werden.
+ * Diese Dienste werden über den Konstruktor injiziert.
+ *
+ * @author Joris
+ */
 @PageTitle("Veranstaltung Detail")
 @Route(value = "veranstaltung-detail/:veranstaltungId", layout = MainLayout.class)
 @RolesAllowed({"ADMIN", "USER"})
@@ -318,7 +330,6 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
             }
         }
 
-
         updateTeilnehmerListe();
     }
 
@@ -366,11 +377,15 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
      */
     public void removeAndAddTerminToTermine (Veranstaltungstermin veranstaltungstermin, Long veranstaltungsterminId) {
         if (veranstaltungstermin != null && veranstaltungsterminId != null){
-            if (!veranstaltungsterminService.findAllVeranstaltungstermine().isEmpty()) {
-                Optional<Veranstaltungstermin> v = veranstaltungsterminService.findVeranstaltungsterminById(veranstaltungsterminId);
-                if (v.isPresent()) {
-                    termine.remove(v.get());
-                    termine.add(veranstaltungstermin);
+            Optional<User> maybeUser = authenticatedUser.get();
+            if (maybeUser.isPresent()) {
+                User user = maybeUser.get();
+                if (!veranstaltungsterminService.findAllVeranstaltungstermine(user).isEmpty()) {
+                    Optional<Veranstaltungstermin> v = veranstaltungsterminService.findVeranstaltungsterminById(veranstaltungsterminId);
+                    if (v.isPresent()) {
+                        termine.remove(v.get());
+                        termine.add(veranstaltungstermin);
+                    }
                 }
             }
         }
@@ -404,12 +419,16 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
         terminZeit.setText(startZeit + "-" + endZeit);
         terminZeit.addClassName("termin-zeit");
 
+        Div terminOrt = new Div();
+        terminOrt.setText(veranstaltungstermin.getOrt());
+        terminOrt.addClassName("termin-ort");
+
         Div terminNotiz = new Div();
         String splitTitle = splitLongWords(veranstaltungstermin.getTitel());
         terminNotiz.setText(splitTitle);
         terminNotiz.addClassName("termin-notiz");
 
-        Div kachelContent = new Div(terminDatum, terminZeit, terminNotiz);
+        Div kachelContent = new Div(terminDatum, terminZeit, terminOrt, terminNotiz);
         kachelContent.addClassName("kachel-content");
 
         Div kachel = new Div(kachelContent);
@@ -486,7 +505,10 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
                 if (aktiveKachelVeranstaltungstermin != null) {
                     aktiveKachelVeranstaltungstermin.removeClassName("kachel-active");
                     aktiverVeranstaltungstermin = null;
-                    aktiveKachelGruppenarbeit.removeClassName("kachel-active");
+                    if(aktiveKachelGruppenarbeit!=null) {
+                        aktiveKachelGruppenarbeit.removeClassName("kachel-active");
+                        aktiveKachelGruppenarbeit = null;
+                    }
                     aktiveGruppenarbeit = null;
                 }
 
@@ -534,12 +556,12 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
         int maxLength = 21;
 
         for (String word : words) {
-            if (word.length() > maxLength) {
-                String splitWord = word.substring(0, maxLength - 1) + "-" + word.substring(maxLength - 1);
+            while (word.length() > maxLength) {
+                String splitWord = word.substring(0, maxLength - 1) + "-";
                 newText.append(splitWord).append(" ");
-            } else {
-                newText.append(word).append(" ");
+                word = word.substring(maxLength - 1);
             }
+            newText.append(word).append(" ");
         }
 
         return newText.toString().trim();
@@ -635,7 +657,7 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
      * @autor Lilli
      */
     private void createVeranstaltungsterminLoeschenDialog() {
-        veranstaltungsterminLoeschenDialog = new VeranstaltungsterminLoeschenDialog(veranstaltung, gruppeService, gruppenarbeitService, this, aktiverVeranstaltungstermin, aktiveGruppenarbeit, veranstaltungsterminService, veranstaltungService);
+        veranstaltungsterminLoeschenDialog = new VeranstaltungsterminLoeschenDialog(gruppeService, gruppenarbeitService, this, aktiverVeranstaltungstermin, aktiveGruppenarbeit, veranstaltungsterminService);
     }
 
     /**
@@ -667,7 +689,7 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
      * Die Kachel enthält Informationen über die Gruppenarbeit und Interaktionsmöglichkeiten wie Bearbeiten und Löschen.
      * Bei einem Mouseover-Event werden die Bearbeiten- und Löschen-Symbole sichtbar.
      * Ein Klick auf das Bearbeiten-Symbol öffnet einen Dialog zum Bearbeiten der Gruppenarbeit.
-     * Ein Klick auf das Löschen-Symbol ��ffnet einen Dialog zum Löschen der Gruppenarbeit.
+     * Ein Klick auf das Löschen-Symbol öffnet einen Dialog zum Löschen der Gruppenarbeit.
      * Ein Klick auf die Kachel selbst aktualisiert die Gruppenarbeitsansicht entsprechend der ausgewählten Gruppenarbeit.
      *
      * @param gruppenarbeit die Gruppenarbeit, für die die Kachel erstellt werden soll
@@ -878,30 +900,6 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
     }
 
     /**
-     * Fügt dem Löschsymbol Funktionalität hinzu.
-     * Wenn das Löschsymbol angeklickt wird, öffnet es einen Löschdialog und verbirgt das Bearbeitungssymbol.
-     * Wenn der Löschdialog geschlossen wird, wird das Löschsymbol verborgen.
-     *
-     * @param deleteIcon das Div-Element, das das Löschsymbol darstellt
-     * @param editIcon das Div-Element, das das Bearbeitungssymbol darstellt
-     * @param deleteDialog der Dialog, der geöffnet wird, wenn das Löschsymbol angeklickt wird
-     *
-     * @autor Lilli
-     */
-    private void deleteIconFunctionality(Div deleteIcon, Div editIcon, Dialog deleteDialog){
-        deleteIcon.getElement().addEventListener("click", e -> {
-                    deleteDialog.open();
-                    editIcon.getStyle().set("visibility", "hidden");
-                }
-        ).addEventData("event.stopPropagation()");
-        deleteDialog.addOpenedChangeListener(e -> {
-            if (!e.isOpened()) {
-                deleteIcon.getStyle().set("visibility", "hidden");
-            }
-        });
-    }
-
-    /**
      * Erstellt ein Div-Element, das ein Bearbeitungssymbol (Stift-Icon) darstellt.
      * Das Div-Element wird mit einer spezifischen CSS-Klasse gestaltet.
      *
@@ -916,6 +914,44 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
     }
 
     /**
+     * Fügt einem Icon Funktionalität hinzu.
+     * Wenn das Icon angeklickt wird, öffnet es einen Dialog und verbirgt das andere Icon.
+     * Wenn der Dialog geschlossen wird, wird das Icon verborgen.
+     *
+     * @param icon das Div-Element, das das Icon darstellt
+     * @param otherIcon das Div-Element, das das andere Icon darstellt
+     * @param dialog der Dialog, der geöffnet wird, wenn das Icon angeklickt wird
+     *
+     * @autor Joris
+     */
+    private void iconFunctionality(Div icon, Div otherIcon, Dialog dialog) {
+        icon.getElement().addEventListener("click", e -> {
+            dialog.open();
+            otherIcon.getStyle().set("visibility", "hidden");
+        }).addEventData("event.stopPropagation()");
+        dialog.addOpenedChangeListener(e -> {
+            if (!e.isOpened()) {
+                icon.getStyle().set("visibility", "hidden");
+            }
+        });
+    }
+
+    /**
+     * Fügt dem Löschsymbol Funktionalität hinzu.
+     * Wenn das Löschsymbol angeklickt wird, öffnet es einen Löschdialog und verbirgt das Bearbeitungssymbol.
+     * Wenn der Löschdialog geschlossen wird, wird das Löschsymbol verborgen.
+     *
+     * @param deleteIcon das Div-Element, das das Löschsymbol darstellt
+     * @param editIcon das Div-Element, das das Bearbeitungssymbol darstellt
+     * @param deleteDialog der Dialog, der geöffnet wird, wenn das Löschsymbol angeklickt wird
+     *
+     * @autor Lilli
+     */
+    private void deleteIconFunctionality(Div deleteIcon, Div editIcon, Dialog deleteDialog){
+        iconFunctionality(deleteIcon, editIcon, deleteDialog);
+    }
+
+    /**
      * Fügt dem Bearbeitungssymbol Funktionalität hinzu.
      * Wenn das Bearbeitungssymbol angeklickt wird, öffnet es einen Bearbeitungsdialog und verbirgt das Löschsymbol.
      * Wenn der Bearbeitungsdialog geschlossen wird, wird das Bearbeitungssymbol verborgen.
@@ -927,16 +963,7 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
      * @autor Lilli
      */
     private void editIconFunctionality(Div editIcon, Div deleteIcon, Dialog editDialog){
-        editIcon.getElement().addEventListener("click", e -> {
-                    editDialog.open();
-                    deleteIcon.getStyle().set("visibility", "hidden");
-                }
-        ).addEventData("event.stopPropagation()");
-        editDialog.addOpenedChangeListener(e -> {
-            if (!e.isOpened()) {
-                editIcon.getStyle().set("visibility", "hidden");
-            }
-        });
+        iconFunctionality(editIcon, deleteIcon, editDialog);
     }
 
     /**
@@ -1037,7 +1064,7 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
         profilbild.setText(t.getVorname().charAt(0) + "" + t.getNachname().charAt(0));
         profilbild.addClassName("profilbild");
 
-        Span name = new Span(t.getVorname() + " " + t.getNachname());
+        Span name = new Span(truncateString(t.getVorname() + " " + t.getNachname(), 16));
         name.addClassName("teilnehmer-name-gruppe");
 
         Div punkteDiv = new Div();
@@ -1051,19 +1078,8 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
             }
         }
 
-        HorizontalLayout layout = new HorizontalLayout();
-        layout.setAlignItems(Alignment.CENTER);
-        layout.setJustifyContentMode(JustifyContentMode.BETWEEN);
-        layout.setWidthFull();
-        layout.add(profilbild, name);
-
-        Div spacer = new Div();
-        layout.add(spacer);
-        layout.setFlexGrow(1, spacer);
-        layout.add(punkteDiv);
-
+        HorizontalLayout layout = createLayoutWithSpacer(profilbild, name, punkteDiv);
         teilnehmerDiv.add(layout);
-
 
         return teilnehmerDiv;
     }
@@ -1087,13 +1103,14 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
         profilbild.setText(t.getVorname().charAt(0) + "" + t.getNachname().charAt(0));
         profilbild.addClassName("profilbild");
 
-        Span name = new Span(t.getVorname() + " " + t.getNachname());
+        Span name = new Span(truncateString(t.getVorname() + " " + t.getNachname(), 24));
         name.addClassName("teilnehmer-name-liste");
 
         Div deleteIcon = new Div(LineAwesomeIcon.TRASH_ALT.create());
         deleteIcon.getStyle().set("visibility", "hidden");
         deleteIcon.getStyle().set("margin-right", "8px");
         deleteIcon.getStyle().set("cursor", "pointer");
+        deleteIcon.getStyle().set("color", "red");
 
         teilnehmerDiv.getElement().addEventListener("mouseover", e -> deleteIcon.getStyle().set("visibility", "visible"));
 
@@ -1105,7 +1122,24 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
             deleteIcon.getStyle().set("visibility", "hidden");
         });
 
+        HorizontalLayout layout = createLayoutWithSpacer(profilbild, name, deleteIcon);
+        teilnehmerDiv.add(layout);
 
+        return teilnehmerDiv;
+    }
+
+    /**
+     * Erstellt ein HorizontalLayout mit einem Spacer zwischen den gegebenen Komponenten.
+     * Der Spacer sorgt dafür, dass die letzte Komponente immer am rechten Rand des Layouts angezeigt wird.
+     *
+     * @param profilbild die erste Komponente, die zum Layout hinzugefügt werden soll
+     * @param name die zweite Komponente, die zum Layout hinzugefügt werden soll
+     * @param otherComponent die letzte Komponente, die zum Layout hinzugefügt werden soll
+     * @return ein HorizontalLayout mit den gegebenen Komponenten und einem Spacer zwischen ihnen
+     *
+     * @autor Joris
+     */
+    private HorizontalLayout createLayoutWithSpacer(Component profilbild, Component name, Component otherComponent) {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setAlignItems(Alignment.CENTER);
         layout.setJustifyContentMode(JustifyContentMode.BETWEEN);
@@ -1115,11 +1149,26 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
         Div spacer = new Div();
         layout.add(spacer);
         layout.setFlexGrow(1, spacer);
-        layout.add(deleteIcon);
+        layout.add(otherComponent);
 
-        teilnehmerDiv.add(layout);
+        return layout;
+    }
 
-        return teilnehmerDiv;
+    /**
+     * Truncates a string to a specified maximum length and appends ".." if the original string is longer than the maximum length.
+     *
+     * @param str the string to be truncated
+     * @param maxLength the maximum length for the string
+     * @return the truncated string, or the original string if its length is less than or equal to the maximum length
+     *
+     * @autor Joris
+     */
+    private String truncateString(String str, int maxLength) {
+        if (str.length() > maxLength) {
+            return str.substring(0, maxLength) + "..";
+        } else {
+            return str;
+        }
     }
 
     /**
@@ -1249,7 +1298,10 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
             HorizontalLayout lineWithText = createLineWithText("Gruppen");
 
             Button editButton = createEditButton();
-            editButton.addClickListener(event -> gruppeBearbeitenDialog.open());
+            editButton.addClickListener(event -> {
+                gruppeBearbeitenDialog.update();
+                gruppeBearbeitenDialog.open();
+            });
 
             Hr lineAfter = new Hr();
             lineAfter.addClassName("line-after-icon");
@@ -1295,11 +1347,15 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
         if (aktiveKachelVeranstaltungstermin != null) {
             Veranstaltungstermin termin = veranstaltungsterminMap.get(aktiveKachelVeranstaltungstermin);
 
-            if (!(veranstaltungsterminService.findAllVeranstaltungstermine().isEmpty())) {
+            Optional<User> maybeUser = authenticatedUser.get();
+            if (maybeUser.isPresent()) {
+                User user = maybeUser.get();
+                if (!(veranstaltungsterminService.findAllVeranstaltungstermine(user).isEmpty())) {
 
-                Optional<Veranstaltungstermin> updatedTermin = veranstaltungsterminService.findVeranstaltungsterminById(termin.getId());
+                    Optional<Veranstaltungstermin> updatedTermin = veranstaltungsterminService.findVeranstaltungsterminById(termin.getId());
 
-                updatedTermin.ifPresent(this::updateGruppenarbeiten);
+                    updatedTermin.ifPresent(this::updateGruppenarbeiten);
+                }
             }
         } else {
             gruppenarbeitContainer.removeAll();
@@ -1375,31 +1431,35 @@ public class VeranstaltungsterminView extends VerticalLayout implements HasUrlPa
         }
 
         // Ansonsten setzen wir die aktive Gruppenarbeit neu
-        if (!veranstaltungsterminService.findAllVeranstaltungstermine().isEmpty()) {
-            Optional<Veranstaltungstermin> neuerVeranstaltungstermin = veranstaltungsterminService.findVeranstaltungsterminById(gruppenarbeit.getVeranstaltungstermin().getId());
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+            if (!veranstaltungsterminService.findAllVeranstaltungstermine(user).isEmpty()) {
+                Optional<Veranstaltungstermin> neuerVeranstaltungstermin = veranstaltungsterminService.findVeranstaltungsterminById(gruppenarbeit.getVeranstaltungstermin().getId());
 
-            if (neuerVeranstaltungstermin.isPresent()) {
-                List<Gruppenarbeit> aktuelleGruppenarbeiten = neuerVeranstaltungstermin.get().getGruppenarbeiten();
+                if (neuerVeranstaltungstermin.isPresent()) {
+                    List<Gruppenarbeit> aktuelleGruppenarbeiten = neuerVeranstaltungstermin.get().getGruppenarbeiten();
 
-                for (Gruppenarbeit aktuelleGruppenarbeit : aktuelleGruppenarbeiten) {
-                    if (aktuelleGruppenarbeit.getId().equals(gruppenarbeit.getId())) {
-                        for (Map.Entry<Div, Gruppenarbeit> entry : gruppenarbeitMap.entrySet()) {
-                            if (entry.getValue().equals(aktuelleGruppenarbeit)) {
-                                // Entfernen der "kachel-active" Klasse von der vorher aktiven Kachel
-                                if (aktiveKachelGruppenarbeit != null) {
-                                    aktiveKachelGruppenarbeit.removeClassName("kachel-active");
+                    for (Gruppenarbeit aktuelleGruppenarbeit : aktuelleGruppenarbeiten) {
+                        if (aktuelleGruppenarbeit.getId().equals(gruppenarbeit.getId())) {
+                            for (Map.Entry<Div, Gruppenarbeit> entry : gruppenarbeitMap.entrySet()) {
+                                if (entry.getValue().equals(aktuelleGruppenarbeit)) {
+                                    // Entfernen der "kachel-active" Klasse von der vorher aktiven Kachel
+                                    if (aktiveKachelGruppenarbeit != null) {
+                                        aktiveKachelGruppenarbeit.removeClassName("kachel-active");
+                                    }
+
+                                    // Setzen der neuen aktiven Kachel und Hinzufügen der "kachel-active" Klasse
+                                    aktiveKachelGruppenarbeit = entry.getKey();
+                                    aktiveKachelGruppenarbeit.addClassName("kachel-active");
+
+                                    // Setzen der neuen aktiven Gruppenarbeit
+                                    aktiveGruppenarbeit = aktuelleGruppenarbeit;
+                                    break;
                                 }
-
-                                // Setzen der neuen aktiven Kachel und Hinzufügen der "kachel-active" Klasse
-                                aktiveKachelGruppenarbeit = entry.getKey();
-                                aktiveKachelGruppenarbeit.addClassName("kachel-active");
-
-                                // Setzen der neuen aktiven Gruppenarbeit
-                                aktiveGruppenarbeit = aktuelleGruppenarbeit;
-                                break;
                             }
+                            break;
                         }
-                        break;
                     }
                 }
             }

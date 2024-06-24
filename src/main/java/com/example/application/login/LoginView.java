@@ -1,11 +1,9 @@
 package com.example.application.login;
 
-import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.login.LoginOverlay;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
@@ -13,8 +11,6 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.internal.RouteUtil;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-
-import java.util.Set;
 
 /**
  * Eine Klasse, die die Login-Ansicht der Anwendung repräsentiert.
@@ -48,9 +44,7 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
         i18n.setAdditionalInformation(null);
         setI18n(i18n);
 
-        Button registerButton = new Button("Registrieren", event -> {
-            getUI().ifPresent(ui -> ui.navigate("registration"));
-        });
+        Button registerButton = new Button("Registrieren", event -> getUI().ifPresent(ui -> ui.navigate("registration")));
         registerButton.setWidthFull();
 
         getFooter().add(registerButton);

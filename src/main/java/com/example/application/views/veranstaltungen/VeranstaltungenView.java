@@ -23,12 +23,27 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.vaadin.lineawesome.LineAwesomeIcon;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Diese Klasse repräsentiert die VeranstaltungenView, die die Hauptansicht für die Veranstaltungen in der Anwendung darstellt.
+ * Sie erbt von der VerticalLayout Klasse und enthält verschiedene Services zur Interaktion mit den Daten der Anwendung.
+ * Die Klasse enthält auch eine Instanz von AuthenticatedUser, um den aktuell authentifizierten Benutzer zu verwalten.
+ * Die VeranstaltungenView enthält auch eine Instanz von Div, die als Container für die Kacheln der Veranstaltungen dient.
+ * Zusätzlich enthält die Klasse eine Instanz von VeranstaltungLoeschenDialog, die zur Verwaltung des Dialogs zum Löschen von Veranstaltungen dient.
+ * Im Konstruktor der Klasse werden die Services initialisiert und das Layout für die VeranstaltungenView erstellt.
+ * Der Konstruktor holt auch den angemeldeten Benutzer und begrüßt ihn.
+ * Wenn kein Benutzer angemeldet ist, wird der Benutzer zur Login-Seite weitergeleitet und eine IllegalStateException wird geworfen.
+ * Der Konstruktor erstellt auch das Layout für die Veranstaltungen, einschließlich der Such- und Filterleiste.
+ * Schließlich wird der Dialog zum Löschen von Veranstaltungen erstellt und der KachelContainer wird aktualisiert.
+ *
+ * @author Joris
+ */
 @PageTitle("Veranstaltungen")
 @Route(value = "", layout = MainLayout.class)
 @RolesAllowed({"ADMIN", "USER"})
@@ -45,16 +60,13 @@ public class VeranstaltungenView extends VerticalLayout  {
 
     private final Div kachelContainer = new Div();
 
-    //Dialog Instances
-    private VeranstaltungLoeschenDialog veranstaltungLoeschenDialog;
-
     /**
      * Konstruktor für die VeranstaltungenView Klasse.
      * Initialisiert die Services und erstellt das Layout für die VeranstaltungenView.
      * Die Methode holt den angemeldeten Benutzer und begrüßt ihn.
      * Wenn kein Benutzer angemeldet ist, wird der Benutzer zur Login-Seite weitergeleitet und eine IllegalStateException wird geworfen.
      * Die Methode erstellt auch das Layout für die Veranstaltungen, einschließlich der Such- und Filterleiste.
-     * Schließlich wird das Dialog zum Löschen von Veranstaltungen erstellt und der KachelContainer wird aktualisiert.
+     * Schließlich wird der Dialog zum Löschen von Veranstaltungen erstellt und der KachelContainer wird aktualisiert.
      *
      * @param veranstaltungenService der Service für die Veranstaltungen
      * @param userService der Service für die Benutzer
@@ -101,9 +113,8 @@ public class VeranstaltungenView extends VerticalLayout  {
 
         kachelContainer.add(new Div());
 
-        createVeranstaltungLoeschenDialog();
-
         updateKachelContainer("");
+        updateKachelContainerWithFilter("Datum absteigend");
         mainLayout.add(username, lineWithText, searchAndFilterBar, kachelContainer);
         add(mainLayout);
     }
@@ -161,7 +172,7 @@ public class VeranstaltungenView extends VerticalLayout  {
     private HorizontalLayout createHorizontalLayout(TextField searchField, Button newEventButton, Div spacer) {
         Select<String> sortSelect = new Select<>();
         sortSelect.setItems("Datum aufsteigend", "Datum absteigend", "A-Z", "Z-A");
-        sortSelect.setValue("Datum aufsteigend");
+        sortSelect.setValue("Datum absteigend");
         sortSelect.addValueChangeListener(e -> {
             String selectedFilter = e.getValue();
             updateKachelContainerWithFilter(selectedFilter);
@@ -354,7 +365,9 @@ public class VeranstaltungenView extends VerticalLayout  {
         Div spacer = new Div();
         spacer.getStyle().set("flex-grow", "1");
 
-        Button deleteButton = new Button(new Icon(VaadinIcon.TRASH));
+        VeranstaltungLoeschenDialog veranstaltungLoeschenDialog = new VeranstaltungLoeschenDialog(veranstaltungsterminService, gruppenarbeitService, gruppeService, veranstaltungenService, this, authenticatedUser);
+
+        Button deleteButton = new Button(LineAwesomeIcon.TRASH_ALT.create());
         deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
         deleteButton.getStyle().set("cursor", "pointer");
         deleteButton.getElement().addEventListener("click", e ->
@@ -365,8 +378,7 @@ public class VeranstaltungenView extends VerticalLayout  {
 
         veranstaltungLoeschenDialog.setVeranstaltung(veranstaltung);
 
-        Button editButton = new Button(new Icon(VaadinIcon.EDIT));
-        ((Icon)editButton.getIcon()).setColor("#2B64D6");
+        Button editButton = new Button(LineAwesomeIcon.EDIT.create());
         editButton.getStyle().set("cursor", "pointer");
         editButton.getElement().addEventListener("click", e-> {
             editDialog.open();
@@ -385,17 +397,5 @@ public class VeranstaltungenView extends VerticalLayout  {
         });
 
         return row;
-    }
-
-    /**
-     * Erstellt den Dialog zum Löschen von Veranstaltungen.
-     * Die Methode initialisiert die `veranstaltungLoeschenDialog` Instanz mit einem neuen `VeranstaltungLoeschenDialog`.
-     * Der `VeranstaltungLoeschenDialog` benötigt mehrere Services, die für seine Funktionen benötigt werden.
-     * Diese Services werden als Parameter an den Konstruktor des `VeranstaltungLoeschenDialog` übergeben.
-     *
-     * @autor Lilli
-     */
-    private void createVeranstaltungLoeschenDialog() {
-        veranstaltungLoeschenDialog = new VeranstaltungLoeschenDialog(veranstaltungsterminService, gruppenarbeitService, gruppeService, veranstaltungenService, teilnehmerService, this, authenticatedUser);
     }
 }

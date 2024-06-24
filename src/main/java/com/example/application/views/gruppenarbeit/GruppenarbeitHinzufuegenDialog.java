@@ -25,76 +25,54 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.List;
 
 //Lilli
+@SuppressWarnings({"SpringTransactionalMethodCallsInspection", "SpringJavaInjectionPointsAutowiringInspection"})
 @PageTitle("Gruppenarbeiten")
 @Route(value = "gruppenarbeiten", layout = MainLayout.class)
 public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
-    private final VeranstaltungenService veranstaltungenService;
-
     //Services
-    private final GruppenarbeitService gruppenarbeitService;
     private final TeilnehmerService teilnehmerService;
-    private final VeranstaltungsterminService veranstaltungsterminService;
-    private final GruppeService gruppeService;
-
-    //User
-    private AuthenticatedUser authenticatedUser;
-
-    private VeranstaltungsterminView veranstaltungsterminView;
 
     //Data
-    private List<Teilnehmer> allParticipants = new ArrayList<>();
+    private final List<Teilnehmer> allParticipants = new ArrayList<>();
     private Set<Teilnehmer> selectedParticipants;
-    private List<Teilnehmer> selectedParticipantsList;
-    private Veranstaltungstermin veranstaltungstermin;
     private final String veranstaltungId;
-    private Gruppenarbeit gruppenarbeit = new Gruppenarbeit();
-    private List<Gruppe> gruppen = new ArrayList<Gruppe>();
+    private final Gruppenarbeit gruppenarbeit = new Gruppenarbeit();
+    private final List<Gruppe> gruppen = new ArrayList<>();
 
     //Binder
-    Binder<Gruppenarbeit> binderGruppenarbeit = new Binder<>(Gruppenarbeit.class);
+    private final Binder<Gruppenarbeit> binderGruppenarbeit = new Binder<>(Gruppenarbeit.class);
 
-    //Dialog Items
-    TextField titleField = new TextField("Titel");
-    TextArea descriptionArea = new TextArea("Beschreibung");
-    MultiSelectListBox<Teilnehmer> participants = new MultiSelectListBox<>();
-    Select<String> groupSize = new Select<>();
-    Grid<Gruppe> groupsGrid = new Grid<>(Gruppe.class, false);
-    //TextField gruppenGroesse = new TextField("Teilnehmeranzahl");
-    Div groupsArea = new Div();
-    Button saveBtn = new Button("Gruppenarbeit speichern");
-    Button randomizeBtn = new Button("Neu mischen");
-    Button cancelBtn = new Button("Abbrechen");
-    Button clearGroupsBtn = new Button("Nur Gruppen leeren");
-    Button clearAllFieldsBtn = new Button("Formular leeren");
-    Button deselectAllParticipantsBtn = new Button("Alle Teilnehmer entfernen");
-    Button selectAllParticipantsBtn = new Button("Alle Teilnehmer auswählen");
-    H4 groupsTitle = new H4("Gruppen");
+    //UI Elements
+    private final TextField titleField = new TextField("Titel");
+    private final TextArea descriptionArea = new TextArea("Beschreibung");
+    private final MultiSelectListBox<Teilnehmer> participants = new MultiSelectListBox<>();
+    private final Select<String> groupSize = new Select<>();
+    private final Grid<Gruppe> groupsGrid = new Grid<>(Gruppe.class, false);
+    private final Div groupsArea = new Div();
+    private final Button saveBtn = new Button("Gruppenarbeit speichern");
+    private final Button randomizeBtn = new Button("Neu mischen");
+    private final Button cancelBtn = new Button("Abbrechen");
+    private final Button clearGroupsBtn = new Button("Nur Gruppen");
+    private final Button clearAllFieldsBtn = new Button("Formular");
+    private final Button deselectAllParticipantsBtn = new Button("Entfernen");
+    private final Button selectAllParticipantsBtn = new Button("Auswählen");
+    private final H4 groupsTitle = new H4("Gruppen");
 
     //Konstruktor
     @Autowired
     public GruppenarbeitHinzufuegenDialog(AuthenticatedUser authenticatedUser, String veranstaltungId, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungsterminView veranstaltungsterminView, VeranstaltungenService veranstaltungenService, Veranstaltungstermin veranstaltungstermin) {
         this.veranstaltungId = veranstaltungId;
-        this.gruppenarbeitService = gruppenarbeitService;
         this.teilnehmerService = teilnehmerService;
-        this.veranstaltungsterminService = veranstaltungsterminService;
-        this.gruppeService = gruppeService;
-        this.veranstaltungstermin = veranstaltungstermin;
-        this.authenticatedUser = authenticatedUser;
-        this.veranstaltungsterminView = veranstaltungsterminView;
-
-        //gruppenGroesse.setReadOnly(true);
-
         configureDialog(authenticatedUser, veranstaltungId, gruppenarbeitService, veranstaltungsterminService, gruppeService, veranstaltungsterminView, veranstaltungenService, veranstaltungstermin);
 
-        //Finales Zeugs
         add(createLayout());
-        this.veranstaltungenService = veranstaltungenService;
     }
 
     private void configureDialog(AuthenticatedUser authenticatedUser, String veranstaltungId, GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungsterminView veranstaltungsterminView, VeranstaltungenService veranstaltungenService, Veranstaltungstermin veranstaltungstermin) {
@@ -111,19 +89,13 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         bindFields();
         addBtnFunctionalities(gruppenarbeitService, veranstaltungsterminService, gruppeService, veranstaltungsterminView, veranstaltungstermin, maybeUser);
 
-        groupSize.addValueChangeListener(event -> {
-            randomize(gruppen);
-        });
+        groupSize.addValueChangeListener(event -> randomize(gruppen));
     }
 
     private void addBtnFunctionalities(GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungsterminView veranstaltungsterminView, Veranstaltungstermin veranstaltungstermin, Optional<User> maybeUser) {
-        randomizeBtn.addClickListener(event -> {
-            randomizeBtnFunctionality();
-        });
+        randomizeBtn.addClickListener(event -> randomizeBtnFunctionality());
 
-        saveBtn.addClickListener(event -> {
-            saveBtnFunctionality(gruppenarbeitService, veranstaltungsterminService, gruppeService, veranstaltungsterminView, veranstaltungstermin, maybeUser);
-        });
+        saveBtn.addClickListener(event -> saveBtnFunctionality(gruppenarbeitService, veranstaltungsterminService, gruppeService, veranstaltungsterminView, veranstaltungstermin, maybeUser));
 
         cancelBtn.addClickListener(event -> {
             clearFields();
@@ -146,9 +118,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
             groupsTitle.setVisible(false);
         });
 
-        deselectAllParticipantsBtn.addClickListener(event -> {
-            participants.deselectAll();
-        });
+        deselectAllParticipantsBtn.addClickListener(event -> participants.deselectAll());
 
         selectAllParticipantsBtn.addClickListener(event -> {
             for(Teilnehmer p:allParticipants){
@@ -190,35 +160,38 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         }
     }
 
-    private void saveGruppenarbeitWithGruppen(GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, Veranstaltungstermin veranstaltungstermin, Optional<User> maybeUser) {
+    @Transactional
+    protected void saveGruppenarbeitWithGruppen(GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, Veranstaltungstermin veranstaltungstermin, Optional<User> maybeUser) {
         if (maybeUser.isPresent()) {
             User user = maybeUser.get();
             gruppenarbeit.setUser(user);
         }
 
         gruppenarbeit.setVeranstaltungstermin(veranstaltungstermin);
-
-        for (Gruppe gruppe : gruppen) {
-            if (maybeUser.isPresent()) {
-                User user = maybeUser.get();
-                gruppe.setUser(user);
-            }
-            gruppeService.save(gruppe);
-        }
-
-        //der Gruppenarbeit die Teilnehmer übergeben
-        selectedParticipants = participants.getSelectedItems();
-        gruppenarbeit.setTeilnehmer(selectedParticipants.stream().toList());
         gruppenarbeitService.save(gruppenarbeit);
 
-        //den Gruppen die Gruppenarbeit übergeben
-        for (Gruppe gruppe : gruppen) {
-            gruppe.setGruppenarbeit(gruppenarbeit);
-            gruppeService.save(gruppe);
+        //der Gruppenarbeit die Teilnehmer übergeben
+        if(!(gruppen.isEmpty())) {
+            for (Gruppe gruppe : gruppen) {
+                if (maybeUser.isPresent()) {
+                    User user = maybeUser.get();
+                    gruppe.setUser(user);
+                }
+                gruppeService.save(gruppe);
+            }
+
+            selectedParticipants = participants.getSelectedItems();
+            gruppenarbeit.setTeilnehmer(selectedParticipants.stream().toList());
+            gruppenarbeitService.save(gruppenarbeit);
+
+            //den Gruppen die Gruppenarbeit übergeben
+            for (Gruppe gruppe : gruppen) {
+                gruppe.setGruppenarbeit(gruppenarbeit);
+                gruppeService.save(gruppe);
+            }
         }
 
         //Gruppenarbeit zum Veranstaltungstermin hinzufügen
-        //TODO: ist das nötig?
         veranstaltungstermin.addGruppenarbeit(gruppenarbeit);
         veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
     }
@@ -242,8 +215,6 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
             int numberOfGroups = getNumberOfGroups();
             int[] sizes = groupSizes(numberOfGroups, participants.getSelectedItems().size());
             makeGroups(numberOfGroups, gruppen);
-            //changeLabelText(numberOfGroups, participants.getSelectedItems().size());
-            //Notification.show(gruppenGroesse.getValue());
             randomizeParticipants(sizes, numberOfGroups, gruppen);
             groupGrids(numberOfGroups, gruppen);
             groupsTitle.setVisible(true);
@@ -278,7 +249,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     //Teilt Teilnehmer zufällig auf Gruppen zu
     private void randomizeParticipants(int[] sizes, int numberOfGroups, List<Gruppe> gruppen) {
         selectedParticipants = participants.getSelectedItems();
-        selectedParticipantsList = new ArrayList<>(selectedParticipants.stream().toList());
+        List<Teilnehmer> selectedParticipantsList = new ArrayList<>(selectedParticipants.stream().toList());
         Collections.shuffle(selectedParticipantsList);
         Iterator<Teilnehmer> teilnehmerIterator = selectedParticipantsList.iterator();
 
@@ -295,7 +266,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     }
 
     //Erstellt benötigte Anzahl an Gruppen
-    private static void makeGroups(int numberOfGroups, List<Gruppe> gruppen) {
+    private void makeGroups(int numberOfGroups, List<Gruppe> gruppen) {
         for(int i = 0; i< numberOfGroups; i++){
             gruppen.add(new Gruppe((long) i+1));
         }
@@ -357,28 +328,31 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
             groupSize.setItems(groups);
             groupsGrid.setVisible(false);
         });
-        participants.setRenderer(new ComponentRenderer<>(participant ->{
-            HorizontalLayout row = new HorizontalLayout();
-            row.setAlignItems(FlexComponent.Alignment.CENTER);
+        participants.setRenderer(new ComponentRenderer<>(GruppenarbeitHinzufuegenDialog::getRenderLayoutParticipants));
+    }
 
-            Avatar avatar = new Avatar();
-            avatar.setName(participant.getFullName());
-            avatar.setImage(null);
+    private static HorizontalLayout getRenderLayoutParticipants(Teilnehmer participant) {
+        HorizontalLayout row = new HorizontalLayout();
+        row.setAlignItems(FlexComponent.Alignment.CENTER);
 
-            Span name = new Span(participant.getFullName());
-            Span matrikelnr = new Span(String.valueOf(participant.getId()));
-            matrikelnr.getStyle()
-                    .set("color", "var(--lumo-secondary-text-color)")
-                    .set("font-size", "var(--lumo-font-size-s)");
+        Avatar avatar = new Avatar();
+        avatar.setName(participant.getFullName());
+        avatar.setImage(null);
+        avatar.addClassName("profilbild");
 
-            VerticalLayout column = new VerticalLayout(name, matrikelnr);
-            column.setPadding(false);
-            column.setSpacing(false);
+        Span name = new Span(participant.getFullName());
+        Span matrikelnr = new Span(String.valueOf(participant.getId()));
+        matrikelnr.getStyle()
+                .set("color", "var(--lumo-secondary-text-color)")
+                .set("font-size", "var(--lumo-font-size-s)");
 
-            row.add(avatar, column);
-            row.getStyle().set("line-height", "var(--lumo-line-height-m)");
-            return row;
-        }));
+        VerticalLayout column = new VerticalLayout(name, matrikelnr);
+        column.setPadding(false);
+        column.setSpacing(false);
+
+        row.add(avatar, column);
+        row.getStyle().set("line-height", "var(--lumo-line-height-m)");
+        return row;
     }
 
 
@@ -414,25 +388,25 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
     //Gibt alle möglichen Gruppengrößen und zugehörige Teilnehmeranzahlen als Strings in einer Liste zurück
     private List<String> groupNumbersAndSizes(int participants){
-        List<String> groupStrings = new ArrayList<String>();
+        List<String> groupStrings = new ArrayList<>();
         for(int i:groupNumbers(participants))
         {
-            String str = "";
-            str += i;
-            str += " x ";
+            StringBuilder str = new StringBuilder();
+            str.append(i);
+            str.append(" x ");
 
             for(Iterator<Integer> it = Arrays.stream(groupSizes(i, participants)).iterator(); it.hasNext();){
                 String nextSize = it.next().toString();
                 if(it.hasNext()){
-                    str += nextSize;
-                    str += " und ";
+                    str.append(nextSize);
+                    str.append(" und ");
                 }
                 else{
-                    str += nextSize;
-                    str += " Teilnehmer";
+                    str.append(nextSize);
+                    str.append(" Teilnehmer");
                 }
             }
-            groupStrings.add(str);
+            groupStrings.add(str.toString());
         }
         return groupStrings;
     }
@@ -448,12 +422,34 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
         titleField.setWidth("400px");
         gruppenarbeitText.add(titleField);
-        descriptionArea.setHeight("270px");
+        descriptionArea.setHeight("240px");
         descriptionArea.setWidth("400px");
         gruppenarbeitText.add(descriptionArea);
 
-        groupSize.setWidth("230px");
-        buttonsLayout.add(groupSize, randomizeBtn, clearAllFieldsBtn, clearGroupsBtn, deselectAllParticipantsBtn, selectAllParticipantsBtn);
+        groupSize.setWidth("320px");
+        randomizeBtn.setWidth("320px");
+        clearAllFieldsBtn.setWidth("150px");
+        clearGroupsBtn.setWidth("150px");
+        deselectAllParticipantsBtn.setWidth("150px");
+        selectAllParticipantsBtn.setWidth("150px");
+
+        VerticalLayout clearBtnsWithText = new VerticalLayout();
+        clearBtnsWithText.setAlignItems(FlexComponent.Alignment.CENTER);
+        HorizontalLayout clearBtns = new HorizontalLayout(clearAllFieldsBtn, clearGroupsBtn);
+        H5 clear = new H5("Leeren");
+        clear.getStyle().set("color", "#0562dc");
+        clearBtnsWithText.add(clear, clearBtns);
+        clearBtnsWithText.getStyle().set("padding", "0px");
+
+        VerticalLayout allParticipantsBtnsWithText = new VerticalLayout();
+        allParticipantsBtnsWithText.setAlignItems(FlexComponent.Alignment.CENTER);
+        HorizontalLayout allParticipantsBtns = new HorizontalLayout(selectAllParticipantsBtn, deselectAllParticipantsBtn);
+        H5 allParticipantsText = new H5("Alle Teilnehmer");
+        allParticipantsText.getStyle().set("color", "#0562dc");
+        allParticipantsBtnsWithText.add(allParticipantsText, allParticipantsBtns);
+        allParticipantsBtnsWithText.getStyle().set("padding", "0px");
+
+        buttonsLayout.add(groupSize, randomizeBtn, clearBtnsWithText, allParticipantsBtnsWithText);
         buttonsLayout.setAlignItems(FlexComponent.Alignment.CENTER);
         getFooter().add(cancelBtn);
         getFooter().add(saveBtn);
@@ -476,30 +472,10 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         binderGruppenarbeit.forField(titleField)
                 .asRequired("Titel muss gefüllt sein")
                 .bind(Gruppenarbeit::getTitel, Gruppenarbeit::setTitel);
+        titleField.setMaxLength(255);
         binderGruppenarbeit.forField(descriptionArea)
                 .bind(Gruppenarbeit::getBeschreibung, Gruppenarbeit::setBeschreibung);
+        descriptionArea.setMaxLength(255);
     }
-
-//    public void setVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin){
-//        this.veranstaltungstermin = veranstaltungstermin;
-//    }
-
-//    private void changeLabelText(int groups, int participants) {
-//        int[] sizes = groupSizes(groups, participants);
-//        String str = "";
-//        for(Iterator<Integer> it = Arrays.stream(sizes).iterator(); it.hasNext();){
-//            String nextSize = it.next().toString();
-//            if(it.hasNext()){
-//                str += nextSize;
-//                str += " ";
-//            }
-//            else{
-//                str += " und ";
-//                str += nextSize;
-//                str += " Teilnehmer";
-//            }
-//        }
-//        gruppenGroesse.setValue(str);
-//        }
 
 }

@@ -10,6 +10,5 @@ import java.util.Set;
 
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
     User findByUsername(String username);
-    User findUserById (Long id);
     List<User> findAllByRolesContains(Role role);
 }

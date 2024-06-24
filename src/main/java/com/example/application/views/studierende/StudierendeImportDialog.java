@@ -80,10 +80,10 @@ public class StudierendeImportDialog extends Dialog {
             this.close();
          });
 
-        upload.addSucceededListener(event -> {
-            try {
-                InputStream inputStream = buffer.getInputStream(event.getFileName());
-                newTeilnehmerListe.addAll(excelImporter.readTeilnehmerFromExcel(inputStream));
+    upload.addSucceededListener(event -> {
+        try {
+            InputStream inputStream = buffer.getInputStream(event.getFileName());
+            newTeilnehmerListe.addAll(excelImporter.readNewTeilnehmerFromExcel(inputStream));
 
                 List<Teilnehmer> combinedItems= new ArrayList<>();
                 Optional<User> maybeUser = authenticatedUser.get();
