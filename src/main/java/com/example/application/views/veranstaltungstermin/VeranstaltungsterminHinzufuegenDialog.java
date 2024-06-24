@@ -19,6 +19,7 @@ import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.data.binder.*;
+import com.vaadin.flow.data.validator.StringLengthValidator;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -194,6 +195,8 @@ public class VeranstaltungsterminHinzufuegenDialog extends Dialog {
                 .withValidator(titel -> titel.length() <= 255, "Der Titel darf maximal 255 Zeichen lang sein")
                 .bind(Veranstaltungstermin::getTitel, Veranstaltungstermin::setTitel);
         binder.forField(ort)
+                .withValidator(new StringLengthValidator(
+                        "Ort darf maximal 14 Zeichen lang sein", 0, 14))
                 .bind(Veranstaltungstermin::getOrt, Veranstaltungstermin::setOrt);
         binder.forField(startTimePicker)
                .asRequired("Startzeit darf nicht leer sein")

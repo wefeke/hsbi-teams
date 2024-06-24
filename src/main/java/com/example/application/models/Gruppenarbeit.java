@@ -1,4 +1,4 @@
-//Autor: Kennet
+//Autor: Lilli
 package com.example.application.models;
 
 import jakarta.persistence.*;
@@ -91,23 +91,15 @@ public class Gruppenarbeit {
     }
 
     public List<Teilnehmer> getTeilnehmer() {
-        return new ArrayList<Teilnehmer>(teilnehmer);
+        return new ArrayList<>(teilnehmer);
     }
 
     public void setUser(User user) {
         this.user = user;
     }
 
-    public void removeGruppe(Gruppe gruppe){
-        this.gruppen.remove(gruppe);
-    }
-
     public void removeAllGruppen(){
         this.gruppen = new ArrayList<>();
-    }
-
-    public void removeVeranstaltungstermin() {
-        this.veranstaltungstermin = null;
     }
 
     public Veranstaltungstermin getVeranstaltungstermin() {
@@ -119,7 +111,7 @@ public class Gruppenarbeit {
     }
 
     public void removeAllTeilnehmer() {
-        this.teilnehmer = new ArrayList<Teilnehmer>();
+        this.teilnehmer = new ArrayList<>();
     }
 
     public void addTeilnehmer(Teilnehmer teilnehmer) {

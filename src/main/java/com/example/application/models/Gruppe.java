@@ -1,4 +1,4 @@
-//Autor: Kennet
+//Autor: Lilli
 package com.example.application.models;
 
 import jakarta.persistence.*;
@@ -28,14 +28,14 @@ public class Gruppe {
     public Gruppe(Long nummer){
         this.nummer = nummer;
         this.gruppenarbeit = null;
-        this.teilnehmer = new HashSet<Teilnehmer>();
+        this.teilnehmer = new HashSet<>();
     }
 
     public Gruppe(Long nummer, User user){
         this.nummer = nummer;
         this.user = user;
         this.gruppenarbeit = null;
-        this.teilnehmer = new HashSet<Teilnehmer>();
+        this.teilnehmer = new HashSet<>();
     }
 
 
@@ -80,7 +80,7 @@ public class Gruppe {
     }
 
     public void removeAllTeilnehmer(){
-        this.teilnehmer = new HashSet<Teilnehmer>();
+        this.teilnehmer = new HashSet<>();
     }
 
     public void addAllTeilnehmer(Collection<Teilnehmer> teilnehmerCollection){

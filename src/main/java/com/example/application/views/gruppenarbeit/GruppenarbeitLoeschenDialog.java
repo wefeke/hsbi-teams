@@ -19,53 +19,45 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@SuppressWarnings("SpringTransactionalMethodCallsInspection")
 public class GruppenarbeitLoeschenDialog extends Dialog {
     //Data
     private Gruppenarbeit gruppenarbeit;
     private Veranstaltungstermin veranstaltungstermin;
-    private VeranstaltungsterminService veranstaltungsterminService;
-    private VeranstaltungsterminView veranstaltungsterminView;
-    private Gruppenarbeit aktiveGruppenarbeit;
-
-    //Services
-    private GruppenarbeitService gruppenarbeitService;
-    private GruppeService gruppeService;
+    private final VeranstaltungsterminView veranstaltungsterminView;
 
     //UI-Elemente
-    H2 infoText = new H2("Empty");
-    Paragraph warningText = new Paragraph("Empty");
-    Paragraph noReturn = new Paragraph("Das kann nicht rückgängig gemacht werden!");
-    Button deleteBtn = new Button("Gruppenarbeit endgültig löschen");
-    Button cancelBtn = new Button("Abbrechen");
+    private final H2 infoText = new H2("Empty");
+    private final Paragraph warningText = new Paragraph("Empty");
+    private final Paragraph noReturn = new Paragraph("Das kann nicht rückgängig gemacht werden!");
+    private final Button deleteBtn = new Button("Gruppenarbeit endgültig löschen");
+    private final Button cancelBtn = new Button("Abbrechen");
 
     public GruppenarbeitLoeschenDialog(GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungsterminService veranstaltungsterminService, VeranstaltungsterminView veranstaltungsdetailView, Gruppenarbeit aktiveGruppenarbeit) {
-        this.gruppenarbeitService = gruppenarbeitService;
         this.veranstaltungsterminView = veranstaltungsdetailView;
-        this.aktiveGruppenarbeit = aktiveGruppenarbeit;
         this.gruppenarbeit = null;
-        this.gruppeService = gruppeService;
         this.veranstaltungstermin = null;
-        this.veranstaltungsterminService = veranstaltungsterminService;
+        styleElements();
+        addButtonFunctionalities(gruppenarbeitService, gruppeService, veranstaltungsterminService, aktiveGruppenarbeit);
+        add(createLayout());
+    }
 
+    private void addButtonFunctionalities(GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungsterminService veranstaltungsterminService, Gruppenarbeit aktiveGruppenarbeit) {
+        deleteBtn.addClickListener(event -> {
+            deleteEverything(gruppenarbeitService, gruppeService, veranstaltungsterminService, aktiveGruppenarbeit);
+            close();
+            veranstaltungsterminView.update();
+        });
+        cancelBtn.addClickListener(event -> close());
+    }
+
+    private void styleElements() {
         warningText.addClassName("warning-text-delete");
         warningText.getStyle().set("white-space", "pre-line");
         noReturn.addClassName("no-return-text-delete");
         noReturn.getStyle().set("white-space", "pre-line");
 
         deleteBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
-        deleteBtn.addClickListener(event -> {
-            deleteEverything(gruppenarbeitService, gruppeService, veranstaltungsterminService, aktiveGruppenarbeit);
-
-            close();
-
-            veranstaltungsterminView.update();
-        });
-
-        cancelBtn.addClickListener(event -> close());
-
-        add(createLayout());
-
     }
 
     @Transactional
@@ -103,7 +95,6 @@ public class GruppenarbeitLoeschenDialog extends Dialog {
 
     public void setVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin) {
         this.veranstaltungstermin = veranstaltungstermin;
-
     }
 
     public VerticalLayout createLayout(){

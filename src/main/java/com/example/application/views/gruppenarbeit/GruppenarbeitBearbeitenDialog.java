@@ -20,18 +20,18 @@ public class GruppenarbeitBearbeitenDialog extends Dialog {
     private final GruppenarbeitService gruppenarbeitService;
 
     //Binder
-    Binder<Gruppenarbeit> binder = new Binder<>(Gruppenarbeit.class);
+    private final Binder<Gruppenarbeit> binder = new Binder<>(Gruppenarbeit.class);
 
     //Data
     private Gruppenarbeit gruppenarbeit;
-    private VeranstaltungsterminView veranstaltungsterminView;
+    private final VeranstaltungsterminView veranstaltungsterminView;
 
     //UI Elements
-    H3 infoText = new H3();
-    TextField titleField = new TextField("Titel");
-    TextArea descriptionArea = new TextArea("Beschreibung");
-    Button saveBtn = new Button("Änderungen speichern");
-    Button cancelBtn = new Button("Abbrechen");
+    private final H3 infoText = new H3();
+    private final TextField titleField = new TextField("Titel");
+    private final TextArea descriptionArea = new TextArea("Beschreibung");
+    private final Button saveBtn = new Button("Änderungen speichern");
+    private final Button cancelBtn = new Button("Abbrechen");
 
 
     public GruppenarbeitBearbeitenDialog(GruppenarbeitService gruppenarbeitService, VeranstaltungsterminView veranstaltungsterminView) {
@@ -75,30 +75,23 @@ public class GruppenarbeitBearbeitenDialog extends Dialog {
     private void configureButtonFunctionalities(){
         saveBtn.addClickListener(event -> {
             saveChanges();
-
             if (gruppenarbeit.getVeranstaltungstermin() != null) {
                 veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
-
                 if (gruppenarbeit != null) {
                     veranstaltungsterminView.setAktiveKachelGruppenarbeit(gruppenarbeit);
                 }
             }
             veranstaltungsterminView.update();
-
             close();
         });
-        cancelBtn.addClickListener(event -> {
-            close();
-        });
+        cancelBtn.addClickListener(event -> close());
     }
 
     //Passt optische Aspekte an
     private void styling(){
         saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
         titleField.setWidth("300px");
         descriptionArea.setWidth("300px");
-
         descriptionArea.setHeight("300px");
     }
 

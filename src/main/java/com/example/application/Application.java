@@ -54,9 +54,7 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
     }
 
     public static void main(String[] args) {
-
         SpringApplication.run(Application.class, args);
-
     }
 
     @Override
@@ -86,7 +84,4 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
 //        veranstaltung.addTeilnehmer(teilnehmer3);
 //        veranstaltungRepository.save(veranstaltung);
     }
-
-
-
 }
