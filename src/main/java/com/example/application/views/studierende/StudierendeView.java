@@ -49,10 +49,10 @@ public class StudierendeView extends VerticalLayout {
     private final Grid<Teilnehmer> grid = new Grid<>();
     private final Editor<Teilnehmer> editor = grid.getEditor();
     private final TextField filterText = new TextField();
-    private final Button addStudiernedenButton = new Button("Studierenden hinzufügen");
+    private final Button addStudiernedenButton = new Button(VaadinIcon.PLUS.create());
     private final StudierendeHinzufuegenDialog dialog;
     private H2 users = new H2("Studierende");
-    private final Button delete = new Button("Studierenden löschen");
+    private final Button delete = new Button(VaadinIcon.TRASH.create());
     private final Component addStudiernedenButtonIcon;
     private final Component deleteIcon;
     private final Button importButton = new Button("Importieren");
@@ -63,8 +63,6 @@ public class StudierendeView extends VerticalLayout {
     TextField vorname = new TextField("Vorname");
     TextField nachname = new TextField("Nachname");
     NumberField matrikelNr = new NumberField("Matrikelnummer");
-    Button save = new Button("Save");
-    Button cancel = new Button("Cancel");
     Button aufraeumenButton = new Button("Aufräumen");
 
 
@@ -248,7 +246,7 @@ public class StudierendeView extends VerticalLayout {
         matrikelNrColumn.setEditorComponent(matrikelNr);
         matrikelNr.setEnabled(false);
 
-        Button saveButton = new Button("Save", e -> {
+        Button saveButton = new Button(VaadinIcon.CHECK.create(), e -> {
             editor.save();
             Teilnehmer updatedTeilnehmer = grid.asSingleSelect().getValue();
             Optional<User> maybeUser = authenticatedUser.get();

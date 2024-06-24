@@ -8,6 +8,7 @@ import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -69,7 +70,7 @@ public class UserManagementView extends VerticalLayout {
             updateGrid(searchText);
         });
 
-        Button addUserButton = new Button(LineAwesomeIcon.PLUS_SOLID.create(), e -> {
+        Button addUserButton = new Button(VaadinIcon.PLUS.create(), e -> {
             VaadinSession.getCurrent().setAttribute("previousLocation", "user-management");
             getUI().get().navigate("registration");
         });

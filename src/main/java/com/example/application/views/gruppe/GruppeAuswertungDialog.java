@@ -100,8 +100,8 @@ public class GruppeAuswertungDialog extends Dialog {
 
     // Standard werden Werte von 1.0 genutzt für Punkte.
     private void configureElements(){
-        if (gruppenarbeitTeilnehmerResult.isPresent()) {
-            auswertungsWert.setValue(1.0);
+        if (gruppenarbeitTeilnehmerResult.get().getPunkte() != null ) {
+            auswertungsWert.setValue(Double.valueOf(gruppenarbeitTeilnehmerResult.get().getPunkte()));
         } else {
             auswertungsWert.setValue(0.0);
         }
