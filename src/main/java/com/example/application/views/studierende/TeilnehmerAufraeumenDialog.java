@@ -9,6 +9,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import jakarta.annotation.security.RolesAllowed;
 
 import java.util.*;
@@ -17,8 +18,6 @@ import java.util.*;
 @RolesAllowed({"ADMIN", "USER"})
 public class TeilnehmerAufraeumenDialog extends Dialog {
     private final TeilnehmerService teilnehmerService;
-    private final Button deleteOldButton = new Button("Älter als ... Jahre");
-    private final Button deleteNoEventButton = new Button("Ohne Veranstaltung");
     private final Button deleteButton = new Button("Löschen");
     private final Button closeButton = new Button("Schließen");
     private final Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class);
@@ -41,26 +40,11 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
         this.teilnehmerService = teilnehmerService;
         this.authenticatedUser = authenticatedUser;
         TeilnehmerLoeschenDialog teilnehmerLoeschenDialog = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, this, studierendeView);
-        yearsField.setPlaceholder("Jahre");
+
 
         closeButton.addClickListener(event ->
                 close());
 
-        deleteOldButton.addClickListener(event -> {
-            Double years = yearsField.getValue();
-            if (years != null) {
-                grid.getSelectedItems().forEach(teilnehmerService::deleteTeilnehmer);
-                updateGridOld(years.intValue());
-                setHeaderTitle("Studierende seit " + years.intValue() + " Jahren");
-            } else {
-                Notification.show("Bitte geben Sie die Anzahl der Jahre ein.");
-            }
-        });
-
-        deleteNoEventButton.addClickListener(event -> {
-            updateGridNoEvent();
-            setHeaderTitle("Studierende ohne Veranstaltung");
-        });
         deleteButton.addClickListener(event -> {
             Set<Teilnehmer> selectedTeilnehmer = grid.getSelectedItems();
             if (!selectedTeilnehmer.isEmpty()) {
@@ -76,7 +60,13 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
         this.setHeight("80vh");
         grid.setSelectionMode(Grid.SelectionMode.MULTI);
         grid.setColumns("vorname", "nachname", "id");
-        updateGridNoEvent();
+
+        updateGrid();
+
+        yearsField.setClearButtonVisible(true);
+        yearsField.setValueChangeMode(ValueChangeMode.LAZY);
+        yearsField.addValueChangeListener(e ->  updateGrid());
+        yearsField.setPlaceholder("Älter als … Jahre");
         add(
                 createLayout()
         );
@@ -91,8 +81,6 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
      */
     private VerticalLayout createLayout() {
         setHeaderTitle("Studierende ohne Veranstaltung");
-        getHeader().add(deleteNoEventButton);
-        getHeader().add(deleteOldButton);
         getHeader().add(yearsField);
         getFooter().add(closeButton);
         getFooter().add(deleteButton);
@@ -139,6 +127,16 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
      */
     public Double getYearsFieldValue() {
         return yearsField.getValue();
+    }
+
+    public void updateGrid() {
+        Double yearsValue = getYearsFieldValue();
+        if (yearsValue != null) {
+            updateGridOld(yearsValue.intValue());
+        }
+        else {
+            updateGridNoEvent();
+        }
     }
 }
 
