@@ -17,6 +17,7 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
@@ -326,10 +327,11 @@ public class StudierendeView extends VerticalLayout {
             anchor.getElement().callJsFunction("click");
         });
 
+
         HorizontalLayout toolbar2 = new HorizontalLayout(importButton, anchor, exportButton, aufraeumenButton);
-
+        toolbar2.setWidthFull();
         toolbar2.addClassName("toolbar");
-
+        toolbar2.setJustifyContentMode(FlexComponent.JustifyContentMode.END); // Buttons nach rechts verschieben
         return toolbar2;
     }
 
