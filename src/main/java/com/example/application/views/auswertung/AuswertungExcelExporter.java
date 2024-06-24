@@ -1,4 +1,5 @@
 package com.example.application.views.auswertung;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -18,10 +19,22 @@ public class AuswertungExcelExporter {
     private XSSFSheet sheet;
     private List<Auswertung> auswertungen;
 
+    /**
+     * Konstruktor für den AuswertungExcelExporter.
+     * Initialisiert die Arbeitsmappe (Workbook) für die Excel-Datei.
+     *
+     * @autor Leon
+     */
     public AuswertungExcelExporter() {
         workbook = new XSSFWorkbook();
     }
 
+    /**
+     * Schreibt die Kopfzeile der Excel-Tabelle.
+     * Erstellt ein neues Blatt, setzt den Stil für die Zellen und fügt die Kopfzeilen hinzu.
+     *
+     * @autor Leon
+     */
     private void writeHeaderLine() {
         sheet = workbook.createSheet("Auswertung");
 
@@ -32,17 +45,27 @@ public class AuswertungExcelExporter {
         font.setBold(true);
         font.setFontHeight(16);
         style.setFont(font);
-        int columnCount=1;
-        Auswertung auswertung = auswertungen.getFirst();
+        int columnCount = 1;
+        Auswertung auswertung = auswertungen.get(0);
         createCell(row, 0, "Matrikelnummer", style);
         for (TGGPHelper tggpHelper : auswertung.getTggpHelper()) {
             createCell(row, columnCount++, tggpHelper.getTerminAndGruppenarbeit(), style);
         }
 
         createCell(row, columnCount, "Gesamtpunkte", style);
-
     }
 
+    /**
+     * Erstellt eine Zelle in einer Zeile der Excel-Tabelle.
+     * Setzt den Wert und den Stil der Zelle basierend auf dem Datentyp.
+     *
+     * @param row die Zeile, in der die Zelle erstellt wird
+     * @param columnCount die Spaltennummer der Zelle
+     * @param value der Wert, der in die Zelle geschrieben wird
+     * @param style der Stil der Zelle
+     *
+     * @autor Leon
+     */
     private void createCell(Row row, int columnCount, Object value, CellStyle style) {
         sheet.autoSizeColumn(columnCount);
         Cell cell = row.createCell(columnCount);
@@ -60,6 +83,12 @@ public class AuswertungExcelExporter {
         cell.setCellStyle(style);
     }
 
+    /**
+     * Schreibt die Datenzeilen in die Excel-Tabelle.
+     * Iteriert über die Auswertungen und erstellt für jede Auswertung eine Zeile mit den entsprechenden Daten.
+     *
+     * @autor Leon
+     */
     private void writeDataLines() {
         int rowCount = 1;
 
@@ -71,18 +100,25 @@ public class AuswertungExcelExporter {
         for (Auswertung auswertung : auswertungen) {
             Row row = sheet.createRow(rowCount++);
             int columnCount = 0;
-            // Eine einzelne Auswertung nehmen und alle Gruppenarbeiten als Columns darstellen
-
 
             createCell(row, columnCount++, auswertung.getNameMatrikelnummer(), style);
             for (TGGPHelper tggpHelper : auswertung.getTggpHelper()) {
-                createCell(row, columnCount++, auswertung.getTggHelperValues(), style);
+                createCell(row, columnCount++, tggpHelper.getTerminAndGruppenarbeit(), style);
             }
             createCell(row, columnCount++, auswertung.getGesamtPunkte(), style);
-
         }
     }
 
+    /**
+     * Exportiert die Auswertungen als Excel-Datei.
+     * Schreibt die Kopfzeile und die Datenzeilen in die Excel-Tabelle und gibt die Datei als Byte-Array zurück.
+     *
+     * @param auswertungen die Liste der Auswertungen, die exportiert werden sollen
+     * @return ein Byte-Array, das die Excel-Datei darstellt
+     * @throws IOException wenn ein Fehler beim Schreiben der Datei auftritt
+     *
+     * @autor Leon
+     */
     public byte[] export(List<Auswertung> auswertungen) throws IOException {
         this.auswertungen = auswertungen;
         writeHeaderLine();
@@ -94,8 +130,6 @@ public class AuswertungExcelExporter {
         } finally {
             bos.close();
         }
-        return  bos.toByteArray();
+        return bos.toByteArray();
     }
 }
-
-

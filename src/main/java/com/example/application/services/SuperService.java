@@ -6,14 +6,18 @@ import com.example.application.views.auswertung.Auswertung;
 import com.example.application.views.auswertung.TGGPHelper;
 import org.springframework.stereotype.Service;
 
-import java.io.Console;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Der SuperService stellt verschiedene Funktionen bereit, die mehrere andere Services kombinieren.
+ * Diese Klasse bietet Methoden zur Verwaltung und Auswertung von Veranstaltungen, Teilnehmern und Gruppenarbeiten.
+ *
+ * @autor Leon
+ */
 @Service
 public class SuperService {
 
@@ -22,10 +26,26 @@ public class SuperService {
     TeilnehmerService teilnehmerService;
     GruppenarbeitService gruppenarbeitService;
     GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService;
-    UserService userService; AuthenticatedUser authenticatedUser;
+    UserService userService;
+    AuthenticatedUser authenticatedUser;
 
     Optional<User> maybeUser;
     User user;
+
+    /**
+     * Konstruktor für den SuperService.
+     * Initialisiert die verschiedenen Services und den AuthenticatedUser.
+     *
+     * @param veranstaltungenService der Service für die Veranstaltungen
+     * @param teilnehmerService der Service für die Teilnehmer
+     * @param gruppenarbeitService der Service für die Gruppenarbeiten
+     * @param gruppenarbeitTeilnehmerService der Service für die Gruppenarbeitsteilnehmer
+     * @param userService der Service für die Benutzer
+     * @param authenticatedUser der aktuell authentifizierte Benutzer
+     * @param gruppeService der Service für die Gruppen
+     *
+     * @autor Leon
+     */
     public SuperService(VeranstaltungenService veranstaltungenService,
                         TeilnehmerService teilnehmerService,
                         GruppenarbeitService gruppenarbeitService,
@@ -40,15 +60,32 @@ public class SuperService {
         this.gruppeService = gruppeService;
     }
 
+    /**
+     * Validiert den authentifizierten Benutzer.
+     * Wenn der Benutzer vorhanden ist, wird er zurückgegeben. Andernfalls wird ein neuer Benutzer erstellt und zurückgegeben.
+     *
+     * @param maybeUser der optionale authentifizierte Benutzer
+     * @return der validierte Benutzer
+     *
+     * @autor Leon
+     */
     private User validateUser(Optional<User> maybeUser) {
         if (maybeUser.isPresent()) {
-            User user = maybeUser.get();
-            return user;
+            return maybeUser.get();
         } else {
             return new User();
         }
     }
 
+    /**
+     * Findet alle Auswertungen für eine bestimmte Veranstaltung.
+     * Diese Methode erstellt eine Liste von Auswertungen für jeden Teilnehmer der Veranstaltung, basierend auf den Gruppenarbeiten und den entsprechenden Punkten.
+     *
+     * @param id die ID der Veranstaltung
+     * @return eine Liste von Auswertungen
+     *
+     * @autor Leon
+     */
     public List<Auswertung> findAllAuswertungenByVeranstaltung(Long id) {
         maybeUser = authenticatedUser.get();
         user = validateUser(maybeUser);
@@ -58,22 +95,10 @@ public class SuperService {
         // Jeder Veranstaltungstermin kann eine Gruppenarbeit haben und dann auch bewertet werden
         List<Veranstaltungstermin> veranstaltungstermine = veranstaltung.getVeranstaltungstermine();
         List<Gruppenarbeit> gruppenarbeiten = new ArrayList<>();
-        // Damit die tggHelperListe bei jedem Teilnehmer gleich lang ist, muss sie jede Gruppenarbeit beinhalten
 
         List<TGGPHelper> tggpHelperList = new ArrayList<>();
 
-        // Aufgrund der Randbedingung, dass aus die Liste nicht leer sein darf, beim Herausschreiben muss mindestens ein Element
-        // noch vorherhinzugefügt werden
-        TGGPHelper tggpHelperLastElement = new TGGPHelper();
-        /*
-        Veranstaltungstermin veranstaltungsterminLastElement = new Veranstaltungstermin(LocalDate.now(), LocalTime.now(), LocalTime.now(), new String("ort"), new String("titel"), new User(), new Veranstaltung());
-        Gruppenarbeit gruppenarbeitLastElement = new Gruppenarbeit(new String("beschreibung"), new String("titel"), new User(), new Veranstaltungstermin());
-        Gruppe gruppeLastElement = new Gruppe();
-        tggpHelperLastElement.setVeranstaltungtermin(veranstaltungsterminLastElement);
-        tggpHelperLastElement.setGruppenarbeit(gruppenarbeitLastElement);
-        tggpHelperLastElement.setGruppe(gruppeLastElement);
-        tggpHelperList.add(tggpHelperLastElement);
-         */
+        // Erstellen der Liste von TGGPHelper für alle Veranstaltungstermine und Gruppenarbeiten
         for (Veranstaltungstermin veranstaltungstermin : veranstaltungstermine) {
             for (Gruppenarbeit gruppenarbeit : veranstaltungstermin.getGruppenarbeiten()) {
                 TGGPHelper tggpHelper = new TGGPHelper();
@@ -83,30 +108,25 @@ public class SuperService {
             }
         }
 
-        List<Auswertung> auswertungen = new ArrayList<Auswertung>();
-        // Für jeden Teilnehmer aus der Veranstaltung soll eine Auswertung angelegt werden
-        for ( Teilnehmer teilnehmer : teilnehmern) {
-
+        List<Auswertung> auswertungen = new ArrayList<>();
+        // Für jeden Teilnehmer aus der Veranstaltung wird eine Auswertung angelegt
+        for (Teilnehmer teilnehmer : teilnehmern) {
             Auswertung auswertung = new Auswertung();
             // Name und Matrikelnummer werden festgelegt
-            auswertung.setNameMatrikelnummer(teilnehmer.getVorname() + " " + teilnehmer.getNachname() + "("+teilnehmer.getId()+")");
+            auswertung.setNameMatrikelnummer(
+                    teilnehmer.getVorname() + " " + teilnehmer.getNachname() + "\n" + "(" + teilnehmer.getId() + ")");
 
-
-            // Auf Basis der tggHelperList, welche alle Veranstaltungstermine, die eine Gruppenarbeit haben, sollen nun die Werte (Gruppe) für den
-            // Teilnehmer hinzufügen
+            // Hinzufügen der Gruppen und Punkte zu den Auswertungen
             for (TGGPHelper tggpHelper : tggpHelperList) {
                 if (tggpHelper.getGruppenarbeit() != null) {
                     List<Gruppe> gruppen = tggpHelper.getGruppenarbeit().getGruppen();
                     for (Gruppe gruppe : gruppen) {
-                        // if (tggpHelper.getGruppenarbeit().equals(gruppe.getGruppenarbeit())) {
-                        for (Teilnehmer teilnehmerinGruppe : gruppe.getTeilnehmer()) {
-                            if (teilnehmerinGruppe.equals(teilnehmer)) {
+                        for (Teilnehmer teilnehmerInGruppe : gruppe.getTeilnehmer()) {
+                            if (teilnehmerInGruppe.equals(teilnehmer)) {
                                 tggpHelper.addGruppe(gruppe);
                                 auswertung.addGruppe(gruppe);
-
                             }
                         }
-
                     }
                 }
                 auswertung.addToGesamtPunkte(gruppenarbeitTeilnehmerService.
@@ -114,16 +134,10 @@ public class SuperService {
                                 teilnehmer.getId(), tggpHelper.getGruppenarbeit().getId()
                         ));
             }
-           auswertung.setTggpHelper(tggpHelperList);
+            auswertung.setTggpHelper(tggpHelperList);
             auswertungen.add(auswertung);
-            }
-        
+        }
+
         return auswertungen;
     }
-
-
-
-
-
-
 }
