@@ -51,7 +51,7 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
         i18n.setAdditionalInformation(null);
         i18n.setErrorMessage(new LoginI18n.ErrorMessage());
         i18n.getErrorMessage().setTitle("Anmeldung fehlgeschlagen");
-        i18n.getErrorMessage().setMessage("Falscher Username oder falsches Passwort. \n Wenn Sie ihr Passwort vergessen haben wenden sie sich an ihren Administrator");
+        i18n.getErrorMessage().setMessage("Falscher Username oder falsches Passwort. Wenn Sie Ihr Passwort vergessen haben, wenden Sie sich an Ihren Administrator.");
 
         setI18n(i18n);
 
@@ -86,14 +86,13 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
                 .getParameters()
                 .containsKey("lockerror")) {
             setError(true);
-            System.out.println("Es hat funktioniert");
-            i18n.getErrorMessage().setMessage("Ihr Account wurde gesperrt. Bitte wenden Sie sich an den Administrator.");
+            i18n.getErrorMessage().setMessage("Ihr Account wurde gesperrt. Bitte wenden Sie sich an Ihren Administrator.");
         } else if(event.getLocation()
                 .getQueryParameters()
                 .getParameters()
                 .containsKey("error")) {
             setError(true);
-            System.out.println("Invalid User");
+            i18n.getErrorMessage().setMessage("Falscher Username oder falsches Passwort. Wenn Sie Ihr Passwort vergessen haben, wenden Sie sich an Ihren Administrator.");
         }
         else {
             setError(false);

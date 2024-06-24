@@ -221,16 +221,12 @@ public class VeranstaltungHinzufuegenDialog extends Dialog {
                     grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname").setSortable(true).setAutoWidth(true);
                     grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname").setSortable(true).setAutoWidth(true);
 
-                    dialog.setWidth(grid.getWidth());
+                    grid.setWidth("70vw");
                     dialog.add(grid);
                     dialog.open();
                 }
-
-                System.out.println("List at end: " + newTeilnehmerListe.toString());
-
             } catch (Exception e) {
                 Notification.show("Error reading Excel file: " + e.getMessage());
-                System.out.println(e.getMessage());
             }
         });
         upload.setUploadButton(new Button(LineAwesomeIcon.UPLOAD_SOLID.create()));
