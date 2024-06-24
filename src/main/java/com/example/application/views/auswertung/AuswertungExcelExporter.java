@@ -52,7 +52,7 @@ public class AuswertungExcelExporter {
             createCell(row, columnCount++, tggpHelper.getTerminAndGruppenarbeit(), style);
         }
 
-        createCell(row, columnCount, "Gesamtpunkte", style);
+        createCell(row, columnCount, "Gesamtpunkte und Anzahl Gruppenarbeiten", style);
     }
 
     /**
@@ -103,9 +103,9 @@ public class AuswertungExcelExporter {
 
             createCell(row, columnCount++, auswertung.getNameMatrikelnummer(), style);
             for (TGGPHelper tggpHelper : auswertung.getTggpHelper()) {
-                createCell(row, columnCount++, tggpHelper.getTerminAndGruppenarbeit(), style);
+                createCell(row, columnCount++, auswertung.getTggHelperValues(), style);
             }
-            createCell(row, columnCount++, auswertung.getGesamtPunkte(), style);
+            createCell(row, columnCount++, auswertung.getGesamtPunkteAndGruppenarbeiten(), style);
         }
     }
 
