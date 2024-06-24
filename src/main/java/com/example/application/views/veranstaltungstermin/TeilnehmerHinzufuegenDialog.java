@@ -79,7 +79,10 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
                 Notification.show("Keine Teilnehmer ausgewählt", 3000, Notification.Position.MIDDLE);
             }
         });
-
+        importButton.addClickListener(event -> {
+            TeilnehmerImportDialog teilnehmerImportDialog = new TeilnehmerImportDialog(teilnehmerService, authenticatedUser, veranstaltungService, veranstaltungId, veranstaltungsterminView);
+             teilnehmerImportDialog.open();
+        });
 
         configureGrid();
 

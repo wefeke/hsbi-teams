@@ -1,10 +1,15 @@
-package com.example.application.views.studierende;
+package com.example.application.views.veranstaltungstermin;
 
 import com.example.application.ExcelReader.ExcelImporter;
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
+import com.example.application.models.Veranstaltung;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
+import com.example.application.services.UserService;
+import com.example.application.services.VeranstaltungenService;
+import com.example.application.views.studierende.StudierendeView;
+import com.example.application.views.veranstaltungen.VeranstaltungenView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
@@ -14,12 +19,15 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
+import jakarta.annotation.security.RolesAllowed;
+import com.vaadin.flow.component.upload.Upload;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 import java.io.InputStream;
 import java.util.*;
 
-public class StudierendeImportDialog extends Dialog {
+@RolesAllowed({"ADMIN", "USER"})
+public class TeilnehmerImportDialog extends Dialog {
 
 
     Button importButton = new Button("Importieren");
@@ -29,6 +37,10 @@ public class StudierendeImportDialog extends Dialog {
     private final Upload upload = new Upload(buffer);
     ExcelImporter excelImporter;
     Set<Teilnehmer> newTeilnehmerListe = new HashSet<>();
+    private final VeranstaltungenService veranstaltungService;
+    private final Long veranstaltungId;
+    private final VeranstaltungsterminView veranstaltungsterminView;
+
 
     /**
      * Konstruktor für die StudierendeImportDialog Klasse.
@@ -44,8 +56,11 @@ public class StudierendeImportDialog extends Dialog {
      * @param authenticatedUser Der aktuell authentifizierte Benutzer.
      * @param studierendeView   Die StudierendeView, die aktualisiert wird, wenn neue Teilnehmer hinzugefügt werden.
      */
-    public StudierendeImportDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, StudierendeView studierendeView) {
+    public TeilnehmerImportDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, VeranstaltungenService veranstaltungService, Long veranstaltungId, VeranstaltungsterminView veranstaltungsterminView) {
         this.excelImporter = new ExcelImporter(teilnehmerService, authenticatedUser);
+        this.veranstaltungService = veranstaltungService;
+        this.veranstaltungId = veranstaltungId;
+        this.veranstaltungsterminView = veranstaltungsterminView;
 
         H2 headerTitle = new H2("Studierende Importieren");
         add(headerTitle);
@@ -55,7 +70,7 @@ public class StudierendeImportDialog extends Dialog {
             dialog.setMaxHeight(getHeight());
             dialog.setHeaderTitle("Neue Teilnehmer");
             dialog.getFooter().add(new Button("OK", e -> {
-                studierendeView.updateStudierendeView();
+                veranstaltungsterminView.update();
                 dialog.close();
             }));
             VerticalLayout dialogLayout = new VerticalLayout();
@@ -66,15 +81,14 @@ public class StudierendeImportDialog extends Dialog {
                 if (maybeUser.isPresent()) {
                     User user = maybeUser.get();
                     teilnehmerService.saveTeilnehmer(teilnehmer, user);
+                    veranstaltungService.addTeilnehmer(veranstaltungId, Collections.singleton(teilnehmer), user); // Add the participant to the event
                     dialogLayout.add(new Span("Teilnehmer :" + teilnehmer.toString() + " angelegt"));
-
                 }
             }
             if (!newTeilnehmerListe.isEmpty())
                 dialog.open();
 
             close();
-
         });
 
         closeButton.addClickListener(event -> {
