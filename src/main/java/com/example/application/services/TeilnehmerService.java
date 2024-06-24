@@ -62,7 +62,6 @@ public class TeilnehmerService {
             } else {
                 return teilnehmerRepository.searchByUser(user, filterText);
             }
-
     }
 
     @Transactional

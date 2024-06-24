@@ -36,7 +36,7 @@ public class VeranstaltungsterminBearbeitenDialog extends Dialog {
     private final TimePicker startTimePicker = new TimePicker("Startzeit");
     private final TimePicker endTimePicker = new TimePicker("Endzeit");
     private final TextField ort = new TextField("Ort");
-    private final TextField notizen = new TextField("Notizen");
+    private final TextField titel = new TextField("Titel");
     private final Button cancelButton= new Button("Abbrechen");
     private final Button saveButton= new Button("Änderungen speichern");
     private final VeranstaltungsterminView veranstaltungsterminView;
@@ -95,7 +95,7 @@ public class VeranstaltungsterminBearbeitenDialog extends Dialog {
         return(
                 new HorizontalLayout(
                         new VerticalLayout(
-                                notizen,
+                                titel,
                                 startTimePicker,
                                 datePicker
                         ),
@@ -151,7 +151,9 @@ public class VeranstaltungsterminBearbeitenDialog extends Dialog {
      * @author Kennet
      */
     private void bindFields(){
-        binder.forField(notizen)
+        binder.forField(titel)
+                .asRequired("Titel darf nicht leer sein")
+                .withValidator(titel -> titel.length() <= 255, "Der Titel darf maximal 255 Zeichen lang sein")
                 .bind(Veranstaltungstermin::getTitel, Veranstaltungstermin::setTitel);
         binder.forField(ort)
                 .bind(Veranstaltungstermin::getOrt, Veranstaltungstermin::setOrt);
@@ -218,7 +220,7 @@ public class VeranstaltungsterminBearbeitenDialog extends Dialog {
         startTimePicker.clear();
         endTimePicker.clear();
         ort.clear();
-        notizen.clear();
+        titel.clear();
     }
 
 

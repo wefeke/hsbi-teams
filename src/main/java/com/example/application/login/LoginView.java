@@ -75,7 +75,11 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
                 .getParameters()
                 .containsKey("error")) {
             setError(true);
-            setDescription("Your account is locked. Please contact an admin to unlock your account.");
+            if (authenticatedUser.get().isPresent() && authenticatedUser.get().get().isLocked()) {
+                setDescription("Ihr Konto ist gesperrt. Bitte kontaktieren Sie einen Administrator, um Ihr Konto zu entsperren.");
+            } else {
+                setDescription("Falsches Passwort. Bitte versuchen Sie es erneut.");
+            }
         }
         else {
             setError(false);
