@@ -12,7 +12,9 @@ import java.util.*;
 public class Veranstaltung implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    //@GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(generator = "generator")
+    @SequenceGenerator(name="generator", sequenceName = "GENERATOR", allocationSize = 50, initialValue = 100)
     private Long id; // Primary Key
     private LocalDate semester;          // Semester-Nummer
     private String titel;
