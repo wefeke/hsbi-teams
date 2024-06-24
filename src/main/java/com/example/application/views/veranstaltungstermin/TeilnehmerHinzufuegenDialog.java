@@ -12,6 +12,8 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -28,7 +30,7 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
     private final TeilnehmerService teilnehmerService;
     private final Long veranstaltungId;
     private final Button hinzufuegenButton = new Button("Hinzufügen");
-    private final Button anlegenButton = new Button("Teilnehmer anlegen");
+    private final Button anlegenButton = new Button(new Icon(VaadinIcon.PLUS));
     private final Button importButton = new Button("Importieren");
     private final TextField filterText = new TextField();
     private final Grid<Teilnehmer> grid = new Grid<>();
