@@ -14,7 +14,13 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Route;
 import java.util.Optional;
 
-// LEON
+/**
+ * Dialog zur Bewertung von Teilnehmern in einer Gruppenarbeit.
+ * Diese Klasse ermöglicht das Hinzufügen, Bearbeiten und Speichern von Bewertungspunkten
+ * für Teilnehmer in einer Gruppenarbeit.
+ *
+ * @autor Leon
+ */
 @Route(value = "gruppeauswertungsdialog")
 public class GruppeAuswertungDialog extends Dialog {
     // Entity-Felder
@@ -37,6 +43,15 @@ public class GruppeAuswertungDialog extends Dialog {
     // View zum zurücknavigieren
     private final VeranstaltungsterminView veranstaltungsterminView;
 
+    /**
+     * Konstruktor für GruppeAuswertungDialog.
+     * Initialisiert die notwendigen Felder und konfiguriert die Dialogelemente.
+     *
+     * @param teilnehmer der Teilnehmer, der bewertet wird
+     * @param gruppenarbeit die Gruppenarbeit, die bewertet wird
+     * @param gruppenarbeitTeilnehmerService der Service zur Verwaltung der GruppenarbeitTeilnehmer-Daten
+     * @param veranstaltungsterminView die View zur Darstellung der Veranstaltungstermine
+     */
     public GruppeAuswertungDialog(Teilnehmer teilnehmer,
                                   Gruppenarbeit gruppenarbeit,
                                   GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService,
@@ -54,30 +69,40 @@ public class GruppeAuswertungDialog extends Dialog {
         bindFields();
     }
 
-
-    // Bei der Konfiguration des Layouts werden die Elemente angeordnet und eine dynamische Überschrift hinzugefügt
+    /**
+     * Erstellt das Layout des Dialogs.
+     * Ordnet die Dialogelemente an und fügt sie dem Layout hinzu.
+     *
+     * @return das erstellte Layout als VerticalLayout
+     */
     private VerticalLayout createLayout() {
         setHeaderTitle("Punkte für " + teilnehmer.getVorname()
                 + " " + teilnehmer.getNachname());
 
-        HorizontalLayout buttonsLayoutFooter = new HorizontalLayout(cancelButton,saveButton);
+        HorizontalLayout buttonsLayoutFooter = new HorizontalLayout(cancelButton, saveButton);
         buttonsLayoutFooter.setAlignItems(FlexComponent.Alignment.CENTER);
         getFooter().add(buttonsLayoutFooter);
 
-        HorizontalLayout buttonsLayoutMain = new HorizontalLayout(incrementButton,decrementButton);
+        HorizontalLayout buttonsLayoutMain = new HorizontalLayout(incrementButton, decrementButton);
         buttonsLayoutMain.setAlignItems(FlexComponent.Alignment.CENTER);
 
-        return new VerticalLayout(auswertungsWert,buttonsLayoutMain);
+        return new VerticalLayout(auswertungsWert, buttonsLayoutMain);
     }
 
+    /**
+     * Bindet die Felder an den Binder.
+     * Validiert die Eingabewerte und bindet sie an die entsprechenden Felder der Entität.
+     */
     private void bindFields() {
-
         binder.forField(auswertungsWert)
                 .withValidator(auswertungsWert -> auswertungsWert != null && auswertungsWert >= 0.0, "Der Wert darf nicht leer oder negativ sein")
                 .bind(GruppenarbeitTeilnehmer::getPunkteD, GruppenarbeitTeilnehmer::setPunkteD);
     }
 
-    // Methode zu Erhöhren des Punkte-Wertes um eine Hälfte, da es auch halbe Punkte gibt
+    /**
+     * Erhöht den Punktewert um eine Hälfte.
+     * Da es auch halbe Punkte gibt, wird der Wert um 0.5 erhöht.
+     */
     private void incrementValueByHalf() {
         if (auswertungsWert.getValue() != null && auswertungsWert.getValue() >= 0.0) {
             Double value = auswertungsWert.getValue();
@@ -86,11 +111,13 @@ public class GruppeAuswertungDialog extends Dialog {
         } else {
             auswertungsWert.setValue(0.0);
         }
-
         gruppenarbeitTeilnehmer.setPunkte(auswertungsWert.getValue().floatValue());
     }
 
-    // Methode zu Verringern des Punkte-Wertes um eine Hälfte, da es auch halbe Punkte gibt
+    /**
+     * Verringert den Punktewert um eine Hälfte.
+     * Da es auch halbe Punkte gibt, wird der Wert um 0.5 verringert.
+     */
     private void decrementValueByHalf() {
         if (auswertungsWert.getValue() != null && auswertungsWert.getValue() >= 0.0) {
             Double value = auswertungsWert.getValue();
@@ -100,10 +127,12 @@ public class GruppeAuswertungDialog extends Dialog {
             auswertungsWert.setValue(0.0);
         }
         gruppenarbeitTeilnehmer.setPunkte(auswertungsWert.getValue().floatValue());
-
     }
 
-    // Standard werden Werte von 1.0 genutzt für Punkte.
+    /**
+     * Konfiguriert die Dialogelemente.
+     * Setzt die Standardwerte, fügt Event-Listener hinzu und definiert das Verhalten der Elemente.
+     */
     private void configureElements(){
         if (gruppenarbeitTeilnehmerResult.isPresent() && gruppenarbeitTeilnehmerResult.get().getPunkte() != null ) {
             auswertungsWert.setValue(Double.valueOf(gruppenarbeitTeilnehmerResult.get().getPunkte()));
@@ -113,8 +142,9 @@ public class GruppeAuswertungDialog extends Dialog {
 
         incrementButton.addClickListener(event -> incrementValueByHalf());
         decrementButton.addClickListener(event -> decrementValueByHalf());
-        //Save Button Implementation
-        saveButton.addClickListener( event -> {
+
+        // Implementierung des Speichern-Buttons
+        saveButton.addClickListener(event -> {
             if (binder.writeBeanIfValid(gruppenarbeitTeilnehmer)){
                 if (auswertungsWert.getValue() != null) {
                     gruppenarbeitTeilnehmer.setPunkte(auswertungsWert.getValue().floatValue());
@@ -128,23 +158,23 @@ public class GruppeAuswertungDialog extends Dialog {
             }
 
             veranstaltungsterminView.setAktiveKachelGruppenarbeit(gruppenarbeit);
-
             veranstaltungsterminView.update();
         });
 
-
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        // Cancel Button Implementation
-        cancelButton.addClickListener( e ->{
+        // Implementierung des Abbrechen-Buttons
+        cancelButton.addClickListener(e -> {
             close();
             clearFields();
         });
-
     }
 
+    /**
+     * Löscht alle Felder nach dem Speichern.
+     * Setzt die Eingabefelder auf ihre Standardwerte zurück.
+     */
     public void clearFields(){
-        //Clear all Fields after saving
         auswertungsWert.clear();
     }
 }

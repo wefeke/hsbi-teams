@@ -4,6 +4,7 @@ import com.example.application.models.Gruppe;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Die Klasse Auswertung dient zur Verwaltung und Berechnung von Auswertungsdaten.
@@ -16,9 +17,10 @@ public class Auswertung {
     private String nameMatrikelnummer;
     private Float gesamtPunkte = 0.0f;
     private List<TGGPHelper> tggpHelper;
-    private List<Gruppe> gruppen = new ArrayList<>();
+    private List<Long> gruppen = new ArrayList<>();
     private List<Float> punkte = new ArrayList<>();
     private int anzahlGruppenarbeiten;
+
     /**
      * Standardkonstruktor für die Klasse Auswertung.
      *
@@ -70,20 +72,28 @@ public class Auswertung {
      * @autor Leon
      */
     public String getTggHelperValues() {
+
         StringBuilder result = new StringBuilder();
-        if (tggpHelper.isEmpty() && gruppen.isEmpty()) {
-            result = new StringBuilder("");
-        } else if (!gruppen.isEmpty()) {
-                result.append(gruppen.get(0).getNummer());
-                gruppen.remove(0);
-                if (!punkte.isEmpty() && punkte.get(0) != 0.0f) {
-                    result.append(", ").append(punkte.get(0));
-                    punkte.remove(0);
-                }
-        } else {
-            result.append("");
+
+
+
+        if (!gruppen.isEmpty()) {
+
+                result.append(gruppen.getFirst());
+
+            gruppen.removeFirst();
         }
 
+
+
+
+
+        if (!punkte.isEmpty()) {
+            if (punkte.getFirst() != 0.0f) {
+                result.append(", ").append(punkte.getFirst());
+            }
+            punkte.removeFirst();
+        }
         return result.toString();
     }
 
@@ -94,7 +104,7 @@ public class Auswertung {
      *
      * @autor Leon
      */
-    public List<Gruppe> getGruppen() {
+    public List<Long> getGruppen() {
         if (gruppen.isEmpty()) {
             return null;
         } else {
@@ -103,14 +113,30 @@ public class Auswertung {
     }
 
     /**
-     * Fügt eine Gruppe zur Liste hinzu.
+     * Fügt eine Gruppenummer zur Liste hinzu am Index i.
      *
      * @param gruppe die hinzuzufügende Gruppe
      *
      * @autor Leon
      */
-    public void addGruppe(Gruppe gruppe) {
-        this.gruppen.add(gruppe);
+    public void addGruppeNummer(Long gruppe, int i) {
+        if (gruppen.isEmpty()) {
+            gruppen.add(gruppe);
+        } else {
+            if (gruppen.get(i) != null) {
+                this.gruppen.set(i,gruppe);
+            } else {
+                this.gruppen.add(gruppe);
+            }
+        }
+    }
+
+    public void addGruppeNummer(Long gruppe) {
+        if (gruppen.isEmpty()) {
+            gruppen.add(gruppe);
+        } else {
+            gruppen.add(gruppe);
+        }
     }
 
     /**
@@ -204,4 +230,6 @@ public class Auswertung {
     public void incrementAnzahlGruppenarbeiten() {
         anzahlGruppenarbeiten++;
     }
+
+
 }
