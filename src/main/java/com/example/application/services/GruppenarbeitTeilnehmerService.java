@@ -16,7 +16,6 @@ import java.util.Optional;
 @Service
 public class GruppenarbeitTeilnehmerService {
     private final GruppenarbeitTeilnehmerRepository gruppenarbeitTeilnehmerRepository;
-
     /**
      * Konstruktor für GruppenarbeitTeilnehmerService.
      *
