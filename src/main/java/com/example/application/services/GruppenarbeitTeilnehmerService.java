@@ -47,6 +47,7 @@ public class GruppenarbeitTeilnehmerService {
     public Optional<GruppenarbeitTeilnehmer> findByID(GruppenarbeitTeilnehmerId teilnehmerGruppenarbeitId){
         return gruppenarbeitTeilnehmerRepository.findById(teilnehmerGruppenarbeitId);
     }
+
     /**
      * Findet die Punkte, die ein Teilnehmer für eine bestimmte Gruppenarbeit erhalten hat.
      * Diese Methode ist transaktional und gibt die Punkte als Float zurück.
