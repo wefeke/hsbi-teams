@@ -9,9 +9,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -37,7 +35,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     /**
      * Lädt die Benutzerdetails für den angegebenen Benutzernamen.
      * Wenn kein Benutzer mit dem angegebenen Benutzernamen vorhanden ist, wird eine UsernameNotFoundException ausgelöst.
-     * Wenn der Benutzer gesperrt ist, wird ebenfalls eine UsernameNotFoundException ausgelöst.
+     * Wenn der Benutzer gesperrt ist, wird ebenfalls eine UserIsLockedException ausgelöst.
      *
      * @author Kennet
      * @param username Der Benutzername des Benutzers, dessen Details geladen werden sollen.
@@ -70,12 +68,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private static List<GrantedAuthority> getAuthorities(User user) {
         return user.getRoles().stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                 .collect(Collectors.toList());
-    }
-
-    public class UserIsLockedException extends RuntimeException {
-        public UserIsLockedException(String message) {
-            super(message);
-        }
     }
 
 }

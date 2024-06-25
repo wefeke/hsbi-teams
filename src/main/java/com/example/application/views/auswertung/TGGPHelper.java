@@ -18,7 +18,7 @@ import java.util.List;
 public class TGGPHelper {
     Veranstaltungstermin veranstaltungtermin;
     Gruppenarbeit gruppenarbeit;
-    List<Gruppe> gruppe = new ArrayList<>();
+    Gruppe gruppe;
     List<Teilnehmer> teilnehmer;
     Float punkte = 0f;
     private int tablePos = 0;
@@ -102,29 +102,31 @@ public class TGGPHelper {
     }
 
     /**
-     * Gibt die erste Gruppe in der Liste zurück, falls vorhanden.
+     * Gibt die erste Gruppennummer in der Liste zurück, falls vorhanden.
      *
-     * @return die erste Gruppe oder null, wenn die Liste leer ist
+     * @return die erste Gruppennummer oder null, wenn die Liste leer ist
      *
      * @autor Leon
      */
     public Gruppe getGruppe() {
-        if (!gruppe.isEmpty()) {
-            return gruppe.get(0);
+        if (gruppe != null) {
+            return gruppe;
         } else {
             return null;
         }
     }
-
     /**
-     * Fügt eine Gruppe zur Liste hinzu.
+     * Gibt true zurück, falls eine Gruppe existiert
      *
-     * @param gruppe die hinzuzufügende Gruppe
+     * @return true wenn Bedingung nicht leer, andernfalls false
      *
      * @autor Leon
      */
-    public void addGruppe(Gruppe gruppe) {
-        this.gruppe.add(gruppe);
+    public boolean isGruppeEmpty() {
+        if (gruppe == null)
+        return true;
+        else
+            return false;
     }
 
     /**
@@ -159,26 +161,6 @@ public class TGGPHelper {
     public boolean hasPunkte() {
         return punkte >= 0f;
     }
-
-    /**
-     * Gibt die erste Gruppe und ein Häkchen zurück, wenn vorhanden.
-     * Entfernt die erste Gruppe aus der Liste nach Rückgabe.
-     *
-     * @return die erste Gruppe und ein Häkchen oder ein Hinweis, dass keine Gruppe vorhanden ist
-     *
-     * @autor Leon
-     */
-    public String getGruppeAndCheckmark() {
-        if (!gruppe.isEmpty()) {
-            String unicodeString = "\u2705";
-            String res = "" + gruppe.get(0);
-            gruppe.remove(0);
-            return res;
-        } else {
-            return "Gehört zu keiner Gruppe!";
-        }
-    }
-
     /**
      * Gibt den Zustand zurück, ob die Gruppe verwendet wird.
      *
@@ -209,13 +191,13 @@ public class TGGPHelper {
     }
 
     /**
-     * Setzt die Liste der Gruppen.
+     * Setzt die Gruppe
      *
-     * @param gruppe die neue Liste der Gruppen
+     * @param gruppe die Gruppe
      *
      * @autor Leon
      */
-    public void setGruppe(List<Gruppe> gruppe) {
+    public void setGruppe(Gruppe gruppe) {
         this.gruppe = gruppe;
     }
 

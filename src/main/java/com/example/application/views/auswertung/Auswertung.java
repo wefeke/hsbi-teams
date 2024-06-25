@@ -4,6 +4,7 @@ import com.example.application.models.Gruppe;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Die Klasse Auswertung dient zur Verwaltung und Berechnung von Auswertungsdaten.
@@ -16,7 +17,9 @@ public class Auswertung {
     private String nameMatrikelnummer;
     private Float gesamtPunkte = 0.0f;
     private List<TGGPHelper> tggpHelper;
-    private List<Gruppe> gruppe = new ArrayList<>();
+    private List<Long> gruppen = new ArrayList<>();
+    private List<Float> punkte = new ArrayList<>();
+    private int anzahlGruppenarbeiten;
 
     /**
      * Standardkonstruktor für die Klasse Auswertung.
@@ -69,19 +72,28 @@ public class Auswertung {
      * @autor Leon
      */
     public String getTggHelperValues() {
+
         StringBuilder result = new StringBuilder();
-        if (tggpHelper.isEmpty()) {
-            result = new StringBuilder("Keine Teilnahme");
-        }
-        if (!gruppe.isEmpty()) {
-            result.append("Gruppe ").append(gruppe.get(0).getNummer());
-            gruppe.remove(0);
+
+
+
+        if (!gruppen.isEmpty()) {
+
+                result.append(gruppen.getFirst());
+
+            gruppen.removeFirst();
         }
 
-        if (gesamtPunkte != 0.0f) {
-            result.append(" \u2705");
-        }
 
+
+
+
+        if (!punkte.isEmpty()) {
+            if (punkte.getFirst() != 0.0f) {
+                result.append(", ").append(punkte.getFirst());
+            }
+            punkte.removeFirst();
+        }
         return result.toString();
     }
 
@@ -92,23 +104,39 @@ public class Auswertung {
      *
      * @autor Leon
      */
-    public Gruppe getGruppe() {
-        if (gruppe.isEmpty()) {
+    public List<Long> getGruppen() {
+        if (gruppen.isEmpty()) {
             return null;
         } else {
-            return gruppe.get(0);
+            return gruppen;
         }
     }
 
     /**
-     * Fügt eine Gruppe zur Liste hinzu.
+     * Fügt eine Gruppenummer zur Liste hinzu am Index i.
      *
      * @param gruppe die hinzuzufügende Gruppe
      *
      * @autor Leon
      */
-    public void addGruppe(Gruppe gruppe) {
-        this.gruppe.add(gruppe);
+    public void addGruppeNummer(Long gruppe, int i) {
+        if (gruppen.isEmpty()) {
+            gruppen.add(gruppe);
+        } else {
+            if (gruppen.get(i) != null) {
+                this.gruppen.set(i,gruppe);
+            } else {
+                this.gruppen.add(gruppe);
+            }
+        }
+    }
+
+    public void addGruppeNummer(Long gruppe) {
+        if (gruppen.isEmpty()) {
+            gruppen.add(gruppe);
+        } else {
+            gruppen.add(gruppe);
+        }
     }
 
     /**
@@ -119,7 +147,7 @@ public class Auswertung {
      * @autor Leon
      */
     public boolean gruppeAdded() {
-        return gruppe != null;
+        return gruppen != null;
     }
 
     /**
@@ -129,8 +157,8 @@ public class Auswertung {
      *
      * @autor Leon
      */
-    public Float getGesamtPunkte() {
-        return gesamtPunkte;
+    public String getGesamtPunkteAndGruppenarbeiten() {
+        return gesamtPunkte + ", " + anzahlGruppenarbeiten;
     }
 
     /**
@@ -165,4 +193,43 @@ public class Auswertung {
     public void setNameMatrikelnummer(String nameMatrikelnummer) {
         this.nameMatrikelnummer = nameMatrikelnummer;
     }
+
+    /**
+     * Gibt die Liste der Punkte für die Gruppenarbeitn zurück.
+     *
+     * @return die Punkte
+     *
+     * @autor Leon
+     */
+    public List<Float> getPunkte() {
+        return punkte;
+    }
+    /**
+     * Setzt die Punkte der Gruppenarbeiten.
+     *
+     * @param punkte die neuen Punkte für die Gruppenarbeiten
+     *
+     * @autor Leon
+     */
+    public void setPunkte(List<Float> punkte) {
+        this.punkte = punkte;
+    }
+
+    public void addPunkte(Float punkte) {
+        this.punkte.add(punkte);
+    }
+
+    public int getAnzahlGruppenarbeiten() {
+        return anzahlGruppenarbeiten;
+    }
+
+    public void setAnzahlGruppenarbeiten(int anzahlGruppenarbeiten) {
+        this.anzahlGruppenarbeiten = anzahlGruppenarbeiten;
+    }
+
+    public void incrementAnzahlGruppenarbeiten() {
+        anzahlGruppenarbeiten++;
+    }
+
+
 }

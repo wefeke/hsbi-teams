@@ -47,13 +47,11 @@ public class VeranstaltungsterminHinzufuegenDialog extends Dialog {
     private final Button cancelButton= new Button("Abbrechen");
     private final Button saveButton= new Button("Speichern");
 
-    private AuthenticatedUser authenticatedUser;
+    private final AuthenticatedUser authenticatedUser;
 
-    private VeranstaltungsterminView veranstaltungsterminView;
-    private Veranstaltungstermin aktiverVeranstaltungstermin;
-    private Gruppenarbeit aktiveGruppenarbeit;
-
-    private Veranstaltung veranstaltung;
+    private final VeranstaltungsterminView veranstaltungsterminView;
+    private final Veranstaltungstermin aktiverVeranstaltungstermin;
+    private final Gruppenarbeit aktiveGruppenarbeit;
 
     //Data Binder
     Binder<Veranstaltungstermin> binder = new Binder<>(Veranstaltungstermin.class);
@@ -130,11 +128,7 @@ public class VeranstaltungsterminHinzufuegenDialog extends Dialog {
         radioGroup.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
 
         radioGroup.addValueChangeListener(e -> { //triggers after the value change in the radioGroup
-            if (e.getValue().equals("Wöchentlich") || e.getValue().equals("Monatlich")) {
-                endDatePicker.setVisible(true);
-            } else {
-                endDatePicker.setVisible(false);
-            }
+            endDatePicker.setVisible(e.getValue().equals("Wöchentlich") || e.getValue().equals("Monatlich"));
         });
 
         startDatePicker.setValue(LocalDate.now());

@@ -1,10 +1,8 @@
 package com.example.application.views.user;
 import com.example.application.models.Role;
 import com.example.application.models.User;
-import com.example.application.models.Veranstaltung;
 import com.example.application.services.UserService;
 import com.example.application.views.MainLayout;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.grid.Grid;
@@ -19,11 +17,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.vaadin.lineawesome.LineAwesomeIcon;
-
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Verwaltungsklasse zur Verwaltung von Benutzern durch einen Administrator.
@@ -38,9 +33,8 @@ public class UserManagementView extends VerticalLayout {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
-    private TextField filterText = new TextField();
-    private Text noEventsText = new Text("");
-    private Grid<User> grid = new Grid<>();
+    private final TextField filterText = new TextField();
+    private final Grid<User> grid = new Grid<>();
     HorizontalLayout toolbar = new HorizontalLayout();
 
     /**
@@ -72,7 +66,8 @@ public class UserManagementView extends VerticalLayout {
 
         Button addUserButton = new Button(VaadinIcon.PLUS.create(), e -> {
             VaadinSession.getCurrent().setAttribute("previousLocation", "user-management");
-            getUI().get().navigate("registration");
+            if (getUI().isPresent())
+                getUI().get().navigate("registration");
         });
 
         toolbar.add(filterText, addUserButton);
@@ -101,7 +96,7 @@ public class UserManagementView extends VerticalLayout {
      */
     private Grid<User> createGrid(){
         //grid.setItems(userService.findAllUserByRole(Role.USER));
-        grid.addColumn(User::getName).setHeader("Name").setSortable(true); // Add a column for the user name
+        grid.addColumn(User::getName).setHeader("Name").setSortable(true); // Add a column for the username
         grid.addColumn(User::getUsername).setHeader("Username").setSortable(true);
 
         grid.addColumn(new ComponentRenderer<>(user -> {
@@ -119,11 +114,7 @@ public class UserManagementView extends VerticalLayout {
             comboBox.setValue(user.getRoles());
 
             comboBox.addValueChangeListener(event -> {
-                if (comboBox.isEmpty())
-                    comboBox.setInvalid(true);
-                else
-                    comboBox.setInvalid(false);
-
+                comboBox.setInvalid(comboBox.isEmpty());
                 if (!comboBox.isInvalid()){
                     user.setRoles(event.getValue());
                     userService.saveUser(user); // Aktualisieren Sie den Benutzer in der Datenbank

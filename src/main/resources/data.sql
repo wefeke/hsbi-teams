@@ -497,6 +497,8 @@ INSERT INTO public.gruppe_teilnehmer (gruppen_id, teilnehmer_matrikel_nr) VALUES
                                                                                 (18, 1000019),
                                                                                 (18, 1000020);
 
+
+
 INSERT INTO public.gruppenarbeit_teilnehmer (gruppenarbeiten_id, teilnehmer_matrikel_nr, punkte) VALUES
     (1, 1000001, 1),
     (1, 1000002, null),

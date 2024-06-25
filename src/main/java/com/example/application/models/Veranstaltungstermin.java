@@ -12,7 +12,9 @@ import java.util.Objects;
 @Entity
 public class Veranstaltungstermin {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    //@GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(generator = "generator")
+    @SequenceGenerator(name="generator", sequenceName = "GENERATOR", allocationSize = 50, initialValue = 100)
     @Column(name = "id", nullable = false)
     private Long id;
     private LocalDate datum;
