@@ -15,6 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Ein Dialogfenster zum endgültigen Löschen einer Veranstaltung und aller zugehörigen Daten.
+ * Die Klasse bietet Funktionen zum Anzeigen von Informationen über die zu löschende Veranstaltung,
+ * zum Hinzufügen von Funktionalitäten zu den Buttons (Löschen und Abbrechen) und zur transaktionalen
+ * Löschung der Veranstaltung samt zugehöriger Termine, Gruppenarbeiten und Gruppen.
+ *
+ * @author Lilli
+ */
 @SuppressWarnings("SpringTransactionalMethodCallsInspection")
 public class VeranstaltungLoeschenDialog extends Dialog {
     //Data
@@ -27,11 +35,36 @@ public class VeranstaltungLoeschenDialog extends Dialog {
     private final Paragraph warningText = new Paragraph("Empty");
     private final Paragraph noReturn = new Paragraph("Empty");
 
+    /**
+     * Konstruktor für den VeranstaltungLoeschenDialog.
+     *
+     * @param veranstaltungsterminService Der Service für Veranstaltungstermine.
+     * @param gruppenarbeitService       Der Service für Gruppenarbeiten.
+     * @param gruppeService              Der Service für Gruppen.
+     * @param veranstaltungenService     Der Service für Veranstaltungen.
+     * @param veranstaltungenView        Die View für Veranstaltungen.
+     * @param authenticatedUser          Der aktuell authentifizierte Benutzer.
+     *
+     * @author Lilli
+     */
     public VeranstaltungLoeschenDialog(VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungenService veranstaltungenService, VeranstaltungenView veranstaltungenView, AuthenticatedUser authenticatedUser) {
         styleElements();
         addButtonFunctionalities(veranstaltungsterminService, gruppenarbeitService, gruppeService, veranstaltungenService, veranstaltungenView, authenticatedUser);
         add(createLayout());
     }
+
+    /**
+     * Fügt den Buttons (Löschen und Abbrechen) ihre Funktionalitäten hinzu.
+     *
+     * @param veranstaltungsterminService Der Service für Veranstaltungstermine.
+     * @param gruppenarbeitService       Der Service für Gruppenarbeiten.
+     * @param gruppeService              Der Service für Gruppen.
+     * @param veranstaltungenService     Der Service für Veranstaltungen.
+     * @param veranstaltungenView        Die View für Veranstaltungen.
+     * @param authenticatedUser          Der aktuell authentifizierte Benutzer.
+     *
+     * @author Lilli
+     */
 
     private void addButtonFunctionalities(VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungenService veranstaltungenService, VeranstaltungenView veranstaltungenView, AuthenticatedUser authenticatedUser) {
         deleteBtn.addClickListener(event -> {
@@ -47,6 +80,11 @@ public class VeranstaltungLoeschenDialog extends Dialog {
         cancelBtn.addClickListener(event -> close());
     }
 
+    /**
+     * Passt das Erscheinungsbild der UI-Elemente des Dialogs an.
+     *
+     * @author Lilli
+     */
     private void styleElements() {
         warningText.addClassName("warning-text-delete");
         warningText.getStyle().set("white-space", "pre-line");
@@ -56,6 +94,16 @@ public class VeranstaltungLoeschenDialog extends Dialog {
         deleteBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     }
 
+    /**
+     * Transaktionale Methode zum vollständigen Löschen aller Daten der Veranstaltung und ihrer zugehörigen Elemente.
+     *
+     * @param veranstaltungsterminService Der Service für Veranstaltungstermine.
+     * @param gruppenarbeitService       Der Service für Gruppenarbeiten.
+     * @param gruppeService              Der Service für Gruppen.
+     * @param veranstaltungenService     Der Service für Veranstaltungen.
+     *
+     * @author Lilli
+     */
     @Transactional
     protected void deleteEverything(VeranstaltungsterminService veranstaltungsterminService, GruppenarbeitService gruppenarbeitService, GruppeService gruppeService, VeranstaltungenService veranstaltungenService) {
         assert veranstaltung != null;
@@ -91,6 +139,13 @@ public class VeranstaltungLoeschenDialog extends Dialog {
         veranstaltungenService.deleteVeranstaltung(veranstaltung);
     }
 
+    /**
+     * Setzt die Veranstaltung, die gelöscht werden soll, und aktualisiert die Anzeigeinformationen entsprechend.
+     *
+     * @param veranstaltung Die zu löschende Veranstaltung.
+     *
+     * @author Lilli
+     */
     public void setVeranstaltung(Veranstaltung veranstaltung) {
         this.veranstaltung = veranstaltung;
         int anzGruppenarbeiten = 0;
@@ -118,6 +173,13 @@ public class VeranstaltungLoeschenDialog extends Dialog {
                 " löschen willst?\n" + "Das kann nicht rückgängig gemacht werden!");
     }
 
+    /**
+     * Erstellt das Layout des Dialogs mit den erforderlichen UI-Elementen und deren Anordnung.
+     *
+     * @return Das erstellte VerticalLayout für den Dialog.
+     *
+     * @author Lilli
+     */
     private VerticalLayout createLayout(){
         VerticalLayout mainLayout = new VerticalLayout();
         mainLayout.setAlignItems(FlexComponent.Alignment.CENTER);
