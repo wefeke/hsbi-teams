@@ -46,8 +46,8 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         this.setHeight("80vh");
 
         hinzufuegenButton.setEnabled(false);
-        hinzufuegenButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
-        hinzufuegenButton.getStyle().set("margin-inline-start", "auto");
+        hinzufuegenButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
 
         dialog = new TeilnehmerErstellenDialog(teilnehmerService, authenticatedUser,this);
         anlegenButton.addClickListener(event ->
@@ -88,9 +88,10 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
 
         Button cancelButton = new Button("Abbrechen", e -> close());
         this.setHeaderTitle("Teilnehmer hinzufügen");
+        this.getHeader().add(getToolbar());
         getFooter().add(cancelButton);
+        getFooter().add(hinzufuegenButton);
         add(
-                getToolbar(),
                 getContent()
         );
 
@@ -104,7 +105,7 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateGrid());
 
-        HorizontalLayout toolbar = new HorizontalLayout(filterText,anlegenButton,importButton, hinzufuegenButton);
+        HorizontalLayout toolbar = new HorizontalLayout(filterText,anlegenButton,importButton);
 
         toolbar.addClassName("toolbar");
 

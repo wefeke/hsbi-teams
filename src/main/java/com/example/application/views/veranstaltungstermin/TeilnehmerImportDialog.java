@@ -37,6 +37,7 @@ public class TeilnehmerImportDialog extends Dialog {
     private final Upload upload = new Upload(buffer);
     ExcelImporter excelImporter;
     Set<Teilnehmer> newTeilnehmerListe = new HashSet<>();
+    Set<Teilnehmer> teilnehmerVeranstaltungsListe = new HashSet<>();
     private final VeranstaltungenService veranstaltungService;
     private final Long veranstaltungId;
     private final VeranstaltungsterminView veranstaltungsterminView;
@@ -54,7 +55,6 @@ public class TeilnehmerImportDialog extends Dialog {
      *
      * @param teilnehmerService Der Service, der für die Verwaltung der Studierenden benötigt wird.
      * @param authenticatedUser Der aktuell authentifizierte Benutzer.
-     * @param studierendeView   Die StudierendeView, die aktualisiert wird, wenn neue Teilnehmer hinzugefügt werden.
      */
     public TeilnehmerImportDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, VeranstaltungenService veranstaltungService, Long veranstaltungId, VeranstaltungsterminView veranstaltungsterminView) {
         this.excelImporter = new ExcelImporter(teilnehmerService, authenticatedUser);
@@ -81,10 +81,16 @@ public class TeilnehmerImportDialog extends Dialog {
                 if (maybeUser.isPresent()) {
                     User user = maybeUser.get();
                     teilnehmerService.saveTeilnehmer(teilnehmer, user);
-                    veranstaltungService.addTeilnehmer(veranstaltungId, Collections.singleton(teilnehmer), user); // Add the participant to the event
                     dialogLayout.add(new Span("Teilnehmer :" + teilnehmer.toString() + " angelegt"));
                 }
             }
+
+            Optional<User> maybeUser = authenticatedUser.get();
+            if (maybeUser.isPresent()) {
+                User user = maybeUser.get();
+                veranstaltungService.addTeilnehmer(veranstaltungId, teilnehmerVeranstaltungsListe, user);
+            }
+
             if (!newTeilnehmerListe.isEmpty())
                 dialog.open();
 
@@ -109,6 +115,7 @@ public class TeilnehmerImportDialog extends Dialog {
             try {
 
                 newTeilnehmerListe.addAll(excelImporter.readNewTeilnehmerFromExcel(buffer.getInputStream(event.getFileName())));
+                teilnehmerVeranstaltungsListe.addAll(excelImporter.readNewTeilnehmerFromExcel(buffer.getInputStream(event.getFileName())));
 
                 List<Teilnehmer> combinedItems = new ArrayList<>();
                 Optional<User> maybeUser = authenticatedUser.get();
@@ -117,6 +124,10 @@ public class TeilnehmerImportDialog extends Dialog {
 
                     combinedItems.addAll(teilnehmerService.findAllTeilnehmerByUserAndFilter(user, ""));
                     combinedItems.addAll(newTeilnehmerListe);
+
+                    combinedItems.addAll(teilnehmerService.findAllTeilnehmerByUserAndFilter(user, ""));
+                    combinedItems.addAll(teilnehmerVeranstaltungsListe);
+
 
                     Dialog dialog = new Dialog();
                     dialog.setHeight(getHeight());

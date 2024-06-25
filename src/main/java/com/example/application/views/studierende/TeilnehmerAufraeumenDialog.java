@@ -4,6 +4,7 @@ import com.example.application.models.*;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
@@ -60,6 +61,13 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
         this.setHeight("80vh");
         grid.setSelectionMode(Grid.SelectionMode.MULTI);
         grid.setColumns("vorname", "nachname", "id");
+        grid.addSelectionListener(selection -> {
+            int size = selection.getAllSelectedItems().size();
+            deleteButton.setEnabled(size != 0);
+        });
+
+        deleteButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        deleteButton.setEnabled(false);
 
         updateGrid();
 

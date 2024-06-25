@@ -163,15 +163,17 @@ public class StudierendeHinzufuegenDialog extends Dialog {
     private void bindFields() {
         binder.forField(firstName)
                 .asRequired("Vorname muss gefüllt sein")
+                .withValidator(vorname -> vorname.length() <= 255, "Der Vorname darf maximal 255 Zeichen lang sein")
                 .bind(Teilnehmer::getVorname, Teilnehmer::setVorname);
 
         binder.forField(lastName)
                 .asRequired("Nachname muss gefüllt sein")
+                .withValidator(nachname -> nachname.length() <= 255, "Der Nachname darf maximal 255 Zeichen lang sein")
                 .bind(Teilnehmer::getNachname, Teilnehmer::setNachname);
 
         binder.forField(matrikelNr)
                 .asRequired("Matrikelnummer muss gefüllt sein")
-                .withValidator(matrikelNr -> String.valueOf(matrikelNr.longValue()).matches("\\d{7}"), "Matrikelnummer muss genau 7 Zahlen enthalten")
+                .withValidator(matrikelNr -> String.valueOf(matrikelNr.longValue()).matches("\\d{7}"), "Matrikelnummer muss genau 7 Ziffern enthalten")
                 .withConverter(d -> Double.valueOf(d).longValue(), Long::doubleValue)
                 .bind(Teilnehmer::getId, Teilnehmer::setId);
     }

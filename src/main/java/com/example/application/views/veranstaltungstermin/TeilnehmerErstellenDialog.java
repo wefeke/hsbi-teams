@@ -114,10 +114,12 @@ public class TeilnehmerErstellenDialog extends Dialog {
     private void bindFields() {
         binder.forField(firstName)
                 .asRequired("Vorname muss gefüllt sein")
+                .withValidator(vorname -> vorname.length() <= 255, "Der Vorname darf maximal 255 Zeichen lang sein")
                 .bind(Teilnehmer::getVorname, Teilnehmer::setVorname);
 
         binder.forField(lastName)
                 .asRequired("Nachname muss gefüllt sein")
+                .withValidator(nachname -> nachname.length() <= 255, "Der Nachname darf maximal 255 Zeichen lang sein")
                 .bind(Teilnehmer::getNachname, Teilnehmer::setNachname);
 
         binder.forField(matrikelNr)
