@@ -5,7 +5,6 @@ import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
-import com.example.application.views.studierende.StudierendeView;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -23,7 +22,7 @@ import java.util.Optional;
 public class TeilnehmerErstellenDialog extends Dialog {
 
     private final TeilnehmerService teilnehmerService;
-    private AuthenticatedUser authenticatedUser;
+    private final AuthenticatedUser authenticatedUser;
 
 
     TextField firstName = new TextField("Vorname");
@@ -71,9 +70,7 @@ public class TeilnehmerErstellenDialog extends Dialog {
                 Notification.show("Bitte füllen Sie alle Felder aus", 3000, Notification.Position.MIDDLE);
             }
         });
-        cancel.addClickListener(event -> {
-            close();
-        });
+        cancel.addClickListener(event -> close());
     }
 
     private boolean isValidInput() {
@@ -125,7 +122,7 @@ public class TeilnehmerErstellenDialog extends Dialog {
         binder.forField(matrikelNr)
                 .asRequired("Matrikelnummer muss gefüllt sein")
                 .withValidator(matrikelNr -> String.valueOf(matrikelNr.longValue()).matches("\\d{7}"), "Matrikelnummer muss genau 7 Zahlen enthalten")
-                .withConverter(d -> Double.valueOf(d).longValue(), Long::doubleValue)
+                .withConverter(Double::longValue, Long::doubleValue)
                 .bind(Teilnehmer::getId, Teilnehmer::setId);
     }
 
@@ -133,5 +130,9 @@ public class TeilnehmerErstellenDialog extends Dialog {
         firstName.clear();
         lastName.clear();
         matrikelNr.clear();
+    }
+
+    public void setTeilnehmer(Teilnehmer teilnehmer) {
+        this.teilnehmer = teilnehmer;
     }
 }

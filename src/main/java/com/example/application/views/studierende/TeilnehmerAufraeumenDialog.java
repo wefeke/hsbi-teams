@@ -7,7 +7,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -24,7 +23,7 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
     private final Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class);
     private final NumberField yearsField = new NumberField();
 
-   private AuthenticatedUser authenticatedUser;
+   private final AuthenticatedUser authenticatedUser;
 
     /**
      * Konstruktor für die TeilnehmerAufraeumenDialog Klasse.
@@ -40,8 +39,6 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
     public TeilnehmerAufraeumenDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, StudierendeView studierendeView) {
         this.teilnehmerService = teilnehmerService;
         this.authenticatedUser = authenticatedUser;
-        TeilnehmerLoeschenDialog teilnehmerLoeschenDialog = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, this, studierendeView);
-
 
         closeButton.addClickListener(event ->
                 close());
@@ -50,7 +47,7 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
             Set<Teilnehmer> selectedTeilnehmer = grid.getSelectedItems();
             if (!selectedTeilnehmer.isEmpty()) {
                 for (Teilnehmer teilnehmer : selectedTeilnehmer) {
-                    TeilnehmerLoeschenDialog deleteDialogForSelectedTeilnehmer = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, this, studierendeView);
+                    TeilnehmerLoeschenDialog deleteDialogForSelectedTeilnehmer = new TeilnehmerLoeschenDialog(teilnehmerService, this, studierendeView);
                     deleteDialogForSelectedTeilnehmer.setTeilnehmer(teilnehmer);
                     deleteDialogForSelectedTeilnehmer.open();
                 }

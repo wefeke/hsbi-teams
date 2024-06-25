@@ -22,7 +22,7 @@ import java.util.Optional;
 public class StudierendeHinzufuegenDialog extends Dialog {
 
     private final TeilnehmerService teilnehmerService;
-    private AuthenticatedUser authenticatedUser;
+    private final AuthenticatedUser authenticatedUser;
 
 
     TextField firstName = new TextField("Vorname");
@@ -30,9 +30,9 @@ public class StudierendeHinzufuegenDialog extends Dialog {
     NumberField matrikelNr = new NumberField("Matrikelnummer");
     Button save = new Button("Speichern");
     Button cancel = new Button("Abbrechen");
-    private Teilnehmer teilnehmer;
+     private Teilnehmer teilnehmer;
     Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
-    private StudierendeView studierendeView;
+    private final StudierendeView studierendeView;
 
     /**
      * Konstruktor für die StudierendeHinzufuegenDialog Klasse.
@@ -56,7 +56,7 @@ public class StudierendeHinzufuegenDialog extends Dialog {
         getFooter().add(cancel, save); // Button hinzufügen
 
 
-        configureButtons();
+        configureButton();
         bindFields();
     }
 
@@ -82,7 +82,7 @@ public class StudierendeHinzufuegenDialog extends Dialog {
      * Ansonsten wird der Teilnehmer gespeichert.
      * Wenn der "Abbrechen"-Button geklickt wird, wird der Dialog geschlossen.
      */
-    private void configureButtons() {
+    private void configureButton() {
         save.addClickListener(event -> {
             if (isValidInput()) {
                 if (isDuplicateMatrikelNr()) {
@@ -94,9 +94,7 @@ public class StudierendeHinzufuegenDialog extends Dialog {
                 Notification.show("Bitte füllen Sie alle Felder aus", 3000, Notification.Position.MIDDLE);
             }
         });
-        cancel.addClickListener(event -> {
-            close();
-        });
+        cancel.addClickListener(event -> close());
     }
 
     /**
@@ -174,7 +172,7 @@ public class StudierendeHinzufuegenDialog extends Dialog {
         binder.forField(matrikelNr)
                 .asRequired("Matrikelnummer muss gefüllt sein")
                 .withValidator(matrikelNr -> String.valueOf(matrikelNr.longValue()).matches("\\d{7}"), "Matrikelnummer muss genau 7 Ziffern enthalten")
-                .withConverter(d -> Double.valueOf(d).longValue(), Long::doubleValue)
+                .withConverter(Double::longValue, Long::doubleValue)
                 .bind(Teilnehmer::getId, Teilnehmer::setId);
     }
 
@@ -185,5 +183,9 @@ public class StudierendeHinzufuegenDialog extends Dialog {
         firstName.clear();
         lastName.clear();
         matrikelNr.clear();
+    }
+
+    public void setTeilnehmer(Teilnehmer teilnehmer) {
+        this.teilnehmer = teilnehmer;
     }
 }

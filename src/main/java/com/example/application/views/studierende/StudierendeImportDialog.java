@@ -16,7 +16,6 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
-import java.io.InputStream;
 import java.util.*;
 
 public class StudierendeImportDialog extends Dialog {
@@ -26,7 +25,6 @@ public class StudierendeImportDialog extends Dialog {
     Button closeButton = new Button("Schließen");
 
     MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
-    private final Upload upload = new Upload(buffer);
     ExcelImporter excelImporter;
     Set<Teilnehmer> newTeilnehmerListe = new HashSet<>();
 
@@ -77,9 +75,8 @@ public class StudierendeImportDialog extends Dialog {
 
         });
 
-        closeButton.addClickListener(event -> {
-            this.close();
-        });
+        closeButton.addClickListener(event -> this.close());
+        Upload upload = new Upload(buffer);
         upload.setUploadButton(new Button(LineAwesomeIcon.UPLOAD_SOLID.create()));
         upload.setDropLabelIcon(LineAwesomeIcon.ID_CARD.create());
         upload.setDropLabel(new Span("Teilnehmer Excel-Datei"));

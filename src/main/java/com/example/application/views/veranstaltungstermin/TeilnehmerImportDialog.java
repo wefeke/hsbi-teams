@@ -3,13 +3,9 @@ package com.example.application.views.veranstaltungstermin;
 import com.example.application.ExcelReader.ExcelImporter;
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
-import com.example.application.models.Veranstaltung;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
-import com.example.application.services.UserService;
 import com.example.application.services.VeranstaltungenService;
-import com.example.application.views.studierende.StudierendeView;
-import com.example.application.views.veranstaltungen.VeranstaltungenView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
@@ -20,10 +16,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import jakarta.annotation.security.RolesAllowed;
-import com.vaadin.flow.component.upload.Upload;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
-import java.io.InputStream;
 import java.util.*;
 
 @RolesAllowed({"ADMIN", "USER"})
@@ -34,13 +28,9 @@ public class TeilnehmerImportDialog extends Dialog {
     Button closeButton = new Button("Schließen");
 
     MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
-    private final Upload upload = new Upload(buffer);
     ExcelImporter excelImporter;
     Set<Teilnehmer> newTeilnehmerListe = new HashSet<>();
     Set<Teilnehmer> teilnehmerVeranstaltungsListe = new HashSet<>();
-    private final VeranstaltungenService veranstaltungService;
-    private final Long veranstaltungId;
-    private final VeranstaltungsterminView veranstaltungsterminView;
 
 
     /**
@@ -58,9 +48,6 @@ public class TeilnehmerImportDialog extends Dialog {
      */
     public TeilnehmerImportDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, VeranstaltungenService veranstaltungService, Long veranstaltungId, VeranstaltungsterminView veranstaltungsterminView) {
         this.excelImporter = new ExcelImporter(teilnehmerService, authenticatedUser);
-        this.veranstaltungService = veranstaltungService;
-        this.veranstaltungId = veranstaltungId;
-        this.veranstaltungsterminView = veranstaltungsterminView;
 
         H2 headerTitle = new H2("Studierende Importieren");
         add(headerTitle);
@@ -97,9 +84,8 @@ public class TeilnehmerImportDialog extends Dialog {
             close();
         });
 
-        closeButton.addClickListener(event -> {
-            this.close();
-        });
+        closeButton.addClickListener(event -> this.close());
+        Upload upload = new Upload(buffer);
         upload.setUploadButton(new Button(LineAwesomeIcon.UPLOAD_SOLID.create()));
         upload.setDropLabelIcon(LineAwesomeIcon.ID_CARD.create());
         upload.setDropLabel(new Span("Teilnehmer Excel-Datei"));
