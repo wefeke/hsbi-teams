@@ -30,7 +30,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.List;
 
-//Lilli
+/**
+ * Diese Klasse implementiert einen Dialog zum Hinzufügen von Gruppenarbeiten.
+ * Sie ermöglicht die Erstellung neuer Gruppenarbeiten für eine Veranstaltung, inklusive Auswahl der Teilnehmer,
+ * Bildung von Gruppen und Speicherung der erstellten Gruppenarbeit.
+ * <p>
+ * Der Dialog bietet Funktionen zum Zufallsauslosen von Teilnehmern zu Gruppen, Anzeige und Neumischen der erstellten
+ * Gruppen sowie zur Speicherung der Gruppenarbeit für einen bestimmten Veranstaltungstermin.
+ *
+ * @author Lilli
+ */
 @SuppressWarnings({"SpringTransactionalMethodCallsInspection", "SpringJavaInjectionPointsAutowiringInspection"})
 @PageTitle("Gruppenarbeiten")
 @Route(value = "gruppenarbeiten", layout = MainLayout.class)
@@ -65,7 +74,24 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     private final Button selectAllParticipantsBtn = new Button("Auswählen");
     private final H4 groupsTitle = new H4("Gruppen");
 
-    //Konstruktor
+    /**
+     * Konstruktor für den {@code GruppenarbeitHinzufuegenDialog}.
+     * <p>
+     * Erzeugt eine neue Instanz des Dialogs zum Hinzufügen einer Gruppenarbeit für eine bestimmte Veranstaltung.
+     * Initialisiert die benötigten UI-Elemente und bindet die erforderlichen Felder.
+     *
+     * @param authenticatedUser Der authentifizierte Benutzer, der die Aktion ausführt.
+     * @param veranstaltungId Die ID der Veranstaltung, zu der die Gruppenarbeit hinzugefügt wird.
+     * @param gruppenarbeitService Der Service für die Verwaltung von Gruppenarbeiten.
+     * @param teilnehmerService Der Service für die Verwaltung von Teilnehmern.
+     * @param veranstaltungsterminService Der Service für die Verwaltung von Veranstaltungsterminen.
+     * @param gruppeService Der Service für die Verwaltung von Gruppen.
+     * @param veranstaltungsterminView Die Ansichtsklasse für die Darstellung eines Veranstaltungstermins.
+     * @param veranstaltungenService Der Service für die Verwaltung von Veranstaltungen.
+     * @param veranstaltungstermin Der spezifische Veranstaltungstermin, zu dem die Gruppenarbeit hinzugefügt wird.
+     *
+     * @author Lilli
+     */
     @Autowired
     public GruppenarbeitHinzufuegenDialog(AuthenticatedUser authenticatedUser, String veranstaltungId, GruppenarbeitService gruppenarbeitService, TeilnehmerService teilnehmerService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungsterminView veranstaltungsterminView, VeranstaltungenService veranstaltungenService, Veranstaltungstermin veranstaltungstermin) {
         this.veranstaltungId = veranstaltungId;
@@ -75,6 +101,23 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         add(createLayout());
     }
 
+    /**
+     * Konfiguriert den Dialog zum Hinzufügen einer Gruppenarbeit.
+     * <p>
+     * Diese Methode initialisiert die notwendigen UI-Elemente, überprüft die Berechtigungen des authentifizierten
+     * Benutzers für die angegebene Veranstaltung und bindet die erforderlichen Felder.
+     *
+     * @param authenticatedUser Der authentifizierte Benutzer, der die Aktion ausführt.
+     * @param veranstaltungId Die ID der Veranstaltung, zu der die Gruppenarbeit hinzugefügt wird.
+     * @param gruppenarbeitService Der Service für die Verwaltung von Gruppenarbeiten.
+     * @param veranstaltungsterminService Der Service für die Verwaltung von Veranstaltungsterminen.
+     * @param gruppeService Der Service für die Verwaltung von Gruppen.
+     * @param veranstaltungsterminView Die Ansichtsklasse für die Darstellung eines Veranstaltungstermins.
+     * @param veranstaltungenService Der Service für die Verwaltung von Veranstaltungen.
+     * @param veranstaltungstermin Der spezifische Veranstaltungstermin, zu dem die Gruppenarbeit hinzugefügt wird.
+     *
+     * @author Lilli
+     */
     private void configureDialog(AuthenticatedUser authenticatedUser, String veranstaltungId, GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungsterminView veranstaltungsterminView, VeranstaltungenService veranstaltungenService, Veranstaltungstermin veranstaltungstermin) {
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
@@ -92,6 +135,27 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         groupSize.addValueChangeListener(event -> randomize(gruppen));
     }
 
+    /**
+     * Fügt den Buttons in der Benutzeroberfläche Funktionalitäten hinzu.
+     * <p>
+     * Diese Methode konfiguriert die Klickereignisse für folgende Buttons:
+     * - "Neu mischen" ordnet die Teilnehmergruppen zufällig neu.
+     * - "Gruppenarbeit speichern" speichert die aktuelle Gruppenarbeit und die zugeordneten Gruppen.
+     * - "Abbrechen" setzt das Formular zurück und schließt den Dialog.
+     * - "Nur Gruppen" löscht die angezeigten Gruppen und die ausgewählte Gruppengröße.
+     * - "Formular" leert alle Eingabefelder im Formular.
+     * - "Entfernen" hebt die Auswahl aller Teilnehmer in der MultiSelect-Liste auf.
+     * - "Auswählen" wählt alle verfügbaren Teilnehmer in der MultiSelect-Liste aus.
+     *
+     * @param gruppenarbeitService Der Service für die Verwaltung von Gruppenarbeiten.
+     * @param veranstaltungsterminService Der Service für die Verwaltung von Veranstaltungsterminen.
+     * @param gruppeService Der Service für die Verwaltung von Gruppen.
+     * @param veranstaltungsterminView Die Ansichtsklasse für die Darstellung eines Veranstaltungstermins.
+     * @param veranstaltungstermin Der spezifische Veranstaltungstermin, zu dem die Gruppenarbeit hinzugefügt wird.
+     * @param maybeUser Der optionale authentifizierte Benutzer, der die Aktion ausführt.
+     *
+     * @author Lilli
+     */
     private void addBtnFunctionalities(GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungsterminView veranstaltungsterminView, Veranstaltungstermin veranstaltungstermin, Optional<User> maybeUser) {
         randomizeBtn.addClickListener(event -> randomizeBtnFunctionality());
 
@@ -128,6 +192,16 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
     }
 
+    /**
+     * Behandelt das Klickereignis des Buttons "Neu mischen".
+     * <p>
+     * Überprüft zunächst, ob Gruppen vorhanden sind. Wenn keine Gruppen vorhanden sind,
+     * wird eine Benachrichtigung angezeigt, dass keine Neuordnung möglich ist. Andernfalls
+     * wird die Methode {@link #randomize(List)} aufgerufen, um die Teilnehmergruppen zufällig
+     * neu anzuordnen.
+     *
+     * @author Lilli
+     */
     private void randomizeBtnFunctionality() {
         if(gruppen.isEmpty()){
             Notification.show("Es existieren keine Gruppen. Kann nicht neu mischen.");
@@ -137,6 +211,24 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         }
     }
 
+    /**
+     * Behandelt das Klickereignis des Buttons "Gruppenarbeit speichern".
+     * <p>
+     * Validiert zuerst die Eingaben im Binder {@link #binderGruppenarbeit}. Wenn die Validierung erfolgreich ist,
+     * wird die Methode {@link #saveGruppenarbeitWithGruppen(GruppenarbeitService, VeranstaltungsterminService,
+     * GruppeService, Veranstaltungstermin, Optional)} aufgerufen, um die Gruppenarbeit und
+     * zugeordneten Gruppen zu speichern. Anschließend wird eine Erfolgsmeldung angezeigt und der Dialog geschlossen.
+     * Wenn die Validierung fehlschlägt, wird eine Fehlermeldung angezeigt.
+     *
+     * @param gruppenarbeitService Der Service für die Verwaltung von Gruppenarbeiten.
+     * @param veranstaltungsterminService Der Service für die Verwaltung von Veranstaltungsterminen.
+     * @param gruppeService Der Service für die Verwaltung von Gruppen.
+     * @param veranstaltungsterminView Die Ansichtsklasse für die Darstellung eines Veranstaltungstermins.
+     * @param veranstaltungstermin Der spezifische Veranstaltungstermin, zu dem die Gruppenarbeit gehört.
+     * @param maybeUser Der optionale authentifizierte Benutzer, der die Aktion ausführt.
+     *
+     * @author Lilli
+     */
     private void saveBtnFunctionality(GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, VeranstaltungsterminView veranstaltungsterminView, Veranstaltungstermin veranstaltungstermin, Optional<User> maybeUser) {
         if(binderGruppenarbeit.writeBeanIfValid(gruppenarbeit)){
             saveGruppenarbeitWithGruppen(gruppenarbeitService, veranstaltungsterminService, gruppeService, veranstaltungstermin, maybeUser);
@@ -160,6 +252,29 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         }
     }
 
+    /**
+     * Speichert die Gruppenarbeit und die zugeordneten Gruppen in der Datenbank.
+     * <p>
+     * Setzt zunächst den Benutzer für die Gruppenarbeit, sofern ein {@code maybeUser} vorhanden ist.
+     * Anschließend wird die Gruppenarbeit dem Veranstaltungstermin zugeordnet und in der Datenbank gespeichert über
+     * den {@code gruppenarbeitService}.
+     * <p>
+     * Wenn Gruppen vorhanden sind, werden diese ebenfalls gespeichert und dem Benutzer zugewiesen.
+     * Die ausgewählten Teilnehmer werden der Gruppenarbeit zugewiesen und ebenfalls gespeichert, sofern Gruppen
+     * mitgespeichert werden.
+     * Jeder Gruppe wird die entsprechende Gruppenarbeit zugewiesen.
+     *
+     * @param gruppenarbeitService Der Service für die Verwaltung von Gruppenarbeiten.
+     * @param veranstaltungsterminService Der Service für die Verwaltung von Veranstaltungsterminen.
+     * @param gruppeService Der Service für die Verwaltung von Gruppen.
+     * @param veranstaltungstermin Der spezifische Veranstaltungstermin, zu dem die Gruppenarbeit gehört.
+     * @param maybeUser Der optionale authentifizierte Benutzer, der die Aktion ausführt.
+     * <p>
+     * {@code @transactional} Diese Methode ist transaktional, um die atomare Ausführung aller Datenbankoperationen
+     * sicherzustellen.
+     *
+     * @author Lilli
+     */
     @Transactional
     protected void saveGruppenarbeitWithGruppen(GruppenarbeitService gruppenarbeitService, VeranstaltungsterminService veranstaltungsterminService, GruppeService gruppeService, Veranstaltungstermin veranstaltungstermin, Optional<User> maybeUser) {
         if (maybeUser.isPresent()) {
@@ -196,7 +311,16 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         veranstaltungsterminService.saveVeranstaltungstermin(veranstaltungstermin);
     }
 
-    //Teilt ausgewählte Teilnehmer zufällig auf Gruppen zu und zeigt diese Zufallseinteilung dann mithilfe von Grids an
+    /**
+     * Teilt ausgewählte Teilnehmer zufällig auf Gruppen zu und zeigt diese Zufallseinteilung dann mithilfe von Grids
+     * an.
+     * <p>
+     * Überprüft zunächst, ob eine gültige Anzahl von Gruppen ausgewählt wurde und ob Teilnehmer ausgewählt sind.
+     * Wenn ja, werden die ausgewählten Teilnehmer zufällig in die Gruppen eingeteilt.
+     * Anschließend werden für jede Gruppe Grids erstellt und angezeigt, die die zugewiesenen Teilnehmer anzeigen.
+     *
+     * @param gruppen Die Liste der Gruppen, in die die Teilnehmer zufällig aufgeteilt werden sollen.
+     */
     private void randomize(List<Gruppe> gruppen) {
         if(groupSize.getOptionalValue().isEmpty()){
             groupsTitle.setVisible(false);
@@ -221,7 +345,17 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         }
     }
 
-    //Erstellt die Grids für die Gruppen
+    /**
+     * Erstellt Grids für jede Gruppe und zeigt die zugewiesenen Teilnehmer in jedem Grid an.
+     * <p>
+     * Jedes Grid zeigt die Teilnehmer einer Gruppe mit ihren Matrikelnummern, Vornamen und Nachnamen an.
+     * Die Grids werden der UI hinzugefügt, um die Zufallseinteilung der Teilnehmer in Gruppen zu visualisieren.
+     *
+     * @param numberOfGroups Die Anzahl der Gruppen, für die Grids erstellt werden sollen.
+     * @param gruppen Eine Liste von Gruppen, deren Teilnehmer in den Grids angezeigt werden sollen.
+     *
+     * @author Lilli
+     */
     private void groupGrids(int numberOfGroups, List<Gruppe> gruppen) {
         for(int i = 0; i< numberOfGroups; i++){
             Grid<Teilnehmer> grid = new Grid<>(Teilnehmer.class, false);
@@ -240,13 +374,29 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         }
     }
 
-    //Konfiguriert den Bereich, in dem die Gruppen-Grids angezeigt werden
+    /**
+     * Konfiguriert den Bereich für Gruppen.
+     * <p>
+     * Diese Methode setzt die Breite der `groupsArea` auf 100% und weist ihm die CSS-Klasse
+     * "gruppen-container-gruppenarbeiten" zu.
+     *
+     * @author Lilli
+     */
     private void configureGroupsArea() {
         groupsArea.setWidth("100%");
         groupsArea.setClassName("gruppen-container-gruppenarbeiten");
     }
 
-    //Teilt Teilnehmer zufällig auf Gruppen zu
+    /**
+     * Mischung der Teilnehmer zufällig in die Gruppen basierend auf den angegebenen Gruppengrößen.
+     *
+     * @param sizes          Ein Array von Größen der Gruppen, das angibt, wie viele Teilnehmer in jeder Gruppe sein
+     *                       sollen.
+     * @param numberOfGroups Die Anzahl der Gruppen, die erstellt wurden.
+     * @param gruppen        Eine Liste von Gruppen, in die die Teilnehmer zufällig aufgeteilt werden.
+     *
+     * @author Lilli
+     */
     private void randomizeParticipants(int[] sizes, int numberOfGroups, List<Gruppe> gruppen) {
         selectedParticipants = participants.getSelectedItems();
         List<Teilnehmer> selectedParticipantsList = new ArrayList<>(selectedParticipants.stream().toList());
@@ -265,46 +415,101 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         }
     }
 
-    //Erstellt benötigte Anzahl an Gruppen
+    /**
+     * Fügt der Liste {@code gruppen} die angegebene Anzahl von Gruppen hinzu.
+     *
+     * @param numberOfGroups Die Anzahl der zu erstellenden Gruppen.
+     * @param gruppen        Die Liste, zu der die neuen Gruppen hinzugefügt werden sollen.
+     *
+     * @author Lilli
+     */
     private void makeGroups(int numberOfGroups, List<Gruppe> gruppen) {
         for(int i = 0; i< numberOfGroups; i++){
             gruppen.add(new Gruppe((long) i+1));
         }
     }
 
-    //Holt benötigte Anzahl an Gruppen aus der ausgewählten Option des Drop-Down-Feldes
+    /**
+     * Gibt die Anzahl der Gruppen zurück, die aus der ausgewählten Gruppengröße extrahiert wird.
+     *
+     * @return Die Anzahl der Gruppen als Ganzzahl.
+     *
+     * @author Lilli
+     */
     private int getNumberOfGroups() {
         String num = groupSize.getValue();
         String[] splitString = num.split(" ");
         return Integer.parseInt(splitString[0]);
     }
 
-    //Leert die Gruppenliste
+    /**
+     * Leert die Liste von Gruppen.
+     * <p>
+     * Diese Methode löscht alle Elemente aus der übergebenen Liste von Gruppen.
+     *
+     * @param gruppen Die Liste von Gruppen, die geleert werden soll.
+     *
+     * @author Lilli
+     */
     private static void clearGroupsList(List<Gruppe> gruppen) {
         if(!gruppen.isEmpty()) {
             gruppen.clear();
         }
     }
 
-    //Leert die Anzeige der Gruppen
+    /**
+     * Leert den Bereich, in dem die Gruppen-Grids angezeigt werden.
+     * <p>
+     * Diese Methode entfernt alle bereits vorhandenen Grids und deren Inhalte
+     * aus dem Bereich, in dem die Gruppen-Grids angezeigt werden.
+     *
+     * @author Lilli
+     */
     private void clearGroupsArea() {
         if(!(groupsArea.getComponentCount()==0)){
             groupsArea.removeAll();
         }
     }
 
+    /**
+     * Konfiguriert die Select-Box für die Auswahl der Gruppengröße.
+     * <p>
+     * Diese Methode setzt die Optionen und das Label für die Select-Box,
+     * basierend auf der Anzahl der ausgewählten Teilnehmer in der MultiSelectListBox.
+     * Wenn keine Teilnehmer ausgewählt sind, wird eine entsprechende Meldung angezeigt.
+     *
+     * @author Lilli
+     */
     private void groupSizeSelect() {
         List<String> groups = getGroups();
         groupSize.setLabel("Gruppen wählen");
         groupSize.setItems(groups);
     }
 
+    /**
+     * Leert die Eingabefelder für Titel und Beschreibung.
+     * <p>
+     * Diese Methode setzt den Textinhalt der Textfelder für Titel und Beschreibung auf leer.
+     * Dadurch werden alle zuvor eingegebenen oder angezeigten Daten in diesen Feldern entfernt.
+     *
+     * @author Lilli
+     */
     private void clearFields() {
         titleField.clear();
         descriptionArea.clear();
     }
 
-    //Für die Select-Box der Gruppengrößen
+    /**
+     * Gibt eine Liste von Strings zurück, die die verfügbaren Gruppenoptionen darstellen.
+     * <p>
+     * Diese Methode erstellt eine Liste von Strings, die die verfügbaren Gruppenoptionen basierend
+     * auf der Anzahl der ausgewählten Teilnehmer in der MultiSelectListBox darstellen. Wenn keine
+     * Teilnehmer ausgewählt sind, wird eine entsprechende Meldung angezeigt.
+     *
+     * @return Eine Liste von Strings, die die verfügbaren Gruppenoptionen darstellen.
+     *
+     * @author Lilli
+     */
     private List<String> getGroups() {
         List<String> groups = new ArrayList<>();
         if(participants.getSelectedItems().isEmpty()){
@@ -315,7 +520,15 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         return groups;
     }
 
-    //Für die Felder der Teilnehmer in der ListBox
+    /**
+     * Befüllt die MultiSelectListBox mit Teilnehmern und konfiguriert die Auswahllogik.
+     * <p>
+     * Diese Methode lädt alle Teilnehmer einer Veranstaltung in die MultiSelectListBox und
+     * konfiguriert die Auswahllogik für die Teilnehmer. Zusätzlich wird die Anzeige der
+     * verfügbaren Gruppengrößen aktualisiert, basierend auf den ausgewählten Teilnehmern.
+     *
+     * @author Lilli
+     */
     private void listBoxParticipants() {
         allParticipants.addAll(teilnehmerService.findTeilnehmerByVeranstaltungId(Long.parseLong(veranstaltungId)));
 
@@ -331,6 +544,18 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         participants.setRenderer(new ComponentRenderer<>(GruppenarbeitHinzufuegenDialog::getRenderLayoutParticipants));
     }
 
+
+    /**
+     * Erstellt ein HorizontalLayout zur Darstellung eines Teilnehmers mit Avatar und Informationen.
+     * <p>
+     * Diese Methode erstellt ein HorizontalLayout, das einen Avatar des Teilnehmers sowie den
+     * Vor- und Nachnamen des Teilnehmers darstellt.
+     *
+     * @param participant Der Teilnehmer, für den das Layout erstellt werden soll.
+     * @return Ein HorizontalLayout zur Darstellung des Teilnehmers.
+     *
+     * @author Lilli
+     */
     private static HorizontalLayout getRenderLayoutParticipants(Teilnehmer participant) {
         HorizontalLayout row = new HorizontalLayout();
         row.setAlignItems(FlexComponent.Alignment.CENTER);
@@ -356,14 +581,28 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
     }
 
 
-    //Berechnet die maximale Anzahl an Gruppen bei gegebener Teilnehmergröße
+    /**
+     * Berechnet die maximale Anzahl von Gruppen basierend auf der Anzahl der Teilnehmer.
+     *
+     * @param participants Die Anzahl der Teilnehmer, für die die maximale Anzahl von Gruppen berechnet werden soll.
+     * @return Die maximale Anzahl von Gruppen, die gebildet werden können.
+     *
+     * @author Lilli
+     */
     private int groupMax(int participants){
         return participants/2;
     }
 
-    //Berechnet alle möglichen Gruppenanzahlen
-    //Das sind dann eine mit allen Teilnehmern, 2 bis zur maximalen Anzahl und dann noch eine Gruppengröße, um alle
-    //Teilnehmer in eine eigene Gruppe zu packen
+    /**
+     * Diese Methode berechnet die Anzahlen der Gruppen basierend auf der Anzahl der Teilnehmer.
+     * Das sind dann eine mit allen Teilnehmern, 2 bis zur maximalen Anzahl und dann noch eine Gruppengröße, um alle
+     * Teilnehmer in eine eigene Gruppe zu packen.
+     *
+     * @param participants Die Anzahl der Teilnehmer, für die die Gruppen berechnet werden sollen.
+     * @return Ein Array von ganzen Zahlen, das die Anzahl der Gruppen und die Anzahl der Teilnehmer enthält.
+     *
+     * @author Lilli
+     */
     private int[] groupNumbers(int participants){
         int groupMax = groupMax(participants);
         int[] groupNumbers = new int[groupMax+1];
@@ -376,7 +615,15 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         return groupNumbers;
     }
 
-    //Berechnet die Gruppengröße(n) bei gegebener Gruppen- und Gesamtteilnehmeranzahl
+    /**
+     * Diese Methode berechnet die Größen der Gruppen basierend auf der Anzahl der Gruppen und der Teilnehmerzahl.
+     *
+     * @param groups      Die Anzahl der Gruppen, in die die Teilnehmer aufgeteilt werden sollen.
+     * @param participants Die Gesamtanzahl der Teilnehmer, die auf die Gruppen aufgeteilt werden sollen.
+     * @return Ein Array von ganzen Zahlen, das die Größen der Gruppen enthält.
+     *
+     * @author Lilli
+     */
     private int[] groupSizes(int groups, int participants){
         if(participants%groups == 0){
             return new int[]{participants/groups};
@@ -386,7 +633,15 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         }
     }
 
-    //Gibt alle möglichen Gruppengrößen und zugehörige Teilnehmeranzahlen als Strings in einer Liste zurück
+    /**
+     * Erstellt eine Liste von Strings, die die Gruppenanzahlen und deren Größen basierend auf der Anzahl der
+     * Teilnehmer enthält.
+     *
+     * @param participants Die Anzahl der Teilnehmer.
+     * @return Eine Liste von Strings, die die Gruppennummern und deren Größen darstellen.
+     *
+     * @author Lilli
+     */
     private List<String> groupNumbersAndSizes(int participants){
         List<String> groupStrings = new ArrayList<>();
         for(int i:groupNumbers(participants))
@@ -411,7 +666,18 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         return groupStrings;
     }
 
-    //Layout des Fensters
+    /**
+     * Erstellt das Layout für das Dialogfenster zur Hinzufügung einer Gruppenarbeit.
+     * <p>
+     * Diese Methode erstellt ein VerticalLayout, das alle UI-Elemente für das Dialogfenster
+     * zur Hinzufügung einer Gruppenarbeit enthält. Dazu gehören Eingabefelder für den Titel
+     * und die Beschreibung der Gruppenarbeit, eine MultiSelectListBox für die Teilnehmerauswahl,
+     * Buttons für verschiedene Aktionen sowie ein Bereich zur Anzeige der Gruppeneinteilungen.
+     *
+     * @return Das VerticalLayout mit allen UI-Elementen für das Gruppenarbeit-Dialogfenster.
+     *
+     * @author Lilli
+     */
     private VerticalLayout createLayout(){
         VerticalLayout mainPageLayout = new VerticalLayout();
         HorizontalLayout gruppenarbeitData = new HorizontalLayout();
@@ -467,7 +733,16 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
         return mainPageLayout;
     }
 
-    //Felder binden
+    /**
+     * Bindet die UI-Felder an die Eigenschaften der Gruppenarbeit.
+     * <p>
+     * Diese Methode konfiguriert den Binder, um die Eingabefelder für Titel und Beschreibung
+     * der Gruppenarbeit an die entsprechenden Eigenschaften der Gruppenarbeit zu binden. Dabei
+     * werden auch Validatoren für die Eingabefelder gesetzt, um sicherzustellen, dass die
+     * eingegebenen Daten den Anforderungen entsprechen.
+     *
+     * @author Lilli
+     */
     private void bindFields(){
         binderGruppenarbeit.forField(titleField)
                 .asRequired("Titel muss gefüllt sein")
