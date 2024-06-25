@@ -11,7 +11,7 @@ import java.util.Optional;
  * Service-Klasse für die Verwaltung von GruppenarbeitTeilnehmer-Entitäten.
  * Diese Klasse bietet Methoden zum Speichern, Abrufen und Verwalten von GruppenarbeitTeilnehmer-Daten.
  *
- * @autor Leon
+ * @author Leon
  */
 @Service
 public class GruppenarbeitTeilnehmerService {
