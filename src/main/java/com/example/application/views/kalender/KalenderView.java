@@ -15,8 +15,6 @@ import org.vaadin.stefan.fullcalendar.CalendarViewImpl;
 import org.vaadin.stefan.fullcalendar.Entry;
 import org.vaadin.stefan.fullcalendar.FullCalendar;
 import org.vaadin.stefan.fullcalendar.FullCalendarBuilder;
-
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -41,13 +39,12 @@ public class KalenderView extends VerticalLayout {
     AuthenticatedUser authenticatedUser;
     Optional<User> maybeUser;
     User user;
-    Long veranstaltungsID;
-    Veranstaltung veranstaltung;
     // Ranges
     LocalDate currentDate = getCurrentDate();
     // Buttons
     Button zuvor = new Button("Zuvor");
     Button naechste = new Button("Nächste");
+    // Auswahl der Ansichten
     ComboBox<KalenderAuswahl> kalenderAuswahlComboBox = new ComboBox<>();
 
     /**
@@ -63,7 +60,7 @@ public class KalenderView extends VerticalLayout {
      * @param superService der Service für übergeordnete Funktionen
      * @param veranstaltungsterminService der Service für die Veranstaltungstermine
      *
-     * @autor Leon
+     * @author Leon
      */
     public KalenderView(
             VeranstaltungenService veranstaltungenService,
@@ -96,7 +93,7 @@ public class KalenderView extends VerticalLayout {
      * Aktualisiert den Kalender mit den Veranstaltungsterminen.
      * Erstellt für jeden Termin einen Kalendereintrag und fügt ihn zum Kalender hinzu.
      *
-     * @autor Leon
+     * @author Leon
      */
     private void updateCalendar() {
         List<Veranstaltungstermin> veranstaltungstermine = veranstaltungsterminService.findAllVeranstaltungstermine(user);
@@ -121,7 +118,7 @@ public class KalenderView extends VerticalLayout {
      *
      * @return das aktuelle Datum
      *
-     * @autor Leon
+     * @author Leon
      */
     private LocalDate getCurrentDate() {
         return LocalDate.now();
@@ -131,14 +128,12 @@ public class KalenderView extends VerticalLayout {
      * Konfiguriert die Auswahlmöglichkeiten im Kalender.
      * Setzt die verfügbaren Optionen und definiert das Verhalten bei Auswahländerungen.
      *
-     * @autor Leon
+     * @author Leon
      */
     private void configureKalenderAuswahl() {
         kalenderAuswahlComboBox.setItems(KalenderAuswahl.getAllWerte());
         kalenderAuswahlComboBox.setItemLabelGenerator(KalenderAuswahl::toString);
-        kalenderAuswahlComboBox.addValueChangeListener(event -> {
-            validateKalenderAuswahl();
-        });
+        kalenderAuswahlComboBox.addValueChangeListener(event -> validateKalenderAuswahl());
     }
 
     /**
@@ -148,7 +143,7 @@ public class KalenderView extends VerticalLayout {
      * @param localTime die lokale Zeit
      * @return die kombinierte LocalDateTime
      *
-     * @autor Leon
+     * @author Leon
      */
     private LocalDateTime dateTimeConverter(LocalDate localDate, LocalTime localTime) {
         return localDate.atTime(localTime);
@@ -160,7 +155,7 @@ public class KalenderView extends VerticalLayout {
      * @param localDate das lokale Datum
      * @return die kombinierte LocalDateTime
      *
-     * @autor Leon
+     * @author Leon
      */
     private LocalDateTime dateTimeConverter(LocalDate localDate) {
         return localDate.atStartOfDay();
@@ -171,7 +166,7 @@ public class KalenderView extends VerticalLayout {
      *
      * @return eine zufällige Farbe als String
      *
-     * @autor Leon
+     * @author Leon
      */
     private String randomColor() {
         Random rand = new Random();
@@ -185,14 +180,14 @@ public class KalenderView extends VerticalLayout {
      *
      * @return der konfigurierte FullCalendar
      *
-     * @autor Leon
+     * @author Leon
      */
     private FullCalendar getCalendar() {
         FullCalendar calendar = FullCalendarBuilder.create().build();
-
+        calendar.setLocale(Locale.GERMAN);
         calendar.addEntryClickedListener((event) -> {
             Entry entry = event.getEntry();
-            Long veranstaltungId = Long.parseLong(entry.getConstraint());
+            long veranstaltungId = Long.parseLong(entry.getConstraint());
             getUI().ifPresent(ui -> ui.navigate("veranstaltung-detail/" + veranstaltungId));
         });
 
@@ -206,12 +201,13 @@ public class KalenderView extends VerticalLayout {
      *
      * @param increment gibt an, ob das Datum inkrementiert oder dekrementiert werden soll
      *
-     * @autor Leon
+     * @author Leon
      */
     private void changeDateByConfiguration(boolean increment) {
         if (increment) {
             if (kalenderAuswahlComboBox.getValue() == null) {
                 fullCalendar.setValidRange(currentDate = currentDate.plusMonths(1), currentDate.plusMonths(2));
+
             } else if (kalenderAuswahlComboBox.getValue().istMonat()) {
                 fullCalendar.setValidRange(currentDate = currentDate.plusMonths(1), currentDate.plusMonths(2));
             } else if (kalenderAuswahlComboBox.getValue().istTag()) {
@@ -221,31 +217,29 @@ public class KalenderView extends VerticalLayout {
             }
         } else {
             if (kalenderAuswahlComboBox.getValue() == null) {
-                fullCalendar.setValidRange(currentDate = currentDate.minusMonths(1), currentDate.minusMonths(0));
+                fullCalendar.setValidRange(currentDate = currentDate.minusMonths(2), currentDate.plusMonths(1));
             } else if (kalenderAuswahlComboBox.getValue().istMonat()) {
-                fullCalendar.setValidRange(currentDate = currentDate.minusMonths(1), currentDate.minusMonths(0));
+                fullCalendar.setValidRange(currentDate = currentDate.minusMonths(2), currentDate.plusMonths(1));
             } else if (kalenderAuswahlComboBox.getValue().istTag()) {
-                fullCalendar.setValidRange(currentDate = currentDate.minusDays(1), currentDate.minusDays(0));
+                fullCalendar.setValidRange(currentDate = currentDate.minusDays(2), currentDate.plusMonths(1));
             } else if (kalenderAuswahlComboBox.getValue().istWoche()) {
-                fullCalendar.setValidRange(currentDate.minusWeeks(1), currentDate.minusWeeks(0));
+                fullCalendar.setValidRange(currentDate.minusWeeks(2), currentDate.plusMonths(1));
             }
         }
     }
+
+    //
 
     /**
      * Konfiguriert die Schaltflächen für die Navigation im Kalender.
      * Definiert das Verhalten bei Klicks auf die "Zuvor" und "Nächste" Schaltflächen.
      *
-     * @autor Leon
+     * @author Leon
      */
     private void configureButtons() {
-        naechste.addClickListener(event -> {
-            changeDateByConfiguration(true);
-        });
+        naechste.addClickListener(event -> changeDateByConfiguration(true));
 
-        zuvor.addClickListener(event -> {
-            changeDateByConfiguration(false);
-        });
+        zuvor.addClickListener(event -> changeDateByConfiguration(false));
     }
 
     /**
@@ -255,14 +249,10 @@ public class KalenderView extends VerticalLayout {
      * @param maybeUser der optionale authentifizierte Benutzer
      * @return der validierte Benutzer
      *
-     * @autor Leon
+     * @author Leon
      */
     private User validateUser(Optional<User> maybeUser) {
-        if (maybeUser.isPresent()) {
-            return maybeUser.get();
-        } else {
-            return new User();
-        }
+        return maybeUser.orElseGet(User::new);
     }
 
     /**
@@ -271,14 +261,13 @@ public class KalenderView extends VerticalLayout {
      *
      * @return das erstellte HorizontalLayout für die Toolbar
      *
-     * @autor Leon
+     * @author Leon
      */
     private HorizontalLayout getToolbar() {
-        String timeStamp = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(new Date());
         H1 username = new H1("Kalender für " + user.getName());
         username.getStyle().set("font-size", "28px");
 
-        if (!maybeUser.isPresent()) {
+        if (maybeUser.isPresent()) {
             getUI().ifPresent(ui -> ui.navigate("login"));
         }
 
@@ -294,7 +283,7 @@ public class KalenderView extends VerticalLayout {
      * Validiert die Auswahl im Kalender und ändert die Ansicht entsprechend.
      * Passt die Kalenderansicht basierend auf der Auswahl an (Tag, Woche, Monat).
      *
-     * @autor Leon
+     * @author Leon
      */
     public void validateKalenderAuswahl() {
         if (kalenderAuswahlComboBox.getValue() == null || kalenderAuswahlComboBox.getValue().istMonat()) {
