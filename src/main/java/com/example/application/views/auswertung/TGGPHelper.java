@@ -26,6 +26,7 @@ public class TGGPHelper {
     private int tablePos = 0;
     boolean used;
 
+
     /**
      * Gibt die Tabellenposition zurück.
      *
