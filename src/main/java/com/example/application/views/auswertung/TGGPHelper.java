@@ -4,7 +4,9 @@ import com.example.application.models.Gruppe;
 import com.example.application.models.Gruppenarbeit;
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.Veranstaltungstermin;
+import com.vaadin.flow.component.html.Paragraph;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,7 +78,11 @@ public class TGGPHelper {
      * @autor Leon
      */
     public String getTerminAndGruppenarbeit() {
-        return gruppenarbeit.getTitel().toString() + "\n" + veranstaltungtermin.getDatum().toString();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        Paragraph paragraph = new Paragraph();
+        paragraph.setText(gruppenarbeit.getTitel() + "\n" +   veranstaltungtermin.getDatum().format(dateFormatter));
+        paragraph.getStyle().set("white-space", "pre-line");
+        return paragraph.getText();
     }
 
     /**
