@@ -1,6 +1,7 @@
 package com.example.application.views.studierende;
 
 import com.example.application.models.*;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -18,6 +19,9 @@ import java.util.stream.IntStream;
 @RolesAllowed({"ADMIN", "USER"})
 public class TeilnehmerLoeschenDialog extends Dialog {
     private final TeilnehmerService teilnehmerService;
+    private AuthenticatedUser authenticatedUser;
+    private TeilnehmerAufraeumenDialog teilnehmerAufraeumenDialog;
+    private StudierendeView studierendeView;
     private Teilnehmer teilnehmer;
 
     H2 infoText = new H2("Empty");
@@ -32,11 +36,15 @@ public class TeilnehmerLoeschenDialog extends Dialog {
      * Fügt das erstellte Layout zum Dialog hinzu.
      *
      * @param teilnehmerService Der Service, der für die Verwaltung von Teilnehmern verwendet wird.
+     * @param authenticatedUser Der authentifizierte Benutzer.
      * @param aufraeumen Der Dialog, der zum Aufräumen von Teilnehmern verwendet wird.
      * @param studierendeView Die Ansicht, die die Studierenden anzeigt.
      */
-    public TeilnehmerLoeschenDialog(TeilnehmerService teilnehmerService, TeilnehmerAufraeumenDialog aufraeumen, StudierendeView studierendeView) {
+    public TeilnehmerLoeschenDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, TeilnehmerAufraeumenDialog aufraeumen, StudierendeView studierendeView) {
         this.teilnehmerService = teilnehmerService;
+        this.authenticatedUser = authenticatedUser;
+        this.teilnehmerAufraeumenDialog = teilnehmerAufraeumenDialog;
+        this.studierendeView = studierendeView;
 
         warningText.addClassName("warning-text-delete");
         warningText.getStyle().set("white-space", "pre-line");

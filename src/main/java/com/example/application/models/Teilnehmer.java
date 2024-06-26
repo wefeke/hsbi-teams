@@ -109,7 +109,10 @@ public class Teilnehmer {
     public String getFullName() {
         return this.vorname + " " + this.nachname;
     }
-    
+
+    public void removeVeranstaltung(Veranstaltung veranstaltung) {
+        this.veranstaltungen.remove(veranstaltung);
+    }
 
     public void addGruppenarbeit(Gruppenarbeit gruppenarbeit){
         this.gruppenarbeiten.add(gruppenarbeit);

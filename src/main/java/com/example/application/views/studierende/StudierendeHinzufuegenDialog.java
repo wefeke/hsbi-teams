@@ -22,7 +22,7 @@ import java.util.Optional;
 public class StudierendeHinzufuegenDialog extends Dialog {
 
     private final TeilnehmerService teilnehmerService;
-    private final AuthenticatedUser authenticatedUser;
+    private AuthenticatedUser authenticatedUser;
 
 
     TextField firstName = new TextField("Vorname");
@@ -30,9 +30,9 @@ public class StudierendeHinzufuegenDialog extends Dialog {
     NumberField matrikelNr = new NumberField("Matrikelnummer");
     Button save = new Button("Speichern");
     Button cancel = new Button("Abbrechen");
-     private Teilnehmer teilnehmer;
+    private Teilnehmer teilnehmer;
     Binder<Teilnehmer> binder = new Binder<>(Teilnehmer.class);
-    private final StudierendeView studierendeView;
+    private StudierendeView studierendeView;
 
     /**
      * Konstruktor für die StudierendeHinzufuegenDialog Klasse.
@@ -56,7 +56,7 @@ public class StudierendeHinzufuegenDialog extends Dialog {
         getFooter().add(cancel, save); // Button hinzufügen
 
 
-        configureButton();
+        configureButtons();
         bindFields();
     }
 
@@ -82,7 +82,7 @@ public class StudierendeHinzufuegenDialog extends Dialog {
      * Ansonsten wird der Teilnehmer gespeichert.
      * Wenn der "Abbrechen"-Button geklickt wird, wird der Dialog geschlossen.
      */
-    private void configureButton() {
+    private void configureButtons() {
         save.addClickListener(event -> {
             if (isValidInput()) {
                 if (isDuplicateMatrikelNr()) {
@@ -94,7 +94,9 @@ public class StudierendeHinzufuegenDialog extends Dialog {
                 Notification.show("Bitte füllen Sie alle Felder aus", 3000, Notification.Position.MIDDLE);
             }
         });
-        cancel.addClickListener(event -> close());
+        cancel.addClickListener(event -> {
+            close();
+        });
     }
 
     /**
@@ -161,18 +163,16 @@ public class StudierendeHinzufuegenDialog extends Dialog {
     private void bindFields() {
         binder.forField(firstName)
                 .asRequired("Vorname muss gefüllt sein")
-                .withValidator(vorname -> vorname.length() <= 255, "Der Vorname darf maximal 255 Zeichen lang sein")
                 .bind(Teilnehmer::getVorname, Teilnehmer::setVorname);
 
         binder.forField(lastName)
                 .asRequired("Nachname muss gefüllt sein")
-                .withValidator(nachname -> nachname.length() <= 255, "Der Nachname darf maximal 255 Zeichen lang sein")
                 .bind(Teilnehmer::getNachname, Teilnehmer::setNachname);
 
         binder.forField(matrikelNr)
                 .asRequired("Matrikelnummer muss gefüllt sein")
-                .withValidator(matrikelNr -> String.valueOf(matrikelNr.longValue()).matches("\\d{7}"), "Matrikelnummer muss genau 7 Ziffern enthalten")
-                .withConverter(Double::longValue, Long::doubleValue)
+                .withValidator(matrikelNr -> String.valueOf(matrikelNr.longValue()).matches("\\d{7}"), "Matrikelnummer muss genau 7 Zahlen enthalten")
+                .withConverter(d -> Double.valueOf(d).longValue(), Long::doubleValue)
                 .bind(Teilnehmer::getId, Teilnehmer::setId);
     }
 
@@ -183,9 +183,5 @@ public class StudierendeHinzufuegenDialog extends Dialog {
         firstName.clear();
         lastName.clear();
         matrikelNr.clear();
-    }
-
-    public void setTeilnehmer(Teilnehmer teilnehmer) {
-        this.teilnehmer = teilnehmer;
     }
 }
