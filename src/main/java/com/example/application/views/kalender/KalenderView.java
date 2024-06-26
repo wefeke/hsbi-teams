@@ -15,6 +15,8 @@ import org.vaadin.stefan.fullcalendar.CalendarViewImpl;
 import org.vaadin.stefan.fullcalendar.Entry;
 import org.vaadin.stefan.fullcalendar.FullCalendar;
 import org.vaadin.stefan.fullcalendar.FullCalendarBuilder;
+
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -206,24 +208,50 @@ public class KalenderView extends VerticalLayout {
     private void changeDateByConfiguration(boolean increment) {
         if (increment) {
             if (kalenderAuswahlComboBox.getValue() == null) {
-                fullCalendar.setValidRange(currentDate = currentDate.plusMonths(1), currentDate.plusMonths(2));
+                fullCalendar.setValidRange(
+                        currentDate = getStartOfMonth(currentDate.plusMonths(1)),
+                        currentDate.plusMonths(1)
+                );
 
             } else if (kalenderAuswahlComboBox.getValue().istMonat()) {
-                fullCalendar.setValidRange(currentDate = currentDate.plusMonths(1), currentDate.plusMonths(2));
+                fullCalendar.setValidRange(
+                        currentDate = getStartOfMonth(currentDate.plusMonths(1)),
+                        currentDate.plusMonths(1)
+                );
             } else if (kalenderAuswahlComboBox.getValue().istTag()) {
-                fullCalendar.setValidRange(currentDate = currentDate.plusDays(1), currentDate.plusDays(2));
+                fullCalendar.setValidRange(
+                        currentDate = currentDate.plusDays(1),
+                        currentDate.plusDays(2)
+                );
             } else if (kalenderAuswahlComboBox.getValue().istWoche()) {
-                fullCalendar.setValidRange(currentDate = currentDate.plusWeeks(1), currentDate.plusWeeks(2));
+                fullCalendar.setValidRange(
+                        currentDate = getStartOfWeek(currentDate.plusWeeks(1)),
+                        currentDate.plusWeeks(1)
+                );
             }
         } else {
             if (kalenderAuswahlComboBox.getValue() == null) {
-                fullCalendar.setValidRange(currentDate = currentDate.minusMonths(2), currentDate.plusMonths(1));
+                fullCalendar.setValidRange(
+                        currentDate = getStartOfMonth(currentDate.minusMonths(1)),
+                        currentDate.plusMonths(1)
+                );
+                currentDate = getStartOfWeek(currentDate.minusMonths(1));
             } else if (kalenderAuswahlComboBox.getValue().istMonat()) {
-                fullCalendar.setValidRange(currentDate = currentDate.minusMonths(2), currentDate.plusMonths(1));
+                fullCalendar.setValidRange(
+                        currentDate = getStartOfMonth(currentDate.minusMonths(1)),
+                        currentDate.plusMonths(1)
+                );
             } else if (kalenderAuswahlComboBox.getValue().istTag()) {
-                fullCalendar.setValidRange(currentDate = currentDate.minusDays(2), currentDate.plusMonths(1));
+                fullCalendar.setValidRange(
+                        currentDate = currentDate.minusDays(1), // Ein Tag wird abgezogen
+                        currentDate.plusDays(1) // Eine Tag wird zum vorherigen Datum hinzugefügt
+                );
+
             } else if (kalenderAuswahlComboBox.getValue().istWoche()) {
-                fullCalendar.setValidRange(currentDate.minusWeeks(2), currentDate.plusMonths(1));
+                fullCalendar.setValidRange(
+                        currentDate = getStartOfWeek(currentDate.minusWeeks(1)), // Eine Woche wird abgezogen und sichergestellt, dass es der Montag ist
+                        getStartOfWeek(currentDate.plusDays(6)) // Eine Woche wird zur vorherigen Operation hinzugefügt
+                );
             }
         }
     }
@@ -286,13 +314,51 @@ public class KalenderView extends VerticalLayout {
      * @author Leon
      */
     public void validateKalenderAuswahl() {
-        if (kalenderAuswahlComboBox.getValue() == null || kalenderAuswahlComboBox.getValue().istMonat()) {
+        if (kalenderAuswahlComboBox.getValue() == null || kalenderAuswahlComboBox.getValue().istMonat()) { // Die neuen Grenzen bilden nur einen Rahmen, daher kann hier auch
+            // mit zwei Monaten gerechnet werden
+            fullCalendar.setValidRange(getStartOfMonth(currentDate).minusWeeks(1), getStartOfMonth(currentDate).plusMonths(2));
             fullCalendar.changeView(CalendarViewImpl.DAY_GRID_MONTH);
         } else if (kalenderAuswahlComboBox.getValue().istTag()) {
+            naechste.click();
+            zuvor.click();
             fullCalendar.changeView(CalendarViewImpl.TIME_GRID_DAY);
-        } else if (kalenderAuswahlComboBox.getValue().istWoche()) {
+        } else if (kalenderAuswahlComboBox.getValue().istWoche()) { // Beim Ändern auf die Wochenansicht passiert es, dass
+            // bei Tag-Ansicht die Valid Range zu klein für eine ganze Woche ist, also kann sie auch einfach auf zwei Wochen gesetzt werden
+            fullCalendar.setValidRange(getStartOfWeek(currentDate).minusWeeks(1), getStartOfWeek(currentDate).plusWeeks(1));
             fullCalendar.changeView(CalendarViewImpl.TIME_GRID_WEEK);
         }
         fullCalendar.setSizeFull();
     }
+
+    private LocalDate getStartOfWeek(LocalDate localDate) {
+        switch(localDate.getDayOfWeek()) {
+            case DayOfWeek.MONDAY:
+                return localDate;
+            case DayOfWeek.TUESDAY:
+                getStartOfWeek(localDate.minusDays(1));
+            case DayOfWeek.WEDNESDAY:
+                getStartOfWeek(localDate.minusDays(2));
+            case DayOfWeek.THURSDAY:
+                getStartOfWeek(localDate.minusDays(3));
+            case DayOfWeek.FRIDAY:
+                getStartOfWeek(localDate.minusDays(4));
+            case DayOfWeek.SATURDAY:
+                getStartOfWeek(localDate.minusDays(5));
+            case DayOfWeek.SUNDAY:
+                getStartOfWeek(localDate.minusDays(6));
+            default:
+                return localDate;
+        }
+    }
+
+
+    private LocalDate getStartOfMonth(LocalDate localDate) {
+
+        if (localDate.getDayOfMonth() == 1) {
+            return localDate;
+        } else {
+            return getStartOfMonth(localDate.minusDays(1));
+        }
+    }
+
 }

@@ -6,20 +6,18 @@ import com.example.application.views.auswertung.Auswertung;
 import com.example.application.views.auswertung.TGGPHelper;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.*;
 
 /**
  * Der SuperService stellt verschiedene Funktionen bereit, die mehrere andere Services kombinieren.
  * Diese Klasse bietet Methoden zur Verwaltung und Auswertung von Veranstaltungen, Teilnehmern und Gruppenarbeiten.
  *
- * @autor Leon
+ * @author Leon
  */
 @Service
 public class SuperService {
 
-    private final GruppeService gruppeService;
+    GruppeService gruppeService;
     VeranstaltungenService veranstaltungenService;
     TeilnehmerService teilnehmerService;
     GruppenarbeitService gruppenarbeitService;
@@ -42,7 +40,7 @@ public class SuperService {
      * @param authenticatedUser der aktuell authentifizierte Benutzer
      * @param gruppeService der Service für die Gruppen
      *
-     * @autor Leon
+     * @author Leon
      */
     public SuperService(VeranstaltungenService veranstaltungenService,
                         TeilnehmerService teilnehmerService,
@@ -65,14 +63,10 @@ public class SuperService {
      * @param maybeUser der optionale authentifizierte Benutzer
      * @return der validierte Benutzer
      *
-     * @autor Leon
+     * @author Leon
      */
     private User validateUser(Optional<User> maybeUser) {
-        if (maybeUser.isPresent()) {
-            return maybeUser.get();
-        } else {
-            return new User();
-        }
+        return maybeUser.orElseGet(User::new);
     }
 
     /**
@@ -82,7 +76,7 @@ public class SuperService {
      * @param id die ID der Veranstaltung
      * @return eine Liste von Auswertungen
      *
-     * @autor Leon
+     * @author Leon
      */
     public List<Auswertung> findAllAuswertungenByVeranstaltung(Long id) {
         maybeUser = authenticatedUser.get();
@@ -132,25 +126,6 @@ public class SuperService {
                         auswertung.addGruppeNummer(gruppe.getNummer(),i);
                     }
                 }
-
-/*
-                if (gruppenarbeit != null) { // Check, ob nicht null
-                    List<Gruppe> gruppen = gruppenarbeit.getGruppen(); // Alle Gruppen der jeweiligen Gruppenarbeit werden zwischen gespeichert
-                    for (Gruppe gruppe : gruppen) {
-                        for (Teilnehmer teilnehmerInGruppe : gruppe.getTeilnehmer()) { // Für jeden Teilnehmer in der jeweiligen Gruppe wird geschaut, ob sie der gleiche Teilnehmer sind.
-                            if (teilnehmerInGruppe.getId().longValue() == teilnehmer.getId().longValue()) {
-                                tggpHelper.setGruppe(gruppe); // Erst dann wird die Gruppe dem TggpHelper hinzugefügt
-                                auswertung.addGruppeNummer(gruppe.getNummer()); // Nun wird auch die GruppenNummer hinzugefügt
-                                auswertung.incrementAnzahlGruppenarbeiten(); // Ebenso wird die Anzahl der Gruppenarbeiten hochgezählt für den Teilnehmer
-                            } else if (gruppenarbeit.equals(gruppe.getGruppenarbeit())){
-                                tggpHelper.setGruppe(gruppe);  // Erst dann wird die Gruppe dem TggpHelper hinzugefügt
-                                auswertung.addGruppeNummer(0L);
-                            }
-                        }
-                    }
-
-                }
-*/
                 Float punkt = gruppenarbeitTeilnehmerService.
                         findPunkteByMatrikelNrAndGruppenarbeitId(
                                 teilnehmer.getId(), gruppenarbeit.getId());
@@ -160,7 +135,6 @@ public class SuperService {
             auswertung.setTggpHelper(tggpHelperList);
             auswertungen.add(auswertung);
         }
-        System.out.println("hallo");
         return auswertungen;
     }
 }
