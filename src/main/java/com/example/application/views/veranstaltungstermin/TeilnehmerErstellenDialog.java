@@ -5,6 +5,7 @@ import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
+import com.example.application.views.studierende.StudierendeView;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -22,7 +23,7 @@ import java.util.Optional;
 public class TeilnehmerErstellenDialog extends Dialog {
 
     private final TeilnehmerService teilnehmerService;
-    private final AuthenticatedUser authenticatedUser;
+    private AuthenticatedUser authenticatedUser;
 
 
     TextField firstName = new TextField("Vorname");
@@ -70,7 +71,9 @@ public class TeilnehmerErstellenDialog extends Dialog {
                 Notification.show("Bitte füllen Sie alle Felder aus", 3000, Notification.Position.MIDDLE);
             }
         });
-        cancel.addClickListener(event -> close());
+        cancel.addClickListener(event -> {
+            close();
+        });
     }
 
     private boolean isValidInput() {
@@ -111,18 +114,16 @@ public class TeilnehmerErstellenDialog extends Dialog {
     private void bindFields() {
         binder.forField(firstName)
                 .asRequired("Vorname muss gefüllt sein")
-                .withValidator(vorname -> vorname.length() <= 255, "Der Vorname darf maximal 255 Zeichen lang sein")
                 .bind(Teilnehmer::getVorname, Teilnehmer::setVorname);
 
         binder.forField(lastName)
                 .asRequired("Nachname muss gefüllt sein")
-                .withValidator(nachname -> nachname.length() <= 255, "Der Nachname darf maximal 255 Zeichen lang sein")
                 .bind(Teilnehmer::getNachname, Teilnehmer::setNachname);
 
         binder.forField(matrikelNr)
                 .asRequired("Matrikelnummer muss gefüllt sein")
                 .withValidator(matrikelNr -> String.valueOf(matrikelNr.longValue()).matches("\\d{7}"), "Matrikelnummer muss genau 7 Zahlen enthalten")
-                .withConverter(Double::longValue, Long::doubleValue)
+                .withConverter(d -> Double.valueOf(d).longValue(), Long::doubleValue)
                 .bind(Teilnehmer::getId, Teilnehmer::setId);
     }
 
@@ -130,9 +131,5 @@ public class TeilnehmerErstellenDialog extends Dialog {
         firstName.clear();
         lastName.clear();
         matrikelNr.clear();
-    }
-
-    public void setTeilnehmer(Teilnehmer teilnehmer) {
-        this.teilnehmer = teilnehmer;
     }
 }

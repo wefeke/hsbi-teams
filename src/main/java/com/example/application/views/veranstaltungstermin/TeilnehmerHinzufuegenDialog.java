@@ -12,8 +12,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -30,7 +28,7 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
     private final TeilnehmerService teilnehmerService;
     private final Long veranstaltungId;
     private final Button hinzufuegenButton = new Button("Hinzufügen");
-    private final Button anlegenButton = new Button(new Icon(VaadinIcon.PLUS));
+    private final Button anlegenButton = new Button("Teilnehmer anlegen");
     private final Button importButton = new Button("Importieren");
     private final TextField filterText = new TextField();
     private final Grid<Teilnehmer> grid = new Grid<>();
@@ -46,8 +44,8 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         this.setHeight("80vh");
 
         hinzufuegenButton.setEnabled(false);
-        hinzufuegenButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
+        hinzufuegenButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        hinzufuegenButton.getStyle().set("margin-inline-start", "auto");
 
         dialog = new TeilnehmerErstellenDialog(teilnehmerService, authenticatedUser,this);
         anlegenButton.addClickListener(event ->
@@ -79,24 +77,20 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
                 Notification.show("Keine Teilnehmer ausgewählt", 3000, Notification.Position.MIDDLE);
             }
         });
-        importButton.addClickListener(event -> {
-            TeilnehmerImportDialog teilnehmerImportDialog = new TeilnehmerImportDialog(teilnehmerService, authenticatedUser, veranstaltungService, veranstaltungId, veranstaltungsterminView);
-            teilnehmerImportDialog.open();
-            teilnehmerImportDialog.addDialogCloseActionListener(e -> close());
-        });
+
 
         configureGrid();
 
         Button cancelButton = new Button("Abbrechen", e -> close());
         this.setHeaderTitle("Teilnehmer hinzufügen");
-        this.getHeader().add(getToolbar());
         getFooter().add(cancelButton);
-        getFooter().add(hinzufuegenButton);
         add(
+                getToolbar(),
                 getContent()
         );
 
         updateGrid();
+
     }
 
     private Component getToolbar() {
@@ -105,7 +99,7 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateGrid());
 
-        HorizontalLayout toolbar = new HorizontalLayout(filterText,anlegenButton,importButton);
+        HorizontalLayout toolbar = new HorizontalLayout(filterText,anlegenButton,importButton, hinzufuegenButton);
 
         toolbar.addClassName("toolbar");
 
@@ -148,6 +142,5 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         content.setSizeFull();
         return content;
     }
-
 
 }

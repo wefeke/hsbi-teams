@@ -8,7 +8,6 @@ import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.VeranstaltungenService;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
@@ -70,12 +69,11 @@ public class TeilnehmerEntfernenDialog extends Dialog {
 
         HorizontalLayout buttonLayout = new HorizontalLayout();
         Button cancelBtn = new Button("Abbrechen");
-        buttonLayout.add(cancelBtn, deleteBtn);
+        buttonLayout.add(deleteBtn, cancelBtn);
         buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
 
         getFooter().add(buttonLayout);
 
-        deleteBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         deleteBtn.addClickListener(event -> {
 
