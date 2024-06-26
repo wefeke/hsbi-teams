@@ -330,29 +330,56 @@ public class KalenderView extends VerticalLayout {
         fullCalendar.setSizeFull();
     }
 
+    /**
+     * Gibt das Startdatum der Woche (Montag) für das gegebene LocalDate zurück.
+     * Wenn das gegebene Datum bereits ein Montag ist, wird es unverändert zurückgegeben.
+     * Andernfalls wird rekursiv der entsprechende Tag subtrahiert, bis der Montag erreicht ist.
+     *
+     * @param localDate das Datum, von dem aus das Startdatum der Woche ermittelt werden soll
+     * @return das Startdatum der Woche (Montag) für das gegebene LocalDate
+     * @throws IllegalArgumentException wenn localDate null ist
+     * @author Leon
+     */
     private LocalDate getStartOfWeek(LocalDate localDate) {
-        switch(localDate.getDayOfWeek()) {
-            case DayOfWeek.MONDAY:
+        if (localDate == null) {
+            throw new IllegalArgumentException("Das angegebene Datum darf nicht null sein");
+        }
+
+        switch (localDate.getDayOfWeek()) {
+            case MONDAY:
                 return localDate;
-            case DayOfWeek.TUESDAY:
-                getStartOfWeek(localDate.minusDays(1));
-            case DayOfWeek.WEDNESDAY:
-                getStartOfWeek(localDate.minusDays(2));
-            case DayOfWeek.THURSDAY:
-                getStartOfWeek(localDate.minusDays(3));
-            case DayOfWeek.FRIDAY:
-                getStartOfWeek(localDate.minusDays(4));
-            case DayOfWeek.SATURDAY:
-                getStartOfWeek(localDate.minusDays(5));
-            case DayOfWeek.SUNDAY:
-                getStartOfWeek(localDate.minusDays(6));
+            case TUESDAY:
+                return getStartOfWeek(localDate.minusDays(1));
+            case WEDNESDAY:
+                return getStartOfWeek(localDate.minusDays(2));
+            case THURSDAY:
+                return getStartOfWeek(localDate.minusDays(3));
+            case FRIDAY:
+                return getStartOfWeek(localDate.minusDays(4));
+            case SATURDAY:
+                return getStartOfWeek(localDate.minusDays(5));
+            case SUNDAY:
+                return getStartOfWeek(localDate.minusDays(6));
             default:
                 return localDate;
         }
     }
 
 
+    /**
+     * Gibt das Startdatum des Monats für das gegebene LocalDate zurück.
+     * Wenn das gegebene Datum bereits der erste Tag des Monats ist, wird es unverändert zurückgegeben.
+     * Andernfalls wird rekursiv ein Tag subtrahiert, bis der erste Tag des Monats erreicht ist.
+     *
+     * @param localDate das Datum, von dem aus das Startdatum des Monats ermittelt werden soll
+     * @return das Startdatum des Monats für das gegebene LocalDate
+     * @throws IllegalArgumentException wenn localDate null ist
+     * @author Leon
+     */
     private LocalDate getStartOfMonth(LocalDate localDate) {
+        if (localDate == null) {
+            throw new IllegalArgumentException("Das angegebene Datum darf nicht null sein");
+        }
 
         if (localDate.getDayOfMonth() == 1) {
             return localDate;
@@ -360,5 +387,4 @@ public class KalenderView extends VerticalLayout {
             return getStartOfMonth(localDate.minusDays(1));
         }
     }
-
 }
