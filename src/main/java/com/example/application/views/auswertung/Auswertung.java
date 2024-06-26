@@ -75,22 +75,17 @@ public class Auswertung {
 
         StringBuilder result = new StringBuilder();
 
-
-
         if (!gruppen.isEmpty()) {
-
+            if (gruppen.getFirst() != 0) {
                 result.append(gruppen.getFirst());
+            }
 
             gruppen.removeFirst();
         }
 
-
-
-
-
         if (!punkte.isEmpty()) {
             if (punkte.getFirst() != 0.0f) {
-                result.append(", ").append(punkte.getFirst());
+                result.append(", ").append(punkte.getFirst()).append(" Punkte");
             }
             punkte.removeFirst();
         }
