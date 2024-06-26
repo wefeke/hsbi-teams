@@ -125,11 +125,10 @@ public class SuperService {
                     Set<Teilnehmer> teilnehmer2 = gruppe.getTeilnehmer();
                     if (teilnehmer2.contains(teilnehmer)) {
                         auswertung.addGruppeNummer(gruppe.getNummer(),i);
+                        auswertung.incrementAnzahlGruppenarbeiten();
                     }
                 }
-                Float punkt = gruppenarbeitTeilnehmerService.
-                        findPunkteByMatrikelNrAndGruppenarbeitId(
-                                teilnehmer.getId(), gruppenarbeit.getId());
+                Float punkt = gruppenarbeitTeilnehmerService.findPunkteByMatrikelNrAndGruppenarbeitId(teilnehmer.getId(), gruppenarbeit.getId());
                 auswertung.addToGesamtPunkte(punkt);
                 auswertung.addPunkte(punkt);
             }
