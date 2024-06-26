@@ -97,8 +97,6 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         );
 
         updateGrid();
-
-
     }
 
     private Component getToolbar() {
