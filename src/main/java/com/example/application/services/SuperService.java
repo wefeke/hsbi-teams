@@ -69,6 +69,7 @@ public class SuperService {
         return maybeUser.orElseGet(User::new);
     }
 
+
     /**
      * Findet alle Auswertungen für eine bestimmte Veranstaltung.
      * Diese Methode erstellt eine Liste von Auswertungen für jeden Teilnehmer der Veranstaltung, basierend auf den Gruppenarbeiten und den entsprechenden Punkten.
