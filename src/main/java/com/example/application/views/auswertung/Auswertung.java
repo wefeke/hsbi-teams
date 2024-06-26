@@ -89,6 +89,46 @@ public class Auswertung {
         }
         return result.toString();
     }
+    /**
+     * Gibt die Werte der TGGPHelper als String zurück.
+     * Falls keine Teilnahme vorhanden ist, wird dies entsprechend angezeigt.
+     *
+     * @return die Werte der TGGPHelper als String
+     *
+     * @author Leon
+     */
+    public Long getTggHelperValuesGruppe() { // Wie getTggHelperValues nur die Punkte
+
+        Long gruppe = 0L;
+        if (!gruppen.isEmpty()) {
+            if (gruppen.getFirst() != 0) {
+                gruppe = gruppen.getFirst();
+            }
+            gruppen.removeFirst();
+        }
+
+        return gruppe;
+    }
+    /**
+     * Gibt die Werte der TGGPHelper als String zurück.
+     * Falls keine Teilnahme vorhanden ist, wird dies entsprechend angezeigt.
+     *
+     * @return die Werte der TGGPHelper als String
+     *
+     * @author Leon
+     */
+    public Float getTggHelperValuesPunkte() { // Wie getTggHelperValues nur die Punkte
+
+        Float punkt = 0.0f;
+        if (!punkte.isEmpty()) {
+            if (punkte.getFirst() != 0.0f) {
+                punkt = punkte.getFirst();
+            }
+            punkte.removeFirst();
+        }
+
+        return punkt;
+    }
 
     /**
      * Gibt die erste Gruppe in der Liste zurück, falls vorhanden.
@@ -139,14 +179,36 @@ public class Auswertung {
     }
 
     /**
+     * Gibt die Gesamtpunkte und Gruppenarbeiten zurück.
+     *
+     * @return die Gesamtpunkte und Gruppenarbeiten
+     *
+     * @author Leon
+     */
+    public String getGesamtPunkteAndGruppenarbeiten() {
+        return gesamtPunkte + ", " + anzahlGruppenarbeiten;
+    }
+
+    /**
+     * Gibt die teilgenommenen Gruppenarbeiten zurück.
+     *
+     * @return die Gruppenarbeiten
+     *
+     * @author Leon
+     */
+    public int getGesamtGruppenarbeiten() {
+        return anzahlGruppenarbeiten;
+    }
+
+    /**
      * Gibt die Gesamtpunkte zurück.
      *
      * @return die Gesamtpunkte
      *
      * @author Leon
      */
-    public String getGesamtPunkteAndGruppenarbeiten() {
-        return gesamtPunkte + ", " + anzahlGruppenarbeiten;
+    public Float getGesamtPunkte() {
+        return gesamtPunkte;
     }
 
     /**

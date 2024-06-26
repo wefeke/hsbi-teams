@@ -15,8 +15,6 @@ import org.vaadin.stefan.fullcalendar.CalendarViewImpl;
 import org.vaadin.stefan.fullcalendar.Entry;
 import org.vaadin.stefan.fullcalendar.FullCalendar;
 import org.vaadin.stefan.fullcalendar.FullCalendarBuilder;
-
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -212,7 +210,6 @@ public class KalenderView extends VerticalLayout {
                         currentDate = getStartOfMonth(currentDate.plusMonths(1)),
                         currentDate.plusMonths(1)
                 );
-
             } else if (kalenderAuswahlComboBox.getValue().istMonat()) {
                 fullCalendar.setValidRange(
                         currentDate = getStartOfMonth(currentDate.plusMonths(1)),
@@ -235,7 +232,6 @@ public class KalenderView extends VerticalLayout {
                         currentDate = getStartOfMonth(currentDate.minusMonths(1)),
                         currentDate.plusMonths(1)
                 );
-                currentDate = getStartOfWeek(currentDate.minusMonths(1));
             } else if (kalenderAuswahlComboBox.getValue().istMonat()) {
                 fullCalendar.setValidRange(
                         currentDate = getStartOfMonth(currentDate.minusMonths(1)),
@@ -246,16 +242,15 @@ public class KalenderView extends VerticalLayout {
                         currentDate = currentDate.minusDays(1), // Ein Tag wird abgezogen
                         currentDate.plusDays(1) // Eine Tag wird zum vorherigen Datum hinzugefügt
                 );
-
             } else if (kalenderAuswahlComboBox.getValue().istWoche()) {
                 fullCalendar.setValidRange(
                         currentDate = getStartOfWeek(currentDate.minusWeeks(1)), // Eine Woche wird abgezogen und sichergestellt, dass es der Montag ist
-                        getStartOfWeek(currentDate.plusDays(6)) // Eine Woche wird zur vorherigen Operation hinzugefügt
+                        getStartOfWeek(currentDate.plusDays(7)) // Eine Woche wird zur vorherigen Operation hinzugefügt
                 );
             }
+
         }
     }
-
     //
 
     /**
@@ -345,24 +340,16 @@ public class KalenderView extends VerticalLayout {
             throw new IllegalArgumentException("Das angegebene Datum darf nicht null sein");
         }
 
-        switch (localDate.getDayOfWeek()) {
-            case MONDAY:
-                return localDate;
-            case TUESDAY:
-                return getStartOfWeek(localDate.minusDays(1));
-            case WEDNESDAY:
-                return getStartOfWeek(localDate.minusDays(2));
-            case THURSDAY:
-                return getStartOfWeek(localDate.minusDays(3));
-            case FRIDAY:
-                return getStartOfWeek(localDate.minusDays(4));
-            case SATURDAY:
-                return getStartOfWeek(localDate.minusDays(5));
-            case SUNDAY:
-                return getStartOfWeek(localDate.minusDays(6));
-            default:
-                return localDate;
-        }
+        return switch (localDate.getDayOfWeek()) {
+            case MONDAY -> localDate;
+            case TUESDAY -> getStartOfWeek(localDate.minusDays(1));
+            case WEDNESDAY -> getStartOfWeek(localDate.minusDays(2));
+            case THURSDAY -> getStartOfWeek(localDate.minusDays(3));
+            case FRIDAY -> getStartOfWeek(localDate.minusDays(4));
+            case SATURDAY -> getStartOfWeek(localDate.minusDays(5));
+            case SUNDAY -> getStartOfWeek(localDate.minusDays(6));
+            default -> localDate;
+        };
     }
 
 

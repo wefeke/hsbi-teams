@@ -4,10 +4,7 @@ import com.example.application.models.Gruppe;
 import com.example.application.models.Gruppenarbeit;
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.Veranstaltungstermin;
-import com.vaadin.flow.component.html.Paragraph;
-
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,7 +12,7 @@ import java.util.List;
  * Sie dient zur Vereinfachung der Darstellung in einer Tabelle, ohne das Datenbankmodell verändern zu müssen.
  * Die Klasse hilft dabei, die jeweiligen Daten pro Spalte in der Auswertung anzugeben.
  *
- * @autor Leon
+ * @author Leon
  */
 public class TGGPHelper {
     Veranstaltungstermin veranstaltungtermin;
@@ -32,7 +29,7 @@ public class TGGPHelper {
      *
      * @return die Tabellenposition
      *
-     * @autor Leon
+     * @author Leon
      */
     public int getTablePos() {
         return tablePos;
@@ -43,7 +40,7 @@ public class TGGPHelper {
      *
      * @param tablePos die neue Tabellenposition
      *
-     * @autor Leon
+     * @author Leon
      */
     public void setTablePos(int tablePos) {
         this.tablePos = tablePos;
@@ -54,7 +51,7 @@ public class TGGPHelper {
      *
      * @return der Veranstaltungstermin
      *
-     * @autor Leon
+     * @author Leon
      */
     public Veranstaltungstermin getVeranstaltungtermin() {
         return veranstaltungtermin;
@@ -65,7 +62,7 @@ public class TGGPHelper {
      *
      * @param veranstaltungtermin der neue Veranstaltungstermin
      *
-     * @autor Leon
+     * @author Leon
      */
     public void setVeranstaltungtermin(Veranstaltungstermin veranstaltungtermin) {
         this.veranstaltungtermin = veranstaltungtermin;
@@ -76,14 +73,11 @@ public class TGGPHelper {
      *
      * @return der Titel der Gruppenarbeit und das Datum des Veranstaltungstermins
      *
-     * @autor Leon
+     * @author Leon
      */
     public String getTerminAndGruppenarbeit() {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        Paragraph paragraph = new Paragraph();
-        paragraph.setText(gruppenarbeit.getTitel() + "\n" +   veranstaltungtermin.getDatum().format(dateFormatter));
-        paragraph.getStyle().set("white-space", "pre-line");
-        return paragraph.getText();
+        return gruppenarbeit.getTitel() + " " +veranstaltungtermin.getDatum().format(dateFormatter);
     }
 
     /**
@@ -91,7 +85,7 @@ public class TGGPHelper {
      *
      * @return die Gruppenarbeit
      *
-     * @autor Leon
+     * @author Leon
      */
     public Gruppenarbeit getGruppenarbeit() {
         return gruppenarbeit;
@@ -102,7 +96,7 @@ public class TGGPHelper {
      *
      * @param gruppenarbeit die neue Gruppenarbeit
      *
-     * @autor Leon
+     * @author Leon
      */
     public void setGruppenarbeit(Gruppenarbeit gruppenarbeit) {
         this.gruppenarbeit = gruppenarbeit;
@@ -113,7 +107,7 @@ public class TGGPHelper {
      *
      * @return die erste Gruppennummer oder null, wenn die Liste leer ist
      *
-     * @autor Leon
+     * @author Leon
      */
     public Gruppe getGruppe() {
         if (gruppe != null) {
@@ -127,13 +121,14 @@ public class TGGPHelper {
      *
      * @return true wenn Bedingung nicht leer, andernfalls false
      *
-     * @autor Leon
+     * @author Leon
      */
     public boolean isGruppeEmpty() {
         if (gruppe == null)
         return true;
-        else
+        else {
             return false;
+        }
     }
 
     /**
@@ -141,7 +136,7 @@ public class TGGPHelper {
      *
      * @return die Punkte
      *
-     * @autor Leon
+     * @author Leon
      */
     public Float getPunkte() {
         return punkte;
@@ -152,7 +147,7 @@ public class TGGPHelper {
      *
      * @param punkte die neuen Punkte
      *
-     * @autor Leon
+     * @author Leon
      */
     public void setPunkte(Float punkte) {
         this.punkte = punkte;
@@ -163,7 +158,7 @@ public class TGGPHelper {
      *
      * @return true, wenn Punkte >= 0 sind, sonst false
      *
-     * @autor Leon
+     * @author Leon
      */
     public boolean hasPunkte() {
         return punkte >= 0f;
@@ -173,7 +168,7 @@ public class TGGPHelper {
      *
      * @return true, wenn verwendet, sonst false
      *
-     * @autor Leon
+     * @author Leon
      */
     public boolean getUsed() {
         return used;
@@ -182,7 +177,7 @@ public class TGGPHelper {
     /**
      * Setzt den Zustand auf verwendet (true).
      *
-     * @autor Leon
+     * @author Leon
      */
     public void setUsedTrue() {
         this.used = true;
@@ -191,7 +186,7 @@ public class TGGPHelper {
     /**
      * Setzt den Zustand auf nicht verwendet (false).
      *
-     * @autor Leon
+     * @author Leon
      */
     public void setUsedFalse() {
         this.used = false;
@@ -202,7 +197,7 @@ public class TGGPHelper {
      *
      * @param gruppe die Gruppe
      *
-     * @autor Leon
+     * @author Leon
      */
     public void setGruppe(Gruppe gruppe) {
         this.gruppe = gruppe;
@@ -213,7 +208,7 @@ public class TGGPHelper {
      *
      * @return die Liste der Teilnehmer
      *
-     * @autor Leon
+     * @author Leon
      */
     public List<Teilnehmer> getTeilnehmer() {
         return teilnehmer;
@@ -224,7 +219,7 @@ public class TGGPHelper {
      *
      * @param teilnehmer die neue Liste der Teilnehmer
      *
-     * @autor Leon
+     * @author Leon
      */
     public void setTeilnehmer(List<Teilnehmer> teilnehmer) {
         this.teilnehmer = teilnehmer;

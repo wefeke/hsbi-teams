@@ -15,44 +15,52 @@ import org.springframework.stereotype.Service;
 // LEON
 @Service
 public class AuswertungExcelExporter {
-    private XSSFWorkbook workbook;
-    private XSSFSheet sheet;
+    private final XSSFWorkbook workbook;
+    private final XSSFSheet sheet;
     private List<Auswertung> auswertungen;
 
     /**
      * Konstruktor für den AuswertungExcelExporter.
      * Initialisiert die Arbeitsmappe (Workbook) für die Excel-Datei.
      *
-     * @autor Leon
+     * @author Leon
      */
     public AuswertungExcelExporter() {
         workbook = new XSSFWorkbook();
+        sheet = workbook.createSheet("Auswertung" );
     }
 
     /**
      * Schreibt die Kopfzeile der Excel-Tabelle.
      * Erstellt ein neues Blatt, setzt den Stil für die Zellen und fügt die Kopfzeilen hinzu.
      *
-     * @autor Leon
+     * @author Leon
      */
-    private void writeHeaderLine() {
-        sheet = workbook.createSheet("Auswertung");
-
-        Row row = sheet.createRow(0);
-
+    private int writeHeaderLine(int startRow) {
         CellStyle style = workbook.createCellStyle();
         XSSFFont font = workbook.createFont();
         font.setBold(true);
         font.setFontHeight(16);
         style.setFont(font);
-        int columnCount = 1;
-        Auswertung auswertung = auswertungen.get(0);
-        createCell(row, 0, "Matrikelnummer", style);
+        int columnCount = 0;
+
+        // Fügt den Titel hinzu, hier Gruppenzuordnung
+        Row titelGruppe = sheet.createRow(startRow++);
+        createCell(titelGruppe, 0, "Gruppenzuordnung", style);
+
+        // Nimmmt die nächste Zeile und fügt die Überschriften hinzu für die jeweiligen Zeilen
+        Row row = sheet.createRow(startRow);
+
+        Auswertung auswertung = auswertungen.getFirst();
+        createCell(row, columnCount++, "Name und Matrikelnummer", style);
+        createCell(row, columnCount++, "Gruppenanzahl/Gesamtpunkte", style);
+        startRow++;
         for (TGGPHelper tggpHelper : auswertung.getTggpHelper()) {
             createCell(row, columnCount++, tggpHelper.getTerminAndGruppenarbeit(), style);
         }
 
-        createCell(row, columnCount, "Gesamtpunkte und Anzahl Gruppenarbeiten", style);
+
+        return startRow;
     }
 
     /**
@@ -64,7 +72,7 @@ public class AuswertungExcelExporter {
      * @param value der Wert, der in die Zelle geschrieben wird
      * @param style der Stil der Zelle
      *
-     * @autor Leon
+     * @author Leon
      */
     private void createCell(Row row, int columnCount, Object value, CellStyle style) {
         sheet.autoSizeColumn(columnCount);
@@ -87,26 +95,50 @@ public class AuswertungExcelExporter {
      * Schreibt die Datenzeilen in die Excel-Tabelle.
      * Iteriert über die Auswertungen und erstellt für jede Auswertung eine Zeile mit den entsprechenden Daten.
      *
-     * @autor Leon
+     * @author Leon
      */
-    private void writeDataLines() {
-        int rowCount = 1;
+    private int writeDataLines(int option, int rowCount) { // int option gibt an,
+        // ob nun die Punkte oder die Gruppen Daten geschrieben werden
 
         CellStyle style = workbook.createCellStyle();
         XSSFFont font = workbook.createFont();
         font.setFontHeight(14);
         style.setFont(font);
 
+
+    if (option == 0) { // Gruppen sollen geschrieben werden
         for (Auswertung auswertung : auswertungen) {
             Row row = sheet.createRow(rowCount++);
             int columnCount = 0;
 
             createCell(row, columnCount++, auswertung.getNameMatrikelnummer(), style);
+            createCell(row, columnCount++, auswertung.getGesamtGruppenarbeiten(), style);
             for (TGGPHelper tggpHelper : auswertung.getTggpHelper()) {
-                createCell(row, columnCount++, auswertung.getTggHelperValues(), style);
+                createCell(row, columnCount++, auswertung.getTggHelperValuesGruppe(), style);
             }
-            createCell(row, columnCount++, auswertung.getGesamtPunkteAndGruppenarbeiten(), style);
         }
+        // Fügt eine Leerzeile hinzu
+        Row leerzeile = sheet.createRow(rowCount++);
+        createCell(leerzeile, 0, "", style);
+
+    } else if (option == 1) { // Punkte sollen geschrieben werden
+        for (Auswertung auswertung : auswertungen) {
+            Row row = sheet.createRow(rowCount++);
+            int columnCount = 0;
+
+            createCell(row, columnCount++, auswertung.getNameMatrikelnummer(), style);
+            createCell(row, columnCount++, auswertung.getGesamtPunkte(), style);
+            for (TGGPHelper tggpHelper : auswertung.getTggpHelper()) {
+                createCell(row, columnCount++, auswertung.getTggHelperValuesPunkte(), style);
+            }
+
+        }
+
+        // Fügt eine Leerzeile hinzu
+        Row leerzeile = sheet.createRow(rowCount++);
+        createCell(leerzeile, 0, "", style);
+    }
+        return rowCount;
     }
 
     /**
@@ -117,12 +149,14 @@ public class AuswertungExcelExporter {
      * @return ein Byte-Array, das die Excel-Datei darstellt
      * @throws IOException wenn ein Fehler beim Schreiben der Datei auftritt
      *
-     * @autor Leon
+     * @author Leon
      */
     public byte[] export(List<Auswertung> auswertungen) throws IOException {
         this.auswertungen = auswertungen;
-        writeHeaderLine();
-        writeDataLines();
+        int currentRow = writeHeaderLine(0);
+        currentRow = writeDataLines(0,currentRow); // Erst die Option angeben, dann die aktuelle Row
+        currentRow = writeHeaderLine(currentRow); // Da Titel für den Abschnitt (Gruppenzuordnung und Spaltenüberschriften zwei Zeilen sind)
+        currentRow = writeDataLines(1, currentRow);
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {

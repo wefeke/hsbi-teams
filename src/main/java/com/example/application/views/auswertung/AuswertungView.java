@@ -59,7 +59,7 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
      * @param superService der Service für übergeordnete Funktionen
      * @param studierendeExcelExporter der Exporter für die Auswertungen in Excel-Format
      *
-     * @autor Leon
+     * @author Leon
      */
     public AuswertungView(
             VeranstaltungenService veranstaltungenService,
@@ -93,12 +93,11 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
      * @param maybeUser der optionale authentifizierte Benutzer
      * @return der validierte Benutzer
      *
-     * @autor Leon
+     * @author Leon
      */
     private User validateUser(Optional<User> maybeUser) {
         if (maybeUser.isPresent()) {
-            User user = maybeUser.get();
-            return user;
+            return maybeUser.get();
         } else {
             return new User();
         }
@@ -110,7 +109,7 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
      *
      * @return der erstellte Hauptinhalt als Component
      *
-     * @autor Leon
+     * @author Leon
      */
     private Component getContent() {
         VerticalLayout content = new VerticalLayout(grid01);
@@ -121,30 +120,22 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
     }
 
     /**
-     * Konfiguriert das Formular. (Platzhalter für zukünftige Implementierung)
-     *
-     * @autor Leon
-     */
-    private void configureForm() {
-        // Noch keine Implementierung
-    }
-
-    /**
      * Konfiguriert das Grid für die Anzeige der Auswertungen.
      * Entfernt alle Spalten und fügt neue Spalten basierend auf den Gruppenarbeiten hinzu.
      * Setzt allgemeine Eigenschaften des Grids wie Breite und automatische Anpassung der Spalten.
      *
-     * @autor Leon
+     * @author Leon
      */
     private void configureGrid() {
         grid01.removeAllColumns();
         // Eine einzelne Auswertung nehmen und alle Gruppenarbeiten als Columns darstellen
         Auswertung auswertung = auswertungen.getFirst();
         grid01.addColumn(Auswertung::getNameMatrikelnummer).setHeader("");
+        grid01.addColumn(Auswertung::getGesamtPunkte).setHeader("Gesamtpunkte");
         for (TGGPHelper tggpHelper : auswertung.getTggpHelper()) {
             grid01.addColumn(Auswertung::getTggHelperValues).setHeader(tggpHelper.getTerminAndGruppenarbeit());
         }
-        grid01.addColumn(Auswertung::getGesamtPunkteAndGruppenarbeiten).setHeader("Gesamtpunkte und teilgenommene Gruppenarbeiten");
+        grid01.addColumn(Auswertung::getGesamtGruppenarbeiten).setHeader("Teilgenommene Gruppenarbeiten");
 
         grid01.addClassNames("contact-grid");
         grid01.setWidthFull();
@@ -158,7 +149,7 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
      *
      * @return die erstellte Toolbar als HorizontalLayout
      *
-     * @autor Leon
+     * @author Leon
      */
     private HorizontalLayout getToolbar() {
         // Timestamp für das Laden der aktuellen Daten
@@ -213,7 +204,7 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
      * Aktualisiert die Liste der Auswertungen im Grid.
      * Ruft die Auswertungen für die aktuelle Veranstaltung aus dem SuperService ab und setzt sie im Grid.
      *
-     * @autor Leon
+     * @author Leon
      */
     private void updateList() {
         grid01.setItems(superService.findAllAuswertungenByVeranstaltung(veranstaltungsID));
@@ -226,7 +217,7 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
      *
      * @param event das BeforeEnterEvent
      *
-     * @autor Leon
+     * @author Leon
      */
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
