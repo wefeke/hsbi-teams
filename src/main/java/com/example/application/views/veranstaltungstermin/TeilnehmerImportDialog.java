@@ -1,10 +1,12 @@
-package com.example.application.views.studierende;
+package com.example.application.views.veranstaltungstermin;
 
 import com.example.application.ExcelReader.ExcelImporter;
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
+import com.example.application.models.Veranstaltung;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
+import com.example.application.services.VeranstaltungenService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
@@ -14,11 +16,13 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
+import jakarta.annotation.security.RolesAllowed;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 import java.util.*;
 
-public class StudierendeImportDialog extends Dialog {
+@RolesAllowed({"ADMIN", "USER"})
+public class TeilnehmerImportDialog extends Dialog {
 
 
     Button importButton = new Button("Importieren");
@@ -27,6 +31,8 @@ public class StudierendeImportDialog extends Dialog {
     MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
     ExcelImporter excelImporter;
     Set<Teilnehmer> newTeilnehmerListe = new HashSet<>();
+    Set<Teilnehmer> teilnehmerVeranstaltungsListe = new HashSet<>();
+
 
     /**
      * Konstruktor für die StudierendeImportDialog Klasse.
@@ -40,9 +46,8 @@ public class StudierendeImportDialog extends Dialog {
      *
      * @param teilnehmerService Der Service, der für die Verwaltung der Studierenden benötigt wird.
      * @param authenticatedUser Der aktuell authentifizierte Benutzer.
-     * @param studierendeView   Die StudierendeView, die aktualisiert wird, wenn neue Teilnehmer hinzugefügt werden.
      */
-    public StudierendeImportDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, StudierendeView studierendeView) {
+    public TeilnehmerImportDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, VeranstaltungenService veranstaltungService, Long veranstaltungId, VeranstaltungsterminView veranstaltungsterminView) {
         this.excelImporter = new ExcelImporter(teilnehmerService, authenticatedUser);
 
         H2 headerTitle = new H2("Studierende Importieren");
@@ -53,7 +58,7 @@ public class StudierendeImportDialog extends Dialog {
             dialog.setMaxHeight(getHeight());
             dialog.setHeaderTitle("Neue Teilnehmer");
             dialog.getFooter().add(new Button("OK", e -> {
-                studierendeView.updateStudierendeView();
+                veranstaltungsterminView.update();
                 dialog.close();
             }));
             VerticalLayout dialogLayout = new VerticalLayout();
@@ -65,14 +70,21 @@ public class StudierendeImportDialog extends Dialog {
                     User user = maybeUser.get();
                     teilnehmerService.saveTeilnehmer(teilnehmer, user);
                     dialogLayout.add(new Span("Teilnehmer :" + teilnehmer.toString() + " angelegt"));
-
                 }
             }
+
+            Optional<User> maybeUser = authenticatedUser.get();
+            if (maybeUser.isPresent()) {
+                User user = maybeUser.get();
+                Veranstaltung veranstaltung = veranstaltungService.findVeranstaltungById(veranstaltungId, user);
+                veranstaltung.addAllTeilnehmer(teilnehmerVeranstaltungsListe);
+                veranstaltungService.saveVeranstaltung(veranstaltung);
+            }
+
             if (!newTeilnehmerListe.isEmpty())
                 dialog.open();
 
             close();
-
         });
 
         closeButton.addClickListener(event -> this.close());
@@ -91,7 +103,8 @@ public class StudierendeImportDialog extends Dialog {
         upload.addSucceededListener(event -> {
             try {
 
-                newTeilnehmerListe.addAll(excelImporter.readNewTeilnehmerFromExcel(buffer.getInputStream(event.getFileName())));
+                newTeilnehmerListe.addAll(excelImporter.readAllTeilnehmerFromExcel(buffer.getInputStream(event.getFileName())));
+                teilnehmerVeranstaltungsListe.addAll(excelImporter.readAllTeilnehmerFromExcel(buffer.getInputStream(event.getFileName())));
 
                 List<Teilnehmer> combinedItems = new ArrayList<>();
                 Optional<User> maybeUser = authenticatedUser.get();
@@ -100,6 +113,10 @@ public class StudierendeImportDialog extends Dialog {
 
                     combinedItems.addAll(teilnehmerService.findAllTeilnehmerByUserAndFilter(user, ""));
                     combinedItems.addAll(newTeilnehmerListe);
+
+                    combinedItems.addAll(teilnehmerService.findAllTeilnehmerByUserAndFilter(user, ""));
+                    combinedItems.addAll(teilnehmerVeranstaltungsListe);
+
 
                     Dialog dialog = new Dialog();
                     dialog.setHeight(getHeight());

@@ -7,6 +7,7 @@ import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.views.MainLayout;
+import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Component;
@@ -22,8 +23,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
@@ -44,7 +43,6 @@ import java.util.*;
 @RolesAllowed({"ADMIN", "USER"})
 public class StudierendeView extends VerticalLayout {
 
-    private final TeilnehmerExcelExporter teilnehmerExcelExporter;
     private final TeilnehmerService teilnehmerService;
     private final Grid<Teilnehmer> grid = new Grid<>();
     private final Editor<Teilnehmer> editor = grid.getEditor();
@@ -57,20 +55,13 @@ public class StudierendeView extends VerticalLayout {
     private final Component deleteIcon;
     private final Button importButton = new Button("Importieren");
     private final Button exportButton = new Button("Exportieren");
-    private AuthenticatedUser authenticatedUser;
+    private final AuthenticatedUser authenticatedUser;
     private final StudierendeImportDialog studierendeImportDialog;
 
     TextField vorname = new TextField("Vorname");
     TextField nachname = new TextField("Nachname");
     NumberField matrikelNr = new NumberField("Matrikelnummer");
     Button aufraeumenButton = new Button("Aufräumen");
-
-
-    MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
-    private final Upload upload = new Upload(buffer);
-//    ExcelImporter excelImporter;
-    Set<Teilnehmer> newTeilnehmerListe = new HashSet<>();
-    private User user;
 
     /**
      * Konstruktor für die StudierendeView Klasse.
@@ -81,31 +72,23 @@ public class StudierendeView extends VerticalLayout {
      *
      * @param teilnehmerService Der Service, der für die Verwaltung der Studierenden benötigt wird.
      * @param authenticatedUser Der aktuell authentifizierte Benutzer.
-     * @param teilnehmerExcelExporter Der ExcelExporter, der für den Export der Studierendendaten benötigt wird.
      */
     @Autowired
-    public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, TeilnehmerExcelExporter teilnehmerExcelExporter) {
+    public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
         this.authenticatedUser = authenticatedUser;
         this.teilnehmerService = teilnehmerService;
         TeilnehmerAufraeumenDialog teilnehmerAufraeumenDialogDialog = new TeilnehmerAufraeumenDialog(teilnehmerService, authenticatedUser, this);
-        TeilnehmerLoeschenDialog teilnehmerLoeschenDialog = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, teilnehmerAufraeumenDialogDialog, this);
-        StudierendeHinzufuegenDialog studierendeHinzufuegenDialog = new StudierendeHinzufuegenDialog(teilnehmerService, authenticatedUser, this);
-        this.teilnehmerExcelExporter = teilnehmerExcelExporter;
-//        this.excelImporter = new ExcelImporter(teilnehmerService, authenticatedUser);
         this.studierendeImportDialog = new StudierendeImportDialog(teilnehmerService, authenticatedUser, this);
 
         TeilnehmerAufraeumenDialog aufraeumenDialog = new TeilnehmerAufraeumenDialog(teilnehmerService, authenticatedUser, this);
-        TeilnehmerLoeschenDialog deleteDialog = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, aufraeumenDialog, this);
-        StudierendeHinzufuegenDialog studierendeHinzufuegen = new StudierendeHinzufuegenDialog(teilnehmerService, authenticatedUser, this);
         addStudiernedenButtonIcon = addStudiernedenButton.getIcon();
         deleteIcon = delete.getIcon();
         //aendernIcon = aendern.getIcon();
 
         addClassName("Studierenden-view");
         Optional<User> maybeUser = authenticatedUser.get();
-        if (maybeUser.isPresent()) {
-            this.user = maybeUser.get();
-        }
+        maybeUser.ifPresent(value -> {
+        });
 
         setSizeFull();
         configureGrid();
@@ -116,7 +99,7 @@ public class StudierendeView extends VerticalLayout {
         );
         updateStudierendeView();
 
-        dialog = new StudierendeHinzufuegenDialog(teilnehmerService, authenticatedUser, this);
+        dialog = new StudierendeHinzufuegenDialog(teilnehmerService, authenticatedUser,this);
         addStudiernedenButton.addClickListener(event -> {
             dialog.open();
             updateStudierendeView();
@@ -132,16 +115,14 @@ public class StudierendeView extends VerticalLayout {
             Set<Teilnehmer> selectedTeilnehmer = grid.getSelectedItems();
             if (!selectedTeilnehmer.isEmpty()) {
                 for (Teilnehmer teilnehmer : selectedTeilnehmer) {
-                    TeilnehmerLoeschenDialog deleteDialogForSelectedTeilnehmer = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, aufraeumenDialog, this);
+                    TeilnehmerLoeschenDialog deleteDialogForSelectedTeilnehmer = new TeilnehmerLoeschenDialog(teilnehmerService, aufraeumenDialog, this);
                     deleteDialogForSelectedTeilnehmer.setTeilnehmer(teilnehmer);
                     deleteDialogForSelectedTeilnehmer.open();
                 }
             }
         });
 
-        importButton.addClickListener(event -> {
-            studierendeImportDialog.open();
-        });
+        importButton.addClickListener(this::onComponentEvent);
 
 
         UI.getCurrent().getPage().addBrowserWindowResizeListener(event -> {
@@ -206,9 +187,9 @@ public class StudierendeView extends VerticalLayout {
     private void configureGrid() {
         grid.setSizeFull();
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
-        Grid.Column<Teilnehmer> vornameColumn = grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname").setSortable(true);;
-        Grid.Column<Teilnehmer> nachnameColumn = grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname").setSortable(true);;
-        Grid.Column<Teilnehmer> matrikelNrColumn = grid.addColumn(Teilnehmer::getId).setHeader("MatrikelNr").setSortable(true);;
+        Grid.Column<Teilnehmer> vornameColumn = grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname").setSortable(true);
+        Grid.Column<Teilnehmer> nachnameColumn = grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname").setSortable(true);
+        Grid.Column<Teilnehmer> matrikelNrColumn = grid.addColumn(Teilnehmer::getId).setHeader("MatrikelNr").setSortable(true);
         grid.addSelectionListener(selection -> {
             int size = selection.getAllSelectedItems().size();
             delete.setEnabled(size != 0);
@@ -241,7 +222,7 @@ public class StudierendeView extends VerticalLayout {
 
         binder.forField(matrikelNr)
                 .asRequired("Matrikelnummer muss gefüllt sein")
-                .withConverter(d -> Double.valueOf(d).longValue(), Long::doubleValue)
+                .withConverter(Double::longValue, Long::doubleValue)
                 .bind(Teilnehmer::getId, Teilnehmer::setId);
         matrikelNrColumn.setEditorComponent(matrikelNr);
         matrikelNr.setEnabled(false);
@@ -311,7 +292,7 @@ public class StudierendeView extends VerticalLayout {
 
             // Die eigentlichen Daten werden in diesem Objekt gespeichert und dem Anchor übergeben
             StreamResource resource = new StreamResource("teilnehmerliste_" + LocalDate.now() + ".xlsx", () -> {
-                byte[] data = null; // Your method to fetch data
+                byte[] data; // Your method to fetch data
                 try {
                     TeilnehmerExcelExporter teilnehmerExcelExporter = new TeilnehmerExcelExporter();
                     data = teilnehmerExcelExporter.export(teilnehmerList);
@@ -354,5 +335,9 @@ public class StudierendeView extends VerticalLayout {
         delete.setIcon(deleteIcon);
         delete.setText("Studierenden löschen");
 
+    }
+
+    private void onComponentEvent(ClickEvent<Button> event) {
+        studierendeImportDialog.open();
     }
 }

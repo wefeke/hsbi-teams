@@ -15,11 +15,11 @@ import java.util.Optional;
 @Service
 public class TeilnehmerService {
     private final TeilnehmerRepository teilnehmerRepository;
-    private final VeranstaltungenService veranstaltungenService;
 
-    public TeilnehmerService(TeilnehmerRepository teilnehmerRepository , VeranstaltungenService veranstaltungenService) {
+
+    public TeilnehmerService(TeilnehmerRepository teilnehmerRepository) {
         this.teilnehmerRepository = teilnehmerRepository;
-        this.veranstaltungenService = veranstaltungenService;
+
     }
 
 

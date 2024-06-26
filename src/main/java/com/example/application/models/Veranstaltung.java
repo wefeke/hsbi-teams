@@ -107,6 +107,10 @@ public class Veranstaltung implements Serializable {
         this.teilnehmer.add(teilnehmer);
     }
 
+    public void addAllTeilnehmer(Set<Teilnehmer> teilnehmer) {
+        this.teilnehmer.addAll(teilnehmer);
+    }
+
     public List<Veranstaltungstermin> getVeranstaltungstermine() {
         return new ArrayList<Veranstaltungstermin>(veranstaltungstermine);
     }
