@@ -96,6 +96,7 @@ public class GruppeAuswertungDialog extends Dialog {
     private void bindFields() {
         binder.forField(auswertungsWert)
                 .withValidator(auswertungsWert -> auswertungsWert != null && auswertungsWert >= 0.0, "Der Wert darf nicht leer oder negativ sein")
+                .withValidator(auswertungsWert -> auswertungsWert % 0.5 == 0, "Der Werte darf nur Ganze und Halbe Punkte enthalten")
                 .bind(GruppenarbeitTeilnehmer::getPunkteD, GruppenarbeitTeilnehmer::setPunkteD);
     }
 

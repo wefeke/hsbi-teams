@@ -1,16 +1,14 @@
 package com.example.application.views.auswertung;
 
-import com.example.application.models.Gruppe;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Die Klasse Auswertung dient zur Verwaltung und Berechnung von Auswertungsdaten.
  * Sie enthält Informationen über die Matrikelnummer, die Gesamtpunkte und eine Liste von TGGPHelper-Objekten.
  *
- * @autor Leon
+ * @author Leon
  */
 public class Auswertung {
 
@@ -24,7 +22,7 @@ public class Auswertung {
     /**
      * Standardkonstruktor für die Klasse Auswertung.
      *
-     * @autor Leon
+     * @author Leon
      */
     public Auswertung() {
 
@@ -35,7 +33,7 @@ public class Auswertung {
      *
      * @return die Liste der TGGPHelper-Objekte
      *
-     * @autor Leon
+     * @author Leon
      */
     public List<TGGPHelper> getTggpHelper() {
         return tggpHelper;
@@ -46,7 +44,7 @@ public class Auswertung {
      *
      * @param tggpHelper die neue Liste der TGGPHelper-Objekte
      *
-     * @autor Leon
+     * @author Leon
      */
     public void setTggpHelper(List<TGGPHelper> tggpHelper) {
         this.tggpHelper = tggpHelper;
@@ -57,7 +55,7 @@ public class Auswertung {
      *
      * @param punkte die hinzuzufügenden Punkte
      *
-     * @autor Leon
+     * @author Leon
      */
     public void addToGesamtPunkte(Float punkte) {
         gesamtPunkte += punkte;
@@ -69,7 +67,7 @@ public class Auswertung {
      *
      * @return die Werte der TGGPHelper als String
      *
-     * @autor Leon
+     * @author Leon
      */
     public String getTggHelperValues() {
 
@@ -97,7 +95,7 @@ public class Auswertung {
      *
      * @return die erste Gruppe oder null, wenn die Liste leer ist
      *
-     * @autor Leon
+     * @author Leon
      */
     public List<Long> getGruppen() {
         if (gruppen.isEmpty()) {
@@ -112,7 +110,7 @@ public class Auswertung {
      *
      * @param gruppe die hinzuzufügende Gruppe
      *
-     * @autor Leon
+     * @author Leon
      */
     public void addGruppeNummer(Long gruppe, int i) {
         if (gruppen.isEmpty()) {
@@ -126,6 +124,12 @@ public class Auswertung {
         }
     }
 
+    /**
+     * Fügt eine neue Gruppennummer zur Liste der Gruppen hinzu.
+     *
+     * @param gruppe die hinzuzufügende Gruppennummer
+     * @author Leon
+     */
     public void addGruppeNummer(Long gruppe) {
         if (gruppen.isEmpty()) {
             gruppen.add(gruppe);
@@ -135,22 +139,11 @@ public class Auswertung {
     }
 
     /**
-     * Überprüft, ob eine Gruppe hinzugefügt wurde.
-     *
-     * @return true, wenn eine Gruppe hinzugefügt wurde, sonst false
-     *
-     * @autor Leon
-     */
-    public boolean gruppeAdded() {
-        return gruppen != null;
-    }
-
-    /**
      * Gibt die Gesamtpunkte zurück.
      *
      * @return die Gesamtpunkte
      *
-     * @autor Leon
+     * @author Leon
      */
     public String getGesamtPunkteAndGruppenarbeiten() {
         return gesamtPunkte + ", " + anzahlGruppenarbeiten;
@@ -161,7 +154,7 @@ public class Auswertung {
      *
      * @param gesamtPunkte die neuen Gesamtpunkte
      *
-     * @autor Leon
+     * @author Leon
      */
     public void setGesamtPunkte(Float gesamtPunkte) {
         this.gesamtPunkte = gesamtPunkte;
@@ -172,7 +165,7 @@ public class Auswertung {
      *
      * @return die Matrikelnummer
      *
-     * @autor Leon
+     * @author Leon
      */
     public String getNameMatrikelnummer() {
         return nameMatrikelnummer;
@@ -183,7 +176,7 @@ public class Auswertung {
      *
      * @param nameMatrikelnummer die neue Matrikelnummer
      *
-     * @autor Leon
+     * @author Leon
      */
     public void setNameMatrikelnummer(String nameMatrikelnummer) {
         this.nameMatrikelnummer = nameMatrikelnummer;
@@ -194,7 +187,7 @@ public class Auswertung {
      *
      * @return die Punkte
      *
-     * @autor Leon
+     * @author Leon
      */
     public List<Float> getPunkte() {
         return punkte;
@@ -204,24 +197,50 @@ public class Auswertung {
      *
      * @param punkte die neuen Punkte für die Gruppenarbeiten
      *
-     * @autor Leon
+     * @author Leon
      */
     public void setPunkte(List<Float> punkte) {
         this.punkte = punkte;
     }
-
+    /**
+     * Fügt der Liste der Punkte einen neuen Punkt hinzu.
+     *
+     * @param punkte der hinzuzufügende Punkt
+     * @throws IllegalArgumentException wenn punkte null ist
+     * @author Leon
+     */
     public void addPunkte(Float punkte) {
+        if (punkte == null) {
+            throw new IllegalArgumentException("Der Punkt darf nicht null sein");
+        }
         this.punkte.add(punkte);
     }
 
+    /**
+     * Gibt die Anzahl der Gruppenarbeiten zurück.
+     *
+     * @return die Anzahl der Gruppenarbeiten
+     * @author Leon
+     */
     public int getAnzahlGruppenarbeiten() {
         return anzahlGruppenarbeiten;
     }
 
+    /**
+     * Setzt die Anzahl der Gruppenarbeiten auf den angegebenen Wert.
+     *
+     * @param anzahlGruppenarbeiten die neue Anzahl der Gruppenarbeiten
+     * @author Leon
+     */
     public void setAnzahlGruppenarbeiten(int anzahlGruppenarbeiten) {
         this.anzahlGruppenarbeiten = anzahlGruppenarbeiten;
     }
 
+    /**
+     * Erhöht die Anzahl der Gruppenarbeiten um eins.
+     *
+     * @author Leon
+     */
     public void incrementAnzahlGruppenarbeiten() {
         anzahlGruppenarbeiten++;
     }
