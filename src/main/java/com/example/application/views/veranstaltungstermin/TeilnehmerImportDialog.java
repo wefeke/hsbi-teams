@@ -3,6 +3,7 @@ package com.example.application.views.veranstaltungstermin;
 import com.example.application.ExcelReader.ExcelImporter;
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
+import com.example.application.models.Veranstaltung;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.services.VeranstaltungenService;
@@ -75,7 +76,9 @@ public class TeilnehmerImportDialog extends Dialog {
             Optional<User> maybeUser = authenticatedUser.get();
             if (maybeUser.isPresent()) {
                 User user = maybeUser.get();
-                veranstaltungService.addTeilnehmer(veranstaltungId, teilnehmerVeranstaltungsListe, user);
+                Veranstaltung veranstaltung = veranstaltungService.findVeranstaltungById(veranstaltungId, user);
+                veranstaltung.addAllTeilnehmer(teilnehmerVeranstaltungsListe);
+                veranstaltungService.saveVeranstaltung(veranstaltung);
             }
 
             if (!newTeilnehmerListe.isEmpty())
@@ -100,8 +103,8 @@ public class TeilnehmerImportDialog extends Dialog {
         upload.addSucceededListener(event -> {
             try {
 
-                newTeilnehmerListe.addAll(excelImporter.readNewTeilnehmerFromExcel(buffer.getInputStream(event.getFileName())));
-                teilnehmerVeranstaltungsListe.addAll(excelImporter.readNewTeilnehmerFromExcel(buffer.getInputStream(event.getFileName())));
+                newTeilnehmerListe.addAll(excelImporter.readAllTeilnehmerFromExcel(buffer.getInputStream(event.getFileName())));
+                teilnehmerVeranstaltungsListe.addAll(excelImporter.readAllTeilnehmerFromExcel(buffer.getInputStream(event.getFileName())));
 
                 List<Teilnehmer> combinedItems = new ArrayList<>();
                 Optional<User> maybeUser = authenticatedUser.get();

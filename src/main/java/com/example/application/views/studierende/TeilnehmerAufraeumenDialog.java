@@ -58,6 +58,7 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
         this.setHeight("80vh");
         grid.setSelectionMode(Grid.SelectionMode.MULTI);
         grid.setColumns("vorname", "nachname", "id");
+        grid.setSizeFull();
         grid.addSelectionListener(selection -> {
             int size = selection.getAllSelectedItems().size();
             deleteButton.setEnabled(size != 0);
@@ -89,9 +90,10 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
         getHeader().add(yearsField);
         getFooter().add(closeButton);
         getFooter().add(deleteButton);
+        VerticalLayout layout = new VerticalLayout(grid);
+        layout.setSizeFull();
 
-        return (
-                new VerticalLayout(grid));
+        return layout;
     }
 
     /**

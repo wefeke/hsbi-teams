@@ -156,6 +156,41 @@ import java.util.Optional;
         workbook.close();
         return teilnehmerList;
     }
+    public List<Teilnehmer> readAllTeilnehmerFromExcel(InputStream inputStream) throws Exception {
+        List<Teilnehmer> teilnehmerList = new ArrayList<>();
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        Sheet sheet = workbook.getSheetAt(0);
+        Iterator<Row> rows = sheet.iterator();
+
+        if (rows.hasNext()) { // skip the header row
+            rows.next();
+        }
+
+        while (rows.hasNext()) {
+            Row currentRow = rows.next();
+            // Assuming the first cell is vorname and the second cell is nachname
+            Cell idCell = currentRow.getCell(0);
+            Cell vornameCell = currentRow.getCell(1);
+            Cell nachnameCell = currentRow.getCell(2);
+
+            Long id = ((long) idCell.getNumericCellValue());
+            String vorname = vornameCell.getStringCellValue();
+            String nachname = nachnameCell.getStringCellValue();
+
+
+
+            // If the Teilnehmer does already exist, add it to the list
+            Teilnehmer teilnehmer = new Teilnehmer();
+            teilnehmer.setId(id);
+            teilnehmer.setVorname(vorname);
+            teilnehmer.setNachname(nachname);
+            teilnehmerList.add(teilnehmer);
+
+        }
+
+        workbook.close();
+        return teilnehmerList;
+    }
 }
 
 

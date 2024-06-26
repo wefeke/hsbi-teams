@@ -81,7 +81,8 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         });
         importButton.addClickListener(event -> {
             TeilnehmerImportDialog teilnehmerImportDialog = new TeilnehmerImportDialog(teilnehmerService, authenticatedUser, veranstaltungService, veranstaltungId, veranstaltungsterminView);
-             teilnehmerImportDialog.open();
+            teilnehmerImportDialog.open();
+            teilnehmerImportDialog.addDialogCloseActionListener(e -> close());
         });
 
         configureGrid();
@@ -96,6 +97,7 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         );
 
         updateGrid();
+
 
     }
 
@@ -148,5 +150,6 @@ public class TeilnehmerHinzufuegenDialog extends Dialog {
         content.setSizeFull();
         return content;
     }
+
 
 }
