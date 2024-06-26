@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.apache.ibatis.annotations.One;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
 
 @Entity

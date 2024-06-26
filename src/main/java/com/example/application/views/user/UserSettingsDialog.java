@@ -29,7 +29,7 @@ public class UserSettingsDialog extends Dialog {
 
     private final TextField name = new TextField("Name");
     private final TextField username = new TextField("Username");
-    private Avatar avatar = new Avatar();
+    private final Avatar avatar = new Avatar();
     private final Button saveButton = new Button("Änderungen speichern");
     private final Button cancelButton = new Button("Abbrechen");
 
@@ -38,12 +38,10 @@ public class UserSettingsDialog extends Dialog {
     private final Upload upload = new Upload(buffer);
     private byte[] uploadedImage;
 
-    private AuthenticatedUser authenticatedUser;
+    private final AuthenticatedUser authenticatedUser;
 
     private User user;
     private final UserService userService;
-
-    private Long userId;
 
     private final Binder<User> binder = new Binder<>(User.class);
 
@@ -57,9 +55,7 @@ public class UserSettingsDialog extends Dialog {
     public UserSettingsDialog(AuthenticatedUser authenticatedUser, UserService userService) {
         this.authenticatedUser = authenticatedUser;
         Optional<User> maybeUser = authenticatedUser.get();
-        if (maybeUser.isPresent()) {
-            this.user = maybeUser.get();
-        }
+        maybeUser.ifPresent(value -> this.user = value);
         this.userService = userService;
         createElements();
         configureElements();

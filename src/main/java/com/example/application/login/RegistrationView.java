@@ -9,7 +9,6 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
@@ -38,28 +37,25 @@ import java.util.*;
 @Route(value = "registration")
 public class RegistrationView extends VerticalLayout {
 
-    private Div mainLayout;
-
     //Elements
-    private H1 header = new H1("Registrieren");
-    private NumberField ID = new NumberField("ID");
-    private TextField name = new TextField("Name");
-    private TextField username = new TextField("Username");
-    private PasswordField password = new PasswordField("Password");
-    private PasswordField password_check = new PasswordField("Password bestätigen");
-    private Button submitButton = new Button("Bestätigen");
-    private Button cancelButton = new Button("Abbrechen");
+    private final H1 header = new H1("Registrieren");
+    private final TextField name = new TextField("Name");
+    private final TextField username = new TextField("Username");
+    private final PasswordField password = new PasswordField("Password");
+    private final PasswordField password_check = new PasswordField("Password bestätigen");
+    private final Button submitButton = new Button("Bestätigen");
+    private final Button cancelButton = new Button("Abbrechen");
 
     //Image
     MultiFileMemoryBuffer buffer =  new MultiFileMemoryBuffer();
-    private Upload upload = new Upload(buffer);
+    private final Upload upload = new Upload(buffer);
     private byte[] uploadedImage;
 
     //Services
     private final UserService userService;
 
     //Data Binder
-    private Binder<User> binder = new Binder<>(User.class);
+    private final Binder<User> binder = new Binder<>(User.class);
 
     //Hashing of Password
     private final PasswordEncoder passwordEncoder;
@@ -77,7 +73,7 @@ public class RegistrationView extends VerticalLayout {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
 
-        mainLayout = new Div(createElements());
+        Div mainLayout = new Div(createElements());
         mainLayout.getStyle()
                 .setBoxShadow("0 0 10px 0 rgba(100, 100, 100, 0.3)")
                 .setBorderRadius("10px")
@@ -219,7 +215,7 @@ public class RegistrationView extends VerticalLayout {
                 .bind(User::getName, User::setName);
         binder.forField(username)
                 .asRequired("Username muss gefüllt sein")
-                .withValidator(username -> userService.isUsernameAvailable(username), "Username bereits vergeben")
+                .withValidator(userService::isUsernameAvailable, "Username bereits vergeben")
                 .withValidator(username -> username.equals(username.toLowerCase()), "Username muss klein geschrieben sein")
                 .bind(User::getUsername, User::setUsername);
         binder.forField(password)

@@ -41,7 +41,7 @@ public class VeranstaltungBearbeitenDialog extends Dialog {
     private final UserService userService;
     private final Veranstaltung veranstaltung;
     private final VeranstaltungenView veranstaltungenView;
-    private Long veranstaltungId;
+    private final Long veranstaltungId;
 
     //Dialog Items
     private final TextField titelField = new TextField("Titel");
@@ -50,7 +50,7 @@ public class VeranstaltungBearbeitenDialog extends Dialog {
     private final Button cancelButton= new Button("Abbrechen");
     private final Button saveButton= new Button("Änderungen speichern");
 
-    private AuthenticatedUser authenticatedUser;
+    private final AuthenticatedUser authenticatedUser;
 
     //Data Binder
     Binder<Veranstaltung> binder = new Binder<>(Veranstaltung.class);
@@ -125,7 +125,9 @@ public class VeranstaltungBearbeitenDialog extends Dialog {
      */
     private void configureElements() {
         //Combobox
-        comboBox.setItems(teilnehmerService.findAllTeilnehmerByUserAndFilter(authenticatedUser.get().get(),""));
+        if (authenticatedUser.get().isPresent())
+            comboBox.setItems(teilnehmerService.findAllTeilnehmerByUserAndFilter(authenticatedUser.get().get(),""));
+
         comboBox.setRenderer(new ComponentRenderer<>(teilnehmer -> {
             HorizontalLayout row = new HorizontalLayout();
             row.setAlignItems(FlexComponent.Alignment.CENTER);

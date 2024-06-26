@@ -6,23 +6,18 @@ import com.example.application.views.auswertung.Auswertung;
 import com.example.application.views.auswertung.TGGPHelper;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Der SuperService stellt verschiedene Funktionen bereit, die mehrere andere Services kombinieren.
  * Diese Klasse bietet Methoden zur Verwaltung und Auswertung von Veranstaltungen, Teilnehmern und Gruppenarbeiten.
  *
- * @autor Leon
+ * @author Leon
  */
 @Service
 public class SuperService {
 
-    private final GruppeService gruppeService;
+    GruppeService gruppeService;
     VeranstaltungenService veranstaltungenService;
     TeilnehmerService teilnehmerService;
     GruppenarbeitService gruppenarbeitService;
@@ -45,7 +40,7 @@ public class SuperService {
      * @param authenticatedUser der aktuell authentifizierte Benutzer
      * @param gruppeService der Service für die Gruppen
      *
-     * @autor Leon
+     * @author Leon
      */
     public SuperService(VeranstaltungenService veranstaltungenService,
                         TeilnehmerService teilnehmerService,
@@ -68,15 +63,12 @@ public class SuperService {
      * @param maybeUser der optionale authentifizierte Benutzer
      * @return der validierte Benutzer
      *
-     * @autor Leon
+     * @author Leon
      */
     private User validateUser(Optional<User> maybeUser) {
-        if (maybeUser.isPresent()) {
-            return maybeUser.get();
-        } else {
-            return new User();
-        }
+        return maybeUser.orElseGet(User::new);
     }
+
 
     /**
      * Findet alle Auswertungen für eine bestimmte Veranstaltung.
@@ -85,7 +77,7 @@ public class SuperService {
      * @param id die ID der Veranstaltung
      * @return eine Liste von Auswertungen
      *
-     * @autor Leon
+     * @author Leon
      */
     public List<Auswertung> findAllAuswertungenByVeranstaltung(Long id) {
         maybeUser = authenticatedUser.get();
@@ -95,13 +87,14 @@ public class SuperService {
 
         // Jeder Veranstaltungstermin kann eine Gruppenarbeit haben und dann auch bewertet werden
         List<Veranstaltungstermin> veranstaltungstermine = veranstaltung.getVeranstaltungstermine();
-        List<Gruppenarbeit> gruppenarbeiten = new ArrayList<>();
+
 
         List<TGGPHelper> tggpHelperList = new ArrayList<>();
 
         // Erstellen der Liste von TGGPHelper für alle Veranstaltungstermine und Gruppenarbeiten
         for (Veranstaltungstermin veranstaltungstermin : veranstaltungstermine) {
-            for (Gruppenarbeit gruppenarbeit : veranstaltungstermin.getGruppenarbeiten()) {
+            List<Gruppenarbeit> gruppenarbeiten = veranstaltungstermin.getGruppenarbeiten();
+            for (Gruppenarbeit gruppenarbeit : gruppenarbeiten) {
                 TGGPHelper tggpHelper = new TGGPHelper();
                 tggpHelper.setVeranstaltungtermin(veranstaltungstermin);
                 tggpHelper.setGruppenarbeit(gruppenarbeit);
@@ -110,48 +103,39 @@ public class SuperService {
         }
 
         List<Auswertung> auswertungen = new ArrayList<>();
+        // Dies ist die Liste aller Auswertungen, wobei jede
+        // einzelne Auswertung für alle Gruppenarbeiten Gruppennummer und Punkte bekommt
+
         // Für jeden Teilnehmer aus der Veranstaltung wird eine Auswertung angelegt
         for (Teilnehmer teilnehmer : teilnehmern) {
-            Auswertung auswertung = new Auswertung();
+            Auswertung auswertung = new Auswertung(); // Eine neue frische Auswertung wird erzeugt
             // Name und Matrikelnummer werden festgelegt
-            auswertung.setNameMatrikelnummer(
+            auswertung.setNameMatrikelnummer( // Auswertung bekommt ihren Teilnehmer mit Name und Matrikelnummer
                     teilnehmer.getVorname() + " " + teilnehmer.getNachname() + "\n" + "(" + teilnehmer.getId() + ")");
-
             // Hinzufügen der Gruppen und Punkte zu den Auswertungen
-            for (TGGPHelper tggpHelper : tggpHelperList) {
-                if (tggpHelper.getGruppenarbeit() != null) {
-                    List<Gruppe> gruppen = tggpHelper.getGruppenarbeit().getGruppen();
-                    for (Gruppe gruppe : gruppen) {
-                        for (Teilnehmer teilnehmerInGruppe : gruppe.getTeilnehmer()) {
-                            if (Objects.equals(teilnehmerInGruppe.getId(), teilnehmer.getId())) {
-                                tggpHelper.addGruppe(gruppe);
-                                auswertung.addGruppe(gruppe);
-                            }
-                        }
+            for (int i = 0;i<=tggpHelperList.size();i++) {
+                auswertung.addGruppeNummer(0L);
+            }
+            for (int i = 0;i<tggpHelperList.size();i++) {// Jeder TggpHelper wird überschrieben mit den nachfolgenden Werten für die spezielle Auswertung des Teilnehmers
+
+                Gruppenarbeit gruppenarbeit =  tggpHelperList.get(i).getGruppenarbeit(); // Zunächst wird die jeweilige Gruppenarbeit aus dem jeweiligen TggpHelper genommen
+
+                List<Gruppe> gruppen2 = gruppenarbeit.getGruppen();
+                for (Gruppe gruppe : gruppen2) {
+                    Set<Teilnehmer> teilnehmer2 = gruppe.getTeilnehmer();
+                    if (teilnehmer2.contains(teilnehmer)) {
+                        auswertung.addGruppeNummer(gruppe.getNummer(),i);
                     }
                 }
                 Float punkt = gruppenarbeitTeilnehmerService.
                         findPunkteByMatrikelNrAndGruppenarbeitId(
-                                teilnehmer.getId(), tggpHelper.getGruppenarbeit().getId());
-
+                                teilnehmer.getId(), gruppenarbeit.getId());
                 auswertung.addToGesamtPunkte(punkt);
                 auswertung.addPunkte(punkt);
             }
-
-            for (Veranstaltungstermin v : veranstaltungstermine) {
-                for (Gruppenarbeit g: v.getGruppenarbeiten()) {
-                    for (Teilnehmer t: g.getTeilnehmer()) {
-                        if (Objects.equals(t.getId(), teilnehmer.getId())) {
-                            auswertung.incrementAnzahlGruppenarbeiten();
-                        }
-                    }
-                }
-            }
-
             auswertung.setTggpHelper(tggpHelperList);
             auswertungen.add(auswertung);
         }
-
         return auswertungen;
     }
 }
