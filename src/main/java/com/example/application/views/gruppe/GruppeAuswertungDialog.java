@@ -19,7 +19,7 @@ import java.util.Optional;
  * Diese Klasse ermöglicht das Hinzufügen, Bearbeiten und Speichern von Bewertungspunkten
  * für Teilnehmer in einer Gruppenarbeit.
  *
- * @autor Leon
+ * @autHor Leon
  */
 @Route(value = "gruppeauswertungsdialog")
 public class GruppeAuswertungDialog extends Dialog {
@@ -55,7 +55,8 @@ public class GruppeAuswertungDialog extends Dialog {
     public GruppeAuswertungDialog(Teilnehmer teilnehmer,
                                   Gruppenarbeit gruppenarbeit,
                                   GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService,
-                                  VeranstaltungsterminView veranstaltungsterminView) {
+                                  VeranstaltungsterminView veranstaltungsterminView) { // Er soll auch nicht autowiren, da ein
+        // Teilnehmer und eine Gruppenarbeit übergeben werdeb
         this.teilnehmer = teilnehmer;
         this.gruppenarbeit = gruppenarbeit;
         this.gruppenarbeitTeilnehmerService = gruppenarbeitTeilnehmerService;
@@ -146,20 +147,24 @@ public class GruppeAuswertungDialog extends Dialog {
 
         // Implementierung des Speichern-Buttons
         saveButton.addClickListener(event -> {
+
             if (binder.writeBeanIfValid(gruppenarbeitTeilnehmer)){
+                System.out.println("Valid");
                 if (auswertungsWert.getValue() != null) {
                     gruppenarbeitTeilnehmer.setPunkte(auswertungsWert.getValue().floatValue());
                     gruppenarbeitTeilnehmerService.save(gruppenarbeitTeilnehmer);
                     close();
                     clearFields();
                 }
-            }
-            if (gruppenarbeit.getVeranstaltungstermin() != null) {
-                veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
+                if (gruppenarbeit.getVeranstaltungstermin() != null) {
+                    veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
+                }
+                veranstaltungsterminView.setAktiveKachelGruppenarbeit(gruppenarbeit);
+                veranstaltungsterminView.update();
             }
 
-            veranstaltungsterminView.setAktiveKachelGruppenarbeit(gruppenarbeit);
-            veranstaltungsterminView.update();
+
+
         });
 
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
