@@ -149,7 +149,6 @@ public class GruppeAuswertungDialog extends Dialog {
         saveButton.addClickListener(event -> {
 
             if (binder.writeBeanIfValid(gruppenarbeitTeilnehmer)){
-                System.out.println("Valid");
                 if (auswertungsWert.getValue() != null) {
                     gruppenarbeitTeilnehmer.setPunkte(auswertungsWert.getValue().floatValue());
                     gruppenarbeitTeilnehmerService.save(gruppenarbeitTeilnehmer);
