@@ -39,6 +39,7 @@ public class TeilnehmerLoeschenDialog extends Dialog {
      * @param authenticatedUser Der authentifizierte Benutzer.
      * @param aufraeumen Der Dialog, der zum Aufräumen von Teilnehmern verwendet wird.
      * @param studierendeView Die Ansicht, die die Studierenden anzeigt.
+     * @author Tobias
      */
     public TeilnehmerLoeschenDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, TeilnehmerAufraeumenDialog aufraeumen, StudierendeView studierendeView) {
         this.teilnehmerService = teilnehmerService;
@@ -77,6 +78,7 @@ public class TeilnehmerLoeschenDialog extends Dialog {
      * Wenn der Teilnehmer nicht in einer Veranstaltung ist, wird eine Bestätigungsnachricht angezeigt und der "deleteBtn" wird aktiviert.
      *
      * @param teilnehmer Der Teilnehmer, der gesetzt werden soll.
+     * @author Tobias
      */
     public void setTeilnehmer(Teilnehmer teilnehmer) {
         this.teilnehmer = teilnehmer;
@@ -106,6 +108,7 @@ public class TeilnehmerLoeschenDialog extends Dialog {
      * Fügt die "cancelBtn" und "deleteBtn" zum Footer hinzu.
      *
      * @return Das erstellte VerticalLayout mit den hinzugefügten Elementen.
+     * @author Tobias
      */
     public VerticalLayout createLayout(){
         VerticalLayout mainLayout = new VerticalLayout();
