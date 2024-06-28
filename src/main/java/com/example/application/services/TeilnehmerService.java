@@ -11,15 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TeilnehmerService {
     private final TeilnehmerRepository teilnehmerRepository;
-    private final VeranstaltungenService veranstaltungenService;
 
-    public TeilnehmerService(TeilnehmerRepository teilnehmerRepository , VeranstaltungenService veranstaltungenService) {
+    public TeilnehmerService(TeilnehmerRepository teilnehmerRepository) {
         this.teilnehmerRepository = teilnehmerRepository;
-        this.veranstaltungenService = veranstaltungenService;
     }
 
 
@@ -57,11 +56,11 @@ public class TeilnehmerService {
 
     @Transactional
     public List<Teilnehmer> findAllTeilnehmerByUserAndFilter(User user, String filterText) {
-            if (filterText == null || filterText.isEmpty()) {
-                return teilnehmerRepository.findByUser(user);
-            } else {
-                return teilnehmerRepository.searchByUser(user, filterText);
-            }
+        if (filterText == null || filterText.isEmpty()) {
+            return teilnehmerRepository.findByUser(user);
+        } else {
+            return teilnehmerRepository.searchByUser(user, filterText);
+        }
     }
 
     @Transactional
@@ -76,7 +75,10 @@ public class TeilnehmerService {
 
     @Transactional
     public List<Teilnehmer> findStudierendeVorJahren(int years, User user) {
-        return teilnehmerRepository.findStudierendeVorJahren(LocalDateTime.now().minusYears(years), user);
+        List<Teilnehmer> teilnehmerList = teilnehmerRepository.findStudierendeVorJahren(LocalDateTime.now().minusYears(years), user);
+        return teilnehmerList.stream()
+                .filter(teilnehmer -> teilnehmer.getVeranstaltungen().isEmpty())
+                .collect(Collectors.toList());
     }
 
     @Transactional

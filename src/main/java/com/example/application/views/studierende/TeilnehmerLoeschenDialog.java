@@ -16,12 +16,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * Diese Klasse repräsentiert einen Dialog zum Löschen von Teilnehmern.
+ * Sie erbt von der Dialog-Klasse von Vaadin und bietet eine Benutzeroberfläche zum Anzeigen und Löschen von Teilnehmern.
+ * Der Dialog enthält Informationen über den zu löschenden Teilnehmer und Schaltflächen zum endgültigen Löschen oder zum Abbrechen des Vorgangs.
+ * Die Klasse verwendet einen TeilnehmerService zum Abrufen und Löschen von Teilnehmern.
+ * Sie enthält auch eine Referenz auf eine StudierendeView und einen TeilnehmerAufraeumenDialog, die aktualisiert werden, wenn Teilnehmer gelöscht werden.
+ * Darüber hinaus bietet die Klasse die Möglichkeit, Teilnehmer basierend auf der Anzahl der Jahre, die sie registriert sind, oder ob sie eine Veranstaltung haben, anzuzeigen und zu löschen.
+ *
+ * @author Tobias
+ */
 @RolesAllowed({"ADMIN", "USER"})
 public class TeilnehmerLoeschenDialog extends Dialog {
     private final TeilnehmerService teilnehmerService;
-    private AuthenticatedUser authenticatedUser;
-    private TeilnehmerAufraeumenDialog teilnehmerAufraeumenDialog;
-    private StudierendeView studierendeView;
+
+
     private Teilnehmer teilnehmer;
 
     H2 infoText = new H2("Empty");
@@ -39,12 +48,11 @@ public class TeilnehmerLoeschenDialog extends Dialog {
      * @param authenticatedUser Der authentifizierte Benutzer.
      * @param aufraeumen Der Dialog, der zum Aufräumen von Teilnehmern verwendet wird.
      * @param studierendeView Die Ansicht, die die Studierenden anzeigt.
+     * @author Tobias
      */
     public TeilnehmerLoeschenDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, TeilnehmerAufraeumenDialog aufraeumen, StudierendeView studierendeView) {
         this.teilnehmerService = teilnehmerService;
-        this.authenticatedUser = authenticatedUser;
-        this.teilnehmerAufraeumenDialog = teilnehmerAufraeumenDialog;
-        this.studierendeView = studierendeView;
+
 
         warningText.addClassName("warning-text-delete");
         warningText.getStyle().set("white-space", "pre-line");
@@ -77,6 +85,7 @@ public class TeilnehmerLoeschenDialog extends Dialog {
      * Wenn der Teilnehmer nicht in einer Veranstaltung ist, wird eine Bestätigungsnachricht angezeigt und der "deleteBtn" wird aktiviert.
      *
      * @param teilnehmer Der Teilnehmer, der gesetzt werden soll.
+     * @author Tobias
      */
     public void setTeilnehmer(Teilnehmer teilnehmer) {
         this.teilnehmer = teilnehmer;
@@ -106,6 +115,7 @@ public class TeilnehmerLoeschenDialog extends Dialog {
      * Fügt die "cancelBtn" und "deleteBtn" zum Footer hinzu.
      *
      * @return Das erstellte VerticalLayout mit den hinzugefügten Elementen.
+     * @author Tobias
      */
     public VerticalLayout createLayout(){
         VerticalLayout mainLayout = new VerticalLayout();

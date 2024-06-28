@@ -7,14 +7,13 @@ import com.example.application.models.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.example.application.views.MainLayout;
+import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.grid.editor.Editor;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -22,8 +21,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
@@ -33,31 +30,35 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 import java.util.stream.Collectors;
-
-
 import java.io.*;
 import java.time.LocalDate;
 import java.util.*;
 
+/**
+ * Diese Klasse repräsentiert die Ansicht der Studierenden in der Anwendung.
+ * Sie erbt von der VerticalLayout-Klasse von Vaadin und stellt eine Tabelle (Grid) zur Anzeige der Studierenden bereit.
+ * Die Klasse bietet auch eine Werkzeugleiste mit Funktionen zum Hinzufügen, Löschen, Importieren und Exportieren von Studierenden.
+ * Darüber hinaus ermöglicht sie das Bearbeiten der Daten der Studierenden direkt in der Tabelle.
+ * Die Klasse verwendet einen TeilnehmerService zum Abrufen und Speichern der Studierenden und einen AuthenticatedUser zur Authentifizierung.
+ * Sie enthält auch Dialoge zum Hinzufügen, Importieren und Aufräumen von Studierenden.
+ *
+ * @author Tobias
+ */
 @Route(value = "studierende", layout = MainLayout.class)
 @PageTitle(value = "Studierende")
 @RolesAllowed({"ADMIN", "USER"})
 public class StudierendeView extends VerticalLayout {
 
-    private final TeilnehmerExcelExporter teilnehmerExcelExporter;
     private final TeilnehmerService teilnehmerService;
     private final Grid<Teilnehmer> grid = new Grid<>();
     private final Editor<Teilnehmer> editor = grid.getEditor();
     private final TextField filterText = new TextField();
     private final Button addStudiernedenButton = new Button(VaadinIcon.PLUS.create());
     private final StudierendeHinzufuegenDialog dialog;
-    private H2 users = new H2("Studierende");
     private final Button delete = new Button(VaadinIcon.TRASH.create());
-    private final Component addStudiernedenButtonIcon;
-    private final Component deleteIcon;
     private final Button importButton = new Button("Importieren");
     private final Button exportButton = new Button("Exportieren");
-    private AuthenticatedUser authenticatedUser;
+    private final AuthenticatedUser authenticatedUser;
     private final StudierendeImportDialog studierendeImportDialog;
 
     TextField vorname = new TextField("Vorname");
@@ -65,47 +66,27 @@ public class StudierendeView extends VerticalLayout {
     NumberField matrikelNr = new NumberField("Matrikelnummer");
     Button aufraeumenButton = new Button("Aufräumen");
 
-
-    MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
-    private final Upload upload = new Upload(buffer);
-//    ExcelImporter excelImporter;
-    Set<Teilnehmer> newTeilnehmerListe = new HashSet<>();
-    private User user;
-
     /**
-     * Konstruktor für die StudierendeView Klasse.
-     * Initialisiert die benötigten Services, Dialoge und Buttons.
-     * Setzt den authentifizierten Benutzer und den ExcelExporter.
-     * Fügt die notwendigen Komponenten zur Ansicht hinzu und konfiguriert das Grid.
-     * Setzt Click-Listener für die Buttons und einen Resize-Listener für das Browserfenster.
+     * Konstruktor für die Klasse StudierendeView.
+     * Dieser Konstruktor initialisiert den authentifizierten Benutzer, den Service zur Handhabung von Teilnehmern und die Dialoge zum Importieren und Aufräumen von Teilnehmern.
+     * Darüber hinaus wird die Ansicht eingerichtet, einschließlich des Grids zur Anzeige der Teilnehmer, der Werkzeugleiste und der Schaltflächen zum Hinzufügen, Löschen, Importieren und Aufräumen von Teilnehmern.
      *
-     * @param teilnehmerService Der Service, der für die Verwaltung der Studierenden benötigt wird.
+     * @param teilnehmerService Der Service zur Handhabung von Teilnehmern.
      * @param authenticatedUser Der aktuell authentifizierte Benutzer.
-     * @param teilnehmerExcelExporter Der ExcelExporter, der für den Export der Studierendendaten benötigt wird.
+     * @author Tobias
      */
     @Autowired
-    public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, TeilnehmerExcelExporter teilnehmerExcelExporter) {
+    public StudierendeView(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
         this.authenticatedUser = authenticatedUser;
         this.teilnehmerService = teilnehmerService;
         TeilnehmerAufraeumenDialog teilnehmerAufraeumenDialogDialog = new TeilnehmerAufraeumenDialog(teilnehmerService, authenticatedUser, this);
-        TeilnehmerLoeschenDialog teilnehmerLoeschenDialog = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, teilnehmerAufraeumenDialogDialog, this);
-        StudierendeHinzufuegenDialog studierendeHinzufuegenDialog = new StudierendeHinzufuegenDialog(teilnehmerService, authenticatedUser, this);
-        this.teilnehmerExcelExporter = teilnehmerExcelExporter;
-//        this.excelImporter = new ExcelImporter(teilnehmerService, authenticatedUser);
         this.studierendeImportDialog = new StudierendeImportDialog(teilnehmerService, authenticatedUser, this);
 
         TeilnehmerAufraeumenDialog aufraeumenDialog = new TeilnehmerAufraeumenDialog(teilnehmerService, authenticatedUser, this);
-        TeilnehmerLoeschenDialog deleteDialog = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, aufraeumenDialog, this);
-        StudierendeHinzufuegenDialog studierendeHinzufuegen = new StudierendeHinzufuegenDialog(teilnehmerService, authenticatedUser, this);
-        addStudiernedenButtonIcon = addStudiernedenButton.getIcon();
-        deleteIcon = delete.getIcon();
-        //aendernIcon = aendern.getIcon();
-
         addClassName("Studierenden-view");
         Optional<User> maybeUser = authenticatedUser.get();
-        if (maybeUser.isPresent()) {
-            this.user = maybeUser.get();
-        }
+        maybeUser.ifPresent(value -> {
+        });
 
         setSizeFull();
         configureGrid();
@@ -116,18 +97,16 @@ public class StudierendeView extends VerticalLayout {
         );
         updateStudierendeView();
 
-        dialog = new StudierendeHinzufuegenDialog(teilnehmerService, authenticatedUser, this);
+        dialog = new StudierendeHinzufuegenDialog(teilnehmerService, authenticatedUser,this);
         addStudiernedenButton.addClickListener(event -> {
             dialog.open();
             updateStudierendeView();
         });
 
-        // CSS Befehle
         delete.setEnabled(false);
         delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
         delete.getStyle().set("margin-inline-start", "auto");
 
-        // Click-Listener für den Lösch-Button
         delete.addClickListener(event -> {
             Set<Teilnehmer> selectedTeilnehmer = grid.getSelectedItems();
             if (!selectedTeilnehmer.isEmpty()) {
@@ -139,28 +118,19 @@ public class StudierendeView extends VerticalLayout {
             }
         });
 
-        importButton.addClickListener(event -> {
-            studierendeImportDialog.open();
-        });
-
-
-        UI.getCurrent().getPage().addBrowserWindowResizeListener(event -> {
-            if (event.getWidth() <= 1000) {
-                makeButtonsSmall();
-            } else {
-                restoreButtons();
-            }
-        });
+        importButton.addClickListener(this::onComponentEvent);
 
         aufraeumenButton.addClickListener(event -> teilnehmerAufraeumenDialogDialog.open());
     }
 
     /**
-    * Aktualisiert die Ansicht der Studierenden in der Tabelle (Grid).
-    * Es werden alle Studierenden, die dem authentifizierten Benutzer zugeordnet sind, abgerufen und basierend auf dem Suchtext gefiltert.
-    * Der Suchtext wird mit dem Vornamen, Nachnamen und der ID (Matrikelnummer) der Studierenden verglichen.
-    * Die gefilterte Liste der Studierenden wird dann als Elemente der Tabelle gesetzt.
-    */
+     * Aktualisiert die Ansicht der Studierenden in der Tabelle (Grid).
+     * Es werden alle Studierenden, die dem authentifizierten Benutzer zugeordnet sind, abgerufen und basierend auf dem Suchtext gefiltert.
+     * Der Suchtext wird mit dem Vornamen, Nachnamen und der ID (Matrikelnummer) der Studierenden verglichen.
+     * Die gefilterte Liste der Studierenden wird dann als Elemente der Tabelle gesetzt.
+     *
+     * @author Tobias
+     */
     public void updateStudierendeView() {
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
@@ -168,22 +138,22 @@ public class StudierendeView extends VerticalLayout {
             String searchText = filterText.getValue().toLowerCase();
             List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmer(user);
             List<Teilnehmer> filteredTeilnehmerList = teilnehmerList.stream()
-                .filter(teilnehmer -> teilnehmer.getVorname().toLowerCase().contains(searchText)
-                        || teilnehmer.getNachname().toLowerCase().contains(searchText)
-                        || Long.toString(teilnehmer.getId()).contains(searchText)) // Vergleicht den Suchtext mit der Matrikelnummer
-                .collect(Collectors.toList());
+                    .filter(teilnehmer -> teilnehmer.getVorname().toLowerCase().contains(searchText)
+                            || teilnehmer.getNachname().toLowerCase().contains(searchText)
+                            || Long.toString(teilnehmer.getId()).contains(searchText))
+                    .collect(Collectors.toList());
             grid.setItems(filteredTeilnehmerList);
         }
     }
 
-
     /**
-    * Erstellt und gibt eine Komponente zurück, die das Hauptlayout für die Anzeige der Studierenden enthält.
-    * Das Layout ist ein HorizontalLayout, das ein Grid enthält, welches die Studierenden anzeigt.
-    * Das Grid nimmt den gesamten verfügbaren Platz im Layout ein.
-    *
-    * @return Eine Komponente, die das Hauptlayout für die Anzeige der Studierenden enthält.
-    */
+     * Erstellt und gibt eine Komponente zurück, die das Hauptlayout für die Anzeige der Studierenden enthält.
+     * Das Layout ist ein HorizontalLayout, das ein Grid enthält, welches die Studierenden anzeigt.
+     * Das Grid nimmt den gesamten verfügbaren Platz im Layout ein.
+     *
+     * @return Eine Komponente, die das Hauptlayout für die Anzeige der Studierenden enthält.
+     * @author Tobias
+     */
     private Component getContent() {
         HorizontalLayout content = new HorizontalLayout(grid);
         content.setFlexGrow(1, grid);
@@ -192,6 +162,7 @@ public class StudierendeView extends VerticalLayout {
 
         return content;
     }
+
     /**
      * Konfiguriert das Grid für die Anzeige der Studierenden.
      * Es werden Spalten für Vorname, Nachname und Matrikelnummer erstellt und entsprechende Header gesetzt.
@@ -202,23 +173,29 @@ public class StudierendeView extends VerticalLayout {
      * Ein Button zum Speichern und ein Button zum Abbrechen der Bearbeitung werden hinzugefügt.
      * Bei Klick auf den Speichern-Button wird der aktuell bearbeitete Studierende gespeichert.
      * Bei Klick auf den Abbrechen-Button wird die Bearbeitung abgebrochen.
+     *
+     * @author Tobias
      */
     private void configureGrid() {
         grid.setSizeFull();
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
-        Grid.Column<Teilnehmer> vornameColumn = grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname").setSortable(true);;
-        Grid.Column<Teilnehmer> nachnameColumn = grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname").setSortable(true);;
-        Grid.Column<Teilnehmer> matrikelNrColumn = grid.addColumn(Teilnehmer::getId).setHeader("MatrikelNr").setSortable(true);;
+        Grid.Column<Teilnehmer> vornameColumn = grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname").setSortable(true);
+        Grid.Column<Teilnehmer> nachnameColumn = grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname").setSortable(true);
+        Grid.Column<Teilnehmer> matrikelNrColumn = grid.addColumn(Teilnehmer::getId).setHeader("MatrikelNr").setSortable(true);
         grid.addSelectionListener(selection -> {
             int size = selection.getAllSelectedItems().size();
             delete.setEnabled(size != 0);
+
+            if (editor.isOpen()) {
+                editor.cancel();
+            }
         });
         Grid.Column<Teilnehmer> editColumn = grid.addComponentColumn(teilnehmer -> {
             Button editButton = new Button(LineAwesomeIcon.EDIT.create());
             editButton.addClickListener(click -> {
                 if (editor.isOpen())
                     editor.cancel();
-                grid.select(teilnehmer); // Zeile auswählen
+                grid.select(teilnehmer);
                 grid.getEditor().editItem(teilnehmer);
             });
             return editButton;
@@ -241,7 +218,7 @@ public class StudierendeView extends VerticalLayout {
 
         binder.forField(matrikelNr)
                 .asRequired("Matrikelnummer muss gefüllt sein")
-                .withConverter(d -> Double.valueOf(d).longValue(), Long::doubleValue)
+                .withConverter(Double::longValue, Long::doubleValue)
                 .bind(Teilnehmer::getId, Teilnehmer::setId);
         matrikelNrColumn.setEditorComponent(matrikelNr);
         matrikelNr.setEnabled(false);
@@ -267,12 +244,14 @@ public class StudierendeView extends VerticalLayout {
         actions.setPadding(false);
         editColumn.setEditorComponent(actions);
     }
+
     /**
      * Erstellt und gibt eine Komponente zurück, die die Werkzeugleiste für die Studierendenansicht enthält.
      * Die Werkzeugleiste besteht aus einem Filtertextfeld und zwei Buttons zum Hinzufügen und Löschen von Studierenden.
      * Das Filtertextfeld hat einen Platzhaltertext, einen Löschen-Button und einen Listener, der die Studierendenansicht aktualisiert, wenn sich der Text ändert.
      *
      * @return Eine Komponente, die die Werkzeugleiste für die Studierendenansicht enthält.
+     * @author Tobias
      */
     private Component getToolbar() {
         filterText.setPlaceholder("Suche...");
@@ -294,10 +273,10 @@ public class StudierendeView extends VerticalLayout {
      * Der Export-Button löst einen Klick auf den Download-Link aus, um den Download der Excel-Datei zu starten.
      *
      * @return Eine Komponente, die die zweite Werkzeugleiste für die Studierendenansicht enthält.
+     * @author Tobias
      */
     private Component getToolbar2() {
 
-        // Ein Anchor, unter welchem der Download der Daten möglich ist
         Anchor anchor = new Anchor();
         anchor.setText("Download");
         anchor.getElement().getStyle().set("display", "none");
@@ -309,9 +288,8 @@ public class StudierendeView extends VerticalLayout {
             User user = maybeUser.get();
             List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue());
 
-            // Die eigentlichen Daten werden in diesem Objekt gespeichert und dem Anchor übergeben
             StreamResource resource = new StreamResource("teilnehmerliste_" + LocalDate.now() + ".xlsx", () -> {
-                byte[] data = null; // Your method to fetch data
+                byte[] data;
                 try {
                     TeilnehmerExcelExporter teilnehmerExcelExporter = new TeilnehmerExcelExporter();
                     data = teilnehmerExcelExporter.export(teilnehmerList);
@@ -329,30 +307,12 @@ public class StudierendeView extends VerticalLayout {
         HorizontalLayout toolbar2 = new HorizontalLayout(importButton, anchor, exportButton, aufraeumenButton);
         toolbar2.setWidthFull();
         toolbar2.addClassName("toolbar");
-        toolbar2.setJustifyContentMode(FlexComponent.JustifyContentMode.END); // Buttons nach rechts verschieben
+        toolbar2.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
         return toolbar2;
     }
 
-    /**
-     * Ändert den Text der Buttons "addStudiernedenButton" und "delete" auf kleinere Symbole.
-     * Dies ist nützlich für kleinere Bildschirmauflösungen oder wenn mehr Platz benötigt wird.
-     */
-    private void makeButtonsSmall() {
 
-        addStudiernedenButton.setText("+");
-        delete.setText("-");
-    }
-
-    /**
-     * Stellt den ursprünglichen Text und das Icon der Buttons "addStudiernedenButton" und "delete" wieder her.
-     * Dies ist nützlich, wenn die Bildschirmauflösung wieder größer wird oder weniger Platz benötigt wird.
-     */
-    private void restoreButtons() {
-        addStudiernedenButton.setIcon(addStudiernedenButtonIcon);
-        addStudiernedenButton.setText("Studierenden hinzufügen");
-
-        delete.setIcon(deleteIcon);
-        delete.setText("Studierenden löschen");
-
+    private void onComponentEvent(ClickEvent<Button> event) {
+        studierendeImportDialog.open();
     }
 }
