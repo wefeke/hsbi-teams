@@ -127,7 +127,7 @@ public class TeilnehmerImportDialog extends Dialog {
 
                     Dialog dialog = new Dialog();
                     dialog.setHeight(getHeight());
-                    dialog.setHeaderTitle(neueStudierende.size() + " neue Teilnehmer gefunden, der neu angelegt werden muss");
+                    dialog.setHeaderTitle(neueStudierende.size() + " Teilnehmer gefunden, der neu angelegt werden muss");
                     dialog.getFooter().add(new Button("OK", e -> dialog.close()));
 
                     if (!neueStudierende.isEmpty()) {

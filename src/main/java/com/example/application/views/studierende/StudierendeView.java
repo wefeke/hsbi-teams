@@ -187,7 +187,7 @@ public class StudierendeView extends VerticalLayout {
             delete.setEnabled(size != 0);
 
             if (editor.isOpen()) {
-                editor.cancel(); // Schließt den Editor und verwirft die Änderungen
+                editor.cancel();
             }
         });
         Grid.Column<Teilnehmer> editColumn = grid.addComponentColumn(teilnehmer -> {
@@ -195,7 +195,7 @@ public class StudierendeView extends VerticalLayout {
             editButton.addClickListener(click -> {
                 if (editor.isOpen())
                     editor.cancel();
-                grid.select(teilnehmer); // Zeile auswählen
+                grid.select(teilnehmer);
                 grid.getEditor().editItem(teilnehmer);
             });
             return editButton;
@@ -288,9 +288,8 @@ public class StudierendeView extends VerticalLayout {
             User user = maybeUser.get();
             List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue());
 
-            // Die eigentlichen Daten werden in diesem Objekt gespeichert und dem Anchor übergeben
             StreamResource resource = new StreamResource("teilnehmerliste_" + LocalDate.now() + ".xlsx", () -> {
-                byte[] data; // Your method to fetch data
+                byte[] data;
                 try {
                     TeilnehmerExcelExporter teilnehmerExcelExporter = new TeilnehmerExcelExporter();
                     data = teilnehmerExcelExporter.export(teilnehmerList);
@@ -308,7 +307,7 @@ public class StudierendeView extends VerticalLayout {
         HorizontalLayout toolbar2 = new HorizontalLayout(importButton, anchor, exportButton, aufraeumenButton);
         toolbar2.setWidthFull();
         toolbar2.addClassName("toolbar");
-        toolbar2.setJustifyContentMode(FlexComponent.JustifyContentMode.END); // Buttons nach rechts verschieben
+        toolbar2.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
         return toolbar2;
     }
 

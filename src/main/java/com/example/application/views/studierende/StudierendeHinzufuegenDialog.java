@@ -152,7 +152,6 @@ public class StudierendeHinzufuegenDialog extends Dialog {
     private void saveTeilnehmer() {
         Teilnehmer teilnehmer = new Teilnehmer();
 
-        // Check if the Matrikelnummer is valid before saving the Teilnehmer
         if (matrikelNr.getValue() != null && String.valueOf(matrikelNr.getValue().longValue()).matches("\\d{7}")) {
             if (binder.writeBeanIfValid(teilnehmer)) {
                 Optional<User> maybeUser = authenticatedUser.get();
