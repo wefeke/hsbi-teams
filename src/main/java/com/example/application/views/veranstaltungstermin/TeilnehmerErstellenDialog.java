@@ -15,9 +15,18 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import jakarta.annotation.security.RolesAllowed;
-
 import java.util.Optional;
 
+/**
+ * Diese Klasse repräsentiert einen Dialog zum Erstellen von Teilnehmern.
+ * Sie erbt von der Dialog-Klasse von Vaadin und bietet eine Benutzeroberfläche zum Eingeben der Daten eines neuen Teilnehmers.
+ * Der Dialog enthält Felder für den Vornamen, Nachnamen und die Matrikelnummer des Teilnehmers.
+ * Es gibt auch Schaltflächen zum Speichern des neuen Teilnehmers oder zum Abbrechen des Vorgangs.
+ * Die Klasse verwendet einen TeilnehmerService zum Speichern des neuen Teilnehmers und einen AuthenticatedUser zur Authentifizierung.
+ * Sie enthält auch eine Referenz auf einen TeilnehmerHinzufuegenDialog, der aktualisiert wird, wenn ein neuer Teilnehmer hinzugefügt wird.
+ *
+ * @author Tobias
+ */
 @RolesAllowed({"ADMIN", "USER"})
 public class TeilnehmerErstellenDialog extends Dialog {
 

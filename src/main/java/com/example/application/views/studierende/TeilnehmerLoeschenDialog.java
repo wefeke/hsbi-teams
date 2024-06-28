@@ -16,6 +16,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * Diese Klasse repräsentiert einen Dialog zum Löschen von Teilnehmern.
+ * Sie erbt von der Dialog-Klasse von Vaadin und bietet eine Benutzeroberfläche zum Anzeigen und Löschen von Teilnehmern.
+ * Der Dialog enthält Informationen über den zu löschenden Teilnehmer und Schaltflächen zum endgültigen Löschen oder zum Abbrechen des Vorgangs.
+ * Die Klasse verwendet einen TeilnehmerService zum Abrufen und Löschen von Teilnehmern.
+ * Sie enthält auch eine Referenz auf eine StudierendeView und einen TeilnehmerAufraeumenDialog, die aktualisiert werden, wenn Teilnehmer gelöscht werden.
+ * Darüber hinaus bietet die Klasse die Möglichkeit, Teilnehmer basierend auf der Anzahl der Jahre, die sie registriert sind, oder ob sie eine Veranstaltung haben, anzuzeigen und zu löschen.
+ *
+ * @author Tobias
+ */
 @RolesAllowed({"ADMIN", "USER"})
 public class TeilnehmerLoeschenDialog extends Dialog {
     private final TeilnehmerService teilnehmerService;

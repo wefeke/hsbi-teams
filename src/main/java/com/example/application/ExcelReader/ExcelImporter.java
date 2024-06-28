@@ -157,7 +157,17 @@ public class ExcelImporter {
         return teilnehmerList;
     }
 
-
+    /**
+     * Liest Teilnehmerdaten aus einer Excel-Datei und gibt eine Liste von Teilnehmer-Objekten zurück.
+     * Jede Zeile in der Excel-Datei sollte einen Teilnehmer darstellen, wobei die erste Zelle die ID,
+     * die zweite Zelle den Vornamen und die dritte Zelle den Nachnamen ist.
+     * Alle Teilnehmer, unabhängig davon, ob sie bereits in der Datenbank existieren oder nicht, werden zur Liste hinzugefügt.
+     *
+     * @param inputStream der InputStream der Excel-Datei
+     * @return eine Liste von Teilnehmer-Objekten, die aus der Excel-Datei gelesen wurden
+     * @throws Exception wenn ein Fehler beim Lesen der Excel-Datei oder bei der Verarbeitung der Daten auftritt
+     * @author Kennet
+     */
     public List<Teilnehmer> readAllTeilnehmerFromExcel(InputStream inputStream) throws Exception {
         List<Teilnehmer> teilnehmerList = new ArrayList<>();
         Workbook workbook = new XSSFWorkbook(inputStream);

@@ -30,12 +30,20 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 import java.util.stream.Collectors;
-
-
 import java.io.*;
 import java.time.LocalDate;
 import java.util.*;
 
+/**
+ * Diese Klasse repräsentiert die Ansicht der Studierenden in der Anwendung.
+ * Sie erbt von der VerticalLayout-Klasse von Vaadin und stellt eine Tabelle (Grid) zur Anzeige der Studierenden bereit.
+ * Die Klasse bietet auch eine Werkzeugleiste mit Funktionen zum Hinzufügen, Löschen, Importieren und Exportieren von Studierenden.
+ * Darüber hinaus ermöglicht sie das Bearbeiten der Daten der Studierenden direkt in der Tabelle.
+ * Die Klasse verwendet einen TeilnehmerService zum Abrufen und Speichern der Studierenden und einen AuthenticatedUser zur Authentifizierung.
+ * Sie enthält auch Dialoge zum Hinzufügen, Importieren und Aufräumen von Studierenden.
+ *
+ * @author Tobias
+ */
 @Route(value = "studierende", layout = MainLayout.class)
 @PageTitle(value = "Studierende")
 @RolesAllowed({"ADMIN", "USER"})

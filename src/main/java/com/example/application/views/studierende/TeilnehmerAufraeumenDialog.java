@@ -14,7 +14,16 @@ import jakarta.annotation.security.RolesAllowed;
 
 import java.util.*;
 
-
+/**
+ * Diese Klasse repräsentiert einen Dialog zum Aufräumen von Teilnehmern.
+ * Sie erbt von der Dialog-Klasse von Vaadin und bietet eine Benutzeroberfläche zum Anzeigen und Löschen von Teilnehmern.
+ * Der Dialog enthält ein Grid zur Anzeige der Teilnehmer und Schaltflächen zum Löschen ausgewählter Teilnehmer und zum Schließen des Dialogs.
+ * Die Klasse verwendet einen TeilnehmerService zum Abrufen und Löschen von Teilnehmern und einen AuthenticatedUser zur Authentifizierung.
+ * Sie enthält auch eine Referenz auf eine StudierendeView, die aktualisiert wird, wenn Teilnehmer gelöscht werden.
+ * Darüber hinaus bietet die Klasse die Möglichkeit, Teilnehmer basierend auf der Anzahl der Jahre, die sie registriert sind, oder ob sie keine Veranstaltung haben, anzuzeigen.
+ *
+ * @author Tobias
+ */
 @RolesAllowed({"ADMIN", "USER"})
 public class TeilnehmerAufraeumenDialog extends Dialog {
     private final TeilnehmerService teilnehmerService;

@@ -15,9 +15,18 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import jakarta.annotation.security.RolesAllowed;
-
 import java.util.Optional;
 
+/**
+ * Diese Klasse repräsentiert einen Dialog zum Importieren von Studierenden aus einer Excel-Datei.
+ * Sie erbt von der Dialog-Klasse von Vaadin und bietet eine Benutzeroberfläche zum Hochladen einer Excel-Datei und zum Importieren der darin enthaltenen Studierenden.
+ * Der Dialog enthält einen Upload-Bereich für die Excel-Datei und Schaltflächen zum Importieren der Studierenden und zum Schließen des Dialogs.
+ * Bei erfolgreichem Hochladen einer Datei werden die Studierendendaten aus der Datei gelesen und in die Datenbank eingefügt.
+ * Die Klasse verwendet einen TeilnehmerService zum Speichern der neuen Studierenden und einen AuthenticatedUser zur Authentifizierung.
+ * Sie enthält auch eine Referenz auf eine StudierendeView, die aktualisiert wird, wenn neue Studierende hinzugefügt werden.
+ *
+ * @author Tobias
+ */
 @RolesAllowed({"ADMIN", "USER"})
 public class StudierendeHinzufuegenDialog extends Dialog {
 

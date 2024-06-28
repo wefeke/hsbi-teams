@@ -18,13 +18,22 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Diese Klasse repräsentiert einen Dialog zum Hinzufügen von Teilnehmern.
+ * Sie erbt von der Dialog-Klasse von Vaadin und bietet eine Benutzeroberfläche zum Anzeigen und Hinzufügen von Teilnehmern.
+ * Der Dialog enthält ein Grid zur Anzeige der Teilnehmer und Schaltflächen zum Hinzufügen, Erstellen und Importieren von Teilnehmern sowie zum Schließen des Dialogs.
+ * Die Klasse verwendet einen TeilnehmerService zum Abrufen und Hinzufügen von Teilnehmern und einen AuthenticatedUser zur Authentifizierung.
+ * Sie enthält auch eine Referenz auf eine VeranstaltungsterminView, die aktualisiert wird, wenn Teilnehmer hinzugefügt werden.
+ * Darüber hinaus bietet die Klasse die Möglichkeit, Teilnehmer basierend auf einem Suchtext zu filtern.
+ *
+ * @author Tobias
+ */
 public class TeilnehmerHinzufuegenDialog extends Dialog {
 
     private final TeilnehmerService teilnehmerService;

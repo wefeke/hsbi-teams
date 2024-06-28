@@ -18,9 +18,19 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import jakarta.annotation.security.RolesAllowed;
 import org.vaadin.lineawesome.LineAwesomeIcon;
-
 import java.util.*;
 
+/**
+ * Diese Klasse repräsentiert einen Dialog zum Importieren von Teilnehmern.
+ * Sie erbt von der Dialog-Klasse von Vaadin und bietet eine Benutzeroberfläche zum Hochladen einer Excel-Datei mit Teilnehmerdaten und zum Importieren dieser Daten.
+ * Der Dialog enthält einen Upload-Button zum Hochladen der Excel-Datei, einen Import-Button zum Importieren der hochgeladenen Daten und einen Schließen-Button zum Schließen des Dialogs.
+ * Bei erfolgreichem Hochladen einer Datei werden die Teilnehmerdaten aus der Datei gelesen und in die entsprechenden Listen eingefügt.
+ * Wenn neue Teilnehmer gefunden werden, die noch nicht in der Datenbank vorhanden sind, wird ein Dialog mit einer Liste dieser Teilnehmer angezeigt.
+ * Die Klasse verwendet einen ExcelImporter zum Lesen der Daten aus der Excel-Datei, einen TeilnehmerService zum Speichern der importierten Teilnehmer und einen AuthenticatedUser zur Authentifizierung.
+ * Sie enthält auch eine Referenz auf eine VeranstaltungsterminView und einen TeilnehmerHinzufuegenDialog, die aktualisiert werden, wenn Teilnehmer importiert werden.
+ *
+ * @author Tobias
+ */
 @RolesAllowed({"ADMIN", "USER"})
 public class TeilnehmerImportDialog extends Dialog {
 
