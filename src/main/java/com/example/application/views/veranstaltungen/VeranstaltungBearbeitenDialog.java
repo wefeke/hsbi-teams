@@ -67,7 +67,7 @@ public class VeranstaltungBearbeitenDialog extends Dialog {
      * @param veranstaltungenView Ein VeranstaltungenView-Objekt, das die Ansicht der Veranstaltungen repräsentiert.
      * @param authenticatedUser Ein AuthenticatedUser-Objekt, das Informationen über den authentifizierten Benutzer enthält.
      */
-    public VeranstaltungBearbeitenDialog(VeranstaltungenService veranstaltungenService, TeilnehmerService teilnehmerService, UserService userService, Veranstaltung veranstaltung, VeranstaltungenView veranstaltungenView, AuthenticatedUser authenticatedUser) {
+    public VeranstaltungBearbeitenDialog(VeranstaltungenService veranstaltungenService, TeilnehmerService teilnehmerService, UserService userService, @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") Veranstaltung veranstaltung, VeranstaltungenView veranstaltungenView, AuthenticatedUser authenticatedUser) {
         this.veranstaltungenService = veranstaltungenService;
         this.teilnehmerService = teilnehmerService;
         this.userService = userService;

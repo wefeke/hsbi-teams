@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class TeilnehmerExcelExporter {
-    private XSSFWorkbook workbook;
+    private final XSSFWorkbook workbook;
     private XSSFSheet sheet;
     private List<Teilnehmer> teilnehmer;
 
