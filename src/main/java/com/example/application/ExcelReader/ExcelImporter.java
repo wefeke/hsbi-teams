@@ -23,7 +23,7 @@ import java.util.Optional;
  */
 public class ExcelImporter {
 
-    private TeilnehmerService teilnehmerService;
+    private final TeilnehmerService teilnehmerService;
     private User user;
 
     /**
@@ -36,9 +36,7 @@ public class ExcelImporter {
     public ExcelImporter(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser) {
         this.teilnehmerService = teilnehmerService;
         Optional<User> maybeUser = authenticatedUser.get();
-        if (maybeUser.isPresent()) {
-            this.user = maybeUser.get();
-        }
+        maybeUser.ifPresent(value -> this.user = value);
     }
 
     /**
@@ -47,10 +45,10 @@ public class ExcelImporter {
      * die zweite Zelle den Vornamen und die dritte Zelle den Nachnamen ist.
      * Wenn ein Teilnehmer mit der gleichen ID bereits in der Datenbank existiert, wird er zur Liste hinzugefügt.
      *
+     * @author Kennet
      * @param inputStream der InputStream der Excel-Datei
      * @return eine Liste von Teilnehmer-Objekten, die aus der Excel-Datei gelesen wurden
      * @throws Exception wenn ein Fehler beim Lesen der Excel-Datei oder bei der Verarbeitung der Daten auftritt
-     * @author Kennet
      */
     public List<Teilnehmer> readOldTeilnehmerFromExcel(InputStream inputStream) throws Exception {
         List<Teilnehmer> teilnehmerList = new ArrayList<>();
@@ -163,6 +161,7 @@ public class ExcelImporter {
      * die zweite Zelle den Vornamen und die dritte Zelle den Nachnamen ist.
      * Alle Teilnehmer, unabhängig davon, ob sie bereits in der Datenbank existieren oder nicht, werden zur Liste hinzugefügt.
      *
+     * @author Kennet
      * @param inputStream der InputStream der Excel-Datei
      * @return eine Liste von Teilnehmer-Objekten, die aus der Excel-Datei gelesen wurden
      * @throws Exception wenn ein Fehler beim Lesen der Excel-Datei oder bei der Verarbeitung der Daten auftritt

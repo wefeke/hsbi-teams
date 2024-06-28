@@ -41,10 +41,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      * @param username Der Benutzername des Benutzers, dessen Details geladen werden sollen.
      * @return Ein UserDetails-Objekt, das die Details des Benutzers enthält.
      * @throws UsernameNotFoundException Wenn kein Benutzer mit dem angegebenen Benutzernamen vorhanden ist oder der Benutzer gesperrt ist.
+     * @throws UserIsLockedException Wenn der Benutzer gesperrt ist.
      */
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, UserIsLockedException {
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException("Keinen User mit Usernamen : " + username + " gefunden");

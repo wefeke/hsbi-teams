@@ -67,6 +67,7 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
      * Wird aufgerufen, bevor der Benutzer die Seite betritt.
      * Überprüft, ob der Benutzer bereits eingeloggt ist und leitet ihn gegebenenfalls zur Hauptseite weiter.
      * Zeigt außerdem eine Fehlermeldung an, wenn der Parameter "error" in der URL vorhanden ist.
+     * Zeigt außerdem eine eigene Fehlermeldung an, wenn der Parameter "lockerror" in der URL vorhanden ist.
      *
      * @author Kennet
      * @param event Ein BeforeEnterEvent-Objekt, das Informationen über das bevorstehende Betreten der Seite enthält.
