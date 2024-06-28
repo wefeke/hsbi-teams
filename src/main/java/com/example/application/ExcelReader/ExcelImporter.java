@@ -21,7 +21,7 @@ import java.util.Optional;
  *
  * @author Kennet
  */
- public class ExcelImporter {
+public class ExcelImporter {
 
     private TeilnehmerService teilnehmerService;
     private User user;
@@ -151,6 +151,40 @@ import java.util.Optional;
                 }
                 teilnehmerList.add(teilnehmer);
             }
+        }
+
+        workbook.close();
+        return teilnehmerList;
+    }
+
+
+    public List<Teilnehmer> readAllTeilnehmerFromExcel(InputStream inputStream) throws Exception {
+        List<Teilnehmer> teilnehmerList = new ArrayList<>();
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        Sheet sheet = workbook.getSheetAt(0);
+        Iterator<Row> rows = sheet.iterator();
+
+        if (rows.hasNext()) {
+            rows.next();
+        }
+
+        while (rows.hasNext()) {
+            Row currentRow = rows.next();
+
+            Cell idCell = currentRow.getCell(0);
+            Cell vornameCell = currentRow.getCell(1);
+            Cell nachnameCell = currentRow.getCell(2);
+
+            Long id = ((long) idCell.getNumericCellValue());
+            String vorname = vornameCell.getStringCellValue();
+            String nachname = nachnameCell.getStringCellValue();
+
+            Teilnehmer teilnehmer = new Teilnehmer();
+            teilnehmer.setId(id);
+            teilnehmer.setVorname(vorname);
+            teilnehmer.setNachname(nachname);
+            teilnehmerList.add(teilnehmer);
+
         }
 
         workbook.close();
