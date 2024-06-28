@@ -19,9 +19,8 @@ import java.util.stream.IntStream;
 @RolesAllowed({"ADMIN", "USER"})
 public class TeilnehmerLoeschenDialog extends Dialog {
     private final TeilnehmerService teilnehmerService;
-    private AuthenticatedUser authenticatedUser;
-    private TeilnehmerAufraeumenDialog teilnehmerAufraeumenDialog;
-    private StudierendeView studierendeView;
+
+
     private Teilnehmer teilnehmer;
 
     H2 infoText = new H2("Empty");
@@ -43,9 +42,7 @@ public class TeilnehmerLoeschenDialog extends Dialog {
      */
     public TeilnehmerLoeschenDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, TeilnehmerAufraeumenDialog aufraeumen, StudierendeView studierendeView) {
         this.teilnehmerService = teilnehmerService;
-        this.authenticatedUser = authenticatedUser;
-        this.teilnehmerAufraeumenDialog = teilnehmerAufraeumenDialog;
-        this.studierendeView = studierendeView;
+
 
         warningText.addClassName("warning-text-delete");
         warningText.getStyle().set("white-space", "pre-line");
