@@ -12,6 +12,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Die VeranstaltungenService Klasse bietet Methoden zur Interaktion mit Veranstaltungsdaten in der Datenbank.
+ * Sie enthält Methoden zum Abrufen, Speichern und Löschen von Veranstaltungen.
+ * Jede Methode ist als Transaktion gekennzeichnet, um die Datenintegrität zu gewährleisten.
+ * Die Klasse verwendet das VeranstaltungenRepository zur Interaktion mit der Datenbank.
+ *
+ * @author Joris
+ */
 @Service
 public class VeranstaltungenService {
 
@@ -69,6 +77,4 @@ public class VeranstaltungenService {
             System.err.println("Veranstaltung nicht gefunden. Sind Sie sicher, dass die Veranstaltung existiert und der Benutzer berechtigt ist?");
         }
     }
-
-
 }

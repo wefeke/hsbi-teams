@@ -110,21 +110,9 @@ public class TeilnehmerImportDialog extends Dialog {
                 teilnehmerVeranstaltungsListe.addAll(excelImporter.readAllTeilnehmerFromExcel(buffer.getInputStream(event.getFileName())));
                 neueStudierende.addAll(excelImporter.readNewTeilnehmerFromExcel(buffer.getInputStream(event.getFileName())));
 
-                List<Teilnehmer> combinedItems = new ArrayList<>();
+
                 Optional<User> maybeUser = authenticatedUser.get();
                 if (maybeUser.isPresent()) {
-                    User user = maybeUser.get();
-
-                    combinedItems.addAll(teilnehmerService.findAllTeilnehmerByUserAndFilter(user, ""));
-                    combinedItems.addAll(newTeilnehmerListe);
-
-                    combinedItems.addAll(teilnehmerService.findAllTeilnehmerByUserAndFilter(user, ""));
-                    combinedItems.addAll(teilnehmerVeranstaltungsListe);
-
-                    combinedItems.addAll(teilnehmerService.findAllTeilnehmerByUserAndFilter(user, ""));
-                    combinedItems.addAll(neueStudierende);
-
-
                     Dialog dialog = new Dialog();
                     dialog.setHeight(getHeight());
                     dialog.setHeaderTitle(neueStudierende.size() + " Teilnehmer gefunden, der neu angelegt werden muss");
@@ -141,7 +129,6 @@ public class TeilnehmerImportDialog extends Dialog {
                         dialog.add(grid);
                         dialog.open();
                     }
-
                 }
             } catch (Exception e) {
                 Notification.show("Error reading Excel file: " + e.getMessage());

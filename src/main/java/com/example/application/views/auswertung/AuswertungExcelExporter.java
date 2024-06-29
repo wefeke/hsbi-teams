@@ -12,7 +12,11 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
-// LEON
+/**
+ * Eine Klasse zum Exportieren von der Auswertung im Excel-Format.
+ *
+ * @author Leon
+ */
 @Service
 public class AuswertungExcelExporter {
     private final XSSFWorkbook workbook;
@@ -77,16 +81,12 @@ public class AuswertungExcelExporter {
     private void createCell(Row row, int columnCount, Object value, CellStyle style) {
         sheet.autoSizeColumn(columnCount);
         Cell cell = row.createCell(columnCount);
-        if (value instanceof Integer) {
-            cell.setCellValue((Integer) value);
-        } else if (value instanceof Boolean) {
-            cell.setCellValue((Boolean) value);
-        } else if (value instanceof Long) {
-            cell.setCellValue((Long) value);
-        } else if (value instanceof Float) {
-            cell.setCellValue((Float) value);
-        } else {
-            cell.setCellValue((String) value);
+        switch (value) {
+            case Integer i -> cell.setCellValue(i);
+            case Boolean b -> cell.setCellValue(b);
+            case Long l -> cell.setCellValue(l);
+            case Float v -> cell.setCellValue(v);
+            case null, default -> cell.setCellValue((String) value);
         }
         cell.setCellStyle(style);
     }
@@ -113,7 +113,7 @@ public class AuswertungExcelExporter {
 
             createCell(row, columnCount++, auswertung.getNameMatrikelnummer(), style);
             createCell(row, columnCount++, auswertung.getGesamtGruppenarbeiten(), style);
-            for (TGGPHelper tggpHelper : auswertung.getTggpHelper()) {
+            for (TGGPHelper ignored : auswertung.getTggpHelper()) {
                 createCell(row, columnCount++, auswertung.getTggHelperValuesGruppe(), style);
             }
         }
@@ -128,7 +128,7 @@ public class AuswertungExcelExporter {
 
             createCell(row, columnCount++, auswertung.getNameMatrikelnummer(), style);
             createCell(row, columnCount++, auswertung.getGesamtPunkte(), style);
-            for (TGGPHelper tggpHelper : auswertung.getTggpHelper()) {
+            for (TGGPHelper ignored : auswertung.getTggpHelper()) {
                 createCell(row, columnCount++, auswertung.getTggHelperValuesPunkte(), style);
             }
 
@@ -156,13 +156,11 @@ public class AuswertungExcelExporter {
         int currentRow = writeHeaderLine(0);
         currentRow = writeDataLines(0,currentRow); // Erst die Option angeben, dann die aktuelle Row
         currentRow = writeHeaderLine(currentRow); // Da Titel für den Abschnitt (Gruppenzuordnung und Spaltenüberschriften zwei Zeilen sind)
-        currentRow = writeDataLines(1, currentRow);
+        writeDataLines(1, currentRow);
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        try {
+        try (bos) {
             workbook.write(bos);
-        } finally {
-            bos.close();
         }
         return bos.toByteArray();
     }

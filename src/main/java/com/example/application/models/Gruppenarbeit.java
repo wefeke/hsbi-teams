@@ -1,4 +1,3 @@
-//Autor: Lilli
 package com.example.application.models;
 
 import jakarta.persistence.*;
@@ -6,8 +5,14 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
+/**
+ * Die Gruppenarbeit Klasse repräsentiert eine Gruppenarbeit in der Anwendung.
+ * Sie enthält Informationen wie Beschreibung, Titel und hat Beziehungen zu den Klassen User, Veranstaltungstermin, Gruppe und Teilnehmer.
+ * Sie enthält auch Methoden zum Hinzufügen und Entfernen von Gruppen und Teilnehmern.
+ *
+ * @author Lilli
+ */
 @Entity
 public class Gruppenarbeit {
     @Id
@@ -120,5 +125,3 @@ public class Gruppenarbeit {
     }
 
 }
-
-

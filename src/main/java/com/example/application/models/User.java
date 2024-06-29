@@ -1,14 +1,19 @@
-//Autor: Kennet
 package com.example.application.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import org.apache.ibatis.annotations.One;
-import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
+/**
+ * Die User Klasse repräsentiert einen Benutzer in der Anwendung.
+ * Sie enthält Informationen wie Benutzername, Name, Passwort, Rollen und Profilbild.
+ * Sie hat auch eine Beziehung zur Veranstaltung Klasse, die die Veranstaltungen repräsentiert, an denen der Benutzer teilnimmt.
+ * Sie enthält auch Methoden zum Abrufen und Setzen dieser Informationen.
+ *
+ * @author Kennet
+ */
 @Entity
-@Table(name = "users") // Ändern Sie den Tabellennamen auf "users"
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(generator = "generator")
@@ -42,7 +47,7 @@ public class User {
         this.locked = locked;
         this.roles = roles;
         this.profilePicture = profilePicture;
-        this.veranstaltungen = veranstaltungen;;
+        this.veranstaltungen = veranstaltungen;
     }
 
     public String getUsername() {
@@ -107,10 +112,6 @@ public class User {
         this.veranstaltungen = veranstaltungen;
     }
 
-    public void addVeranstaltungen (Veranstaltung veranstaltung) {
-        this.veranstaltungen.add(veranstaltung);
-    }
-
     @Override
     public int hashCode() {
         if (getId() != null) {
@@ -137,8 +138,4 @@ public class User {
         }
         return super.equals(that);
     }
-
-
-
-
 }

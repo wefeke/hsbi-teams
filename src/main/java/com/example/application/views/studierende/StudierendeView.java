@@ -1,6 +1,5 @@
 package com.example.application.views.studierende;
 
-
 import com.example.application.ExcelReader.TeilnehmerExcelExporter;
 import com.example.application.models.Teilnehmer;
 import com.example.application.models.User;
@@ -111,7 +110,7 @@ public class StudierendeView extends VerticalLayout {
             Set<Teilnehmer> selectedTeilnehmer = grid.getSelectedItems();
             if (!selectedTeilnehmer.isEmpty()) {
                 for (Teilnehmer teilnehmer : selectedTeilnehmer) {
-                    TeilnehmerLoeschenDialog deleteDialogForSelectedTeilnehmer = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, aufraeumenDialog, this);
+                    TeilnehmerLoeschenDialog deleteDialogForSelectedTeilnehmer = new TeilnehmerLoeschenDialog(teilnehmerService, aufraeumenDialog, this);
                     deleteDialogForSelectedTeilnehmer.setTeilnehmer(teilnehmer);
                     deleteDialogForSelectedTeilnehmer.open();
                 }
@@ -284,23 +283,24 @@ public class StudierendeView extends VerticalLayout {
 
         exportButton.addClickListener(event -> {
             Optional<User> maybeUser = authenticatedUser.get();
+            if (maybeUser.isPresent()) {
+                User user = maybeUser.get();
+                List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue());
 
-            User user = maybeUser.get();
-            List<Teilnehmer> teilnehmerList = teilnehmerService.findAllTeilnehmerByUserAndFilter(user, filterText.getValue());
+                StreamResource resource = new StreamResource("teilnehmerliste_" + LocalDate.now() + ".xlsx", () -> {
+                    byte[] data;
+                    try {
+                        TeilnehmerExcelExporter teilnehmerExcelExporter = new TeilnehmerExcelExporter();
+                        data = teilnehmerExcelExporter.export(teilnehmerList);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return new ByteArrayInputStream(data);
+                });
+                anchor.setHref(resource);
 
-            StreamResource resource = new StreamResource("teilnehmerliste_" + LocalDate.now() + ".xlsx", () -> {
-                byte[] data;
-                try {
-                    TeilnehmerExcelExporter teilnehmerExcelExporter = new TeilnehmerExcelExporter();
-                    data = teilnehmerExcelExporter.export(teilnehmerList);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                return new ByteArrayInputStream(data);
-            });
-            anchor.setHref(resource);
-
-            anchor.getElement().callJsFunction("click");
+                anchor.getElement().callJsFunction("click");
+            }
         });
 
 

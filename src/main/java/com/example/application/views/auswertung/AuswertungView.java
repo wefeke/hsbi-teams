@@ -96,11 +96,7 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
      * @author Leon
      */
     private User validateUser(Optional<User> maybeUser) {
-        if (maybeUser.isPresent()) {
-            return maybeUser.get();
-        } else {
-            return new User();
-        }
+        return maybeUser.orElseGet(User::new);
     }
 
     /**
@@ -172,14 +168,11 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
         anchor.getElement().getStyle().set("display", "none");
         anchor.getElement().setAttribute("download", true);
 
-        // Die eigentlichen Daten werden in diesem Objekt gespeichert und dem Anchor übergeben
-
-
         // Dieser Button wird gedrückt und führt ein Click-Event aus, um den Anchor zu triggern
         Button button = new Button("Download");
         button.addClickListener(event -> {
             StreamResource resource = new StreamResource("auswertung_"+timeStamp+".xlsx", () -> {
-                byte[] data = null; // Your method to fetch data
+                byte[] data; // Your method to fetch data
                 try {
                     data = auswertungExcelExporter.export(superService.findAllAuswertungenByVeranstaltung(veranstaltungsID));
                 } catch (IOException e) {
@@ -223,9 +216,7 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
     public void beforeEnter(BeforeEnterEvent event) {
         // Der Route-Parameter enthält die Veranstaltungs-ID, welche genutzt wird, um die aktuelle Veranstaltung zu suchen
         final Optional<String> optionalId = event.getRouteParameters().get("veranstaltungId");
-        optionalId.ifPresentOrElse(id -> {
-                    veranstaltungsID = Long.parseLong(id);
-                },
+        optionalId.ifPresentOrElse(id -> veranstaltungsID = Long.parseLong(id),
                 () -> {
                     // Da es mindestens eine Veranstaltung gibt, soll hier der Minimum-Wert 1 genommen werden.
                     veranstaltungsID = 1L;

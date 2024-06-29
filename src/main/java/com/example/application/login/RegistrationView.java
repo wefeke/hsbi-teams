@@ -175,7 +175,7 @@ public class RegistrationView extends VerticalLayout {
                     byteOutputStream.write(buffer, 0, bytesRead);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println(e.getMessage());
             }
             uploadedImage = byteOutputStream.toByteArray();
             Notification.show("Datei \"" + event.getFileName() + "\" erfolgreich hochgeladen.");

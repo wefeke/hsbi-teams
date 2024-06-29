@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class KalenderAuswahl {
 
-    AuswahlWert auswahlWert;
+    private final AuswahlWert auswahlWert;
 
     /**
      * Konstruktor mit Parameter zur Initialisierung des Auswahlwerts.
@@ -21,35 +21,6 @@ public class KalenderAuswahl {
      * @autor Leon
      */
     public KalenderAuswahl(AuswahlWert auswahlWert) {
-        this.auswahlWert = auswahlWert;
-    }
-
-    /**
-     * Standardkonstruktor für die Klasse KalenderAuswahl.
-     *
-     * @autor Leon
-     */
-    public KalenderAuswahl() {}
-
-    /**
-     * Gibt den aktuellen Auswahlwert zurück.
-     *
-     * @return der aktuelle Auswahlwert
-     *
-     * @autor Leon
-     */
-    public AuswahlWert getAuswahlWert() {
-        return auswahlWert;
-    }
-
-    /**
-     * Setzt den Auswahlwert.
-     *
-     * @param auswahlWert der neue Auswahlwert
-     *
-     * @autor Leon
-     */
-    public void setAuswahlWert(AuswahlWert auswahlWert) {
         this.auswahlWert = auswahlWert;
     }
 
@@ -115,15 +86,4 @@ public class KalenderAuswahl {
         werte.add(wert03);
         return werte;
     }
-}
-
-/**
- * Enum für die verschiedenen Auswahlwerte im Kalender.
- *
- * @autor Leon
- */
-enum AuswahlWert {
-    Monat,
-    Woche,
-    Tag
 }

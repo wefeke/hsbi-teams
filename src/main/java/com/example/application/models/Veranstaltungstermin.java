@@ -1,4 +1,3 @@
-//Autor: Kennet
 package com.example.application.models;
 
 import jakarta.persistence.*;
@@ -9,6 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Die Veranstaltungstermin Klasse repräsentiert einen Veranstaltungstermin in der Anwendung.
+ * Sie enthält Informationen wie Datum, Startzeit, Endzeit, Ort und Titel des Termins.
+ * Sie hat Beziehungen zu den Klassen User, Veranstaltung und Gruppenarbeit, die den Benutzer, die Veranstaltung und die Gruppenarbeiten des Termins repräsentieren.
+ * Sie enthält auch Methoden zum Hinzufügen und Entfernen von Gruppenarbeiten.
+ *
+ * @author Joris
+ */
 @Entity
 public class Veranstaltungstermin {
     @Id
@@ -137,6 +144,6 @@ public class Veranstaltungstermin {
 
     //Lilli
     public void removeAllGruppenarbeiten(){
-        this.gruppenarbeiten = new ArrayList<Gruppenarbeit>();
+        this.gruppenarbeiten = new ArrayList<>();
     }
 }

@@ -13,6 +13,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Die TeilnehmerService Klasse bietet Methoden zur Interaktion mit Teilnehmerdaten in der Datenbank.
+ * Sie enthält Methoden zum Abrufen, Speichern und Löschen von Teilnehmern, sowie zur Überprüfung der Teilnahme an Veranstaltungen.
+ * Jede Methode ist als Transaktion gekennzeichnet, um die Datenintegrität zu gewährleisten.
+ * Die Klasse verwendet das TeilnehmerRepository zur Interaktion mit der Datenbank.
+ *
+ * @author Tobias
+ */
 @Service
 public class TeilnehmerService {
     private final TeilnehmerRepository teilnehmerRepository;
@@ -105,6 +113,3 @@ public class TeilnehmerService {
     }
 
 }
-
-
-

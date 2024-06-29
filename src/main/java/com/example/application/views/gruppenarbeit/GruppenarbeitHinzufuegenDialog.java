@@ -240,6 +240,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
             if (gruppenarbeit.getVeranstaltungstermin() != null) {
                 veranstaltungsterminView.setAktiveKachelVeranstaltungstermin(gruppenarbeit.getVeranstaltungstermin());
 
+                //Warning kann nicht entfernt werden
                 if (gruppenarbeit != null) {
                     veranstaltungsterminView.setAktiveKachelGruppenarbeit(gruppenarbeit);
                 }
