@@ -86,8 +86,9 @@ public class SuperService {
         for (Teilnehmer teilnehmer : teilnehmern) {
             Auswertung auswertung = new Auswertung(); // Eine neue frische Auswertung wird erzeugt
             // Name und Matrikelnummer werden festgelegt
-            auswertung.setNameMatrikelnummer( // Auswertung bekommt ihren Teilnehmer mit Name und Matrikelnummer
-                    teilnehmer.getVorname() + " " + teilnehmer.getNachname() + "\n" + "(" + teilnehmer.getId() + ")");
+            auswertung.setVorname( teilnehmer.getVorname());
+            auswertung.setNachname(teilnehmer.getNachname());
+            auswertung.setMatrikelnummer(teilnehmer.getId() );
             // Hinzufügen der Gruppen und Punkte zu den Auswertungen
             for (int i = 0;i<=tggpHelperList.size();i++) {
                 auswertung.addGruppeNummer(0L);

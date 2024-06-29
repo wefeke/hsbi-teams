@@ -1,5 +1,4 @@
 package com.example.application.views.kalender;
-
 import com.example.application.models.*;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.*;
@@ -105,15 +104,15 @@ public class KalenderView extends VerticalLayout {
         List<Veranstaltungstermin> veranstaltungstermine = veranstaltungsterminService.findAllVeranstaltungstermine(user);
         for (Veranstaltungstermin veranstaltungstermin : veranstaltungstermine) {
             Entry entry = new Entry();
-            entry.setTitle(veranstaltungstermin.getTitel());
+            entry.setTitle(veranstaltungstermin.getVeranstaltung().getTitel() + ": " + veranstaltungstermin.getTitel() + " " + veranstaltungstermin.getOrt());
             entry.setColor(randomColor());
             entry.setConstraint(veranstaltungstermin.getVeranstaltung().getId().toString());
             if (veranstaltungstermin.getStartZeit() == null) {
                 entry.setStart(dateTimeConverter(veranstaltungstermin.getDatum()));
-                entry.setEnd(entry.getStart().plusHours(23));
+                entry.setEnd(entry.getStart().plusHours(1));
             } else {
                 entry.setStart(dateTimeConverter(veranstaltungstermin.getDatum(), veranstaltungstermin.getStartZeit()));
-                entry.setEnd(entry.getStart().plusHours(veranstaltungstermin.getEndZeit().getHour()));
+                entry.setEnd(dateTimeConverter(veranstaltungstermin.getDatum(), veranstaltungstermin.getEndZeit()));
             }
             fullCalendar.getEntryProvider().asInMemory().addEntries(entry);
         }

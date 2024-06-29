@@ -125,14 +125,15 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
     private void configureGrid() {
         grid01.removeAllColumns();
         // Eine einzelne Auswertung nehmen und alle Gruppenarbeiten als Columns darstellen
-        Auswertung auswertung = auswertungen.getFirst();
-        grid01.addColumn(Auswertung::getNameMatrikelnummer).setHeader("");
-        grid01.addColumn(Auswertung::getGesamtPunkte).setHeader("Gesamtpunkte");
-        for (TGGPHelper tggpHelper : auswertung.getTggpHelper()) {
-            grid01.addColumn(Auswertung::getTggHelperValues).setHeader(tggpHelper.getTerminAndGruppenarbeit());
+        if (!auswertungen.isEmpty()) {
+            Auswertung auswertung = auswertungen.getFirst();
+            grid01.addColumn(Auswertung::getNameMatrikelnummer).setHeader("");
+            grid01.addColumn(Auswertung::getGesamtPunkte).setHeader("Gesamtpunkte");
+            for (TGGPHelper tggpHelper : auswertung.getTggpHelper()) {
+                grid01.addColumn(Auswertung::getTggHelperValues).setHeader(tggpHelper.getTerminAndGruppenarbeit());
+            }
+            grid01.addColumn(Auswertung::getGesamtGruppenarbeiten).setHeader("Teilgenommene Gruppenarbeiten");
         }
-        grid01.addColumn(Auswertung::getGesamtGruppenarbeiten).setHeader("Teilgenommene Gruppenarbeiten");
-
         grid01.addClassNames("contact-grid");
         grid01.setWidthFull();
         grid01.getColumns().forEach(col -> col.setAutoWidth(true));
@@ -167,6 +168,9 @@ public class AuswertungView extends VerticalLayout implements BeforeEnterObserve
         anchor.setText("Download");
         anchor.getElement().getStyle().set("display", "none");
         anchor.getElement().setAttribute("download", true);
+
+        // Die eigentlichen Daten werden in diesem Objekt gespeichert und dem Anchor übergeben
+
 
         // Dieser Button wird gedrückt und führt ein Click-Event aus, um den Anchor zu triggern
         Button button = new Button("Download");

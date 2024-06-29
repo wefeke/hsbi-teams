@@ -56,7 +56,9 @@ public class AuswertungExcelExporter {
         Row row = sheet.createRow(startRow);
 
         Auswertung auswertung = auswertungen.getFirst();
-        createCell(row, columnCount++, "Name und Matrikelnummer", style);
+        createCell(row, columnCount++, "Matrikelnummer", style);
+        createCell(row, columnCount++, "Vorname", style);
+        createCell(row, columnCount++, "Nachname", style);
         createCell(row, columnCount++, "Gruppenanzahl/Gesamtpunkte", style);
         startRow++;
         for (TGGPHelper tggpHelper : auswertung.getTggpHelper()) {
@@ -111,7 +113,10 @@ public class AuswertungExcelExporter {
             Row row = sheet.createRow(rowCount++);
             int columnCount = 0;
 
-            createCell(row, columnCount++, auswertung.getNameMatrikelnummer(), style);
+            createCell(row, columnCount++, auswertung.getMatrikelnummer(), style);
+            createCell(row, columnCount++, auswertung.getNachname(), style);
+            createCell(row, columnCount++, auswertung.getVorname(), style);
+
             createCell(row, columnCount++, auswertung.getGesamtGruppenarbeiten(), style);
             for (TGGPHelper ignored : auswertung.getTggpHelper()) {
                 createCell(row, columnCount++, auswertung.getTggHelperValuesGruppe(), style);
@@ -126,7 +131,10 @@ public class AuswertungExcelExporter {
             Row row = sheet.createRow(rowCount++);
             int columnCount = 0;
 
-            createCell(row, columnCount++, auswertung.getNameMatrikelnummer(), style);
+            createCell(row, columnCount++, auswertung.getMatrikelnummer(), style);
+            createCell(row, columnCount++, auswertung.getNachname(), style);
+            createCell(row, columnCount++, auswertung.getVorname(), style);
+
             createCell(row, columnCount++, auswertung.getGesamtPunkte(), style);
             for (TGGPHelper ignored : auswertung.getTggpHelper()) {
                 createCell(row, columnCount++, auswertung.getTggHelperValuesPunkte(), style);
