@@ -20,13 +20,18 @@
     - INSERT INTO public.gruppenarbeit_teilnehmer (gruppenarbeit_id, teilnehmer_matrikel_nr)
 */
 
+INSERT INTO public.users (locked, id, hashed_password, "name", username, profile_picture) VALUES
+                                                                                              (false, 1, '$2a$10$jpLNVNeA7Ar/ZQ2DKbKCm.MuT2ESe.Qop96jipKMq7RaUgCoQedV.', 'Admin', 'admin', null);
+
+INSERT INTO public.user_roles (user_id, roles) VALUES
+                                                   (1, 'ADMIN');
+
+/* //Ab hier einkommentieren für initialen Datenbestand
 
 INSERT INTO public.users (locked, id, hashed_password, "name", username, profile_picture) VALUES
-                                                                                              (false, 1, '$2a$10$jpLNVNeA7Ar/ZQ2DKbKCm.MuT2ESe.Qop96jipKMq7RaUgCoQedV.', 'Admin', 'admin', null),
                                                                                               (true, 2, '$2a$10$jpLNVNeA7Ar/ZQ2DKbKCm.MuT2ESe.Qop96jipKMq7RaUgCoQedV.', 'Test User', 'testUser', null);
 
 INSERT INTO public.user_roles (user_id, roles) VALUES
-                                                   (1, 'ADMIN'),
                                                    (2, 'USER');
 
 INSERT INTO public.veranstaltung (id, semester, titel, user_id) VALUES
@@ -387,3 +392,5 @@ INSERT INTO public.gruppenarbeit_teilnehmer (gruppenarbeiten_id, teilnehmer_matr
                                                                                                      (6, 1000028, null),
                                                                                                      (6, 1000029, null),
                                                                                                      (6, 1000030, null);
+
+ */
