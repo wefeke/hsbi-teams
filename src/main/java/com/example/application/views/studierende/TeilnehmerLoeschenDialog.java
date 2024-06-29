@@ -111,7 +111,7 @@ public class TeilnehmerLoeschenDialog extends Dialog {
 
     /**
      * Erstellt ein VerticalLayout und fügt die Info-, Warn- und NoReturn-Texte hinzu.
-     * Setzt die Ausrichtung der Elemente auf Zentrum.
+     * Setzt die Ausrichtung der Elemente auf mittig.
      * Fügt die "cancelBtn" und "deleteBtn" zum Footer hinzu.
      *
      * @return Das erstellte VerticalLayout mit den hinzugefügten Elementen.
