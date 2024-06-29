@@ -116,6 +116,7 @@ public class VeranstaltungenView extends VerticalLayout  {
         updateKachelContainer("");
         updateKachelContainerWithFilter("Datum absteigend");
         mainLayout.add(username, lineWithText, searchAndFilterBar, kachelContainer);
+        updateKachelContainer("");
         add(mainLayout);
     }
 
