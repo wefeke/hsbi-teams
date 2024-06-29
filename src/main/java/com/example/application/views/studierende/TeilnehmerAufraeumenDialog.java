@@ -56,10 +56,16 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
         deleteButton.addClickListener(event -> {
             Set<Teilnehmer> selectedTeilnehmer = grid.getSelectedItems();
             if (!selectedTeilnehmer.isEmpty()) {
-                for (Teilnehmer teilnehmer : selectedTeilnehmer) {
-                    TeilnehmerLoeschenDialog deleteDialogForSelectedTeilnehmer = new TeilnehmerLoeschenDialog(teilnehmerService, this, studierendeView);
-                    deleteDialogForSelectedTeilnehmer.setTeilnehmer(teilnehmer);
-                    deleteDialogForSelectedTeilnehmer.open();
+                if (selectedTeilnehmer.size() > 1) {
+                    TeilnehmerMehreLoeschenDialog deleteDialogForMultipleTeilnehmer = new TeilnehmerMehreLoeschenDialog(teilnehmerService, this, studierendeView);
+                    deleteDialogForMultipleTeilnehmer.setTeilnehmer(selectedTeilnehmer);
+                    deleteDialogForMultipleTeilnehmer.open();
+                } else {
+                    for (Teilnehmer teilnehmer : selectedTeilnehmer) {
+                        TeilnehmerLoeschenDialog deleteDialogForSelectedTeilnehmer = new TeilnehmerLoeschenDialog(teilnehmerService, this, studierendeView);
+                        deleteDialogForSelectedTeilnehmer.setTeilnehmer(teilnehmer);
+                        deleteDialogForSelectedTeilnehmer.open();
+                    }
                 }
             }
         });

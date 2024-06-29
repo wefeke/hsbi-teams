@@ -312,7 +312,14 @@ public class StudierendeView extends VerticalLayout {
     }
 
 
+    /**
+     * Behandelt das Klickereignis eines Buttons.
+    * Diese Methode öffnet den 'studierendeImportDialog', wenn der Button angeklickt wird.
+    *
+    * @param event Das ClickEvent, das durch den Button-Klick ausgelöst wird.
+    * @author Tobias
+    */
     private void onComponentEvent(ClickEvent<Button> event) {
-        studierendeImportDialog.open();
+    studierendeImportDialog.open();
     }
 }

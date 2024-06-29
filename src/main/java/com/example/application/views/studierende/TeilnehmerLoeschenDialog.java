@@ -55,7 +55,7 @@ public class TeilnehmerLoeschenDialog extends Dialog {
         warningText.addClassName("warning-text-delete");
         warningText.getStyle().set("white-space", "pre-line");
         noReturn.addClassName("no-return-text-delete");
-        noReturn.getStyle().set("white-space", "pre-line");
+        noReturn.getStyle().set("color", "green");
 
         deleteBtn.addClickListener(event -> {
             Double years = aufraeumen.getYearsFieldValue();
