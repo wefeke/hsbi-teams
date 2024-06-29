@@ -14,12 +14,12 @@ import jakarta.annotation.security.RolesAllowed;
 import java.util.Set;
 
 /**
- * Diese Klasse repräsentiert einen Dialog zum Löschen von Teilnehmern.
- * Sie erbt von der Dialog-Klasse von Vaadin und bietet eine Benutzeroberfläche zum Anzeigen und Löschen von Teilnehmern.
- * Der Dialog enthält Informationen über den zu löschenden Teilnehmer und Schaltflächen zum endgültigen Löschen oder zum Abbrechen des Vorgangs.
- * Die Klasse verwendet einen TeilnehmerService zum Abrufen und Löschen von Teilnehmern.
- * Sie enthält auch eine Referenz auf eine StudierendeView und einen TeilnehmerAufraeumenDialog, die aktualisiert werden, wenn Teilnehmer gelöscht werden.
- * Darüber hinaus bietet die Klasse die Möglichkeit, Teilnehmer basierend auf der Anzahl der Jahre, die sie registriert sind, oder ob sie eine Veranstaltung haben, anzuzeigen und zu löschen.
+ * Diese Klasse repräsentiert einen Dialog, der es ermöglicht, mehrere Teilnehmer gleichzeitig zu löschen.
+ * Sie erlaubt den Zugriff für die Rollen "ADMIN" und "USER".
+ * Der Dialog enthält einen Info-Text und zwei Schaltflächen: "Studierenden endgültig löschen" und "Abbrechen".
+ * Der "Löschen"-Button löscht die ausgewählten Teilnehmer und aktualisiert die Ansicht entsprechend.
+ * Der "Abbrechen"-Button schließt den Dialog.
+ * Der Dialog enthält auch ein Layout, das zentriert ist und den Info-Text sowie die Schaltflächen zum Löschen und Abbrechen enthält.
  *
  * @author Tobias
  */
@@ -32,13 +32,15 @@ public class TeilnehmerMehreLoeschenDialog extends Dialog {
     Button cancelBtn = new Button("Abbrechen");
 
     /**
-     * Konstruktor für die Klasse TeilnehmerLoeschenDialog.
-     * Initialisiert die Instanzvariablen und setzt die Klick-Listener für die Schaltflächen "deleteBtn" und "cancelBtn".
+     * Konstruktor für die TeilnehmerMehreLoeschenDialog Klasse.
+     * Initialisiert die Click-Listener für die Schaltflächen "Löschen" und "Abbrechen".
+     * Der "Löschen"-Button löscht die Teilnehmer und aktualisiert die Ansicht entsprechend.
+     * Der "Abbrechen"-Button schließt den Dialog.
      * Fügt das erstellte Layout zum Dialog hinzu.
      *
-     * @param teilnehmerService Der Service, der für die Verwaltung von Teilnehmern verwendet wird.
-     * @param aufraeumen Der Dialog, der zum Aufräumen von Teilnehmern verwendet wird.
-     * @param studierendeView Die Ansicht, die die Studierenden anzeigt.
+     * @param teilnehmerService Der Service, der für die Verwaltung der Teilnehmer benötigt wird.
+     * @param aufraeumen Die Instanz von TeilnehmerAufraeumenDialog, die für die Aktualisierung der Ansicht benötigt wird.
+     * @param studierendeView Die StudierendeView, die aktualisiert wird, wenn Teilnehmer gelöscht werden.
      * @author Tobias
      */
     public TeilnehmerMehreLoeschenDialog(TeilnehmerService teilnehmerService, TeilnehmerAufraeumenDialog aufraeumen, StudierendeView studierendeView) {
@@ -68,12 +70,11 @@ public class TeilnehmerMehreLoeschenDialog extends Dialog {
     }
 
     /**
-     * Setzt den Teilnehmer und aktualisiert die Benutzeroberfläche entsprechend.
-     * Wenn der Teilnehmer in einer Veranstaltung ist, wird eine Warnmeldung angezeigt und der "deleteBtn" wird deaktiviert.
-     * Wenn der Teilnehmer nicht in einer Veranstaltung ist, wird eine Bestätigungsnachricht angezeigt und der "deleteBtn" wird aktiviert.
+     * Setzt das Set von Teilnehmern und aktualisiert den Info-Text entsprechend.
+     * Der Info-Text wird auf die Frage gesetzt, ob der Benutzer wirklich die Anzahl der Teilnehmer im Set löschen möchte.
      *
-     @param teilnehmerSet Das Set von Teilnehmern, das gesetzt werden soll.
-      * @author Tobias
+     * @param teilnehmerSet Das Set von Teilnehmern, das gesetzt werden soll.
+     * @author Tobias
      */
     public void setTeilnehmer(Set<Teilnehmer> teilnehmerSet) {
         this.teilnehmerSet = teilnehmerSet;
@@ -82,11 +83,11 @@ public class TeilnehmerMehreLoeschenDialog extends Dialog {
     }
 
     /**
-     * Erstellt ein VerticalLayout und fügt die Info-, Warn- und NoReturn-Texte hinzu.
-     * Setzt die Ausrichtung der Elemente auf Zentrum.
-     * Fügt die "cancelBtn" und "deleteBtn" zum Footer hinzu.
+     * Erstellt ein neues VerticalLayout und fügt die notwendigen Komponenten hinzu.
+     * Das erstellte Layout wird zentriert und enthält den Info-Text sowie die Schaltflächen zum Löschen und Abbrechen.
+     * Die Schaltflächen zum Löschen und Abbrechen werden auch zur Fußzeile des Dialogs hinzugefügt.
      *
-     * @return Das erstellte VerticalLayout mit den hinzugefügten Elementen.
+     * @return Ein VerticalLayout, das den Info-Text und die Schaltflächen zum Löschen und Abbrechen enthält.
      * @author Tobias
      */
     public VerticalLayout createLayout(){

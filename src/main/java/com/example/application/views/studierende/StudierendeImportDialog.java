@@ -59,28 +59,16 @@ public class StudierendeImportDialog extends Dialog {
         add(headerTitle);
 
         importButton.addClickListener(event -> {
-            Dialog dialog = new Dialog();
-            dialog.setMaxHeight(getHeight());
-            dialog.setHeaderTitle("Neue Teilnehmer");
-            dialog.getFooter().add(new Button("OK", e -> {
-                studierendeView.updateStudierendeView();
-                dialog.close();
-            }));
-            VerticalLayout dialogLayout = new VerticalLayout();
-            dialog.add(dialogLayout);
 
             for (Teilnehmer teilnehmer : newTeilnehmerListe) {
                 Optional<User> maybeUser = authenticatedUser.get();
                 if (maybeUser.isPresent()) {
                     User user = maybeUser.get();
                     teilnehmerService.saveTeilnehmer(teilnehmer, user);
-                    dialogLayout.add(new Span("Teilnehmer :" + teilnehmer.toString() + " angelegt"));
 
                 }
             }
-            if (!newTeilnehmerListe.isEmpty())
-                dialog.open();
-
+            studierendeView.updateStudierendeView();
             close();
 
         });
