@@ -78,7 +78,7 @@ public class StudierendeImportDialog extends Dialog {
         upload.setUploadButton(new Button(LineAwesomeIcon.UPLOAD_SOLID.create()));
         upload.setDropLabelIcon(LineAwesomeIcon.ID_CARD.create());
         upload.setDropLabel(new Span("Teilnehmer Excel-Datei"));
-        upload.setAcceptedFileTypes(".xlsx");
+        upload.setAcceptedFileTypes(".xlsx"); // only allow .xlsx files
 
 
         VerticalLayout layout = new VerticalLayout(upload);
