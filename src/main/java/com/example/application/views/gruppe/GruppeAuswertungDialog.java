@@ -27,7 +27,7 @@ public class GruppeAuswertungDialog extends Dialog {
     private final Teilnehmer teilnehmer;
     private final Gruppenarbeit gruppenarbeit;
     private final GruppenarbeitTeilnehmer gruppenarbeitTeilnehmer;
-    private final Optional<GruppenarbeitTeilnehmer> gruppenarbeitTeilnehmerResult;
+    private Optional<GruppenarbeitTeilnehmer> gruppenarbeitTeilnehmerResult;
 
     // Dialog Elemente
     private final NumberField auswertungsWert = new NumberField();
@@ -107,10 +107,12 @@ public class GruppeAuswertungDialog extends Dialog {
      * Da es auch halbe Punkte gibt, wird der Wert um 0.5 erhöht.
      */
     private void incrementValueByHalf() {
-        if (auswertungsWert.getValue() != null && auswertungsWert.getValue() >= 0.0) {
+        if (auswertungsWert.getValue() != null && auswertungsWert.getValue() >= 0.0 && auswertungsWert.getValue() % 0.5 == 0) {
             Double value = auswertungsWert.getValue();
-            value += 0.5;
-            auswertungsWert.setValue(value);
+            if (value % 0.5 == 0) {
+                value += 0.5;
+                auswertungsWert.setValue(value);
+            }
         } else {
             auswertungsWert.setValue(0.0);
         }
@@ -124,8 +126,10 @@ public class GruppeAuswertungDialog extends Dialog {
     private void decrementValueByHalf() {
         if (auswertungsWert.getValue() != null && auswertungsWert.getValue() >= 0.0) {
             Double value = auswertungsWert.getValue();
-            value -= 0.5;
-            auswertungsWert.setValue(value);
+            if (value % 0.5 == 0) {
+                value -= 0.5;
+                auswertungsWert.setValue(value);
+            }
         } else {
             auswertungsWert.setValue(0.0);
         }
@@ -137,9 +141,10 @@ public class GruppeAuswertungDialog extends Dialog {
      * Setzt die Standardwerte, fügt Event-Listener hinzu und definiert das Verhalten der Elemente.
      */
     private void configureElements(){
-        if (gruppenarbeitTeilnehmerResult.isPresent() && gruppenarbeitTeilnehmerResult.get().getPunkte() != null ) {
+        if (gruppenarbeitTeilnehmerResult.isPresent() && gruppenarbeitTeilnehmerResult.get().getPunkte() != null) {
             auswertungsWert.setValue(Double.valueOf(gruppenarbeitTeilnehmerResult.get().getPunkte()));
         } else {
+            gruppenarbeitTeilnehmerResult = Optional.of(new GruppenarbeitTeilnehmer());
             auswertungsWert.setValue(0.0);
         }
 
