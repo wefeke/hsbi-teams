@@ -6,14 +6,12 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import jakarta.annotation.security.RolesAllowed;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+
+import java.util.Set;
 
 /**
  * Diese Klasse repräsentiert einen Dialog zum Löschen von Teilnehmern.
@@ -26,17 +24,12 @@ import java.util.stream.IntStream;
  * @author Tobias
  */
 @RolesAllowed({"ADMIN", "USER"})
-public class TeilnehmerLoeschenDialog extends Dialog {
-    private final TeilnehmerService teilnehmerService;
-
-
-    private Teilnehmer teilnehmer;
+public class TeilnehmerMehreLoeschenDialog extends Dialog {
+    private Set<Teilnehmer> teilnehmerSet;
 
     H2 infoText = new H2("Empty");
     Button deleteBtn = new Button("Studierenden endgültig löschen");
     Button cancelBtn = new Button("Abbrechen");
-    Paragraph warningText = new Paragraph("Empty");
-    Paragraph noReturn = new Paragraph("Der Studierende ist in keiner Veranstaltung");
 
     /**
      * Konstruktor für die Klasse TeilnehmerLoeschenDialog.
@@ -48,26 +41,23 @@ public class TeilnehmerLoeschenDialog extends Dialog {
      * @param studierendeView Die Ansicht, die die Studierenden anzeigt.
      * @author Tobias
      */
-    public TeilnehmerLoeschenDialog(TeilnehmerService teilnehmerService, TeilnehmerAufraeumenDialog aufraeumen, StudierendeView studierendeView) {
-        this.teilnehmerService = teilnehmerService;
+    public TeilnehmerMehreLoeschenDialog(TeilnehmerService teilnehmerService, TeilnehmerAufraeumenDialog aufraeumen, StudierendeView studierendeView) {
 
-
-        warningText.addClassName("warning-text-delete");
-        warningText.getStyle().set("white-space", "pre-line");
-        noReturn.addClassName("no-return-text-delete");
-        noReturn.getStyle().set("color", "green");
 
         deleteBtn.addClickListener(event -> {
-            Double years = aufraeumen.getYearsFieldValue();
-            teilnehmerService.deleteTeilnehmer(teilnehmer);
-            studierendeView.updateStudierendeView();
-            aufraeumen.updateGridNoEvent();
-            if (years != null) {
-                aufraeumen.updateGridOld(years.intValue());
+
+            for (Teilnehmer teilnehmer : teilnehmerSet) {
+                Double years = aufraeumen.getYearsFieldValue();
+                teilnehmerService.deleteTeilnehmer(teilnehmer);
+                studierendeView.updateStudierendeView();
+                aufraeumen.updateGridNoEvent();
+                if (years != null) {
+                    aufraeumen.updateGridOld(years.intValue());
                 close();
-            }
-            else {
+                }
+                else {
                 close();
+                }
             }
         });
         deleteBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -82,29 +72,13 @@ public class TeilnehmerLoeschenDialog extends Dialog {
      * Wenn der Teilnehmer in einer Veranstaltung ist, wird eine Warnmeldung angezeigt und der "deleteBtn" wird deaktiviert.
      * Wenn der Teilnehmer nicht in einer Veranstaltung ist, wird eine Bestätigungsnachricht angezeigt und der "deleteBtn" wird aktiviert.
      *
-     * @param teilnehmer Der Teilnehmer, der gesetzt werden soll.
-     * @author Tobias
+     @param teilnehmerSet Das Set von Teilnehmern, das gesetzt werden soll.
+      * @author Tobias
      */
-    public void setTeilnehmer(Teilnehmer teilnehmer) {
-        this.teilnehmer = teilnehmer;
+    public void setTeilnehmer(Set<Teilnehmer> teilnehmerSet) {
+        this.teilnehmerSet = teilnehmerSet;
 
-        if (teilnehmerService.isTeilnehmerInVeranstaltung(teilnehmer)) {
-            List<Veranstaltung> veranstaltungen = teilnehmerService.getVeranstaltungenOfTeilnehmer(teilnehmer);
-            String veranstaltungenString = IntStream.range(0, veranstaltungen.size())
-                    .mapToObj(i -> (i + 1) + ". " + veranstaltungen.get(i).getTitel())
-                    .collect(Collectors.joining("<br>"));
-
-            infoText.setText("Teilnehmer " + teilnehmer.getVorname() + " " + teilnehmer.getNachname() + " löschen");
-
-            noReturn.setText("Bitte entfernen Sie den Teilnehmer zuerst aus den Veranstaltungen.");
-            warningText.getElement().setProperty("innerHTML", "Der Teilnehmer " + teilnehmer.getVorname() + " " + teilnehmer.getNachname() + " <span class='highlight'>kann nicht entfernt werden</span>, da er bereits in folgenden Veranstaltungen ist:<br>" + veranstaltungenString);
-            deleteBtn.setEnabled(false);
-
-        } else {
-            infoText.setText("Teilnehmer " + teilnehmer.getVorname() + " " + teilnehmer.getNachname() + " löschen");
-            warningText.setText("Sind Sie sicher, dass Sie den Teilnehmer " + teilnehmer.getVorname() + " " + teilnehmer.getNachname() + " entfernen möchten?");
-            deleteBtn.setEnabled(true);
-        }
+        infoText.setText("Wollen Sie die " + teilnehmerSet.size() + " Teilnehmer wirklich löschen?");
     }
 
     /**
@@ -119,8 +93,6 @@ public class TeilnehmerLoeschenDialog extends Dialog {
         VerticalLayout mainLayout = new VerticalLayout();
         mainLayout.setAlignItems(FlexComponent.Alignment.CENTER);
         mainLayout.add(infoText);
-        mainLayout.add(warningText);
-        mainLayout.add(noReturn);
         getFooter().add(cancelBtn);
         getFooter().add(deleteBtn);
         return mainLayout;
