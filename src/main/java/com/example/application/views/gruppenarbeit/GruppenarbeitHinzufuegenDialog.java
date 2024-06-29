@@ -724,6 +724,7 @@ public class GruppenarbeitHinzufuegenDialog extends Dialog {
 
         gruppenarbeitData.add(gruppenarbeitText);
         participants.setHeight("400px");
+        participants.setWidth("1000px");
         gruppenarbeitData.add(participants);
         gruppenarbeitData.add(buttonsLayout);
         gruppenarbeitData.setWidthFull();
