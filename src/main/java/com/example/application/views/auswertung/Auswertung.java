@@ -1,5 +1,6 @@
 package com.example.application.views.auswertung;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +12,9 @@ import java.util.List;
  */
 public class Auswertung {
 
-    private String nameMatrikelnummer;
+    private String vorname;
+    private String nachname;
+    private Long matrikelnummer;
     private Float gesamtPunkte = 0.0f;
     private List<TGGPHelper> tggpHelper;
     private final List<Long> gruppen = new ArrayList<>();
@@ -195,7 +198,6 @@ public class Auswertung {
         return gesamtPunkte;
     }
 
-
     /**
      * Gibt die Matrikelnummer zurück.
      *
@@ -204,40 +206,9 @@ public class Auswertung {
      * @author Leon
      */
     public String getNameMatrikelnummer() {
-        return nameMatrikelnummer;
+        return vorname + " " + nachname + " " + "(" + matrikelnummer + ")";
     }
 
-    /**
-     * Setzt die Matrikelnummer.
-     *
-     * @param nameMatrikelnummer die neue Matrikelnummer
-     *
-     * @author Leon
-     */
-    public void setNameMatrikelnummer(String nameMatrikelnummer) {
-        this.nameMatrikelnummer = nameMatrikelnummer;
-    }
-
-    /**
-     * Gibt die Liste der Punkte für die Gruppenarbeitn zurück.
-     *
-     * @return die Punkte
-     *
-     * @author Leon
-     */
-    public List<Float> getPunkte() {
-        return punkte;
-    }
-    /**
-     * Setzt die Punkte der Gruppenarbeiten.
-     *
-     * @param punkte die neuen Punkte für die Gruppenarbeiten
-     *
-     * @author Leon
-     */
-    public void setPunkte(List<Float> punkte) {
-        this.punkte = punkte;
-    }
     /**
      * Fügt der Liste der Punkte einen neuen Punkt hinzu.
      *
@@ -246,9 +217,7 @@ public class Auswertung {
      * @author Leon
      */
     public void addPunkte(Float punkte) {
-        if (punkte == null) {
-            throw new IllegalArgumentException("Der Punkt darf nicht null sein");
-        }
+        if (punkte == null) throw new IllegalArgumentException("Der Punkt darf nicht null sein");
         this.punkte.add(punkte);
     }
 
@@ -261,5 +230,74 @@ public class Auswertung {
         anzahlGruppenarbeiten++;
     }
 
+    /**
+     * Gibt den Vornamen zurück.
+     *
+     * @return der Vorname
+     *
+     * @author Leon
+     */
 
+    public String getVorname() {
+        return vorname;
+    }
+
+    /**
+     * Setzt den Vornamen.
+     *
+     * @param vorname der Vorname der gesetz werden soll
+     *
+     * @author Leon
+     */
+
+    public void setVorname(String vorname) {
+        this.vorname = vorname;
+    }
+
+    /**
+     * Gibt den Nachname zurück.
+     *
+     * @return der Nachname
+     *
+     * @author Leon
+     */
+
+    public String getNachname() {
+        return nachname;
+    }
+
+    /**
+     * Setzt den Vornamen.
+     *
+     * @param nachname der Nachname der gesetz werden soll
+     *
+     * @author Leon
+     */
+
+    public void setNachname(String nachname) {
+        this.nachname = nachname;
+    }
+
+    /**
+     * Gibt den Nachname zurück.
+     *
+     * @return der Nachname
+     *
+     * @author Leon
+     */
+    public Long getMatrikelnummer() {
+        return matrikelnummer;
+    }
+
+    /**
+     * Setzt die Matrikelnummer.
+     *
+     * @param matrikelnummer die Matrikelnummer die gesetz werden soll
+     *
+     * @author Leon
+     */
+
+    public void setMatrikelnummer(Long matrikelnummer) {
+        this.matrikelnummer = matrikelnummer;
+    }
 }
