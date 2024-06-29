@@ -1,4 +1,3 @@
-//Autor: Kennet
 package com.example.application.models;
 
 import jakarta.persistence.*;
@@ -10,6 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Die Teilnehmer Klasse repräsentiert einen Teilnehmer in der Anwendung.
+ * Sie enthält Informationen wie Matrikelnummer, Vorname, Nachname und den Zeitpunkt, wann der Teilnehmer hinzugefügt wurde.
+ * Sie hat Beziehungen zu den Klassen User, Veranstaltung, Gruppenarbeit und Gruppe, die den Benutzer, die Veranstaltungen, die Gruppenarbeiten und die Gruppen repräsentieren, an denen der Teilnehmer teilnimmt.
+ * Sie enthält auch Methoden zum Abrufen und Setzen dieser Informationen sowie zum Hinzufügen und Entfernen von Gruppenarbeiten.
+ *
+ * @author Tobias
+ */
 @Entity
 public class Teilnehmer {
     @Id
@@ -108,10 +115,6 @@ public class Teilnehmer {
 
     public String getFullName() {
         return this.vorname + " " + this.nachname;
-    }
-
-    public void removeVeranstaltung(Veranstaltung veranstaltung) {
-        this.veranstaltungen.remove(veranstaltung);
     }
 
     public void addGruppenarbeit(Gruppenarbeit gruppenarbeit){

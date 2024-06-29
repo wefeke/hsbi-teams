@@ -1,7 +1,6 @@
 package com.example.application.views.studierende;
 
 import com.example.application.models.*;
-import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.TeilnehmerService;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -45,12 +44,11 @@ public class TeilnehmerLoeschenDialog extends Dialog {
      * Fügt das erstellte Layout zum Dialog hinzu.
      *
      * @param teilnehmerService Der Service, der für die Verwaltung von Teilnehmern verwendet wird.
-     * @param authenticatedUser Der authentifizierte Benutzer.
      * @param aufraeumen Der Dialog, der zum Aufräumen von Teilnehmern verwendet wird.
      * @param studierendeView Die Ansicht, die die Studierenden anzeigt.
      * @author Tobias
      */
-    public TeilnehmerLoeschenDialog(TeilnehmerService teilnehmerService, AuthenticatedUser authenticatedUser, TeilnehmerAufraeumenDialog aufraeumen, StudierendeView studierendeView) {
+    public TeilnehmerLoeschenDialog(TeilnehmerService teilnehmerService, TeilnehmerAufraeumenDialog aufraeumen, StudierendeView studierendeView) {
         this.teilnehmerService = teilnehmerService;
 
 

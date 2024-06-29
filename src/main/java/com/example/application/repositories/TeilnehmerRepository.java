@@ -11,6 +11,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Das TeilnehmerRepository Interface bietet Methoden zur Interaktion mit Teilnehmerdaten in der Datenbank.
+ * Es erweitert JpaRepository und definiert zusätzliche Methoden zum Abrufen von Teilnehmern basierend auf verschiedenen Kriterien wie Vorname, Nachname, Matrikelnummer und Benutzer.
+ * Es enthält auch Methoden zum Durchführen komplexer Abfragen, wie das Finden von Teilnehmern, die an bestimmten Veranstaltungen teilnehmen, das Finden von Teilnehmern, die an keiner Veranstaltung teilnehmen, und das Überprüfen, ob ein Teilnehmer an einer Gruppenarbeit teilnimmt.
+ *
+ * @author Tobias
+ */
 public interface TeilnehmerRepository extends JpaRepository<Teilnehmer, Long> {
     Optional<Teilnehmer> findTeilnehmerByVornameAndNachnameAndUser (String vorname, String nachname, User user);
 

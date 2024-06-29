@@ -10,6 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Die VeranstaltungsterminService Klasse bietet Methoden zur Interaktion mit Veranstaltungstermin-Daten in der Datenbank.
+ * Sie enthält Methoden zum Abrufen, Speichern und Löschen von Veranstaltungsterminen.
+ * Jede Methode ist als Transaktion gekennzeichnet, um die Datenintegrität zu gewährleisten.
+ * Die Klasse verwendet das VeranstaltungsterminRepository zur Interaktion mit der Datenbank und das VeranstaltungenService zur Verwaltung von Veranstaltungen.
+ *
+ * @author Joris
+ */
 @Service
 public class VeranstaltungsterminService {
 
@@ -58,6 +66,4 @@ public class VeranstaltungsterminService {
             System.err.println("Veranstaltungstermin is null. Are you sure you have connected your form to the application?");
         }
     }
-
-
 }

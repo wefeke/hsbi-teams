@@ -1,4 +1,3 @@
-//Author: Joris
 package com.example.application.views;
 
 import com.example.application.services.UserService;

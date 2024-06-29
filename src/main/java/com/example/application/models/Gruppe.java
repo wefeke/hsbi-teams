@@ -1,10 +1,16 @@
-//Autor: Lilli
 package com.example.application.models;
 
 import jakarta.persistence.*;
 
 import java.util.*;
 
+/**
+ * Die Gruppe Klasse repräsentiert eine Gruppe in der Anwendung.
+ * Sie enthält Informationen wie Nummer und hat Beziehungen zu den Klassen User, Gruppenarbeit und Teilnehmer.
+ * Sie enthält auch Methoden zum Hinzufügen und Entfernen von Teilnehmern.
+ *
+ * @author Lilli
+ */
 @Entity
 public class Gruppe {
     @Id

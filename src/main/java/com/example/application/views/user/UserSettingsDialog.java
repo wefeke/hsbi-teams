@@ -122,7 +122,7 @@ public class UserSettingsDialog extends Dialog {
                     byteOutputStream.write(buffer, 0, bytesRead);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println(e.getMessage());
             }
 
             uploadedImage = byteOutputStream.toByteArray();

@@ -119,5 +119,3 @@ public class TeilnehmerExcelExporter {
         return bos.toByteArray();
     }
 }
-
-

@@ -8,6 +8,13 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
 
+/**
+ * Die Veranstaltung Klasse repräsentiert eine Veranstaltung in der Anwendung.
+ * Sie enthält Informationen wie Semester, Titel und hat Beziehungen zu den Klassen User, Veranstaltungstermin und Teilnehmer.
+ * Sie enthält auch Methoden zum Hinzufügen und Entfernen von Veranstaltungsterminen und Teilnehmern.
+ *
+ * @author Joris
+ */
 @Entity
 public class Veranstaltung implements Serializable {
 
@@ -73,11 +80,11 @@ public class Veranstaltung implements Serializable {
         this.user = user;
     }
 
+    @SuppressWarnings("PatternVariableHidesField")
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Veranstaltung)) return false;
-        Veranstaltung semester = (Veranstaltung) o;
+        if (!(o instanceof Veranstaltung semester)) return false;
         return Objects.equals(id, semester.id);
     }
 
@@ -103,36 +110,24 @@ public class Veranstaltung implements Serializable {
         this.teilnehmer = teilnehmer;
     }
 
-    public void addTeilnehmer(Teilnehmer teilnehmer) {
-        this.teilnehmer.add(teilnehmer);
-    }
 
     public void addAllTeilnehmer(Set<Teilnehmer> teilnehmer) {
         this.teilnehmer.addAll(teilnehmer);
     }
 
     public List<Veranstaltungstermin> getVeranstaltungstermine() {
-        return new ArrayList<Veranstaltungstermin>(veranstaltungstermine);
-    }
-
-    public void setVeranstaltungstermine(List<Veranstaltungstermin> veranstaltungstermine) {
-        this.veranstaltungstermine = veranstaltungstermine;
+        return new ArrayList<>(veranstaltungstermine);
     }
 
     public void addVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin) {
         this.veranstaltungstermine.add(veranstaltungstermin);
     }
 
-    //Lilli
-    public void removeVeranstaltungstermin(Veranstaltungstermin veranstaltungstermin){
-        this.veranstaltungstermine.remove(veranstaltungstermin);
-    }
-
     public void removeAllTermine() {
-        this.veranstaltungstermine = new ArrayList<Veranstaltungstermin>();
+        this.veranstaltungstermine = new ArrayList<>();
     }
 
     public void removeAllTeilnehmer() {
-        this.teilnehmer = new HashSet<Teilnehmer>();
+        this.teilnehmer = new HashSet<>();
     }
 }

@@ -1,6 +1,5 @@
 package com.example.application.views.auswertung;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +14,7 @@ public class Auswertung {
     private String nameMatrikelnummer;
     private Float gesamtPunkte = 0.0f;
     private List<TGGPHelper> tggpHelper;
-    private List<Long> gruppen = new ArrayList<>();
+    private final List<Long> gruppen = new ArrayList<>();
     private List<Float> punkte = new ArrayList<>();
     private int anzahlGruppenarbeiten;
 
@@ -171,22 +170,7 @@ public class Auswertung {
      * @author Leon
      */
     public void addGruppeNummer(Long gruppe) {
-        if (gruppen.isEmpty()) {
-            gruppen.add(gruppe);
-        } else {
-            gruppen.add(gruppe);
-        }
-    }
-
-    /**
-     * Gibt die Gesamtpunkte und Gruppenarbeiten zurück.
-     *
-     * @return die Gesamtpunkte und Gruppenarbeiten
-     *
-     * @author Leon
-     */
-    public String getGesamtPunkteAndGruppenarbeiten() {
-        return gesamtPunkte + ", " + anzahlGruppenarbeiten;
+        gruppen.add(gruppe);
     }
 
     /**
@@ -211,16 +195,6 @@ public class Auswertung {
         return gesamtPunkte;
     }
 
-    /**
-     * Setzt die Gesamtpunkte.
-     *
-     * @param gesamtPunkte die neuen Gesamtpunkte
-     *
-     * @author Leon
-     */
-    public void setGesamtPunkte(Float gesamtPunkte) {
-        this.gesamtPunkte = gesamtPunkte;
-    }
 
     /**
      * Gibt die Matrikelnummer zurück.
@@ -276,26 +250,6 @@ public class Auswertung {
             throw new IllegalArgumentException("Der Punkt darf nicht null sein");
         }
         this.punkte.add(punkte);
-    }
-
-    /**
-     * Gibt die Anzahl der Gruppenarbeiten zurück.
-     *
-     * @return die Anzahl der Gruppenarbeiten
-     * @author Leon
-     */
-    public int getAnzahlGruppenarbeiten() {
-        return anzahlGruppenarbeiten;
-    }
-
-    /**
-     * Setzt die Anzahl der Gruppenarbeiten auf den angegebenen Wert.
-     *
-     * @param anzahlGruppenarbeiten die neue Anzahl der Gruppenarbeiten
-     * @author Leon
-     */
-    public void setAnzahlGruppenarbeiten(int anzahlGruppenarbeiten) {
-        this.anzahlGruppenarbeiten = anzahlGruppenarbeiten;
     }
 
     /**

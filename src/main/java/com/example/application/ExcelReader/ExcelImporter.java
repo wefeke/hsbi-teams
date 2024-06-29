@@ -124,10 +124,7 @@ public class ExcelImporter {
             // Check if the Teilnehmer already exists in the database
             Optional<Teilnehmer> existingTeilnehmer = (teilnehmerService.findByMatrikelNr(id, user));
 
-            if (existingTeilnehmer.isPresent()) {
-                //
-            }
-            else {
+            if (existingTeilnehmer.isEmpty()) {
                 // If the Teilnehmer does not exist, add it to the list
                 Teilnehmer teilnehmer = new Teilnehmer();
                 teilnehmer.setId(id);

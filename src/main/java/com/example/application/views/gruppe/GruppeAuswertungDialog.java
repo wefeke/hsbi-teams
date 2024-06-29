@@ -19,7 +19,7 @@ import java.util.Optional;
  * Diese Klasse ermöglicht das Hinzufügen, Bearbeiten und Speichern von Bewertungspunkten
  * für Teilnehmer in einer Gruppenarbeit.
  *
- * @autHor Leon
+ * @author Leon
  */
 @Route(value = "gruppeauswertungsdialog")
 public class GruppeAuswertungDialog extends Dialog {
@@ -52,6 +52,7 @@ public class GruppeAuswertungDialog extends Dialog {
      * @param gruppenarbeitTeilnehmerService der Service zur Verwaltung der GruppenarbeitTeilnehmer-Daten
      * @param veranstaltungsterminView die View zur Darstellung der Veranstaltungstermine
      */
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public GruppeAuswertungDialog(Teilnehmer teilnehmer,
                                   Gruppenarbeit gruppenarbeit,
                                   GruppenarbeitTeilnehmerService gruppenarbeitTeilnehmerService,

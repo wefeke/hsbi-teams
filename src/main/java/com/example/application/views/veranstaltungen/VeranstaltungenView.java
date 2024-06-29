@@ -1,4 +1,3 @@
-//Author: Joris
 package com.example.application.views.veranstaltungen;
 
 import com.example.application.models.User;

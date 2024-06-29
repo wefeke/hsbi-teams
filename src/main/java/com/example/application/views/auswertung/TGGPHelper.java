@@ -20,42 +20,7 @@ public class TGGPHelper {
     Gruppe gruppe;
     List<Teilnehmer> teilnehmer;
     Float punkte = 0f;
-    private int tablePos = 0;
     boolean used;
-
-
-    /**
-     * Gibt die Tabellenposition zurück.
-     *
-     * @return die Tabellenposition
-     *
-     * @author Leon
-     */
-    public int getTablePos() {
-        return tablePos;
-    }
-
-    /**
-     * Setzt die Tabellenposition.
-     *
-     * @param tablePos die neue Tabellenposition
-     *
-     * @author Leon
-     */
-    public void setTablePos(int tablePos) {
-        this.tablePos = tablePos;
-    }
-
-    /**
-     * Gibt den Veranstaltungstermin zurück.
-     *
-     * @return der Veranstaltungstermin
-     *
-     * @author Leon
-     */
-    public Veranstaltungstermin getVeranstaltungtermin() {
-        return veranstaltungtermin;
-    }
 
     /**
      * Setzt den Veranstaltungstermin.
@@ -116,20 +81,6 @@ public class TGGPHelper {
             return null;
         }
     }
-    /**
-     * Gibt true zurück, falls eine Gruppe existiert
-     *
-     * @return true wenn Bedingung nicht leer, andernfalls false
-     *
-     * @author Leon
-     */
-    public boolean isGruppeEmpty() {
-        if (gruppe == null)
-        return true;
-        else {
-            return false;
-        }
-    }
 
     /**
      * Gibt die Punkte zurück.
@@ -153,16 +104,7 @@ public class TGGPHelper {
         this.punkte = punkte;
     }
 
-    /**
-     * Überprüft, ob Punkte vorhanden sind.
-     *
-     * @return true, wenn Punkte >= 0 sind, sonst false
-     *
-     * @author Leon
-     */
-    public boolean hasPunkte() {
-        return punkte >= 0f;
-    }
+
     /**
      * Gibt den Zustand zurück, ob die Gruppe verwendet wird.
      *
@@ -172,24 +114,6 @@ public class TGGPHelper {
      */
     public boolean getUsed() {
         return used;
-    }
-
-    /**
-     * Setzt den Zustand auf verwendet (true).
-     *
-     * @author Leon
-     */
-    public void setUsedTrue() {
-        this.used = true;
-    }
-
-    /**
-     * Setzt den Zustand auf nicht verwendet (false).
-     *
-     * @author Leon
-     */
-    public void setUsedFalse() {
-        this.used = false;
     }
 
     /**

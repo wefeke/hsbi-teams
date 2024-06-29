@@ -103,14 +103,8 @@ public class StudierendeImportDialog extends Dialog {
 
                 newTeilnehmerListe.addAll(excelImporter.readNewTeilnehmerFromExcel(buffer.getInputStream(event.getFileName())));
 
-                List<Teilnehmer> combinedItems = new ArrayList<>();
                 Optional<User> maybeUser = authenticatedUser.get();
                 if (maybeUser.isPresent()) {
-                    User user = maybeUser.get();
-
-                    combinedItems.addAll(teilnehmerService.findAllTeilnehmerByUserAndFilter(user, ""));
-                    combinedItems.addAll(newTeilnehmerListe);
-
                     Dialog dialog = new Dialog();
                     dialog.setHeight(getHeight());
                     dialog.setHeaderTitle(newTeilnehmerListe.size() + " neue Teilnehmer gefunden");

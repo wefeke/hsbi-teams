@@ -1,13 +1,3 @@
-/**
- * GruppenarbeitBearbeitenDialog ist ein Dialog zum Bearbeiten einer Gruppenarbeit.
- * Er ermöglicht das Bearbeiten von Titel und Beschreibung einer Gruppenarbeit und
- * speichert die Änderungen in der Datenbank.
- * <p>
- * Dieser Dialog verwendet Vaadin-Komponenten und bindet die Felder an ein
- * {@link Gruppenarbeit} Modell.
- *
- * @author Lilli
- */
 package com.example.application.views.gruppenarbeit;
 
 import com.example.application.models.Gruppenarbeit;
@@ -23,6 +13,16 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 
+/**
+ * GruppenarbeitBearbeitenDialog ist ein Dialog zum Bearbeiten einer Gruppenarbeit.
+ * Er ermöglicht das Bearbeiten von Titel und Beschreibung einer Gruppenarbeit und
+ * speichert die Änderungen in der Datenbank.
+ * <p>
+ * Dieser Dialog verwendet Vaadin-Komponenten und bindet die Felder an ein
+ * {@link Gruppenarbeit} Modell.
+ *
+ * @author Lilli
+ */
 public class GruppenarbeitBearbeitenDialog extends Dialog {
     //Services
     private final GruppenarbeitService gruppenarbeitService;

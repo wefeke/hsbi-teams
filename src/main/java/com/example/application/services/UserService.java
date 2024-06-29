@@ -11,6 +11,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * Die UserService Klasse bietet Methoden zur Interaktion mit Benutzerdaten in der Datenbank.
+ * Sie enthält Methoden zum Abrufen, Speichern von Benutzern und zur Überprüfung der Verfügbarkeit von Benutzernamen.
+ * Jede Methode ist als Transaktion gekennzeichnet, um die Datenintegrität zu gewährleisten.
+ * Die Klasse verwendet das UserRepository zur Interaktion mit der Datenbank.
+ *
+ * @author Kennet
+ */
 @Service
 public class UserService {
     private final UserRepository userRepository;

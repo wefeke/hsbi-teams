@@ -1,4 +1,5 @@
 package com.example.application.views.kalender;
+
 import com.example.application.models.*;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.*;
@@ -400,7 +401,6 @@ public class KalenderView extends VerticalLayout {
             case FRIDAY -> getStartOfWeek(localDate.minusDays(4));
             case SATURDAY -> getStartOfWeek(localDate.minusDays(5));
             case SUNDAY -> getStartOfWeek(localDate.minusDays(6));
-            default -> localDate;
         };
     }
 

@@ -1,4 +1,3 @@
-//Autor: Lilli
 package com.example.application.services;
 
 import com.example.application.models.Gruppenarbeit;
@@ -6,6 +5,13 @@ import com.example.application.repositories.GruppenarbeitRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Der GruppenarbeitService bietet Methoden zur Interaktion mit Gruppenarbeit-Daten in der Datenbank.
+ * Er verwendet das GruppenarbeitRepository zur Durchführung von Datenbankoperationen.
+ * Er enthält Methoden zum Speichern, Löschen und Finden von Gruppenarbeiten.
+ *
+ * @author Lilli
+ */
 @Service
 public class GruppenarbeitService {
     private final GruppenarbeitRepository gruppenarbeitRepository;

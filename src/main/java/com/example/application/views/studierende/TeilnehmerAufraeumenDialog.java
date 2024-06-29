@@ -57,7 +57,7 @@ public class TeilnehmerAufraeumenDialog extends Dialog {
             Set<Teilnehmer> selectedTeilnehmer = grid.getSelectedItems();
             if (!selectedTeilnehmer.isEmpty()) {
                 for (Teilnehmer teilnehmer : selectedTeilnehmer) {
-                    TeilnehmerLoeschenDialog deleteDialogForSelectedTeilnehmer = new TeilnehmerLoeschenDialog(teilnehmerService, authenticatedUser, this, studierendeView);
+                    TeilnehmerLoeschenDialog deleteDialogForSelectedTeilnehmer = new TeilnehmerLoeschenDialog(teilnehmerService, this, studierendeView);
                     deleteDialogForSelectedTeilnehmer.setTeilnehmer(teilnehmer);
                     deleteDialogForSelectedTeilnehmer.open();
                 }

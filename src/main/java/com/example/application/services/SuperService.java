@@ -28,20 +28,6 @@ public class SuperService {
     Optional<User> maybeUser;
     User user;
 
-    /**
-     * Konstruktor für den SuperService.
-     * Initialisiert die verschiedenen Services und den AuthenticatedUser.
-     *
-     * @param veranstaltungenService der Service für die Veranstaltungen
-     * @param teilnehmerService der Service für die Teilnehmer
-     * @param gruppenarbeitService der Service für die Gruppenarbeiten
-     * @param gruppenarbeitTeilnehmerService der Service für die Gruppenarbeitsteilnehmer
-     * @param userService der Service für die Benutzer
-     * @param authenticatedUser der aktuell authentifizierte Benutzer
-     * @param gruppeService der Service für die Gruppen
-     *
-     * @author Leon
-     */
     public SuperService(VeranstaltungenService veranstaltungenService,
                         TeilnehmerService teilnehmerService,
                         GruppenarbeitService gruppenarbeitService,
@@ -56,19 +42,9 @@ public class SuperService {
         this.gruppeService = gruppeService;
     }
 
-    /**
-     * Validiert den authentifizierten Benutzer.
-     * Wenn der Benutzer vorhanden ist, wird er zurückgegeben. Andernfalls wird ein neuer Benutzer erstellt und zurückgegeben.
-     *
-     * @param maybeUser der optionale authentifizierte Benutzer
-     * @return der validierte Benutzer
-     *
-     * @author Leon
-     */
     private User validateUser(Optional<User> maybeUser) {
         return maybeUser.orElseGet(User::new);
     }
-
 
     /**
      * Findet alle Auswertungen für eine bestimmte Veranstaltung.
