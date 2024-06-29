@@ -29,7 +29,6 @@ import java.util.*;
  */
 public class StudierendeImportDialog extends Dialog {
 
-
     Button importButton = new Button("Importieren");
     Button closeButton = new Button("Schließen");
 
@@ -104,6 +103,7 @@ public class StudierendeImportDialog extends Dialog {
                         grid.addColumn(Teilnehmer::getId).setHeader("MatrikelNr").setSortable(true).setAutoWidth(true);
                         grid.addColumn(Teilnehmer::getVorname).setHeader("Vorname").setSortable(true).setAutoWidth(true);
                         grid.addColumn(Teilnehmer::getNachname).setHeader("Nachname").setSortable(true).setAutoWidth(true);
+                        grid.setWidth("70vw");
 
                         dialog.setWidth(grid.getWidth());
                         dialog.add(grid);
