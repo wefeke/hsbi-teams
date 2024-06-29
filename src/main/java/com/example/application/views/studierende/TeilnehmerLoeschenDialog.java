@@ -96,7 +96,9 @@ public class TeilnehmerLoeschenDialog extends Dialog {
 
             infoText.setText("Teilnehmer " + teilnehmer.getVorname() + " " + teilnehmer.getNachname() + " löschen");
 
+
             noReturn.setText("Bitte entfernen Sie den Teilnehmer zuerst aus den Veranstaltungen.");
+            noReturn.getStyle().set("color", "red");
             warningText.getElement().setProperty("innerHTML", "Der Teilnehmer " + teilnehmer.getVorname() + " " + teilnehmer.getNachname() + " <span class='highlight'>kann nicht entfernt werden</span>, da er bereits in folgenden Veranstaltungen ist:<br>" + veranstaltungenString);
             deleteBtn.setEnabled(false);
 
@@ -109,7 +111,7 @@ public class TeilnehmerLoeschenDialog extends Dialog {
 
     /**
      * Erstellt ein VerticalLayout und fügt die Info-, Warn- und NoReturn-Texte hinzu.
-     * Setzt die Ausrichtung der Elemente auf Zentrum.
+     * Setzt die Ausrichtung der Elemente auf mittig.
      * Fügt die "cancelBtn" und "deleteBtn" zum Footer hinzu.
      *
      * @return Das erstellte VerticalLayout mit den hinzugefügten Elementen.
